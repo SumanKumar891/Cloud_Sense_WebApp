@@ -17,7 +17,7 @@ class DeviceListPage extends StatelessWidget {
             child: Text(
               "Your Chosen Devices",
               style: TextStyle(
-                color: Colors.white,
+                color: const Color.fromARGB(255, 56, 56, 56),
                 fontSize: 25,
               ),
             ),
@@ -29,7 +29,7 @@ class DeviceListPage extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/sensor.jpg'),
+            image: AssetImage('assets/background.jpg'),
             fit: BoxFit.cover,
           ),
         ),

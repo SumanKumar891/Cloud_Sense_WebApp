@@ -88,7 +88,7 @@ flutter:
     - assets/loginImage.png
     - assets/signup3.png
     - assets/cloud.gif
-    - assets/sensor.jpg
+    - assets/background.jpg
   fonts:
       - family: DMSerifText
         fonts:
