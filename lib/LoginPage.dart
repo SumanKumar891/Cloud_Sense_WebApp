@@ -247,7 +247,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 SizedBox(height: 16),
                 Text('Create Account',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(243, 173, 21, 211),
                     )),
