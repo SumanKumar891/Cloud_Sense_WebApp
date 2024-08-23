@@ -19,7 +19,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/cloud.gif'),
+                image: AssetImage('assets/cloudVideo.gif'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -89,8 +89,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     }
 
     return SingleChildScrollView(
+      key: ValueKey('SignIn'),
       child: Row(
-        key: ValueKey('SignIn'),
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -230,8 +230,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
   Widget _buildSignUp() {
     return SingleChildScrollView(
+      key: ValueKey('SignUp'),
       child: Row(
-        key: ValueKey('SignUp'),
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -321,10 +321,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             height: 500,
             color: const Color.fromARGB(155, 0, 0, 0),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 16),
+                  SizedBox(height: 35),
                   Text(
                     'Join Us Now!',
                     style: TextStyle(
@@ -335,7 +335,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   SizedBox(height: 13),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 10, right: 10, bottom: 0, top: 20),
+                        left: 50, right: 10, bottom: 0, top: 20),
                     child: Text(
                       'Create your account to experience seamless connection.',
                       style: TextStyle(
