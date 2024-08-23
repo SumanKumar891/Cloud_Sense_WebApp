@@ -18,7 +18,7 @@ class DeviceListPage extends StatelessWidget {
               "Your Chosen Devices",
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 25,
+                fontSize: 24,
               ),
             ),
           ),
