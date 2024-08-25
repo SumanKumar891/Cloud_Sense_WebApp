@@ -37,63 +37,70 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   Future<void> _fetchDeviceDetails() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final selectedDevice = data.firstWhere(
+            (device) => device['deviceId'] == widget.deviceName,
+            orElse: () => null);
+
+        if (selectedDevice != null) {
+          setState(() {
+            _currentStatus = _getDeviceStatus(selectedDevice['lastReceivedTime']);
+            _dataReceivedTime =
+                selectedDevice['lastReceivedTime'] ?? 'Unknown';
+          });
+        } else {
+          print('Device ${widget.deviceName} not found.');
+        }
+      } else {
+        throw Exception('Failed to load device details');
+      }
+    } catch (e) {
+      print('Error fetching device details: $e');
+    }
+  }
+
+ Future<void> fetchData() async {
+  final startDate = _formatDate(_selectedDay);
+  final endDate = startDate;
+
+  try {
     final response = await http.get(Uri.parse(
-        'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+        'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=${widget.deviceName}&startdate=$startDate&enddate=$endDate'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final selectedDevice = data.firstWhere(
-          (device) => device['deviceId'] == widget.deviceName,
-          orElse: () => null);
-
-      if (selectedDevice != null) {
-        setState(() {
-          _currentStatus = _getDeviceStatus(selectedDevice['lastReceivedTime']);
-          _dataReceivedTime =
-              selectedDevice['lastReceivedTime'] ?? 'Unknown';
-        });
-      }
-    } else {
-      throw Exception('Failed to load device details');
-    }
-  }
-
-  Future<void> fetchData() async {
-    final startDate = _formatDate(_selectedDay);
-    final endDate = startDate;
-
-    final response = await http.get(Uri.parse(
-        'https://5gdhg1ja9d.execute-api.us-east-1.amazonaws.com/default/beehive_weather?deviceid=${widget.deviceName}&startdate=$startDate&enddate=$endDate'));
-
-    if (response.statusCode == 200) {
-      try {
-        final data = json.decode(response.body);
-        setState(() {
-          temperatureData = _parseChartData(data, 'Temperature');
-          humidityData = _parseChartData(data, 'Humidity');
-          lightIntensityData = _parseChartData(data, 'LightIntensity');
-          solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
-          windSpeedData = _parseChartData(data, 'WindSpeed');
-          windDirectionData = _parseChartData(data, 'WindDirection');
-          rainDetectionData = _parseChartData(data, 'RainDetection');
-          rainSpeedData = _parseChartData(data, 'RainSpeed');
-          rainTimeData = _parseChartData(data, 'RainTime');
-          soilSensorData = _parseChartData(data, 'SoilSensor');
-          pressureData = _parseChartData(data, 'Pressure');
-        });
-      } catch (e, stackTrace) {
-        print('Error parsing response: $e');
-        print('Stack trace: $stackTrace');
-      }
+      setState(() {
+        temperatureData = _parseChartData(data, 'Temperature');
+        humidityData = _parseChartData(data, 'Humidity');
+        lightIntensityData = _parseChartData(data, 'LightIntensity');
+        solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
+        windSpeedData = _parseChartData(data, 'WindSpeed');
+        windDirectionData = _parseChartData(data, 'WindDirection');
+        rainDetectionData = _parseChartData(data, 'RainDetection');
+        rainSpeedData = _parseChartData(data, 'RainSpeed');
+        rainTimeData = _parseChartData(data, 'RainTime');
+        soilSensorData = _parseChartData(data, 'SoilSensor');
+        pressureData = _parseChartData(data, 'Pressure');
+      });
     } else {
       print('Failed to load data. Status code: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Error fetching data: $e');
   }
+}
+
 
   List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
       if (item == null || item[type] == null) {
+        print('Missing data for $type');
         return ChartData(timestamp: 'N/A', value: 0.0);
       }
       return ChartData.fromJson(item, type);
@@ -186,7 +193,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               child: ElevatedButton(
                 onPressed: _selectDate,
                 child: Text(
-                    'Select Date: ${_selectedDay.toLocal().toIso8601String().split('T')[0]}'),
+                    'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}'),
               ),
             ),
             // Charts
