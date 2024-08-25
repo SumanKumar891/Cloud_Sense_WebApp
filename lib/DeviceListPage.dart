@@ -50,7 +50,7 @@ class DeviceListPage extends StatelessWidget {
                 title: Text(device),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _showDeviceDetails(context, device);
+                  _navigateToDeviceGraphPage(context, device);
                 },
               );
             }).toList(),
@@ -68,23 +68,53 @@ class DeviceListPage extends StatelessWidget {
     );
   }
 
-  void _showDeviceDetails(BuildContext context, String deviceName) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Device Details"),
-          content: Text("Details for $deviceName"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Close"),
-            ),
+  void _navigateToDeviceGraphPage(BuildContext context, String deviceName) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DeviceGraphPage(deviceName: deviceName),
+      ),
+    );
+  }
+}
+
+class DeviceGraphPage extends StatelessWidget {
+  final String deviceName;
+
+  DeviceGraphPage({required this.deviceName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Graphs for $deviceName"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            _buildGraphCard("Temperature", "Temperature graph goes here"),
+            _buildGraphCard("Humidity", "Humidity graph goes here"),
+            _buildGraphCard("Light Intensity", "Light Intensity graph goes here"),
+            _buildGraphCard("Solar Irradiance", "Solar Irradiance graph goes here"),
+            _buildGraphCard("Wind Speed", "Wind Speed graph goes here"),
+            _buildGraphCard("Wind Direction", "Wind Direction graph goes here"),
+            _buildGraphCard("Rain Detection", "Rain Detection graph goes here"),
+            _buildGraphCard("Rain Speed", "Rain Speed graph goes here"),
+            _buildGraphCard("Rain Time", "Rain Time graph goes here"),
+            _buildGraphCard("Soil Sensor Node", "Soil Sensor Node graph goes here"),
+            _buildGraphCard("Atmospheric Pressure", "Atmospheric Pressure graph goes here"),
           ],
-        );
-      },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGraphCard(String title, String graphDescription) {
+    return Card(
+      child: ListTile(
+        title: Text(title),
+        subtitle: Text(graphDescription),
+      ),
     );
   }
 }
