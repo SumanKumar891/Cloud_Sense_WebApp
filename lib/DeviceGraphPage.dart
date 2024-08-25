@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
 class DeviceGraphPage extends StatefulWidget {
   final String deviceName;
@@ -13,6 +14,9 @@ class DeviceGraphPage extends StatefulWidget {
 }
 
 class _DeviceGraphPageState extends State<DeviceGraphPage> {
+  DateTime _selectedDay = DateTime.now();
+  String _currentStatus = 'Unknown';
+  String _dataReceivedTime = 'Unknown';
   List<ChartData> temperatureData = [];
   List<ChartData> humidityData = [];
   List<ChartData> lightIntensityData = [];
@@ -28,11 +32,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   @override
   void initState() {
     super.initState();
+    _fetchDeviceDetails();
     fetchData();
   }
 
+  Future<void> _fetchDeviceDetails() async {
+    final response = await http.get(Uri.parse(
+        'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final selectedDevice = data.firstWhere(
+          (device) => device['deviceId'] == widget.deviceName,
+          orElse: () => null);
+
+      if (selectedDevice != null) {
+        setState(() {
+          _currentStatus = _getDeviceStatus(selectedDevice['lastReceivedTime']);
+          _dataReceivedTime =
+              selectedDevice['lastReceivedTime'] ?? 'Unknown';
+        });
+      }
+    } else {
+      throw Exception('Failed to load device details');
+    }
+  }
+
   Future<void> fetchData() async {
-    final startDate = _formatDate(DateTime.now());
+    final startDate = _formatDate(_selectedDay);
     final endDate = startDate;
 
     final response = await http.get(Uri.parse(
@@ -77,6 +104,52 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
   }
 
+  String _getDeviceStatus(String lastReceivedTime) {
+    if (lastReceivedTime == 'Unknown') return 'Unknown';
+
+    try {
+      final dateTimeParts = lastReceivedTime.split('_');
+      final datePart = dateTimeParts[0].split('-');
+      final timePart = dateTimeParts[1].split('-');
+
+      final day = int.parse(datePart[0]);
+      final month = int.parse(datePart[1]);
+      final year = int.parse(datePart[2]);
+
+      final hour = int.parse(timePart[0]);
+      final minute = int.parse(timePart[1]);
+      final second = int.parse(timePart[2]);
+
+      final lastReceivedDate = DateTime(year, month, day, hour, minute, second);
+      final currentTime = DateTime.now();
+      final difference = currentTime.difference(lastReceivedDate);
+
+      if (difference.inMinutes <= 7) {
+        return 'Active';
+      } else {
+        return 'Inactive';
+      }
+    } catch (e) {
+      return 'Inactive';
+    }
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDay,
+      firstDate: DateTime(1970),
+      lastDate: DateTime(2025),
+    );
+
+    if (picked != null && picked != _selectedDay) {
+      setState(() {
+        _selectedDay = picked;
+        fetchData(); // Fetch data for the selected date
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +159,37 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // Device Details in a Row
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Device ID: ${widget.deviceName}',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(
+                    'Status: $_currentStatus',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(
+                    'Received: $_dataReceivedTime',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+            // Date Picker Button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _selectDate,
+                child: Text(
+                    'Select Date: ${_selectedDay.toLocal().toIso8601String().split('T')[0]}'),
+              ),
+            ),
+            // Charts
             _buildChartContainer('Temperature', temperatureData, 'Temperature (°C)'),
             _buildChartContainer('Humidity', humidityData, 'Humidity (%)'),
             _buildChartContainer('Light Intensity', lightIntensityData, 'Light Intensity (Lux)'),
