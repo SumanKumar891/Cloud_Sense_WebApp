@@ -18,7 +18,45 @@ class _DeviceListPageState extends State<DeviceListPage> {
     super.initState();
     _fetchDevices();
   }
-  Future<void> _fetchDevices() async {
+
+  // Future<void> _fetchDevices() async {
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       print("Fetched data: $data"); // Debugging output
+
+  //       if (data is List) {
+  //         final List<String> fetchedDevices = data.map<String>((device) {
+  //           // Ensure 'deviceId' is the correct key; adjust if necessary
+  //           return device['deviceId'] != null ? device['deviceId'].toString() : 'Unknown';
+  //         }).toList();
+  //         setState(() {
+  //           devices = fetchedDevices;
+  //           isLoading = false;
+  //         });
+  //       } else {
+  //         setState(() {
+  //           errorMessage = 'Unexpected data format.';
+  //           isLoading = false;
+  //         });
+  //       }
+  //     } else {
+  //       setState(() {
+  //         errorMessage = 'Failed to load devices. Status code: ${response.statusCode}';
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       errorMessage = 'Error fetching devices: $e';
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+Future<void> _fetchDevices() async {
   try {
     final response = await http.get(Uri.parse(
         'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
@@ -63,8 +101,6 @@ class _DeviceListPageState extends State<DeviceListPage> {
     print('Error fetching devices: $e');
   }
 }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
