@@ -53,6 +53,9 @@ dependencies:
   video_player: ^2.9.1
   chewie: ^1.8.1
   email_validator: ^3.0.0
+  amplify_flutter: ^2.4.0
+  amplify_auth_cognito: ^2.4.0
+  amplify_authenticator: ^2.1.2
 
 dev_dependencies:
   flutter_test:
