@@ -81,23 +81,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  // List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
-  //   final List<dynamic> items = data['items'] ?? [];
-  //   return items
-  //       .map((item) {
-  //         if (item == null || item[type] == null) {
-  //           return ChartData(
-  //               timestamp: DateTime.now(),
-  //               value: 0.0); // Provide default DateTime value
-  //         }
-  //         return ChartData.fromJson(item, type);
-  //       })
-  //       .where((data) =>
-  //           data.value < 100 ||
-  //           data.value >
-  //               110) // condition to filter out data, modify according to the API
-  //       .toList();
-  // }
   List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -176,52 +159,82 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(
+          255, 202, 213, 223), // Blue background color for the entire page
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(
+            255, 202, 213, 223), // Blue background color for the AppBar
         title: Text("Graphs for ${widget.deviceName}"),
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.arrow_back),
+        //     onPressed: () {
+        //       Navigator.pop(context);
+        //     },
+        //     color: Colors.white, // White color for the back button icon
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Device Details in a Row
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Device ID: ${widget.deviceName}',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    'Status: $_currentStatus',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    'Received: $_dataReceivedTime',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ],
+        child: Container(
+          color: const Color.fromARGB(255, 202, 213,
+              223), // Ensure the container matches the background color
+          child: Column(
+            children: [
+              // Device Details in a Row
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Device ID: ${widget.deviceName}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black), // White text color
+                    ),
+                    Text(
+                      'Status: $_currentStatus',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black), // White text color
+                    ),
+                    Text(
+                      'Received: $_dataReceivedTime',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black), // White text color
+                    ),
+                  ],
+                ),
               ),
-            ),
-            // Date Picker Button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _selectDate,
-                child: Text(
-                    'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}'),
+              // Date Picker Button
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: _selectDate,
+                  child: Text(
+                      'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}'),
+                  style: ElevatedButton.styleFrom(
+                      // backgroundColor:
+                      //     Colors.blue, // Blue background color for the button
+                      ),
+                ),
               ),
-            ),
-            // Charts with updated styles
-            _buildChartContainer('Temperature', temperatureData,
-                'Temperature (°C)', ChartType.spline),
-            _buildChartContainer(
-                'Humidity', humidityData, 'Humidity (%)', ChartType.column),
-            _buildChartContainer('Light Intensity', lightIntensityData,
-                'Light Intensity (Lux)', ChartType.line),
-            _buildChartContainer('Wind Speed', windSpeedData,
-                'Wind Speed (m/s)', ChartType.stepLine),
-          ],
+              // Charts with updated styles
+              _buildChartContainer('Temperature', temperatureData,
+                  'Temperature (°C)', ChartType.line),
+              _buildChartContainer(
+                  'Humidity', humidityData, 'Humidity (%)', ChartType.line),
+              _buildChartContainer('Light Intensity', lightIntensityData,
+                  'Light Intensity (Lux)', ChartType.line),
+              _buildChartContainer('Wind Speed', windSpeedData,
+                  'Wind Speed (m/s)', ChartType.line),
+            ],
+          ),
         ),
       ),
     );
@@ -233,7 +246,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         ? Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
-              height: 300,
+              height: 340,
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
@@ -247,28 +260,44 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   ),
                 ],
               ),
-              child: SfCartesianChart(
-                plotAreaBackgroundColor: Colors.white,
-                primaryXAxis: DateTimeAxis(
-                  dateFormat: DateFormat('hh:mm a'), // Match the format here
-                  title: AxisTitle(
-                    text: 'Time',
-                    textStyle: TextStyle(fontWeight: FontWeight.bold),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Text(
+                      '$title Graph', // Displaying the chart's title
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  labelRotation: 70,
-                  edgeLabelPlacement: EdgeLabelPlacement.shift,
-                ),
-                primaryYAxis: NumericAxis(
-                  title: AxisTitle(
-                    text: yAxisTitle,
-                    textStyle: TextStyle(fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: SfCartesianChart(
+                      plotAreaBackgroundColor: Colors.white,
+                      primaryXAxis: DateTimeAxis(
+                        dateFormat: DateFormat('hh:mm a'),
+                        title: AxisTitle(
+                          text: 'Time',
+                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        labelRotation: 70,
+                        edgeLabelPlacement: EdgeLabelPlacement.shift,
+                      ),
+                      primaryYAxis: NumericAxis(
+                        title: AxisTitle(
+                          text: yAxisTitle,
+                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        axisLine: AxisLine(width: 1),
+                        majorGridLines: MajorGridLines(width: 1),
+                      ),
+                      tooltipBehavior: TooltipBehavior(enable: true),
+                      series: <ChartSeries<ChartData, DateTime>>[
+                        _getChartSeries(chartType, data, title),
+                      ],
+                    ),
                   ),
-                  axisLine: AxisLine(width: 1),
-                  majorGridLines: MajorGridLines(width: 1),
-                ),
-                tooltipBehavior: TooltipBehavior(enable: true),
-                series: <ChartSeries<ChartData, DateTime>>[
-                  _getChartSeries(chartType, data, title),
                 ],
               ),
             ),
@@ -279,7 +308,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   ChartSeries<ChartData, DateTime> _getChartSeries(
       ChartType chartType, List<ChartData> data, String title) {
     switch (chartType) {
-      case ChartType.spline:
+      case ChartType.line:
         return SplineSeries<ChartData, DateTime>(
           markerSettings: const MarkerSettings(
             height: 4.0,
@@ -293,7 +322,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           name: title,
           color: Colors.blue,
         );
-      case ChartType.column:
+      case ChartType.line:
         return ColumnSeries<ChartData, DateTime>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.timestamp,
@@ -315,7 +344,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           name: title,
           color: Colors.blue,
         );
-      case ChartType.stepLine:
+      case ChartType.line:
         return StepLineSeries<ChartData, DateTime>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.timestamp,
@@ -335,7 +364,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 }
 
-enum ChartType { spline, column, line, stepLine }
+enum ChartType {
+  line,
+}
 
 class ChartData {
   final DateTime timestamp;
