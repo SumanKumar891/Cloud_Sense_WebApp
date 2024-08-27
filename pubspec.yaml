@@ -90,9 +90,12 @@ flutter:
     - assets/buildings.jpg
     - assets/loginImage.png
     - assets/signup3.png
-    - assets/cloud.gif
-    - assets/background.jpg
+    - assets/clouds.jpg
+    - assets/backgroundd.jpg
     - assets/cloudVideo.gif
+    - assets/leaves.jpg
+    - assets/blue.jpg
+    - assets/sunn.jpg
   fonts:
       - family: DMSerifText
         fonts:

@@ -81,22 +81,47 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  // List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
+  //   final List<dynamic> items = data['items'] ?? [];
+  //   return items
+  //       .map((item) {
+  //         if (item == null || item[type] == null) {
+  //           return ChartData(
+  //               timestamp: DateTime.now(),
+  //               value: 0.0); // Provide default DateTime value
+  //         }
+  //         return ChartData.fromJson(item, type);
+  //       })
+  //       .where((data) =>
+  //           data.value < 100 ||
+  //           data.value >
+  //               110) // condition to filter out data, modify according to the API
+  //       .toList();
+  // }
   List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
-    return items
-        .map((item) {
-          if (item == null || item[type] == null) {
-            return ChartData(
-                timestamp: DateTime.now(),
-                value: 0.0); // Provide default DateTime value
-          }
-          return ChartData.fromJson(item, type);
-        })
-        .where((data) =>
-            data.value < 10 ||
-            data.value >
-                100) // condition to filter out data, modify according to the API
-        .toList();
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parseDate(item['human_time']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  DateTime _parseDate(String dateString) {
+    final dateFormat = DateFormat(
+        'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -188,19 +213,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ),
             ),
             // Charts with updated styles
+            _buildChartContainer('Temperature', temperatureData,
+                'Temperature (°C)', ChartType.spline),
             _buildChartContainer(
-                'Temperature', temperatureData, 'Temperature (°C)', ChartType.spline),
-            _buildChartContainer('Humidity', humidityData, 'Humidity (%)', ChartType.column),
-            _buildChartContainer('Light Intensity', lightIntensityData, 'Light Intensity (Lux)', ChartType.line),
-            _buildChartContainer('Wind Speed', windSpeedData, 'Wind Speed (m/s)', ChartType.stepLine),
+                'Humidity', humidityData, 'Humidity (%)', ChartType.column),
+            _buildChartContainer('Light Intensity', lightIntensityData,
+                'Light Intensity (Lux)', ChartType.line),
+            _buildChartContainer('Wind Speed', windSpeedData,
+                'Wind Speed (m/s)', ChartType.stepLine),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildChartContainer(
-      String title, List<ChartData> data, String yAxisTitle, ChartType chartType) {
+  Widget _buildChartContainer(String title, List<ChartData> data,
+      String yAxisTitle, ChartType chartType) {
     return data.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.all(16.0),
@@ -222,13 +250,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               child: SfCartesianChart(
                 plotAreaBackgroundColor: Colors.white,
                 primaryXAxis: DateTimeAxis(
-                  dateFormat:
-                      DateFormat('yyyy-MM-dd hh:mm a'), // Match the format here
+                  dateFormat: DateFormat('hh:mm a'), // Match the format here
                   title: AxisTitle(
                     text: 'Time',
                     textStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  labelRotation: 45,
+                  labelRotation: 70,
                   edgeLabelPlacement: EdgeLabelPlacement.shift,
                 ),
                 primaryYAxis: NumericAxis(
@@ -236,8 +263,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                     text: yAxisTitle,
                     textStyle: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  axisLine: AxisLine(width: 0),
-                  majorGridLines: MajorGridLines(width: 0.5),
+                  axisLine: AxisLine(width: 1),
+                  majorGridLines: MajorGridLines(width: 1),
                 ),
                 tooltipBehavior: TooltipBehavior(enable: true),
                 series: <ChartSeries<ChartData, DateTime>>[

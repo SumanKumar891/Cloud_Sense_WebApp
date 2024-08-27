@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'dart:ui'; // Import for BackdropFilter
 import 'DeviceListPage.dart';
 
 class SignInSignUpScreen extends StatefulWidget {
@@ -15,12 +16,18 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Fullscreen GIF background
+          // Fullscreen GIF background with blur effect
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/cloudVideo.gif'),
+                image: AssetImage('assets/sunn.jpg'),
                 fit: BoxFit.cover,
+              ),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: Container(
+                color: Colors.black.withOpacity(0.2), // Transparent container
               ),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui'; // Import this for BackdropFilter
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'DeviceGraphPage.dart';
@@ -13,124 +14,145 @@ class _DeviceListPageState extends State<DeviceListPage> {
   bool isLoading = true;
   String errorMessage = '';
 
+  // Notifier for hover state
+  final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
+
   @override
   void initState() {
     super.initState();
     _fetchDevices();
   }
 
-  // Future<void> _fetchDevices() async {
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+  Future<void> _fetchDevices() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
 
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-  //       print("Fetched data: $data"); // Debugging output
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("Fetched data: $data"); // Debugging output
 
-  //       if (data is List) {
-  //         final List<String> fetchedDevices = data.map<String>((device) {
-  //           // Ensure 'deviceId' is the correct key; adjust if necessary
-  //           return device['deviceId'] != null ? device['deviceId'].toString() : 'Unknown';
-  //         }).toList();
-  //         setState(() {
-  //           devices = fetchedDevices;
-  //           isLoading = false;
-  //         });
-  //       } else {
-  //         setState(() {
-  //           errorMessage = 'Unexpected data format.';
-  //           isLoading = false;
-  //         });
-  //       }
-  //     } else {
-  //       setState(() {
-  //         errorMessage = 'Failed to load devices. Status code: ${response.statusCode}';
-  //         isLoading = false;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       errorMessage = 'Error fetching devices: $e';
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-Future<void> _fetchDevices() async {
-  try {
-    final response = await http.get(Uri.parse(
-        'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+        if (data is List) {
+          final List<String> fetchedDevices = data.map<String>((device) {
+            print("Device: $device"); // Debugging each device
+            return device['deviceId'] != null
+                ? device['deviceId'].toString()
+                : 'Unknown';
+          }).toList();
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      print("Fetched data: $data"); // Debugging output
+          if (fetchedDevices.isEmpty) {
+            print("No devices found in the data.");
+          }
 
-      if (data is List) {
-        final List<String> fetchedDevices = data.map<String>((device) {
-          print("Device: $device"); // Debugging each device
-          return device['deviceId'] != null ? device['deviceId'].toString() : 'Unknown';
-        }).toList();
-        
-        if (fetchedDevices.isEmpty) {
-          print("No devices found in the data.");
+          setState(() {
+            devices = fetchedDevices;
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            errorMessage = 'Unexpected data format.';
+            isLoading = false;
+          });
+          print('Unexpected data format: $data');
         }
-        
-        setState(() {
-          devices = fetchedDevices;
-          isLoading = false;
-        });
       } else {
         setState(() {
-          errorMessage = 'Unexpected data format.';
+          errorMessage =
+              'Failed to load devices. Status code: ${response.statusCode}';
           isLoading = false;
         });
-        print('Unexpected data format: $data');
+        print('Failed to load devices. Status code: ${response.statusCode}');
       }
-    } else {
+    } catch (e) {
       setState(() {
-        errorMessage = 'Failed to load devices. Status code: ${response.statusCode}';
+        errorMessage = 'Error fetching devices: $e';
         isLoading = false;
       });
-      print('Failed to load devices. Status code: ${response.statusCode}');
+      print('Error fetching devices: $e');
     }
-  } catch (e) {
-    setState(() {
-      errorMessage = 'Error fetching devices: $e';
-      isLoading = false;
-    });
-    print('Error fetching devices: $e');
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Padding(
-          padding: const EdgeInsets.only(left: 20, top: 40.0),
-          child: GestureDetector(
-            onTap: () {
-              _showDeviceListPopup(context);
-            },
-            child: Text(
-              "Your Chosen Devices",
-              style: TextStyle(
-                color: const Color.fromARGB(255, 56, 56, 56),
-                fontSize: 25,
-              ),
+          padding: const EdgeInsets.only(left: 20, top: 20.0),
+          child: MouseRegion(
+            onEnter: (_) => _isHovered.value = true,
+            onExit: (_) => _isHovered.value = false,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _isHovered,
+              builder: (context, isHovered, child) {
+                return ElevatedButton(
+                  onPressed: () {
+                    _showDeviceListPopup(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20), // Reduced padding
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(
+                    "Choose Your Device",
+                    style: TextStyle(
+                      color: isHovered ? Colors.blue : Colors.white,
+                      fontSize: 20, // Slightly reduced font size
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
+        toolbarHeight: 100, // Increased height of the AppBar
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background.jpg'),
-            fit: BoxFit.cover,
+      body: Stack(
+        children: [
+          // Background image with blur effect
+          Positioned.fill(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/backgroundd.jpg',
+                  fit: BoxFit.cover,
+                ),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+                  child: Container(
+                    color: Colors.black.withOpacity(
+                        0.4), // Optional: To darken the blurred image
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Select a device to unlock insights into temperature, humidity, light, and \n more—your complete environmental toolkit awaits.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'OpenSans',
+                  //-- fontStyle: FontStyle.italic,
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // Changed text color for better contrast
+                  // backgroundColor: Colors.black54,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
