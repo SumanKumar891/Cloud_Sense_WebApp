@@ -1,7 +1,10 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 
 class SignInSignUpScreen extends StatefulWidget {
   @override
@@ -16,6 +19,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   String _errorMessage = '';
   bool _emailValid = true;
   bool _isLoading = false;
+  String? _verificationCode;
+  String? _emailToVerify;
 
   @override
   void initState() {
@@ -35,19 +40,187 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     super.dispose();
   }
 
-  void _signIn() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DeviceListPage(),
-      ),
-    );
+  Future<void> _signIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      SignInResult res = await Amplify.Auth.signIn(
+        username: _emailController.text,
+        password: _passwordController.text,
+      );
+      if (res.isSignedIn) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                DeviceListPage(emailId: _emailController.text),
+          ),
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'Sign-in failed';
+        });
+      }
+    } on AuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  void _signUp() {
+  Future<void> _signUp() async {
     setState(() {
-      _isSignIn = true;
+      _isLoading = true;
     });
+
+    try {
+      SignUpResult res = await Amplify.Auth.signUp(
+        username: _emailController.text,
+        password: _passwordController.text,
+        options: SignUpOptions(
+          userAttributes: {
+            CognitoUserAttributeKey.email: _emailController.text,
+            CognitoUserAttributeKey.name: _nameController.text,
+          },
+        ),
+      );
+
+      if (res.isSignUpComplete) {
+        _emailToVerify = _emailController.text;
+        Future.microtask(() => _showVerificationDialog());
+        // _showVerificationDialog();
+      } else {
+        setState(() {
+          _errorMessage = 'Sign-up failed';
+        });
+      }
+    } on AuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _confirmSignUp() async {
+    if (_verificationCode == null || _emailToVerify == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      SignUpResult res = await Amplify.Auth.confirmSignUp(
+        username: _emailToVerify!,
+        confirmationCode: _verificationCode!,
+      );
+      if (res.isSignUpComplete) {
+        setState(() {
+          _isSignIn = true;
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Verification failed';
+        });
+      }
+    } on AuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // void _showVerificationDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Verify Your Email'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Text(
+  //                 'A verification code has been sent to your email. Please enter the code below:'),
+  //             TextField(
+  //               onChanged: (value) {
+  //                 _verificationCode = value;
+  //               },
+  //               decoration: InputDecoration(labelText: 'Verification Code'),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //               _confirmSignUp();
+  //             },
+  //             child: Text('Submit'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+  void _showVerificationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Verify Your Email'),
+          content: Padding(
+            padding:
+                const EdgeInsets.all(16.0), // Add padding around the content
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'A verification code has been sent to your email. Please enter the code below:',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                    height: 16), // Add space between the text and text field
+                TextField(
+                  onChanged: (value) {
+                    _verificationCode = value;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Verification Code',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType
+                      .number, // Set keyboard type to number for code input
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _confirmSignUp(); // Confirm sign-up
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

@@ -1,21 +1,23 @@
 import 'dart:convert';
-import 'dart:ui'; // Import for ImageFilter
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'DeviceGraphPage.dart';
 
 class DeviceListPage extends StatefulWidget {
+  final String emailId;
+
+  DeviceListPage({required this.emailId}); // Add emailId as a parameter
+
   @override
   _DeviceListPageState createState() => _DeviceListPageState();
 }
 
 class _DeviceListPageState extends State<DeviceListPage> {
-  List<String> devices = [];
+  List<Map<String, dynamic>> devices = []; // List of devices with details
   bool isLoading = true;
   String errorMessage = '';
 
-  // Notifier for hover state
   final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
 
   @override
@@ -25,25 +27,19 @@ class _DeviceListPageState extends State<DeviceListPage> {
   }
 
   Future<void> _fetchDevices() async {
+    final url =
+        'https://ln8b1r7ld9.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_devices?email_id=${widget.emailId}';
+
     try {
-      final response = await http.get(Uri.parse(
-          'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'));
+      final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print("Fetched data: $data"); // Debugging output
+        print("Fetched data: $data");
 
         if (data is List) {
-          final List<String> fetchedDevices = data.map<String>((device) {
-            print("Device: $device"); // Debugging each device
-            return device['deviceId'] != null
-                ? device['deviceId'].toString()
-                : 'Unknown';
-          }).toList();
-
-          if (fetchedDevices.isEmpty) {
-            print("No devices found in the data.");
-          }
+          final List<Map<String, dynamic>> fetchedDevices =
+              List<Map<String, dynamic>>.from(data);
 
           setState(() {
             devices = fetchedDevices;
@@ -94,7 +90,7 @@ class _DeviceListPageState extends State<DeviceListPage> {
                     backgroundColor: const Color.fromARGB(255, 12, 12, 12),
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20), // Reduced padding
+                        horizontal: 20, vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -103,7 +99,7 @@ class _DeviceListPageState extends State<DeviceListPage> {
                     "Choose Your Device",
                     style: TextStyle(
                       color: isHovered ? Colors.blue : Colors.white,
-                      fontSize: 20, // Slightly reduced font size
+                      fontSize: 20,
                     ),
                   ),
                 );
@@ -117,34 +113,36 @@ class _DeviceListPageState extends State<DeviceListPage> {
       ),
       body: Stack(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/backgroundd.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                color: Colors.black.withOpacity(0.4),
-              ),
+          // Background image with blur effect
+          Positioned.fill(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/backgroundd.jpg',
+                  fit: BoxFit.cover,
+                ),
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+                  child: Container(
+                    color: Colors.black.withOpacity(
+                        0.4), // Optional: To darken the blurred image
+                  ),
+                ),
+              ],
             ),
           ),
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(16.0),
               child: Text(
-                "Select a device to unlock insights into temperature, humidity, light, and more—your complete environmental toolkit awaits.",
+                "Select a device to unlock insights into temperature, humidity, light, and \n more—your complete environmental toolkit awaits.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'OpenSans',
-
-                  fontSize: 55,
+                  fontSize: 48,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
-
-                  // backgroundColor: Colors.black54,
+                  color: Colors.white, // Changed text color for better contrast
                 ),
               ),
             ),
@@ -161,8 +159,8 @@ class _DeviceListPageState extends State<DeviceListPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Devices"),
-            content: const Center(
+            title: Text("Devices"),
+            content: Center(
               child: CircularProgressIndicator(),
             ),
           );
@@ -173,29 +171,33 @@ class _DeviceListPageState extends State<DeviceListPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Devices"),
+            title: Text("Devices"),
             content: errorMessage.isNotEmpty
                 ? Text(errorMessage)
                 : devices.isNotEmpty
                     ? Column(
                         mainAxisSize: MainAxisSize.min,
                         children: devices.map((device) {
+                          final deviceId = device['deviceId'] ?? 'Unknown';
+                          final deviceName =
+                              device['deviceName'] ?? 'Unnamed Device';
                           return ListTile(
-                            title: Text(device),
+                            title: Text(deviceName),
+                            subtitle: Text(deviceId),
                             onTap: () {
                               Navigator.of(context).pop();
-                              _navigateToDeviceGraphPage(context, device);
+                              _navigateToDeviceGraphPage(context, deviceName);
                             },
                           );
                         }).toList(),
                       )
-                    : const Text('No devices available.'),
+                    : Text('No devices available.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text("Close"),
+                child: Text("Close"),
               ),
             ],
           );
