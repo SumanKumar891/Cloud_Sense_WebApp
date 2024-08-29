@@ -105,14 +105,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Authenticator(
-    child: MaterialApp(
-      builder: Authenticator.builder(),
-      home: const Scaffold(
-        body: Center(
-        child: Text('Logged in'),
+      child: MaterialApp(
+        builder: Authenticator.builder(),
+        home: const Scaffold(
+          body: Center(
+            child: Text('Logged in'),
+          ),
+        ),
       ),
-      ),
-    ),
     );
   }
 }
