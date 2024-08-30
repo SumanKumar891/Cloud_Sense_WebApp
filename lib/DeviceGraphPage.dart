@@ -21,6 +21,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> humidityData = [];
   List<ChartData> lightIntensityData = [];
   List<ChartData> windSpeedData = [];
+  List<ChartData> chlorineData = [];
 
   @override
   void initState() {
@@ -61,18 +62,43 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final startDate = _formatDate(_selectedDay);
     final endDate = startDate;
 
+    String apiUrl;
+    if (widget.deviceName.startsWith('WD')) {
+      apiUrl =
+          'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=202&startdate=$startDate&enddate=$endDate';
+    } else if (widget.deviceName.startsWith('CL') ||
+        (widget.deviceName.startsWith('BD'))) {
+      apiUrl =
+          'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=106&starttime=1719635904&endtime=1719635905';
+    } else {
+      print('Unknown device type');
+      return;
+    }
+
     try {
-      final response = await http.get(Uri.parse(
-          'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=202&startdate=$startDate&enddate=$endDate'));
+      final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        setState(() {
-          temperatureData = _parseChartData(data, 'temperature');
-          humidityData = _parseChartData(data, 'humidity');
-          lightIntensityData = _parseChartData(data, 'light_intensity');
-          windSpeedData = _parseChartData(data, 'wind_speed');
-        });
+
+        if (widget.deviceName.startsWith('CL') ||
+            (widget.deviceName.startsWith('BD'))) {
+          setState(() {
+            chlorineData = _parseBDChartData(data);
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+          });
+        } else {
+          setState(() {
+            temperatureData = _parseChartData(data, 'temperature');
+            humidityData = _parseChartData(data, 'humidity');
+            lightIntensityData = _parseChartData(data, 'light_intensity');
+            windSpeedData = _parseChartData(data, 'wind_speed');
+            chlorineData = [];
+          });
+        }
       } else {
         print('Failed to load data. Status code: ${response.statusCode}');
       }
@@ -92,6 +118,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         timestamp: _parseDate(item['human_time']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parseBDChartData(List<dynamic> data) {
+    return data.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parseDate(item['human_time']),
+        value: item['chlorine'] != null
+            ? double.tryParse(item['chlorine'].toString()) ?? 0.0
             : 0.0,
       );
     }).toList();
@@ -177,11 +218,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          color: const Color.fromARGB(255, 202, 213,
-              223), // Ensure the container matches the background color
+          color: const Color.fromARGB(255, 202, 213, 223),
           child: Column(
             children: [
-              // Device Details in a Row
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -192,39 +231,36 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.black), // White text color
+                          color: Colors.black),
                     ),
                     Text(
                       'Status: $_currentStatus',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.black), // White text color
+                          color: Colors.black),
                     ),
                     Text(
                       'Received: $_dataReceivedTime',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.black), // White text color
+                          color: Colors.black),
                     ),
                   ],
                 ),
               ),
-              // Date Picker Button
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ElevatedButton(
                   onPressed: _selectDate,
                   child: Text(
                       'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}'),
-                  style: ElevatedButton.styleFrom(
-                      // backgroundColor:
-                      //     Colors.blue, // Blue background color for the button
-                      ),
+                  style: ElevatedButton.styleFrom(),
                 ),
               ),
-              // Charts with updated styles
+              _buildChartContainer(
+                  'Chlorine', chlorineData, 'chlorine (mg/L)', ChartType.line),
               _buildChartContainer('Temperature', temperatureData,
                   'Temperature (°C)', ChartType.line),
               _buildChartContainer(
@@ -346,6 +382,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         );
       case ChartType.line:
         return StepLineSeries<ChartData, DateTime>(
+          dataSource: data,
+          xValueMapper: (ChartData data, _) => data.timestamp,
+          yValueMapper: (ChartData data, _) => data.value,
+          name: title,
+          color: Colors.blue,
+        );
+      case ChartType.line:
+        return ColumnSeries<ChartData, DateTime>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.timestamp,
           yValueMapper: (ChartData data, _) => data.value,
