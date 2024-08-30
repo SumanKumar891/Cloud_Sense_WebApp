@@ -1,216 +1,405 @@
-import 'dart:convert';
-import 'dart:ui';
+// import 'dart:convert';
+// import 'dart:ui';
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+// import 'DeviceGraphPage.dart';
+
+// class DeviceListPage extends StatefulWidget {
+//   final String emailId;
+
+//   DeviceListPage({required this.emailId}); // Add emailId as a parameter
+
+//   @override
+//   _DeviceListPageState createState() => _DeviceListPageState();
+// }
+
+// class _DeviceListPageState extends State<DeviceListPage> {
+//   List<Map<String, dynamic>> devices = []; // List of devices with details
+//   bool isLoading = true;
+//   String errorMessage = '';
+
+//   final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _fetchDevices();
+//   }
+
+//   Future<void> _fetchDevices() async {
+//     final url =
+//         'https://ln8b1r7ld9.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_devices?email_id=${widget.emailId}';
+
+//     try {
+//       final response = await http.get(Uri.parse(url));
+
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//         print("Fetched data: $data");
+
+//         if (data is List) {
+//           final List<Map<String, dynamic>> fetchedDevices =
+//               List<Map<String, dynamic>>.from(data);
+
+//           setState(() {
+//             devices = fetchedDevices;
+//             isLoading = false;
+//           });
+//         } else {
+//           setState(() {
+//             errorMessage = 'Unexpected data format.';
+//             isLoading = false;
+//           });
+//           print('Unexpected data format: $data');
+//         }
+//       } else {
+//         setState(() {
+//           errorMessage =
+//               'Failed to load devices. Status code: ${response.statusCode}';
+//           isLoading = false;
+//         });
+//         print('Failed to load devices. Status code: ${response.statusCode}');
+//       }
+//     } catch (e) {
+//       setState(() {
+//         errorMessage = 'Error fetching devices: $e';
+//         isLoading = false;
+//       });
+//       print('Error fetching devices: $e');
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       extendBodyBehindAppBar: true,
+//       appBar: AppBar(
+//         title: Padding(
+//           padding: const EdgeInsets.only(left: 20, top: 20.0),
+//           child: MouseRegion(
+//             onEnter: (_) => _isHovered.value = true,
+//             onExit: (_) => _isHovered.value = false,
+//             child: ValueListenableBuilder<bool>(
+//               valueListenable: _isHovered,
+//               builder: (context, isHovered, child) {
+//                 return ElevatedButton(
+//                   onPressed: () {
+//                     _showDeviceListPopup(context);
+//                   },
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: const Color.fromARGB(255, 12, 12, 12),
+//                     elevation: 0,
+//                     padding: const EdgeInsets.symmetric(
+//                         horizontal: 20, vertical: 20),
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(30),
+//                     ),
+//                   ),
+//                   child: Text(
+//                     "Choose Your Device",
+//                     style: TextStyle(
+//                       color: isHovered ? Colors.blue : Colors.white,
+//                       fontSize: 20,
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//         ),
+//         toolbarHeight: 100, // Increased height of the AppBar
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//       ),
+//       body: Stack(
+//         children: [
+//           // Background image with blur effect
+//           Positioned.fill(
+//             child: Stack(
+//               fit: StackFit.expand,
+//               children: [
+//                 Image.asset(
+//                   'assets/backgroundd.jpg',
+//                   fit: BoxFit.cover,
+//                 ),
+//                 BackdropFilter(
+//                   filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
+//                   child: Container(
+//                     color: Colors.black.withOpacity(
+//                         0.4), // Optional: To darken the blurred image
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Center(
+//             child: Padding(
+//               padding: const EdgeInsets.all(16.0),
+//               child: Text(
+//                 "Select a device to unlock insights into temperature, humidity, light, and \n more—your complete environmental toolkit awaits.",
+//                 textAlign: TextAlign.center,
+//                 style: TextStyle(
+//                   fontFamily: 'OpenSans',
+//                   fontSize: 48,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.white, // Changed text color for better contrast
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   void _showDeviceListPopup(BuildContext context) {
+//     if (isLoading) {
+//       // Show loading indicator if data is still being fetched
+//       showDialog(
+//         context: context,
+//         builder: (context) {
+//           return AlertDialog(
+//             title: Text("Devices"),
+//             content: Center(
+//               child: CircularProgressIndicator(),
+//             ),
+//           );
+//         },
+//       );
+//     } else {
+//       showDialog(
+//         context: context,
+//         builder: (context) {
+//           return AlertDialog(
+//             title: Text("Devices"),
+//             content: errorMessage.isNotEmpty
+//                 ? Text(errorMessage)
+//                 : devices.isNotEmpty
+//                     ? Column(
+//                         mainAxisSize: MainAxisSize.min,
+//                         children: devices.map((device) {
+//                           final deviceId = device['deviceId'] ?? 'Unknown';
+//                           final deviceName =
+//                               device['deviceName'] ?? 'Unnamed Device';
+//                           return ListTile(
+//                             title: Text(deviceName),
+//                             subtitle: Text(deviceId),
+//                             onTap: () {
+//                               Navigator.of(context).pop();
+//                               _navigateToDeviceGraphPage(context, deviceName);
+//                             },
+//                           );
+//                         }).toList(),
+//                       )
+//                     : Text('No devices available.'),
+//             actions: [
+//               TextButton(
+//                 onPressed: () {
+//                   Navigator.of(context).pop();
+//                 },
+//                 child: Text("Close"),
+//               ),
+//             ],
+//           );
+//         },
+//       );
+//     }
+//   }
+
+//   void _navigateToDeviceGraphPage(BuildContext context, String deviceName) {
+//     Navigator.of(context).push(
+//       MaterialPageRoute(
+//         builder: (context) => DeviceGraphPage(deviceName: deviceName),
+//       ),
+//     );
+//   }
+// }
+
+// import 'package:cloud_sense_webapp/QRScannerPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'AddDevice.dart';
 import 'DeviceGraphPage.dart';
 
-class DeviceListPage extends StatefulWidget {
-  final String emailId;
+class DataDisplayPage extends StatefulWidget {
+  final String email;
 
-  DeviceListPage({required this.emailId}); // Add emailId as a parameter
+  DataDisplayPage({required this.email});
 
   @override
-  _DeviceListPageState createState() => _DeviceListPageState();
+  _DataDisplayPageState createState() => _DataDisplayPageState();
 }
 
-class _DeviceListPageState extends State<DeviceListPage> {
-  List<Map<String, dynamic>> devices = []; // List of devices with details
-  bool isLoading = true;
-  String errorMessage = '';
-
-  final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
+class _DataDisplayPageState extends State<DataDisplayPage> {
+  bool _isLoading = true;
+  Map<String, List<String>> _deviceCategories = {};
 
   @override
   void initState() {
     super.initState();
-    _fetchDevices();
+    _fetchData();
   }
 
-  Future<void> _fetchDevices() async {
+  Future<void> _fetchData() async {
     final url =
-        'https://ln8b1r7ld9.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_devices?email_id=${widget.emailId}';
-
+        'https://ln8b1r7ld9.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_devices?email_id=${widget.email}';
     try {
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print("Fetched data: $data");
+        final result = json.decode(response.body);
 
-        if (data is List) {
-          final List<Map<String, dynamic>> fetchedDevices =
-              List<Map<String, dynamic>>.from(data);
-
-          setState(() {
-            devices = fetchedDevices;
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            errorMessage = 'Unexpected data format.';
-            isLoading = false;
-          });
-          print('Unexpected data format: $data');
-        }
-      } else {
         setState(() {
-          errorMessage =
-              'Failed to load devices. Status code: ${response.statusCode}';
-          isLoading = false;
+          _deviceCategories = {
+            for (var key in result.keys)
+              if (key != 'device_id' && key != 'email_id')
+                _mapCategory(key): List<String>.from(result[key] ?? [])
+          };
         });
-        print('Failed to load devices. Status code: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (error) {
+    } finally {
       setState(() {
-        errorMessage = 'Error fetching devices: $e';
-        isLoading = false;
+        _isLoading = false;
       });
-      print('Error fetching devices: $e');
+    }
+  }
+
+  String _mapCategory(String key) {
+    switch (key) {
+      case 'BD':
+        return 'Biodiversity Sensors';
+      case 'WD':
+        return 'Weather Sensors';
+      default:
+        return key;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 20, top: 20.0),
-          child: MouseRegion(
-            onEnter: (_) => _isHovered.value = true,
-            onExit: (_) => _isHovered.value = false,
-            child: ValueListenableBuilder<bool>(
-              valueListenable: _isHovered,
-              builder: (context, isHovered, child) {
-                return ElevatedButton(
-                  onPressed: () {
-                    _showDeviceListPopup(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 12, 12, 12),
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: Text(
-                    "Choose Your Device",
-                    style: TextStyle(
-                      color: isHovered ? Colors.blue : Colors.white,
-                      fontSize: 20,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        toolbarHeight: 100, // Increased height of the AppBar
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: Text('Your Chosen Devices'),
+        backgroundColor: const Color.fromARGB(169, 46, 88, 151),
       ),
-      body: Stack(
-        children: [
-          // Background image with blur effect
-          Positioned.fill(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  'assets/backgroundd.jpg',
-                  fit: BoxFit.cover,
-                ),
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 6.0, sigmaY: 6.0),
-                  child: Container(
-                    color: Colors.black.withOpacity(
-                        0.4), // Optional: To darken the blurred image
+      body: Center(
+        child: _isLoading
+            ? CircularProgressIndicator()
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: _deviceCategories.isNotEmpty
+                        ? _buildDeviceCards()
+                        : Center(
+                            child: Text('No devices found.'),
+                          ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Select a device to unlock insights into temperature, humidity, light, and \n more—your complete environmental toolkit awaits.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'OpenSans',
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white, // Changed text color for better contrast
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        backgroundColor: const Color.fromARGB(169, 46, 88, 151),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QRScannerPage(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Add Devices',
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 245, 241, 240)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  void _showDeviceListPopup(BuildContext context) {
-    if (isLoading) {
-      // Show loading indicator if data is still being fetched
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Devices"),
-            content: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Devices"),
-            content: errorMessage.isNotEmpty
-                ? Text(errorMessage)
-                : devices.isNotEmpty
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: devices.map((device) {
-                          final deviceId = device['deviceId'] ?? 'Unknown';
-                          final deviceName =
-                              device['deviceName'] ?? 'Unnamed Device';
-                          return ListTile(
-                            title: Text(deviceName),
-                            subtitle: Text(deviceId),
+  Widget _buildDeviceCards() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _deviceCategories.keys.map((category) {
+          return Container(
+            width: 300,
+            height: 300,
+            margin: EdgeInsets.all(10),
+            child: Card(
+              color: _getCardColor(category),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 30),
+                    Text(
+                      category,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Expanded(
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: _deviceCategories[category]!.map((deviceId) {
+                          return InkWell(
                             onTap: () {
-                              Navigator.of(context).pop();
-                              _navigateToDeviceGraphPage(context, deviceName);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DeviceGraphPage(
+                                    deviceName: deviceId,
+                                  ),
+                                ),
+                              );
                             },
+                            child: Text(
+                              deviceId,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
                           );
                         }).toList(),
-                      )
-                    : Text('No devices available.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("Close"),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           );
-        },
-      );
-    }
-  }
-
-  void _navigateToDeviceGraphPage(BuildContext context, String deviceName) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DeviceGraphPage(deviceName: deviceName),
+        }).toList(),
       ),
     );
+  }
+
+  Color _getCardColor(String category) {
+    switch (category) {
+      case 'Biodiversity Sensors':
+        return Colors.blue;
+      case 'Weather Sensors':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 }
