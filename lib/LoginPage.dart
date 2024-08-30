@@ -5,6 +5,7 @@ import 'dart:ui'; // Import for BackdropFilter
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInSignUpScreen extends StatefulWidget {
   @override
@@ -40,7 +41,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => DataDisplayPage(email: currentUser.username),
+            builder: (context) => DataDisplayPage(),
           ),
         );
       }
@@ -75,10 +76,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         password: _passwordController.text,
       );
       if (res.isSignedIn) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('email', _emailController.text);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => DataDisplayPage(email: _emailController.text),
+            builder: (context) => DataDisplayPage(),
           ),
         );
       } else {
@@ -147,7 +150,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => DataDisplayPage(email: _emailController.text),
+          builder: (context) => DataDisplayPage(),
         ),
       );
     } on AuthException catch (e) {
