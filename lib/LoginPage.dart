@@ -46,6 +46,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     });
 
     try {
+      // Check if the user is already signed in
+      var currentUser = await Amplify.Auth.getCurrentUser();
+      if (currentUser != null) {
+        // Sign out the user before trying to sign in again
+        await Amplify.Auth.signOut();
+      }
       SignInResult res = await Amplify.Auth.signIn(
         username: _emailController.text,
         password: _passwordController.text,
