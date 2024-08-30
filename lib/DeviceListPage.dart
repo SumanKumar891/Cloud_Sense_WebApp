@@ -149,6 +149,68 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     );
   }
 
+  // Widget _buildDeviceCards() {
+  //   List<Widget> cardList = _deviceCategories.keys.map((category) {
+  //     return Container(
+  //       width: 300,
+  //       height: 300,
+  //       margin: EdgeInsets.all(10),
+  //       child: Card(
+  //         color: _getCardColor(category),
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.center,
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               SizedBox(height: 30),
+  //               Text(
+  //                 category,
+  //                 textAlign: TextAlign.center,
+  //                 style: TextStyle(
+  //                   fontSize: 18,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.black,
+  //                 ),
+  //               ),
+  //               SizedBox(height: 10),
+  //               Expanded(
+  //                 child: ListView.builder(
+  //                   shrinkWrap: true,
+  //                   itemCount: _deviceCategories[category]?.length ?? 0,
+  //                   itemBuilder: (context, index) {
+  //                     // Generate a sequential name like "Chlorine Sensor 1"
+  //                     String sequentialName =
+  //                         '${category.split(" ").first} Sensor ${index + 1}';
+  //                     return InkWell(
+  //                       onTap: () {
+  //                         Navigator.push(
+  //                           context,
+  //                           MaterialPageRoute(
+  //                             builder: (context) => DeviceGraphPage(
+  //                               deviceName: _deviceCategories[category]![index],
+  //                             ),
+  //                           ),
+  //                         );
+  //                       },
+  //                       child: Text(
+  //                         sequentialName,
+  //                         textAlign: TextAlign.center,
+  //                         style: TextStyle(
+  //                           fontSize: 14,
+  //                           color: Colors.black,
+  //                         ),
+  //                       ),
+  //                     );
+  //                   },
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }).toList();
   Widget _buildDeviceCards() {
     List<Widget> cardList = _deviceCategories.keys.map((category) {
       return Container(
@@ -182,23 +244,31 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                       // Generate a sequential name like "Chlorine Sensor 1"
                       String sequentialName =
                           '${category.split(" ").first} Sensor ${index + 1}';
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DeviceGraphPage(
-                                deviceName: _deviceCategories[category]![index],
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black, // Text color
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DeviceGraphPage(
+                                  deviceName:
+                                      _deviceCategories[category]![index],
+                                ),
                               ),
+                            );
+                          },
+                          child: Text(
+                            sequentialName,
+                            style: TextStyle(
+                              fontSize: 14,
                             ),
-                          );
-                        },
-                        child: Text(
-                          sequentialName,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
                           ),
                         ),
                       );
