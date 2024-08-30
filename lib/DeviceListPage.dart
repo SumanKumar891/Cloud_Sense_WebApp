@@ -136,9 +136,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             Expanded(
                               child: _deviceCategories.isNotEmpty
                                   ? _buildDeviceCards()
-                                  : Center(
-                                      child: Text('No devices found.'),
-                                    ),
+                                  : _buildNoDevicesCard(),
                             ),
                           ],
                         ),
@@ -265,6 +263,65 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: cardList,
+      ),
+    );
+  }
+
+  Widget _buildNoDevicesCard() {
+    return Center(
+      child: Container(
+        width: 300,
+        height: 300,
+        margin: EdgeInsets.all(10),
+        child: Card(
+          color: const Color.fromARGB(255, 167, 158, 172),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Message Text
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'No devices found.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: const Color.fromARGB(255, 235, 28, 28),
+                  ),
+                ),
+              ),
+              // Plus sign above the button
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Icon(
+                  Icons.add,
+                  size: 80,
+                  color: Colors.black,
+                ),
+              ),
+              // Add Devices button
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QRScannerPage(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Add Devices',
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 245, 241, 240)),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
