@@ -177,22 +177,26 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
                 SizedBox(height: 10),
                 Expanded(
-                  child: ListView(
+                  child: ListView.builder(
                     shrinkWrap: true,
-                    children: _deviceCategories[category]!.map((deviceId) {
+                    itemCount: _deviceCategories[category]?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      // Generate a sequential name like "Chlorine Sensor 1"
+                      String sequentialName =
+                          '${category.split(" ").first} Sensor ${index + 1}';
                       return InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => DeviceGraphPage(
-                                deviceName: deviceId,
+                                deviceName: _deviceCategories[category]![index],
                               ),
                             ),
                           );
                         },
                         child: Text(
-                          deviceId,
+                          sequentialName,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,
@@ -200,7 +204,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                           ),
                         ),
                       );
-                    }).toList(),
+                    },
                   ),
                 ),
               ],
@@ -209,7 +213,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         ),
       );
     }).toList();
-// Add the "Add Devices" button as a card
+
+    // Add the "Add Devices" button as a card
     cardList.add(
       Container(
         width: 300,
@@ -232,8 +237,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               // Add Devices button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    backgroundColor: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  backgroundColor: Colors.black,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -253,6 +259,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         ),
       ),
     );
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
