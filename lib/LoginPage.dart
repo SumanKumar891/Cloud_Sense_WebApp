@@ -78,9 +78,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     setState(() {
       _isLoading = true;
     });
-
     try {
-      SignUpResult res = await Amplify.Auth.signUp(
+      await Amplify.Auth.signUp(
         username: _emailController.text,
         password: _passwordController.text,
         options: SignUpOptions(
@@ -90,16 +89,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           },
         ),
       );
-
-      if (res.isSignUpComplete) {
-        _emailToVerify = _emailController.text;
-        Future.microtask(() => _showVerificationDialog());
-        // _showVerificationDialog();
-      } else {
-        setState(() {
-          _errorMessage = 'Sign-up failed';
-        });
-      }
+      _emailToVerify = _emailController.text;
+      _showVerificationDialog();
+    } on UsernameExistsException {
+      setState(() {
+        _errorMessage =
+            'An account with this email already exists. Please log in or use a different email to sign up.';
+      });
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
@@ -119,19 +115,19 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     });
 
     try {
-      SignUpResult res = await Amplify.Auth.confirmSignUp(
+      // SignUpResult res = await Amplify.Auth.confirmSignUp(
+      await Amplify.Auth.confirmSignUp(
         username: _emailToVerify!,
         confirmationCode: _verificationCode!,
       );
-      if (res.isSignUpComplete) {
-        setState(() {
-          _isSignIn = true;
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'Verification failed';
-        });
-      }
+
+      // } // Redirect to the DeviceListPage after successful verification
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DeviceListPage(emailId: _emailController.text),
+        ),
+      );
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
@@ -143,77 +139,30 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     }
   }
 
-  // void _showVerificationDialog() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Verify Your Email'),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Text(
-  //                 'A verification code has been sent to your email. Please enter the code below:'),
-  //             TextField(
-  //               onChanged: (value) {
-  //                 _verificationCode = value;
-  //               },
-  //               decoration: InputDecoration(labelText: 'Verification Code'),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               _confirmSignUp();
-  //             },
-  //             child: Text('Submit'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   void _showVerificationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Verify Your Email'),
-          content: Padding(
-            padding:
-                const EdgeInsets.all(16.0), // Add padding around the content
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'A verification code has been sent to your email. Please enter the code below:',
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                    height: 16), // Add space between the text and text field
-                TextField(
-                  onChanged: (value) {
-                    _verificationCode = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Verification Code',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType
-                      .number, // Set keyboard type to number for code input
-                ),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                  'A verification code has been sent to your email. Please enter the code below:'),
+              TextField(
+                onChanged: (value) {
+                  _verificationCode = value;
+                },
+                decoration: InputDecoration(labelText: 'Verification Code'),
+              ),
+            ],
           ),
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                _confirmSignUp(); // Confirm sign-up
+                Navigator.of(context).pop();
+                _confirmSignUp();
               },
               child: Text('Submit'),
             ),
@@ -272,6 +221,21 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               child: _isSignIn ? _buildSignIn() : _buildSignUp(),
             ),
           ),
+          if (_errorMessage.isNotEmpty)
+            Positioned(
+              bottom: 16.0,
+              left: 16.0,
+              right: 16.0,
+              child: Container(
+                padding: EdgeInsets.all(16.0),
+                color: Colors.redAccent,
+                child: Text(
+                  _errorMessage,
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
         ],
       ),
     );
