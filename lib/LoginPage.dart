@@ -25,11 +25,28 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   @override
   void initState() {
     super.initState();
+    _checkCurrentUser();
     _emailController.addListener(() {
       setState(() {
         _emailValid = EmailValidator.validate(_emailController.text);
       });
     });
+  }
+
+  Future<void> _checkCurrentUser() async {
+    try {
+      var currentUser = await Amplify.Auth.getCurrentUser();
+      if (currentUser != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DeviceListPage(emailId: currentUser.username),
+          ),
+        );
+      }
+    } catch (e) {
+      // No user signed in, continue to show the sign-in/sign-up screen
+    }
   }
 
   @override
@@ -46,12 +63,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     });
 
     try {
-      // Check if the user is already signed in
-      var currentUser = await Amplify.Auth.getCurrentUser();
-      if (currentUser != null) {
-        // Sign out the user before trying to sign in again
+      // Sign out the user before trying to sign in again
+      try {
         await Amplify.Auth.signOut();
+      } catch (e) {
+        // Ignore errors from signOut, as the user might not be signed in
       }
+
       SignInResult res = await Amplify.Auth.signIn(
         username: _emailController.text,
         password: _passwordController.text,
@@ -121,13 +139,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     });
 
     try {
-      // SignUpResult res = await Amplify.Auth.confirmSignUp(
       await Amplify.Auth.confirmSignUp(
         username: _emailToVerify!,
         confirmationCode: _verificationCode!,
       );
 
-      // } // Redirect to the DeviceListPage after successful verification
+      // Redirect to the DeviceListPage after successful verification
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -178,6 +195,328 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Stack(
+//         children: [
+//           Container(
+//             decoration: BoxDecoration(
+//               image: DecorationImage(
+//                 image: AssetImage('assets/sunn.jpg'),
+//                 fit: BoxFit.cover,
+//               ),
+//             ),
+//             child: BackdropFilter(
+//               filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+//               child: Container(
+//                 color: Colors.black.withOpacity(0.2),
+//               ),
+//             ),
+//           ),
+//           Positioned(
+//             top: 0,
+//             left: 0,
+//             right: 0,
+//             child: AppBar(
+//               leading: IconButton(
+//                 icon: Icon(Icons.arrow_back),
+//                 onPressed: () {
+//                   Navigator.of(context).pop();
+//                 },
+//               ),
+//               backgroundColor: Colors.transparent,
+//               elevation: 0,
+//             ),
+//           ),
+//           Center(
+//             child: AnimatedSwitcher(
+//               duration: Duration(milliseconds: 800),
+//               transitionBuilder: (Widget child, Animation<double> animation) {
+//                 return SlideTransition(
+//                   position: Tween<Offset>(
+//                     begin: Offset(0.1, 0.0),
+//                     end: Offset.zero,
+//                   ).animate(animation),
+//                   child: child,
+//                 );
+//               },
+//               child: _isSignIn ? _buildSignIn() : _buildSignUp(),
+//             ),
+//           ),
+//           if (_errorMessage.isNotEmpty)
+//             Positioned(
+//               bottom: 16.0,
+//               left: 16.0,
+//               right: 16.0,
+//               child: Container(
+//                 padding: EdgeInsets.all(16.0),
+//                 color: Colors.redAccent,
+//                 child: Text(
+//                   _errorMessage,
+//                   style: TextStyle(color: Colors.white),
+//                   textAlign: TextAlign.center,
+//                 ),
+//               ),
+//             ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildSignIn() {
+//     return SingleChildScrollView(
+//       key: ValueKey('SignIn'),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         crossAxisAlignment: CrossAxisAlignment.center,
+//         children: [
+//           Container(
+//             width: 400,
+//             height: 500,
+//             color: const Color.fromARGB(155, 0, 0, 0),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 SizedBox(height: 55),
+//                 Text(
+//                   'Welcome Back!',
+//                   style: TextStyle(
+//                       fontSize: 32,
+//                       fontWeight: FontWeight.bold,
+//                       color: Color.fromARGB(223, 216, 226, 231)),
+//                 ),
+//                 SizedBox(height: 15),
+//                 Padding(
+//                   padding: const EdgeInsets.only(
+//                       left: 40, right: 40, bottom: 20, top: 20),
+//                   child: Text(
+//                     'To keep connected with us please login with your personal info.',
+//                     style: TextStyle(
+//                         fontSize: 24,
+//                         fontWeight: FontWeight.bold,
+//                         color: Color.fromARGB(223, 205, 108, 230)),
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: const EdgeInsets.only(top: 20.0),
+//                   child: Container(
+//                     width: 290,
+//                     height: 190,
+//                     decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(50),
+//                       image: DecorationImage(
+//                         image: AssetImage('assets/loginImage.png'),
+//                         fit: BoxFit.cover,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Container(
+//             width: 400,
+//             height: 500,
+//             padding: EdgeInsets.all(32.0),
+//             color: const Color.fromARGB(155, 255, 255, 255),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 SizedBox(height: 40.0),
+//                 Text(
+//                   'Sign In',
+//                   style: TextStyle(
+//                     fontSize: 32,
+//                     fontWeight: FontWeight.bold,
+//                     color: Color.fromARGB(255, 27, 17, 49),
+//                   ),
+//                 ),
+//                 SizedBox(height: 24.0),
+//                 TextField(
+//                   controller: _emailController,
+//                   keyboardType: TextInputType.emailAddress,
+//                   decoration: InputDecoration(
+//                     labelText: 'Email',
+//                     errorText:
+//                         _emailValid ? null : 'Please enter a valid email',
+//                   ),
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 TextField(
+//                   controller: _passwordController,
+//                   obscureText: true,
+//                   decoration: InputDecoration(
+//                     labelText: 'Password',
+//                   ),
+//                 ),
+//                 SizedBox(height: 24.0),
+//                 SizedBox(
+//                   width: double.infinity,
+//                   child: ElevatedButton(
+//                     onPressed: _signIn,
+//                     child: _isLoading
+//                         ? CircularProgressIndicator(
+//                             color: Colors.white,
+//                           )
+//                         : Text('Sign In'),
+//                   ),
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text('Don\'t have an account?'),
+//                     TextButton(
+//                       onPressed: () {
+//                         setState(() {
+//                           _isSignIn = false;
+//                         });
+//                       },
+//                       child: Text('Sign Up'),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildSignUp() {
+//     return SingleChildScrollView(
+//       key: ValueKey('SignUp'),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         crossAxisAlignment: CrossAxisAlignment.center,
+//         children: [
+//           Container(
+//             width: 400,
+//             height: 500,
+//             color: const Color.fromARGB(155, 0, 0, 0),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 SizedBox(height: 55),
+//                 Text(
+//                   'Welcome!',
+//                   style: TextStyle(
+//                       fontSize: 32,
+//                       fontWeight: FontWeight.bold,
+//                       color: Color.fromARGB(223, 216, 226, 231)),
+//                 ),
+//                 SizedBox(height: 15),
+//                 Padding(
+//                   padding: const EdgeInsets.only(
+//                       left: 40, right: 40, bottom: 20, top: 20),
+//                   child: Text(
+//                     'Enter your personal details and start your journey with us.',
+//                     style: TextStyle(
+//                         fontSize: 24,
+//                         fontWeight: FontWeight.bold,
+//                         color: Color.fromARGB(223, 205, 108, 230)),
+//                   ),
+//                 ),
+//                 Padding(
+//                   padding: const EdgeInsets.only(top: 20.0),
+//                   child: Container(
+//                     width: 290,
+//                     height: 190,
+//                     decoration: BoxDecoration(
+//                       borderRadius: BorderRadius.circular(50),
+//                       image: DecorationImage(
+//                         image: AssetImage('assets/loginImage.png'),
+//                         fit: BoxFit.cover,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Container(
+//             width: 400,
+//             height: 500,
+//             padding: EdgeInsets.all(32.0),
+//             color: const Color.fromARGB(155, 255, 255, 255),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 SizedBox(height: 40.0),
+//                 Text(
+//                   'Sign Up',
+//                   style: TextStyle(
+//                     fontSize: 32,
+//                     fontWeight: FontWeight.bold,
+//                     color: Color.fromARGB(255, 27, 17, 49),
+//                   ),
+//                 ),
+//                 SizedBox(height: 24.0),
+//                 TextField(
+//                   controller: _nameController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Name',
+//                   ),
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 TextField(
+//                   controller: _emailController,
+//                   keyboardType: TextInputType.emailAddress,
+//                   decoration: InputDecoration(
+//                     labelText: 'Email',
+//                     errorText:
+//                         _emailValid ? null : 'Please enter a valid email',
+//                   ),
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 TextField(
+//                   controller: _passwordController,
+//                   obscureText: true,
+//                   decoration: InputDecoration(
+//                     labelText: 'Password',
+//                   ),
+//                 ),
+//                 SizedBox(height: 24.0),
+//                 SizedBox(
+//                   width: double.infinity,
+//                   child: ElevatedButton(
+//                     onPressed: _signUp,
+//                     child: _isLoading
+//                         ? CircularProgressIndicator(
+//                             color: Colors.white,
+//                           )
+//                         : Text('Sign Up'),
+//                   ),
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text('Already have an account?'),
+//                     TextButton(
+//                       onPressed: () {
+//                         setState(() {
+//                           _isSignIn = true;
+//                         });
+//                       },
+//                       child: Text('Sign In'),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
