@@ -4,7 +4,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'AddDevice.dart';
 import 'DeviceGraphPage.dart';
+import 'HomePage.dart'; // Import your HomePage here
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 
 class DataDisplayPage extends StatefulWidget {
   @override
@@ -78,6 +80,15 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     }
   }
 
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('email'); // Clear the saved email
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()), // Navigate to HomePage
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,16 +98,14 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'assets/backgroundd.jpg'), // Update with your image path
+                image: AssetImage('assets/backgroundd.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
-                color: Colors.black
-                    .withOpacity(0.4), // Optional overlay for readability
+                color: Colors.black.withOpacity(0.4), // Optional overlay for readability
               ),
             ),
           ),
@@ -107,6 +116,32 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 title: Text('Your Chosen Devices'),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
+                actions: [
+                  TextButton.icon(
+                    onPressed: () async {
+              try {
+                await Amplify.Auth.signOut();
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.remove('email');
+
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
+              } catch (e) {
+                // Handle error during logout if necessary
+              }
+            },// Logout function
+                    icon: Icon(Icons.logout, color: Colors.white),
+                    label: Text(
+                      'Log out',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
               Expanded(
                 child: Center(

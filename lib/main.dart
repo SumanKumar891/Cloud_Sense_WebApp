@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget { final String? initialEmail;
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cloud Sense',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
