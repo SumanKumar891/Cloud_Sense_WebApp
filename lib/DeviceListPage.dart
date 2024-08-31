@@ -227,12 +227,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 horizontal: 20, vertical: 10),
                           ),
                           onPressed: () {
+                            String sequentialName = '${category.split(" ").first} Sensor ${index + 1}';
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DeviceGraphPage(
-                                  deviceName:
-                                      _deviceCategories[category]![index],
+                                  deviceName: sequentialName, // Pass the formatted name
+                                     
                                 ),
                               ),
                             );

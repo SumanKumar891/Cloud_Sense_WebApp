@@ -206,15 +206,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         backgroundColor: const Color.fromARGB(
             255, 202, 213, 223), // Blue background color for the AppBar
         title: Text("Graphs for ${widget.deviceName}"),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.arrow_back),
-        //     onPressed: () {
-        //       Navigator.pop(context);
-        //     },
-        //     color: Colors.white, // White color for the back button icon
-        //   ),
-        // ],
+        
       ),
       body: SingleChildScrollView(
         child: Container(
