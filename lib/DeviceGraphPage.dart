@@ -65,11 +65,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=202&startdate=$startDate&enddate=$endDate';
+          'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=204&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('CL') ||
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
-          'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=106&starttime=1719635904&endtime=1719635905';
+          // 'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=106&starttime=1719635904&endtime=1719635905';
+          'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=101&starttime=1720781575&endtime=1720781832';
     } else {
       print('Unknown device type');
       return;
