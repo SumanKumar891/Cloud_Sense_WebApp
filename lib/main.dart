@@ -15,12 +15,13 @@ void main() async {
   } catch (e) {
     print('Could not configure Amplify: $e');
   }
- SharedPreferences prefs = await SharedPreferences.getInstance();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   String? email = prefs.getString('email');
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget { final String? initialEmail;
+class MyApp extends StatelessWidget {
+  final String? initialEmail;
 
   MyApp({this.initialEmail});
   @override

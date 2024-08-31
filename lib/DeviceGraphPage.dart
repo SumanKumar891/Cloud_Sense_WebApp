@@ -61,6 +61,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Future<void> fetchData() async {
     final startDate = _formatDate(_selectedDay);
     final endDate = startDate;
+    final starttime = DateTime(_selectedDay.year, _selectedDay.month,
+                _selectedDay.day, 0, 0, 0)
+            .millisecondsSinceEpoch ~/
+        1000;
+    final endtime = DateTime(_selectedDay.year, _selectedDay.month,
+                _selectedDay.day, 16, 30, 59)
+            .millisecondsSinceEpoch ~/
+        1000;
+    print(starttime);
+    print(endtime);
 
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
@@ -69,8 +79,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('CL') ||
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
-          // 'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=106&starttime=1719635904&endtime=1719635905';
-          'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=101&starttime=1720781575&endtime=1720781832';
+          'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=101&starttime=$starttime&endtime=$endtime';
     } else {
       print('Unknown device type');
       return;
@@ -193,6 +202,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     if (picked != null && picked != _selectedDay) {
       setState(() {
         _selectedDay = picked;
+        chlorineData.clear();
         fetchData(); // Fetch data for the selected date
       });
     }
