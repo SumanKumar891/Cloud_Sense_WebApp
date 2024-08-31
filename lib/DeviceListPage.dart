@@ -85,7 +85,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     await prefs.remove('email'); // Clear the saved email
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => HomePage()), // Navigate to HomePage
+      MaterialPageRoute(
+          builder: (context) => HomePage()), // Navigate to HomePage
     );
   }
 
@@ -105,7 +106,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
-                color: Colors.black.withOpacity(0.4), // Optional overlay for readability
+                color: Colors.black
+                    .withOpacity(0.4), // Optional overlay for readability
               ),
             ),
           ),
@@ -119,22 +121,23 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 actions: [
                   TextButton.icon(
                     onPressed: () async {
-              try {
-                await Amplify.Auth.signOut();
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.remove('email');
+                      try {
+                        await Amplify.Auth.signOut();
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.remove('email');
 
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(),
-                  ),
-                  (Route<dynamic> route) => false,
-                );
-              } catch (e) {
-                // Handle error during logout if necessary
-              }
-            },// Logout function
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      } catch (e) {
+                        // Handle error during logout if necessary
+                      }
+                    }, // Logout function
                     icon: Icon(Icons.logout, color: Colors.white),
                     label: Text(
                       'Log out',
@@ -227,7 +230,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 horizontal: 20, vertical: 10),
                           ),
                           onPressed: () {
-                            
                             Navigator.push(
                               context,
                               MaterialPageRoute(
