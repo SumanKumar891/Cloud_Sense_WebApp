@@ -24,7 +24,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
           'Contact Us',
           style: TextStyle(color: Colors.white), // Set font color to white
         ),
-        backgroundColor: Colors.grey[900],
+        // backgroundColor: Colors.grey[900],
         iconTheme: IconThemeData(
           color: Colors.white, // Set back arrow color to white
         ),
