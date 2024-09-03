@@ -75,7 +75,7 @@ class _QRScannerPageState extends State<QRScannerPage>
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Confirm Device Addition'),
-          content: Text('Do you want to add this device'),
+          content: Text('Do you want to add this device?'),
           actions: <Widget>[
             TextButton(
               child: Text('No'),
