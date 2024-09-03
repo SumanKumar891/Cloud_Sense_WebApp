@@ -303,7 +303,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                                 },
                               ),
                             ),
-                            SizedBox(height: 16.0),
+                            SizedBox(height: 46.0),
                             Center(
                               child: ElevatedButton(
                                 onPressed: () {
