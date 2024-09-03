@@ -76,7 +76,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=201&startdate=$startDate&enddate=$endDate';
+          'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=200&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('CL') ||
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
