@@ -70638,7 +70638,7 @@ A.nh(i)
 A.nh(h)
 m=null
 f=n.a.c
-if(B.c.bv(f,"WD"))m="https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=204&startdate="+e+"&enddate="+e
+if(B.c.bv(f,"WD"))m="https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=200&startdate="+e+"&enddate="+e
 else if(B.c.bv(f,"CL")||B.c.bv(f,"BD"))m="https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=101&starttime="+i+"&endtime="+h
 else{A.nh("Unknown device type")
 s=1
