@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'LoginPage.dart';
+import 'ContactUsPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -349,16 +350,3 @@ class ProductsServicesPage extends StatelessWidget {
   }
 }
 
-class ContactUsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Contact Us Page'),
-      ),
-      body: Center(
-        child: Text('Contact Us Page'),
-      ),
-    );
-  }
-}

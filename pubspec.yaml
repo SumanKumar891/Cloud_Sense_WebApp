@@ -98,6 +98,7 @@ flutter:
     - assets/leaves.jpg
     - assets/blue.jpg
     - assets/sunn.jpg
+    - assets/tower.jpg
   fonts:
       - family: DMSerifText
         fonts:
