@@ -19,16 +19,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Contact Us',
-          style: TextStyle(color: Colors.white), // Set font color to white
-        ),
-        // backgroundColor: Colors.grey[900],
-        iconTheme: IconThemeData(
-          color: Colors.white, // Set back arrow color to white
-        ),
-      ),
+      // No AppBar directly here to avoid layering issues
       body: Stack(
         children: [
           // Background image
@@ -43,21 +34,38 @@ class _ContactUsPageState extends State<ContactUsPage> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
               child: Container(
-                color: Colors.black.withOpacity(
-                    0.3), // Optional: Adjust opacity for better readability
+                color:
+                    Colors.black.withOpacity(0.3), // Optional: Adjust opacity
+              ),
+            ),
+          ),
+          // AppBar on top of everything
+          Align(
+            alignment: Alignment.topCenter,
+            child: AppBar(
+              title: Text(
+                'Contact Us',
+                style:
+                    TextStyle(color: Colors.black), // Set font color to white
+              ),
+              backgroundColor: Colors.transparent, // Make AppBar transparent
+              elevation: 0, // Remove shadow
+              iconTheme: IconThemeData(
+                color: Colors.black, // Set back arrow color to white
               ),
             ),
           ),
           // Content on top of the blurred background
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(66.0),
             child: Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        right: 36.0), // Add padding on the right side
+                        right: 36.0,
+                        top: 36.0), // Add padding on the right side
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -162,7 +170,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        left: 36.0), // Add padding on the left side
+                        left: 36.0, top: 36), // Add padding on the left side
                     child: Container(
                       padding: EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
@@ -294,7 +302,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                                   labelText: 'How can we help you?',
                                   border: InputBorder.none,
                                 ),
-                                maxLines: 4,
+                                maxLines: 5,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your message';
@@ -303,21 +311,15 @@ class _ContactUsPageState extends State<ContactUsPage> {
                                 },
                               ),
                             ),
-                            SizedBox(height: 46.0),
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState?.validate() ??
-                                      false) {
-                                    // Handle form submission
-                                  }
-                                },
-                                child: Text('Submit'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 201, 139, 219),
-                                ),
-                              ),
+                            SizedBox(height: 44.0),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  // Handle form submission
+                                }
+                              },
+                              child: Text('Send'),
                             ),
                           ],
                         ),

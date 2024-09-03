@@ -236,6 +236,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 builder: (context) => DeviceGraphPage(
                                   deviceName:
                                       _deviceCategories[category]![index],
+                                  sequentialName: sequentialName,
                                 ),
                               ),
                             );

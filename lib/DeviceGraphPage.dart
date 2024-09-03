@@ -6,8 +6,9 @@ import 'package:intl/intl.dart';
 
 class DeviceGraphPage extends StatefulWidget {
   final String deviceName;
+  final sequentialName;
 
-  DeviceGraphPage({required this.deviceName});
+  DeviceGraphPage({required this.deviceName, required this.sequentialName});
 
   @override
   _DeviceGraphPageState createState() => _DeviceGraphPageState();
@@ -23,27 +24,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> windSpeedData = [];
   List<ChartData> chlorineData = [];
 
-  // Mapping of device IDs to descriptive names
-  final Map<String, String> _deviceDisplayNames = {
-    'CL001': 'Chlorine Sensor 1',
-    'CL002': 'Chlorine Sensor 2',
-    'WD001': 'Weather Sensor 1',
-    'WD002': 'Weather Sensor 2',
-    'WD003': 'Weather Sensor 3',
-    'WD1008': 'Weather Sensor 4',
-    // Add more mappings as needed
-  };
-
   @override
   void initState() {
     super.initState();
     _fetchDeviceDetails();
     fetchData();
-  }
-
-  // Method to get the display name based on device ID
-  String _getDisplayName(String deviceId) {
-    return _deviceDisplayNames[deviceId] ?? deviceId;
   }
 
   Future<void> _fetchDeviceDetails() async {
@@ -93,7 +78,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       apiUrl =
           'https://ixzeyfcuw5.execute-api.us-east-1.amazonaws.com/default/weather_station_awadh_api?deviceid=204&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('CL') ||
-        widget.deviceName.startsWith('BD')) {
+        (widget.deviceName.startsWith('BD'))) {
       apiUrl =
           'https://5iwg95nbb1.execute-api.us-east-1.amazonaws.com/v1/data?deviceId=101&starttime=$starttime&endtime=$endtime';
     } else {
@@ -108,7 +93,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         final data = json.decode(response.body);
 
         if (widget.deviceName.startsWith('CL') ||
-            widget.deviceName.startsWith('BD')) {
+            (widget.deviceName.startsWith('BD'))) {
           setState(() {
             chlorineData = _parseBDChartData(data);
             temperatureData = [];
@@ -226,15 +211,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   @override
   Widget build(BuildContext context) {
-    String displayName = _getDisplayName(widget.deviceName);
-
     return Scaffold(
       backgroundColor: const Color.fromARGB(
           255, 202, 213, 223), // Blue background color for the entire page
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(
             255, 202, 213, 223), // Blue background color for the AppBar
-        title: Text("Graphs for $displayName"),
+        title: Text("Graphs for ${widget.sequentialName}"),
         // actions: [
         //   IconButton(
         //     icon: Icon(Icons.arrow_back),
@@ -255,8 +238,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Text(
+                    //   'Device ID: ${widget.deviceName}',
+                    //   style: TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 16,
+                    //       color: Colors.black),
+                    // ),
                     Text(
-                      'Device: $displayName',
+                      'Device ID: ${widget.sequentialName}',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -289,7 +279,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
               ),
               _buildChartContainer(
-                  'Chlorine', chlorineData, 'Chlorine (mg/L)', ChartType.line),
+                  'Chlorine', chlorineData, 'chlorine (mg/L)', ChartType.line),
               _buildChartContainer('Temperature', temperatureData,
                   'Temperature (°C)', ChartType.line),
               _buildChartContainer(
@@ -374,6 +364,28 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ChartType chartType, List<ChartData> data, String title) {
     switch (chartType) {
       case ChartType.line:
+        return SplineSeries<ChartData, DateTime>(
+          markerSettings: const MarkerSettings(
+            height: 4.0,
+            width: 4.0,
+            borderColor: Colors.blue,
+            isVisible: true,
+          ),
+          dataSource: data,
+          xValueMapper: (ChartData data, _) => data.timestamp,
+          yValueMapper: (ChartData data, _) => data.value,
+          name: title,
+          color: Colors.blue,
+        );
+      case ChartType.line:
+        return ColumnSeries<ChartData, DateTime>(
+          dataSource: data,
+          xValueMapper: (ChartData data, _) => data.timestamp,
+          yValueMapper: (ChartData data, _) => data.value,
+          name: title,
+          color: Colors.blue,
+        );
+      case ChartType.line:
         return LineSeries<ChartData, DateTime>(
           markerSettings: const MarkerSettings(
             height: 4.0,
@@ -387,7 +399,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           name: title,
           color: Colors.blue,
         );
-      // If you plan to add more chart types in the future, handle them here
+      case ChartType.line:
+        return StepLineSeries<ChartData, DateTime>(
+          dataSource: data,
+          xValueMapper: (ChartData data, _) => data.timestamp,
+          yValueMapper: (ChartData data, _) => data.value,
+          name: title,
+          color: Colors.blue,
+        );
+      case ChartType.line:
+        return ColumnSeries<ChartData, DateTime>(
+          dataSource: data,
+          xValueMapper: (ChartData data, _) => data.timestamp,
+          yValueMapper: (ChartData data, _) => data.value,
+          name: title,
+          color: Colors.blue,
+        );
       default:
         return LineSeries<ChartData, DateTime>(
           dataSource: data,
@@ -402,7 +429,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
 enum ChartType {
   line,
-  // Add more chart types if needed
 }
 
 class ChartData {
