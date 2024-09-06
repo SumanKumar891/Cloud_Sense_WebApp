@@ -28,7 +28,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
-  Color _productsServicesColor = const Color.fromARGB(255, 235, 232, 232);
+  // Color _productsServicesColor = const Color.fromARGB(255, 235, 232, 232);
   Color _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
 
   @override
@@ -86,27 +86,27 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(color: _loginTestColor)),
               ),
             ),
-            SizedBox(width: 50),
-            MouseRegion(
-              onEnter: (_) => setState(() {
-                _productsServicesColor = Colors.blue;
-              }),
-              onExit: (_) => setState(() {
-                _productsServicesColor =
-                    const Color.fromARGB(255, 235, 232, 232);
-              }),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ProductsServicesPage()),
-                  );
-                },
-                child: Text('PRODUCTS AND SERVICES',
-                    style: TextStyle(color: _productsServicesColor)),
-              ),
-            ),
+            // SizedBox(width: 50),
+            // MouseRegion(
+            //   onEnter: (_) => setState(() {
+            //     _productsServicesColor = Colors.blue;
+            //   }),
+            //   onExit: (_) => setState(() {
+            //     _productsServicesColor =
+            //         const Color.fromARGB(255, 235, 232, 232);
+            //   }),
+            //   child: TextButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => ProductsServicesPage()),
+            //       );
+            //     },
+            //     child: Text('PRODUCTS AND SERVICES',
+            //         style: TextStyle(color: _productsServicesColor)),
+            //   ),
+            // ),
             SizedBox(width: 50),
             MouseRegion(
               onEnter: (_) => setState(() {
@@ -171,9 +171,9 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: Text(
-                          'At Cloud Sense, we’re dedicated to providing you with real-time environmental monitoring\nto help you make informed decisions about your surroundings. Our advanced app leverages\ncutting-edge technology to deliver accurate and timely data on a variety of crucial\natmospheric parameters.',
+                          'At Cloud Sense, we’re dedicated to providing you with real-time data\nto help you make informed decisions about your surroundings. Our\nadvanced app leverages cutting-edge technology to deliver accurate\nand timely data.',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 22,
                             color: Colors.white, // Text color
                           ),
                           textAlign: TextAlign.left, // Align text to the left
@@ -215,9 +215,10 @@ class _HomePageState extends State<HomePage> {
                             ),
                             SizedBox(height: 16),
                             Text(
-                              'Explore the sensors you’ve selected and dive into the live data they capture. With just a tap, you can access\ndetailed insights for each sensor, allowing you to stay informed and in control of your environment.\n\nMonitor air quality to ensure a fresh and safe atmosphere, detect potential sources of contamination, and stay\nvigilant against hazardous gases. Keep track of weather conditions to plan your day and contribute to climate\ncontrol efforts by optimizing energy usage and reducing your carbon footprint. Fine-tune your indoor climate\nto prevent issues like mold, and adjust lighting for both comfort and efficiency. By closely monitoring\ntemperature variations, you can also refine your heating and cooling systems for ultimate comfort. All the\nessential insights you need are right at your fingertips, helping you create a safer, more sustainable living space.',
+                              // 'Explore the sensors you’ve selected and dive into the live data they capture. With just a tap, you can access\ndetailed insights for each sensor, allowing you to stay informed.\n\nMonitor air quality to ensure a fresh and safe atmosphere, detect potential sources of contamination, and stay\nvigilant against hazardous gases. Keep track of weather conditions to plan your day and contribute to climate\ncontrol efforts by optimizing energy usage and reducing your carbon footprint. Fine-tune your indoor climate\nto prevent issues like mold, and adjust lighting for both comfort and efficiency. By closely monitoring\ntemperature variations, you can also refine your heating and cooling systems for ultimate comfort. All the\nessential insights you need are right at your fingertips, helping you create a safer, more sustainable living space.',
+                              'Explore the sensors and dive into the live data they capture.With just a tap,you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space,detect potential issues, and stay alert for any\nirregularities. Track various factors to help you plan effectively and contribute to optimizing your\nusage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort\nand efficiency. With all the essential insights at your fingertips, you can create a more comfortable\nand sustainable living space.',
                               style: TextStyle(
-                                fontSize: 20, // Reduced font size
+                                fontSize: 22, // Reduced font size
                                 color: Colors.black, // Text color
                               ),
                             ),
@@ -272,9 +273,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(height: 16),
                       Text(
-                        'At Cloud Sense, we aim to transform the way you interact with your biodiversity by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential environmental data, giving you the tools to anticipate and respond to changes in your surroundings. With Cloud Sense, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and sustainable environment.',
+                        // 'At Cloud Sense, we aim to transform the way you interact with your biodiversity by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes in your surroundings. With Cloud Sense, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and sustainable life.',
+                        'At Cloud Sense, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 24,
                           color: Colors.white, // Text color
                         ),
                       ),
@@ -334,19 +336,19 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// Dummy pages for navigation
+// // Dummy pages for navigation
 
-class ProductsServicesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Products and Services Page'),
-      ),
-      body: Center(
-        child: Text('Products and Services Page'),
-      ),
-    );
-  }
-}
+// class ProductsServicesPage extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Products and Services Page'),
+//       ),
+//       body: Center(
+//         child: Text('Products and Services Page'),
+//       ),
+//     );
+//   }
+// }
 
