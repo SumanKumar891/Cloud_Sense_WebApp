@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                 fontSize: 32,
               ),
             ),
-            SizedBox(width: 300),
+            SizedBox(width: 200),
             MouseRegion(
               onEnter: (_) => setState(() {
                 _aboutUsColor = Colors.blue;
