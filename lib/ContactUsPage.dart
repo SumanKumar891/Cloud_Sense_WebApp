@@ -203,7 +203,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
   Widget _form() {
     return Padding(
       padding: const EdgeInsets.only(
-          left: 36.0, top: 36), // Add padding on the left side
+          left: 16.0, top: 16), // Add padding on the left side
       child: Container(
         padding: EdgeInsets.all(16.0),
         decoration: BoxDecoration(

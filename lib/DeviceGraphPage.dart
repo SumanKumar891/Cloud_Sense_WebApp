@@ -49,7 +49,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final selectedDevice = data.firstWhere(
-            (device) => device['deviceId'] == '101',
+            (device) => device['deviceId'] == 101,
             orElse: () => null);
 
         if (selectedDevice != null) {
@@ -69,75 +69,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  // Future<void> fetchData() async {
-  //   final startdate = _formatDate(_selectedDay);
-  //   final enddate = startdate;
-  //   String apiUrl;
-  //   if (widget.deviceName.startsWith('WD')) {
-  //     apiUrl =
-  //         'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=99&startdate=$startdate&enddate=$enddate';
-  //   } else if (widget.deviceName.startsWith('CL') ||
-  //       (widget.deviceName.startsWith('BD'))) {
-  //     apiUrl =
-  //         'https://b0e4z6nczh.execute-api.us-east-1.amazonaws.com/CloudSense_Chloritrone_api_function?deviceid=101&startdate=$startdate&enddate=$enddate';
-  //   } else {
-  //     print('Unknown device type');
-  //     return;
-  //   }
-
-  //   try {
-  //     final response = await http.get(Uri.parse(apiUrl));
-
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-
-  //       if (widget.deviceName.startsWith('CL') ||
-  //           (widget.deviceName.startsWith('BD'))) {
-  //         setState(() {
-  //           chlorineData = _parseBDChartData(data, 'chlorine');
-  //           temperatureData = [];
-  //           humidityData = [];
-  //           lightIntensityData = [];
-  //           windSpeedData = [];
-  //           rainIntensityData = [];
-  //           solarIrradianceData = [];
-  //           windDirectionData = [];
-  //         });
-  //       } else {
-  //         setState(() {
-  //           temperatureData = _parseChartData(data, 'Temperature');
-  //           humidityData = _parseChartData(data, 'Humidity');
-  //           lightIntensityData = _parseChartData(data, 'LightIntensity');
-  //           windSpeedData = _parseChartData(data, 'WindSpeed');
-
-  //           rainIntensityData = _parseChartData(data, 'RainIntensity');
-  //           solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
-  //           chlorineData = [];
-  //         });
-  //       }
-  //     } else {
-  //       print('Failed to load data. Status code: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching data: $e');
-  //   }
-  // }
-
   List<List<dynamic>> _csvRows = [];
-  String _message = ""; // Variable to store the message
+  String _message = "";
+  String _lastWindDirection = "";
 
   Future<void> fetchData() async {
     final startdate = _formatDate(_selectedDay);
     final enddate = startdate;
+    int deviceId =
+        int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
 
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=99&startdate=$startdate&enddate=$enddate';
+          'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CL') ||
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
-          'https://b0e4z6nczh.execute-api.us-east-1.amazonaws.com/CloudSense_Chloritrone_api_function?deviceid=101&startdate=$startdate&enddate=$enddate';
+          'https://b0e4z6nczh.execute-api.us-east-1.amazonaws.com/CloudSense_Chloritrone_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else {
       setState(() {
         _message = "Unknown device type";
@@ -152,6 +101,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         final data = json.decode(response.body);
 
         List<List<dynamic>> rows = [];
+        String lastWindDirection = 'Unknown';
 
         if (widget.deviceName.startsWith('CL') ||
             widget.deviceName.startsWith('BD')) {
@@ -179,6 +129,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             rainIntensityData = _parseChartData(data, 'RainIntensity');
             solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
             chlorineData = [];
+
+            // Extract the last wind direction from the data
+            if (data['items'].isNotEmpty) {
+              lastWindDirection = data['items'].last['WindDirection'];
+            }
 
             // Prepare data for CSV
             rows = [
@@ -208,6 +163,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         // Store CSV rows for download later
         setState(() {
           _csvRows = rows;
+          _lastWindDirection =
+              lastWindDirection; // Store the last wind direction
 
           if (_csvRows.isEmpty) {
             _message = "No data available for download.";
@@ -354,7 +311,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(
             255, 202, 213, 223), // Blue background color for the AppBar
-        title: Text("Graphs for ${widget.sequentialName}"),
+        title: Text("Graphs for ${widget.sequentialName} "),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -367,39 +324,69 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   builder: (context, constraints) {
                     // Use constraints.maxWidth to determine screen width
                     bool isWide = constraints.maxWidth >
-                        600; // Adjust width threshold as needed
+                        800; // Adjust width threshold as needed
 
                     return isWide
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ? Column(
                             children: [
-                              Text(
-                                'Device ID: ${widget.sequentialName}',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.013,
-                                    color: Colors.black),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Device ID: ${widget.sequentialName}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.013,
+                                        color: Colors.black),
+                                  ),
+                                  Text(
+                                    'Status: $_currentStatus',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.013,
+                                        color: Colors.black),
+                                  ),
+                                  Text(
+                                    'Received: $_dataReceivedTime',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                                0.013,
+                                        color: Colors.black),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                'Status: $_currentStatus',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.013,
-                                    color: Colors.black),
-                              ),
-                              Text(
-                                'Received: $_dataReceivedTime',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.013,
-                                    color: Colors.black),
-                              ),
+                              if (widget.deviceName.startsWith('WD'))
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons
+                                              .wind_power, // Choose an appropriate icon
+                                          size: 40, // Adjust size as needed
+                                          color: Colors.blueGrey[900],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Wind Direction: $_lastWindDirection',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                             ],
                           )
                         : Column(
@@ -428,6 +415,31 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     fontSize: 16,
                                     color: Colors.black),
                               ),
+                              if (widget.deviceName.startsWith('WD'))
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons
+                                              .wind_power, // Choose an appropriate icon
+                                          size: 40, // Adjust size as needed
+                                          color: Colors.blueGrey[900],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Wind Direction: $_lastWindDirection',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                             ],
                           );
                   },
@@ -477,98 +489,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     backgroundColor: const Color.fromARGB(
-  //         255, 202, 213, 223), // Blue background color for the entire page
-  //     appBar: AppBar(
-  //       backgroundColor: const Color.fromARGB(
-  //           255, 202, 213, 223), // Blue background color for the AppBar
-  //       title: Text("Graphs for ${widget.sequentialName}"),
-  //     ),
-  //     body: SingleChildScrollView(
-  //       child: Container(
-  //         color: const Color.fromARGB(255, 202, 213, 223),
-  //         child: Column(
-  //           children: [
-  //             Padding(
-  //               padding: const EdgeInsets.all(16.0),
-  //               child: Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Text(
-  //                     'Device ID: ${widget.sequentialName}',
-  //                     style: TextStyle(
-  //                         fontWeight: FontWeight.bold,
-  //                         fontSize: MediaQuery.of(context).size.width * 0.01,
-  //                         color: Colors.black),
-  //                   ),
-  //                   Text(
-  //                     'Status: $_currentStatus',
-  //                     style: TextStyle(
-  //                         fontWeight: FontWeight.bold,
-  //                         fontSize: MediaQuery.of(context).size.width * 0.013,
-  //                         // fontSize: 16,
-  //                         color: Colors.black),
-  //                   ),
-  //                   Text(
-  //                     'Received: $_dataReceivedTime',
-  //                     style: TextStyle(
-  //                         fontWeight: FontWeight.bold,
-  //                         fontSize: MediaQuery.of(context).size.width * 0.013,
-  //                         // fontSize: 16,
-  //                         color: Colors.black),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             SizedBox(height: 20),
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 Padding(
-  //                   padding: const EdgeInsets.all(16.0),
-  //                   child: ElevatedButton(
-  //                     onPressed: _selectDate,
-  //                     child: Text(
-  //                         'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}'),
-  //                     style: ElevatedButton.styleFrom(),
-  //                   ),
-  //                 ),
-  //                 ElevatedButton(
-  //                   onPressed:
-  //                       downloadCSV, // Trigger CSV download when this button is pressed
-  //                   child: Text('Download CSV'),
-  //                 ),
-  //               ],
-  //             ),
-  //             SizedBox(height: 20),
-  //             Text(
-  //               _message,
-  //               style: TextStyle(color: Colors.red),
-  //             ),
-  //             _buildChartContainer(
-  //                 'Chlorine', chlorineData, 'chlorine (mg/L)', ChartType.line),
-  //             _buildChartContainer('Temperature', temperatureData,
-  //                 'Temperature (°C)', ChartType.line),
-  //             _buildChartContainer(
-  //                 'Humidity', humidityData, 'Humidity (%)', ChartType.line),
-  //             _buildChartContainer('Light Intensity', lightIntensityData,
-  //                 'Light Intensity (Lux)', ChartType.line),
-  //             _buildChartContainer('Wind Speed', windSpeedData,
-  //                 'Wind Speed (m/s)', ChartType.line),
-  //             _buildChartContainer('Rain Intensity', rainIntensityData,
-  //                 'Rain Intensity (mm/h)', ChartType.line),
-  //             _buildChartContainer('Solar Irradiance', solarIrradianceData,
-  //                 'Solar Irradiance (W/M^2)', ChartType.line),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildChartContainer(String title, List<ChartData> data,
       String yAxisTitle, ChartType chartType) {
