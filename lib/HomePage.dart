@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   // Color _productsServicesColor = const Color.fromARGB(255, 235, 232, 232);
-  Color _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
+  // Color _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -351,13 +351,13 @@ class _HomePageState extends State<HomePage> {
                           builder: (context) => SignInSignUpScreen()),
                     );
                   }),
-                  SizedBox(width: 20),
-                  _buildNavButton('CONTACT US', _contactUsColor, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ContactUsPage()),
-                    );
-                  }),
+                  // SizedBox(width: 20),
+                  // _buildNavButton('CONTACT US', _contactUsColor, () {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context) => ContactUsPage()),
+                  //   );
+                  // }),
                 ],
                 if (isMobile)
                   IconButton(
@@ -407,16 +407,16 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            ListTile(
-              leading: Icon(Icons.contact_mail),
-              title: Text('CONTACT US'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ContactUsPage()),
-                );
-              },
-            ),
+            // ListTile(
+            //   leading: Icon(Icons.contact_mail),
+            //   title: Text('CONTACT US'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => ContactUsPage()),
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),
@@ -667,15 +667,15 @@ class _HomePageState extends State<HomePage> {
       onEnter: (_) => setState(() {
         if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
         if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
-        if (text == 'CONTACT US') _contactUsColor = Colors.blue;
+        // if (text == 'CONTACT US') _contactUsColor = Colors.blue;
       }),
       onExit: (_) => setState(() {
         if (text == 'ABOUT US')
           _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
         if (text == 'LOGIN/SIGNUP')
           _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
-        if (text == 'CONTACT US')
-          _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
+        // if (text == 'CONTACT US')
+        //   _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
       }),
       child: TextButton(
         onPressed: onPressed,
