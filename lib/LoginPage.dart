@@ -246,7 +246,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             Positioned(
               bottom: 16.0,
               left: 16.0,
-              right: 16.0,
+              right: 15.0,
               child: Container(
                 padding: EdgeInsets.all(16.0),
                 color: Colors.redAccent,
