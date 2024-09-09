@@ -164,7 +164,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'OpenSans',
-                                  fontSize: 45,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 800
+                                          ? 30
+                                          : 45,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
