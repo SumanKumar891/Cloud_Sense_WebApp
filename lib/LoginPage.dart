@@ -201,6 +201,16 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Stack(
         children: [
           Container(
@@ -215,21 +225,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               child: Container(
                 color: Colors.black.withOpacity(0.2),
               ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
             ),
           ),
           Center(
@@ -270,287 +265,321 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   Widget _buildSignIn() {
     return SingleChildScrollView(
       key: ValueKey('SignIn'),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 400,
-            height: 500,
-            color: const Color.fromARGB(155, 0, 0, 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 55),
-                Text(
-                  'Welcome Back!',
-                  style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(223, 216, 226, 231)),
-                ),
-                SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 40, right: 40, bottom: 20, top: 20),
-                  child: Text(
-                    'To keep connected with us please login with your personal info.',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(223, 205, 108, 230)),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Container(
-                    width: 290,
-                    height: 190,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      image: DecorationImage(
-                        image: AssetImage('assets/loginImage.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 400,
-            height: 500,
-            padding: EdgeInsets.all(32.0),
-            color: const Color.fromARGB(155, 255, 255, 255),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 24),
-                Text(
-                  'Login',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(243, 173, 21, 211),
-                  ),
-                ),
-                SizedBox(height: 42),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    errorText: _emailValid ? null : 'Invalid email format',
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                ),
-                if (_isLoading)
-                  CircularProgressIndicator()
-                else
-                  Padding(
-                    padding: const EdgeInsets.only(top: 30.0),
-                    child: ElevatedButton(
-                      onPressed: _signIn,
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 245, 241, 240)),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        backgroundColor: Color.fromARGB(223, 205, 108, 230),
-                      ),
-                    ),
-                  ),
-                SizedBox(height: 32),
-                Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          bool isSmallScreen = constraints.maxWidth < 800;
+
+          return isSmallScreen
+              ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Don\'t have an Account?',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(181, 113, 5, 214)),
-                    ),
-                    SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignIn = false;
-                        });
-                      },
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
+                  children: _buildContent(isSmallScreen),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: _buildContent(isSmallScreen),
+                );
+        },
+      ),
+    );
+  }
+
+  List<Widget> _buildContent(bool isSmallScreen) {
+    return [
+      Container(
+        width: isSmallScreen ? double.infinity : 400,
+        height: 500,
+        color: const Color.fromARGB(155, 0, 0, 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 55),
+            Text(
+              'Welcome Back!',
+              style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(223, 216, 226, 231)),
+            ),
+            SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              child: Text(
+                'To keep connected with us please login with your personal info.',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(223, 205, 108, 230)),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Container(
+                width: 290,
+                height: 190,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  image: DecorationImage(
+                    image: AssetImage('assets/loginImage.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: isSmallScreen ? 32 : 0),
+      Container(
+        width: isSmallScreen ? double.infinity : 400,
+        height: 500,
+        padding: EdgeInsets.all(32.0),
+        color: const Color.fromARGB(155, 255, 255, 255),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 24),
+            Text(
+              'Login',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(243, 173, 21, 211),
+              ),
+            ),
+            SizedBox(height: 42),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+                errorText: _emailValid ? null : 'Invalid email format',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+            if (_isLoading)
+              CircularProgressIndicator()
+            else
+              Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: ElevatedButton(
+                  onPressed: _signIn,
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(
+                        color: const Color.fromARGB(255, 245, 241, 240)),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    backgroundColor: Color.fromARGB(223, 205, 108, 230),
+                  ),
+                ),
+              ),
+            SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Don\'t have an Account?',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(181, 113, 5, 214)),
+                ),
+                SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSignIn = false;
+                    });
+                  },
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
+    ];
   }
 
   Widget _buildSignUp() {
     return SingleChildScrollView(
       key: ValueKey('SignUp'),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 400,
-            height: 500,
-            padding: EdgeInsets.all(32.0),
-            color: const Color.fromARGB(155, 255, 255, 255),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 16),
-                Text('Create Account',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(243, 173, 21, 211),
-                    )),
-                SizedBox(height: 24),
-                TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    errorText: _emailValid ? null : 'Invalid email format',
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                  ),
-                  obscureText: true,
-                ),
-                if (_isLoading)
-                  CircularProgressIndicator()
-                else
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
-                    child: ElevatedButton(
-                      onPressed: _signUp,
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 245, 241, 240)),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        backgroundColor: Color.fromARGB(223, 205, 108, 230),
-                      ),
-                    ),
-                  ),
-                SizedBox(height: 32),
-                Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          bool isSmallScreen = constraints.maxWidth < 800;
+
+          return isSmallScreen
+              ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Already have an Account?',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(181, 113, 5, 214)),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _isSignIn = true;
-                        });
-                      },
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 400,
-            height: 500,
-            color: const Color.fromARGB(155, 0, 0, 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 55),
-                Text(
-                  'Welcome!',
-                  style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(223, 216, 226, 231)),
-                ),
-                SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 40, right: 40, bottom: 20, top: 20),
-                  child: Text(
-                    'Enter your personal details and start journey with us.',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(223, 205, 108, 230)),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Container(
-                    width: 290,
-                    height: 190,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      image: DecorationImage(
-                        image: AssetImage('assets/loginImage.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+                  children: _buildSignUpContent(isSmallScreen),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: _buildSignUpContent(isSmallScreen),
+                );
+        },
       ),
     );
+  }
+
+  List<Widget> _buildSignUpContent(bool isSmallScreen) {
+    return [
+      Container(
+        width: isSmallScreen ? double.infinity : 400,
+        height: 500,
+        padding: EdgeInsets.all(32.0),
+        color: const Color.fromARGB(155, 255, 255, 255),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 16),
+            Text(
+              'Create Account',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(243, 173, 21, 211),
+              ),
+            ),
+            SizedBox(height: 24),
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+                errorText: _emailValid ? null : 'Invalid email format',
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+            if (_isLoading)
+              CircularProgressIndicator()
+            else
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: ElevatedButton(
+                  onPressed: _signUp,
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(
+                        color: const Color.fromARGB(255, 245, 241, 240)),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    backgroundColor: Color.fromARGB(223, 205, 108, 230),
+                  ),
+                ),
+              ),
+            SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Already have an Account?',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(181, 113, 5, 214)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isSignIn = true;
+                    });
+                  },
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      SizedBox(height: isSmallScreen ? 32 : 0),
+      Container(
+        width: isSmallScreen ? double.infinity : 400,
+        height: 500,
+        color: const Color.fromARGB(155, 0, 0, 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 55),
+            Text(
+              'Welcome!',
+              style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(223, 216, 226, 231)),
+            ),
+            SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              child: Text(
+                'Enter your personal details and start your journey with us.',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(223, 205, 108, 230)),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Container(
+                width: 290,
+                height: 190,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  image: DecorationImage(
+                    image: AssetImage('assets/loginImage.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
   }
 }
