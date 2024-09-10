@@ -76,6 +76,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Future<void> fetchData() async {
     final startdate = _formatDate(_selectedDay);
     final enddate = startdate;
+    final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
     int deviceId =
         int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
 
@@ -115,9 +116,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             solarIrradianceData = [];
 
             // Prepare data for CSV
+
             rows = [
               ["Timestamp", "Chlorine"],
-              ...chlorineData.map((entry) => [entry.timestamp, entry.value])
+              ...chlorineData.map(
+                  (entry) => [formatter.format(entry.timestamp), entry.value])
             ];
           });
         } else {
@@ -148,7 +151,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ],
               for (int i = 0; i < temperatureData.length; i++)
                 [
-                  temperatureData[i].timestamp,
+                  formatter.format(temperatureData[i].timestamp),
                   temperatureData[i].value,
                   humidityData[i].value,
                   lightIntensityData[i].value,
