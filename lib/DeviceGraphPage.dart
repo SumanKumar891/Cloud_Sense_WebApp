@@ -35,37 +35,37 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> chlorineData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
 
-  ZoomPanBehavior _zoomPanBehavior = ZoomPanBehavior(
-    enablePinching: true,
-    enablePanning: true,
-    zoomMode: ZoomMode.x, // Enable zooming on the X-axis
-  );
+  // ZoomPanBehavior _zoomPanBehavior = ZoomPanBehavior(
+  //   enablePinching: true,
+  //   enablePanning: true,
+  //   zoomMode: ZoomMode.x, // Enable zooming on the X-axis
+  // );
 // Add the zoom control buttons
-  Widget _buildZoomControls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          icon: Icon(Icons.zoom_in),
-          onPressed: () {
-            _zoomPanBehavior.zoomIn();
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.zoom_out),
-          onPressed: () {
-            _zoomPanBehavior.zoomOut();
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.refresh),
-          onPressed: () {
-            _zoomPanBehavior.reset(); // Reset zoom and pan
-          },
-        ),
-      ],
-    );
-  }
+  // Widget _buildZoomControls() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       IconButton(
+  //         icon: Icon(Icons.zoom_in),
+  //         onPressed: () {
+  //           _zoomPanBehavior.zoomIn();
+  //         },
+  //       ),
+  //       IconButton(
+  //         icon: Icon(Icons.zoom_out),
+  //         onPressed: () {
+  //           _zoomPanBehavior.zoomOut();
+  //         },
+  //       ),
+  //       IconButton(
+  //         icon: Icon(Icons.refresh),
+  //         onPressed: () {
+  //           _zoomPanBehavior.reset(); // Reset zoom and pan
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   @override
   void initState() {
