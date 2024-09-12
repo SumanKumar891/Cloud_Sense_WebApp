@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: Colors.grey[900],
           title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (!isMobile) SizedBox(width: 50),
               Icon(Icons.cloud, color: Colors.white, size: isMobile ? 24 : 32),

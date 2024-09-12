@@ -119,7 +119,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
             child: Column(
               children: [
                 AppBar(
-                  title: Text('Your Chosen Devices'),
+                  title: Text(
+                    'Your Chosen Devices',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   actions: [
