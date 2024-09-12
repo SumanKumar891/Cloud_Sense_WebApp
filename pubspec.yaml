@@ -100,9 +100,9 @@ flutter:
     - assets/blue.jpg
     - assets/sunn.jpg
     - assets/tower.jpg
-    - assets/Chloritron.PNG
-    - assets/soil.jpg
-    - assets/tree.jpg
+    # - assets/Chloritron.PNG
+    - assets/soill.jpg
+    - assets/trees.jpeg
   fonts:
       - family: DMSerifText
         fonts:
