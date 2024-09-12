@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'HomePage.dart';
 
 import 'LoginPage.dart';
 import 'ContactUsPage.dart';
@@ -54,6 +55,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Spacer(),
                 if (!isMobile) ...[
+                  SizedBox(width: 20),
                   _buildNavButton('ABOUT US', _aboutUsColor, () {
                     Navigator.push(
                       context,
@@ -107,12 +109,12 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: Icon(Icons.info),
               title: Text('ABOUT US'),
-              // onTap: () {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => AboutUsPage()),
-              //   );
-              // },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.login),
@@ -394,8 +396,8 @@ class _HomePageState extends State<HomePage> {
         // if (text == 'CONTACT US')
         //   _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
       }),
-      child: TextButton(
-        onPressed: onPressed,
+      child: GestureDetector(
+        onTap: onPressed,
         child: Text(text, style: TextStyle(color: color)),
       ),
     );
