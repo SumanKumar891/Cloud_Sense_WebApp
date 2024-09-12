@@ -460,52 +460,88 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       padding: const EdgeInsets.all(16.0),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
+                          bool isMobile = constraints.maxWidth < 800;
                           return Column(
                             children: [
                               // Display Device ID, Status, and Received time
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Device ID: ${widget.sequentialName}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:
-                                          MediaQuery.of(context).size.width *
-                                              0.013,
-                                      color: Colors.white,
+                              isMobile
+                                  ? Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Device ID: ${widget.sequentialName}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Status: $_currentStatus',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Received: $_dataReceivedTime',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Device ID: ${widget.sequentialName}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.013,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Status: $_currentStatus',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.013,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Received: $_dataReceivedTime',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.013,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  Text(
-                                    'Status: $_currentStatus',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:
-                                          MediaQuery.of(context).size.width *
-                                              0.013,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Received: $_dataReceivedTime',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:
-                                          MediaQuery.of(context).size.width *
-                                              0.013,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
                               SizedBox(
                                   height:
                                       20), // Space between status and buttons
 
                               // Row for Date Picker and Download CSV button aligned to the left
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   // Date Picker button
                                   Padding(
