@@ -396,8 +396,8 @@ class _HomePageState extends State<HomePage> {
         // if (text == 'CONTACT US')
         //   _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
       }),
-      child: GestureDetector(
-        onTap: onPressed,
+      child: TextButton(
+        onPressed: onPressed,
         child: Text(text, style: TextStyle(color: color)),
       ),
     );
