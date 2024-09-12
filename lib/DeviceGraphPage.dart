@@ -643,9 +643,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       case ChartType.line:
         return LineSeries<ChartData, DateTime>(
           markerSettings: const MarkerSettings(
-            height: 2.0,
-            width: 2.0,
-            borderColor: Colors.blue,
+            height: 6.0,
+            width: 6.0,
+            color: Colors.red,
+            borderColor: Colors.red,
             isVisible: true,
           ),
           dataSource: data,
