@@ -522,7 +522,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               ),
                               SizedBox(
                                   height:
-                                      22), // Space between buttons and Wind Direction
+                                      20), // Space between buttons and Wind Direction
 
                               // Wind Direction widget in the center
                               if (widget.deviceName.startsWith('WD'))
@@ -638,7 +638,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
-                        enableMouseWheelZooming: true,
+                        // enableMouseWheelZooming: true,
                       ),
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
