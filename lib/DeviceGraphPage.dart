@@ -556,6 +556,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         ),
                         labelRotation: 70,
                         edgeLabelPlacement: EdgeLabelPlacement.shift,
+                        interval: 30,
                       ),
                       primaryYAxis: NumericAxis(
                         title: AxisTitle(
