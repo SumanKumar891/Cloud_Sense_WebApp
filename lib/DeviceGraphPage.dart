@@ -453,7 +453,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          'Device ID: ${widget.sequentialName}',
+                                          'Device ID : ${widget.sequentialName}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,

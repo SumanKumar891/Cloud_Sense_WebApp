@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 0.0),
                           child: Text(
-                            'At Cloud Sense, we’re dedicated to providing you with real-time data to help you make informed decisions about your surroundings. Our advanced app leverages cutting-edge technology to deliver accurate and timely data.',
+                            "At Cloud Sense, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings. Our advanced app leverages cutting-edge technology to deliver accurate and timely data.",
                             style: TextStyle(
                               fontSize: MediaQuery.of(context).size.width < 800
                                   ? 16

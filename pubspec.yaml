@@ -104,6 +104,7 @@ flutter:
     - assets/Chloritron.PNG
     - assets/soil.jpg
     - assets/tree.jpg
+    - assets/yellow.jpg
   fonts:
       - family: DMSerifText
         fonts:
