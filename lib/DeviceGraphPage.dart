@@ -546,38 +546,35 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                     ),
                   ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: SfCartesianChart(
-                        plotAreaBackgroundColor: Colors.white,
-                        primaryXAxis: DateTimeAxis(
-                          dateFormat: DateFormat('hh:mm a'),
-                          title: AxisTitle(
-                            text: 'Time',
-                            textStyle: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          labelRotation: 70,
-                          edgeLabelPlacement: EdgeLabelPlacement.shift,
+                    child: SfCartesianChart(
+                      plotAreaBackgroundColor: Colors.white,
+                      primaryXAxis: DateTimeAxis(
+                        dateFormat: DateFormat('hh:mm a'),
+                        title: AxisTitle(
+                          text: 'Time',
+                          textStyle: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        primaryYAxis: NumericAxis(
-                          title: AxisTitle(
-                            text: yAxisTitle,
-                            textStyle: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          axisLine: AxisLine(width: 1),
-                          majorGridLines: MajorGridLines(width: 1),
-                        ),
-                        tooltipBehavior: TooltipBehavior(enable: true),
-                        // zoomPanBehavior: ZoomPanBehavior(
-                        //   zoomMode: ZoomMode.x,
-                        //   enablePanning: true,
-                        //   enablePinching: true,
-                        // enableMouseWheelZooming: true,
-                        // ),
-                        series: <ChartSeries<ChartData, DateTime>>[
-                          _getChartSeries(chartType, data, title),
-                        ],
+                        labelRotation: 70,
+                        edgeLabelPlacement: EdgeLabelPlacement.shift,
                       ),
+                      primaryYAxis: NumericAxis(
+                        title: AxisTitle(
+                          text: yAxisTitle,
+                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        axisLine: AxisLine(width: 1),
+                        majorGridLines: MajorGridLines(width: 1),
+                      ),
+                      tooltipBehavior: TooltipBehavior(enable: true),
+                      zoomPanBehavior: ZoomPanBehavior(
+                        zoomMode: ZoomMode.x,
+                        enablePanning: true,
+                        enablePinching: true,
+                        // enableMouseWheelZooming: true,
+                      ),
+                      series: <ChartSeries<ChartData, DateTime>>[
+                        _getChartSeries(chartType, data, title),
+                      ],
                     ),
                   ),
                   // Add zoom control buttons
