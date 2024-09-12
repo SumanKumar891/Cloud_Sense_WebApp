@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/soil.jpg', // Replace with your image path
+                    'assets/buildings.jpg', // Replace with your image path
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width < 800 ? 400 : 550,
                     fit: BoxFit.cover,
