@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.grey[900],
           title: Row(
             children: [
-              isMobile ? SizedBox(width: 30) : SizedBox(width: 80),
+              isMobile ? SizedBox(width: 10) : SizedBox(width: 80),
               Icon(Icons.cloud, color: Colors.white, size: isMobile ? 24 : 32),
               SizedBox(width: isMobile ? 10 : 20),
               Text(
