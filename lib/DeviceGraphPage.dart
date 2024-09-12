@@ -495,6 +495,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     padding: const EdgeInsets.all(16.0),
                                     child: ElevatedButton(
                                       onPressed: _selectDate,
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor:
+                                            Colors.blue, // Text color
+                                      ),
                                       child: Text(
                                         'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
                                       ),
@@ -505,6 +510,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     padding: const EdgeInsets.all(16.0),
                                     child: ElevatedButton(
                                       onPressed: downloadCSV,
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        backgroundColor:
+                                            Colors.blue, // Text color
+                                      ),
                                       child: Text('Download CSV'),
                                     ),
                                   ),
