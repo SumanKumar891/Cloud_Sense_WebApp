@@ -628,6 +628,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
+                        enableMouseWheelZooming: true,
                       ),
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
