@@ -76,6 +76,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Chlorine Sensors';
       case 'WD':
         return 'Weather Sensors';
+      case 'SS':
+        return 'Soil Sensors';
       default:
         return key;
     }
@@ -189,103 +191,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     body: Stack(
-  //       children: [
-  //         // Background image
-  //         Container(
-  //           decoration: const BoxDecoration(
-  //             image: DecorationImage(
-  //               image: AssetImage('assets/backgroundd.jpg'),
-  //               fit: BoxFit.cover,
-  //             ),
-  //           ),
-  //           child: BackdropFilter(
-  //             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-  //             child: Container(
-  //               color: Colors.black
-  //                   .withOpacity(0.4), // Optional overlay for readability
-  //             ),
-  //           ),
-  //         ),
-  //         // Main content
-  //         Column(
-  //           children: [
-  //             AppBar(
-  //               title: Text('Your Chosen Devices'),
-  //               backgroundColor: Colors.transparent,
-  //               elevation: 0,
-  //               actions: [
-  //                 TextButton.icon(
-  //                   onPressed: () async {
-  //                     try {
-  //                       await Amplify.Auth.signOut();
-  //                       SharedPreferences prefs =
-  //                           await SharedPreferences.getInstance();
-  //                       await prefs.remove('email');
-
-  //                       Navigator.pushAndRemoveUntil(
-  //                         context,
-  //                         MaterialPageRoute(
-  //                           builder: (context) => HomePage(),
-  //                         ),
-  //                         (Route<dynamic> route) => false,
-  //                       );
-  //                     } catch (e) {
-  //                       // Handle error during logout if necessary
-  //                     }
-  //                   }, // Logout function
-  //                   icon: Icon(Icons.logout, color: Colors.white),
-  //                   label: Text(
-  //                     'Log out',
-  //                     style: TextStyle(color: Colors.white),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //             Expanded(
-  //               child: Center(
-  //                 child: _isLoading
-  //                     ? CircularProgressIndicator()
-  //                     : Column(
-  //                         mainAxisAlignment: MainAxisAlignment.center,
-  //                         children: [
-  //                           // Quote Text
-  //                           Padding(
-  //                             padding: const EdgeInsets.only(
-  //                                 top: 70.0, left: 16.0, right: 16.0),
-  //                             child: Text(
-  //                               "Select a device to unlock insights into data.",
-  //                               textAlign: TextAlign.center,
-  //                               style: TextStyle(
-  //                                 fontFamily: 'OpenSans',
-  //                                 fontSize: 45,
-  //                                 fontWeight: FontWeight.bold,
-  //                                 color: Colors.white,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                           SizedBox(
-  //                               height:
-  //                                   5), // Space between quote and device cards
-  //                           Expanded(
-  //                             child: _deviceCategories.isNotEmpty
-  //                                 ? _buildDeviceCards()
-  //                                 : _buildNoDevicesCard(),
-  //                           ),
-  //                         ],
-  //                       ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildDeviceCards() {
     List<Widget> cardList = _deviceCategories.keys.map((category) {
@@ -479,6 +384,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'Chlorine Sensors':
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Weather Sensors':
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Soil Sensors': // Add color for Soil Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

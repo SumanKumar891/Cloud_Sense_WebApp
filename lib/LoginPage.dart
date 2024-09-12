@@ -201,6 +201,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar:
+          true, // This allows the body to extend behind the app bar
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
