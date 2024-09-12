@@ -96,7 +96,6 @@ flutter:
     - assets/signup3.png
     - assets/clouds.jpg
     - assets/backgroundd.jpg
-    - assets/cloudVideo.gif
     - assets/leaves.jpg
     - assets/blue.jpg
     - assets/sunn.jpg
@@ -104,7 +103,6 @@ flutter:
     - assets/Chloritron.PNG
     - assets/soil.jpg
     - assets/tree.jpg
-    - assets/yellow.jpg
   fonts:
       - family: DMSerifText
         fonts:

@@ -70847,7 +70847,7 @@ $0(){A.eT(this.a,!1).fv()},
 $S:0}
 A.b1f.prototype={
 $2(a,b){var s,r,q,p=null,o=this.a,n=t.p,m=o.a
-if(b.b<800)m=A.cN(A.b([A.b9("Device ID : "+m.d,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,16,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p),A.b9("Status: "+o.e,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,16,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p),A.b9("Received: "+o.f,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,16,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p)],n),B.w,B.jx,B.v)
+if(b.b<800)m=A.cN(A.b([A.b9("Device ID: "+m.d,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,16,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p),A.b9("Status: "+o.e,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,16,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p),A.b9("Received: "+o.f,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,16,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p)],n),B.w,B.jx,B.v)
 else{s=t.l
 s=A.hu(A.b([A.b9("Device ID: "+m.d,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,A.bm(a,p,s).w.a.a*0.013,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p),A.b9("Status: "+o.e,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,A.bm(a,p,s).w.a.a*0.013,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p),A.b9("Received: "+o.f,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,A.bm(a,p,s).w.a.a*0.013,p,p,B.K,p,p,!0,p,p,p,p,p,p,p,p),p,p,p)],n),B.w,B.jx,B.v)
 m=s}s=A.bt(p,20,p)
@@ -71055,7 +71055,7 @@ o=A.S(p,0,0,0)
 n=A.bm(a0,g,s).w.a.a<800?20:100
 m=A.bm(a0,g,s).w.a.a<800?60:120
 l=A.bm(a0,g,s).w.a.a<1000?60:400
-k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+k=A.b9("Welcome to Cloud Sense ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 j=A.bt(g,20,g)
 r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],c),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],c),B.G,B.aZ,g)
 q=A.bt(g,80,g)
@@ -71446,7 +71446,7 @@ o=A.S(p,0,0,0)
 n=A.bm(a0,g,s).w.a.a<800?20:100
 m=A.bm(a0,g,s).w.a.a<800?60:120
 l=A.bm(a0,g,s).w.a.a<1000?60:400
-k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+k=A.b9("Welcome to Cloud Sense ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 j=A.bt(g,20,g)
 r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],c),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],c),B.G,B.aZ,g)
 q=A.bt(g,80,g)
