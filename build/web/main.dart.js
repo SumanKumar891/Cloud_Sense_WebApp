@@ -70721,7 +70721,7 @@ case 2:o=b
 if(o!=null&&!o.j(0,q.d))q.ak(new A.b1d(q,o))
 return A.x(null,r)}})
 return A.y($async$Ef,r)},
-U(a){var s,r,q=this,p=null,o=q.a,n=B.c.br(o.c,"WD")?"assets/trees.jpeg":"assets/soill.jpg",m=A.bkw(0,A.cv(p,p,B.o,p,p,new A.dW(p,A.axM(new A.azY(A.S(B.d.aa(76.5),0,0,0),B.Kf),B.bs,new A.q8(n,p,p)),p,p,p,p,B.ag),p,p,p,p,p,p,p,p))
+U(a){var s,r,q=this,p=null,o=q.a,n=B.c.br(o.c,"WD")?"assets/tree.jpg":"assets/Chloritron.PNG",m=A.bkw(0,A.cv(p,p,B.o,p,p,new A.dW(p,A.axM(new A.azY(A.S(B.d.aa(76.5),0,0,0),B.Kf),B.bs,new A.q8(n,p,p)),p,p,p,p,B.ag),p,p,p,p,p,p,p,p))
 o=A.b9("Graphs for "+o.d,p,p,p,p,A.bb(p,p,B.k,p,p,p,p,p,p,p,p,p,p,p,p,p,p,!0,p,p,p,p,p,p,p,p),p,p,p)
 o=A.Q7(p,A.CU(p,B.n,0,p,A.zV(p,A.kZ(B.j8,B.k,p,p),new A.b1e(a),p,p),o),p,p,0,0,0,p)
 s=A.CU(p,p,p,p,p,p)
@@ -71048,14 +71048,14 @@ if(a){a=this.a
 B.b.M(b,A.b([A.bt(g,g,20),a.UT(f,a.d,new A.b2R(a0)),A.bt(g,g,20),a.UT(e,a.e,new A.b2S(a0))],c))}b=A.CU(g,B.cL,g,new A.eQ(g,g,g,g,g,B.k,g,g,g),g,A.hu(b,B.w,B.x,B.v))
 a=d?A.biz(A.bjP(A.b([A.biA(A.b9("Menu",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),new A.dW(B.cL,g,g,g,g,g,B.ag)),A.aFr(A.kZ(B.tl,g,g,g),new A.b2T(a0),A.b9(f,g,g,g,g,g,g,g,g)),A.aFr(A.kZ(B.tm,g,g,g),new A.b2U(a0),A.b9(e,g,g,g,g,g,g,g,g))],c),B.b3)):g
 s=t.l
-r=A.zX("assets/soill.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:550,1/0)
+r=A.zX("assets/soil.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:550,1/0)
 q=A.bm(a0,g,s).w.a.a<800?400:550
 p=B.d.aa(127.5)
 o=A.S(p,0,0,0)
 n=A.bm(a0,g,s).w.a.a<800?20:100
 m=A.bm(a0,g,s).w.a.a<800?60:120
 l=A.bm(a0,g,s).w.a.a<1000?60:400
-k=A.b9("Welcome to Cloud Sense ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 j=A.bt(g,20,g)
 r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],c),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],c),B.G,B.aZ,g)
 q=A.bt(g,80,g)
@@ -71439,14 +71439,14 @@ if(a){a=this.a
 B.b.M(b,A.b([A.bt(g,g,20),a.VE(f,a.d,new A.b2M(a0)),A.bt(g,g,20),a.VE(e,a.e,new A.b2N(a0))],c))}b=A.CU(g,B.cL,g,new A.eQ(g,g,g,g,g,B.k,g,g,g),g,A.hu(b,B.w,B.x,B.v))
 a=d?A.biz(A.bjP(A.b([A.biA(A.b9("Menu",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),new A.dW(B.cL,g,g,g,g,g,B.ag)),A.aFr(A.kZ(B.tl,g,g,g),new A.b2O(a0),A.b9(f,g,g,g,g,g,g,g,g)),A.aFr(A.kZ(B.tm,g,g,g),new A.b2P(a0),A.b9(e,g,g,g,g,g,g,g,g))],c),B.b3)):g
 s=t.l
-r=A.zX("assets/soill.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:550,1/0)
+r=A.zX("assets/soil.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:550,1/0)
 q=A.bm(a0,g,s).w.a.a<800?400:550
 p=B.d.aa(127.5)
 o=A.S(p,0,0,0)
 n=A.bm(a0,g,s).w.a.a<800?20:100
 m=A.bm(a0,g,s).w.a.a<800?60:120
 l=A.bm(a0,g,s).w.a.a<1000?60:400
-k=A.b9("Welcome to Cloud Sense ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 j=A.bt(g,20,g)
 r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],c),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],c),B.G,B.aZ,g)
 q=A.bt(g,80,g)
