@@ -35,38 +35,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> chlorineData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
 
-  // ZoomPanBehavior _zoomPanBehavior = ZoomPanBehavior(
-  //   enablePinching: true,
-  //   enablePanning: true,
-  //   zoomMode: ZoomMode.x, // Enable zooming on the X-axis
-  // );
-// Add the zoom control buttons
-  // Widget _buildZoomControls() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       IconButton(
-  //         icon: Icon(Icons.zoom_in),
-  //         onPressed: () {
-  //           _zoomPanBehavior.zoomIn();
-  //         },
-  //       ),
-  //       IconButton(
-  //         icon: Icon(Icons.zoom_out),
-  //         onPressed: () {
-  //           _zoomPanBehavior.zoomOut();
-  //         },
-  //       ),
-  //       IconButton(
-  //         icon: Icon(Icons.refresh),
-  //         onPressed: () {
-  //           _zoomPanBehavior.reset(); // Reset zoom and pan
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
-
+// Add options for selecting the date range
+  String _selectedRange = '1 Day'; // Default range
   @override
   void initState() {
     super.initState();
@@ -119,10 +89,37 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _message = "";
   String _lastWindDirection = "";
 
+// Function to set the start and end dates based on the selected range
+  Map<String, String> _getDateRange() {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
+    String startDate;
+    String endDate = formatter.format(_selectedDay); // Current selected date
+
+    if (_selectedRange == '1 Day') {
+      startDate = endDate; // Single day
+    } else if (_selectedRange == '7 Days') {
+      // Subtract 7 days for 7 days range
+      startDate = formatter.format(_selectedDay.subtract(Duration(days: 7)));
+    } else if (_selectedRange == '6 Months') {
+      // Subtract 6 months for 6 months range
+      startDate = formatter.format(DateTime(
+          _selectedDay.year, _selectedDay.month - 6, _selectedDay.day));
+    } else {
+      startDate = endDate; // Default to 1 day
+    }
+
+    return {'startdate': startDate, 'enddate': endDate};
+  }
+
   Future<void> fetchData() async {
-    final startdate = _formatDate(_selectedDay);
-    final enddate = startdate;
-    final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    // final startdate = _formatDate(_selectedDay);
+    // final enddate = startdate;
+    // final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
+    final dateRange = _getDateRange();
+    final startdate = dateRange['startdate'];
+    final enddate = dateRange['enddate'];
     int deviceId =
         int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
 
@@ -378,6 +375,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+// Dropdown to select the date range
+  Widget _buildDateRangeSelector() {
+    return DropdownButton<String>(
+      value: _selectedRange,
+      onChanged: (String? newValue) {
+        setState(() {
+          _selectedRange = newValue!;
+          fetchData(); // Fetch data for the selected range
+        });
+      },
+      items: <String>['1 Day', '7 Days', '6 Months']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Determine the background image based on the device type
@@ -520,9 +537,77 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   ),
                                 ],
                               ),
+
                               SizedBox(
                                   height:
                                       20), // Space between buttons and Wind Direction
+                              // Row for Date Picker, 7 Days, and 6 Months buttons
+                              // Row(
+                              //   mainAxisAlignment: MainAxisAlignment.start,
+                              //   children: [
+                              //     // Date Picker button
+                              //     Padding(
+                              //       padding: const EdgeInsets.all(16.0),
+                              //       child: ElevatedButton(
+                              //         onPressed: _selectDate,
+                              //         style: ElevatedButton.styleFrom(
+                              //           foregroundColor: Colors.white,
+                              //           backgroundColor:
+                              //               Colors.blue, // Text color
+                              //         ),
+                              //         child: Text(
+                              //           'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     // Last 7 Days button
+                              //     Padding(
+                              //       padding: const EdgeInsets.all(16.0),
+                              //       child: ElevatedButton(
+                              //         onPressed: () {
+                              //           _fetchDataForDays(7);
+                              //         },
+                              //         style: ElevatedButton.styleFrom(
+                              //           foregroundColor: Colors.white,
+                              //           backgroundColor:
+                              //               Colors.blue, // Text color
+                              //         ),
+                              //         child: Text('Last 7 Days'),
+                              //       ),
+                              //     ),
+                              //     // Last 6 Months button
+                              //     Padding(
+                              //       padding: const EdgeInsets.all(16.0),
+                              //       child: ElevatedButton(
+                              //         onPressed: () {
+                              //           _fetchDataForMonths(6);
+                              //         },
+                              //         style: ElevatedButton.styleFrom(
+                              //           foregroundColor: Colors.white,
+                              //           backgroundColor:
+                              //               Colors.blue, // Text color
+                              //         ),
+                              //         child: Text('Last 6 Months'),
+                              //       ),
+                              //     ),
+                              //     // Download CSV button
+                              //     Padding(
+                              //       padding: const EdgeInsets.all(16.0),
+                              //       child: ElevatedButton(
+                              //         onPressed: downloadCSV,
+                              //         style: ElevatedButton.styleFrom(
+                              //           foregroundColor: Colors.white,
+                              //           backgroundColor:
+                              //               Colors.blue, // Text color
+                              //         ),
+                              //         child: Text('Download CSV'),
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
+                              // SizedBox(
+                              //     height:
+                              //         20), // Space between buttons and Wind Direction
 
                               // Wind Direction widget in the center
                               if (widget.deviceName.startsWith('WD'))
@@ -638,7 +723,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
-                        // enableMouseWheelZooming: true,
+                        enableMouseWheelZooming: true,
                       ),
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
