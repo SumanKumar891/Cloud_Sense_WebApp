@@ -71038,37 +71038,37 @@ U(a){return new A.l0(new A.b2X(this),null)},
 UT(a,b,c){var s=null
 return A.nN(A.ut(!1,A.b9(a,s,s,s,s,A.bb(s,s,b,s,s,s,s,s,s,s,s,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s,s),s,s,B.bU,s,s,s,s,c,s,s),B.bP,s,new A.b2A(this,a),new A.b2B(this,a),s)}}
 A.b2X.prototype={
-$2(a0,a1){var s,r,q,p,o,n,m,l,k,j,i,h,g=null,f="ABOUT US",e="LOGIN/SIGNUP",d=a1.b<800,c=t.p,b=A.b([],c),a=!d
-if(a)b.push(A.bt(g,g,50))
-b.push(A.kZ(B.tk,B.k,g,d?24:32))
-b.push(A.bt(g,g,d?8:16))
-b.push(A.b9("Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,d?20:32,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g))
-b.push(new A.GE(g))
-if(a){a=this.a
-B.b.M(b,A.b([A.bt(g,g,20),a.UT(f,a.d,new A.b2R(a0)),A.bt(g,g,20),a.UT(e,a.e,new A.b2S(a0))],c))}b=A.CU(g,B.cL,g,new A.eQ(g,g,g,g,g,B.k,g,g,g),g,A.hu(b,B.w,B.x,B.v))
-a=d?A.biz(A.bjP(A.b([A.biA(A.b9("Menu",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),new A.dW(B.cL,g,g,g,g,g,B.ag)),A.aFr(A.kZ(B.tl,g,g,g),new A.b2T(a0),A.b9(f,g,g,g,g,g,g,g,g)),A.aFr(A.kZ(B.tm,g,g,g),new A.b2U(a0),A.b9(e,g,g,g,g,g,g,g,g))],c),B.b3)):g
+$2(a1,a2){var s,r,q,p,o,n,m,l,k,j,i,h,g=null,f="ABOUT US",e="LOGIN/SIGNUP",d="assets/weatherr.jpg",c=a2.b<800,b=t.p,a=A.b([],b),a0=!c
+if(a0)a.push(A.bt(g,g,50))
+a.push(A.kZ(B.tk,B.k,g,c?24:32))
+a.push(A.bt(g,g,c?8:16))
+a.push(A.b9("Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,c?20:32,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g))
+a.push(new A.GE(g))
+if(a0){a0=this.a
+B.b.M(a,A.b([A.bt(g,g,20),a0.UT(f,a0.d,new A.b2R(a1)),A.bt(g,g,20),a0.UT(e,a0.e,new A.b2S(a1))],b))}a=A.CU(g,B.cL,g,new A.eQ(g,g,g,g,g,B.k,g,g,g),g,A.hu(a,B.w,B.x,B.v))
+a0=c?A.biz(A.bjP(A.b([A.biA(A.b9("Menu",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),new A.dW(B.cL,g,g,g,g,g,B.ag)),A.aFr(A.kZ(B.tl,g,g,g),new A.b2T(a1),A.b9(f,g,g,g,g,g,g,g,g)),A.aFr(A.kZ(B.tm,g,g,g),new A.b2U(a1),A.b9(e,g,g,g,g,g,g,g,g))],b),B.b3)):g
 s=t.l
-r=A.zX("assets/buildings.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:550,1/0)
-q=A.bm(a0,g,s).w.a.a<800?400:550
+r=A.zX(d,B.bs,A.bm(a1,g,s).w.a.a<800?400:550,1/0)
+q=A.bm(a1,g,s).w.a.a<800?400:550
 p=B.d.aa(127.5)
 o=A.S(p,0,0,0)
-n=A.bm(a0,g,s).w.a.a<800?20:100
-m=A.bm(a0,g,s).w.a.a<800?60:120
-l=A.bm(a0,g,s).w.a.a<1000?60:400
-k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+n=A.bm(a1,g,s).w.a.a<800?20:100
+m=A.bm(a1,g,s).w.a.a<800?60:120
+l=A.bm(a1,g,s).w.a.a<1000?60:400
+k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a1,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 j=A.bt(g,20,g)
-r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],c),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],c),B.G,B.aZ,g)
+r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a1,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],b),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],b),B.G,B.aZ,g)
 q=A.bt(g,80,g)
 o=A.bt(g,100,g)
-n=A.zX("assets/weatherr.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:500,1/0)
-m=A.bm(a0,g,s).w.a.a<800?400:500
+n=A.zX(d,B.bs,A.bm(a1,g,s).w.a.a<800?400:500,1/0)
+m=A.bm(a1,g,s).w.a.a<800?400:500
 p=A.S(p,0,0,0)
-l=A.bm(a0,g,s).w.a.a<800?20:80
-k=A.bm(a0,g,s).w.a.a<800?40:85
-j=A.bm(a0,g,s).w.a.a<800?20:90
-i=A.b9("Our Mission",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?30:50,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+l=A.bm(a1,g,s).w.a.a<800?20:80
+k=A.bm(a1,g,s).w.a.a<800?40:85
+j=A.bm(a1,g,s).w.a.a<800?20:90
+i=A.b9("Our Mission",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a1,g,s).w.a.a<800?30:50,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 h=A.bt(g,16,g)
-return A.QU(b,g,A.jB(A.cN(A.b([r,q,new A.c_(new A.aA(16,10,16,10),new A.l0(new A.b2V(),g),g),o,A.iO(B.b9,A.b([n,A.cv(g,A.jB(A.cN(A.b([i,h,A.b9(u.A,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?18:24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],c),B.bd,B.x,B.v),g,g,g,B.a9),B.o,p,g,g,g,m,g,g,new A.aA(l,k,j,50),g,g,1/0)],c),B.G,B.aZ,g),A.bt(g,0,g),A.cv(g,A.cN(A.b([A.b9(u.r,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Phone : 01881 - 232601 ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Email : contact.awadh@iitrpr.ac.in",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],c),B.w,B.x,B.v),B.o,B.qA,g,g,g,g,g,g,new A.aA(20,20,20,20),g,g,1/0)],c),B.bd,B.x,B.v),g,g,g,B.a9),a,!1)},
+return A.QU(a,g,A.jB(A.cN(A.b([r,q,new A.c_(new A.aA(16,10,16,10),new A.l0(new A.b2V(),g),g),o,A.iO(B.b9,A.b([n,A.cv(g,A.jB(A.cN(A.b([i,h,A.b9(u.A,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a1,g,s).w.a.a<800?18:24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],b),B.bd,B.x,B.v),g,g,g,B.a9),B.o,p,g,g,g,m,g,g,new A.aA(l,k,j,50),g,g,1/0)],b),B.G,B.aZ,g),A.bt(g,0,g),A.cv(g,A.cN(A.b([A.b9(u.r,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Phone : 01881 - 232601 ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Email : contact.awadh@iitrpr.ac.in",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],b),B.w,B.x,B.v),B.o,B.qA,g,g,g,g,g,g,new A.aA(20,20,20,20),g,g,1/0)],b),B.bd,B.x,B.v),g,g,g,B.a9),a0,!1)},
 $S:253}
 A.b2R.prototype={
 $0(){var s=A.l1(new A.b2I(),null,t.z)
@@ -71429,37 +71429,37 @@ U(a){return new A.l0(new A.b2W(this),null)},
 VE(a,b,c){var s=null
 return A.nN(A.ut(!1,A.b9(a,s,s,s,s,A.bb(s,s,b,s,s,s,s,s,s,s,s,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s),s,s,s),s,s,B.bU,s,s,s,s,c,s,s),B.bP,s,new A.b2C(this,a),new A.b2D(this,a),s)}}
 A.b2W.prototype={
-$2(a0,a1){var s,r,q,p,o,n,m,l,k,j,i,h,g=null,f="ABOUT US",e="LOGIN/SIGNUP",d=a1.b<800,c=t.p,b=A.b([],c),a=!d
-if(a)b.push(A.bt(g,g,50))
-b.push(A.kZ(B.tk,B.k,g,d?24:32))
-b.push(A.bt(g,g,d?8:16))
-b.push(A.b9("Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,d?20:32,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g))
-b.push(new A.GE(g))
-if(a){a=this.a
-B.b.M(b,A.b([A.bt(g,g,20),a.VE(f,a.d,new A.b2M(a0)),A.bt(g,g,20),a.VE(e,a.e,new A.b2N(a0))],c))}b=A.CU(g,B.cL,g,new A.eQ(g,g,g,g,g,B.k,g,g,g),g,A.hu(b,B.w,B.x,B.v))
-a=d?A.biz(A.bjP(A.b([A.biA(A.b9("Menu",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),new A.dW(B.cL,g,g,g,g,g,B.ag)),A.aFr(A.kZ(B.tl,g,g,g),new A.b2O(a0),A.b9(f,g,g,g,g,g,g,g,g)),A.aFr(A.kZ(B.tm,g,g,g),new A.b2P(a0),A.b9(e,g,g,g,g,g,g,g,g))],c),B.b3)):g
+$2(a1,a2){var s,r,q,p,o,n,m,l,k,j,i,h,g=null,f="ABOUT US",e="LOGIN/SIGNUP",d="assets/weatherr.jpg",c=a2.b<800,b=t.p,a=A.b([],b),a0=!c
+if(a0)a.push(A.bt(g,g,50))
+a.push(A.kZ(B.tk,B.k,g,c?24:32))
+a.push(A.bt(g,g,c?8:16))
+a.push(A.b9("Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,c?20:32,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g))
+a.push(new A.GE(g))
+if(a0){a0=this.a
+B.b.M(a,A.b([A.bt(g,g,20),a0.VE(f,a0.d,new A.b2M(a1)),A.bt(g,g,20),a0.VE(e,a0.e,new A.b2N(a1))],b))}a=A.CU(g,B.cL,g,new A.eQ(g,g,g,g,g,B.k,g,g,g),g,A.hu(a,B.w,B.x,B.v))
+a0=c?A.biz(A.bjP(A.b([A.biA(A.b9("Menu",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),new A.dW(B.cL,g,g,g,g,g,B.ag)),A.aFr(A.kZ(B.tl,g,g,g),new A.b2O(a1),A.b9(f,g,g,g,g,g,g,g,g)),A.aFr(A.kZ(B.tm,g,g,g),new A.b2P(a1),A.b9(e,g,g,g,g,g,g,g,g))],b),B.b3)):g
 s=t.l
-r=A.zX("assets/buildings.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:550,1/0)
-q=A.bm(a0,g,s).w.a.a<800?400:550
+r=A.zX(d,B.bs,A.bm(a1,g,s).w.a.a<800?400:550,1/0)
+q=A.bm(a1,g,s).w.a.a<800?400:550
 p=B.d.aa(127.5)
 o=A.S(p,0,0,0)
-n=A.bm(a0,g,s).w.a.a<800?20:100
-m=A.bm(a0,g,s).w.a.a<800?60:120
-l=A.bm(a0,g,s).w.a.a<1000?60:400
-k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a0,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+n=A.bm(a1,g,s).w.a.a<800?20:100
+m=A.bm(a1,g,s).w.a.a<800?60:120
+l=A.bm(a1,g,s).w.a.a<1000?60:400
+k=A.b9("Welcome to Cloud Sense",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,"OpenSans",g,g,A.bm(a1,g,s).w.a.a<800?40:65,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 j=A.bt(g,20,g)
-r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],c),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],c),B.G,B.aZ,g)
+r=A.iO(B.b9,A.b([r,A.cv(B.dy,A.cN(A.b([k,j,new A.c_(B.b3,A.b9(u.y,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a1,g,s).w.a.a<800?16:22,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),B.e5,g,g),g)],b),B.bd,B.x,B.v),B.o,o,g,g,g,q,g,g,new A.aA(n,m,l,20),g,g,1/0)],b),B.G,B.aZ,g)
 q=A.bt(g,80,g)
 o=A.bt(g,100,g)
-n=A.zX("assets/weatherr.jpg",B.bs,A.bm(a0,g,s).w.a.a<800?400:500,1/0)
-m=A.bm(a0,g,s).w.a.a<800?400:500
+n=A.zX(d,B.bs,A.bm(a1,g,s).w.a.a<800?400:500,1/0)
+m=A.bm(a1,g,s).w.a.a<800?400:500
 p=A.S(p,0,0,0)
-l=A.bm(a0,g,s).w.a.a<800?20:80
-k=A.bm(a0,g,s).w.a.a<800?40:85
-j=A.bm(a0,g,s).w.a.a<800?20:90
-i=A.b9("Our Mission",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?30:50,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
+l=A.bm(a1,g,s).w.a.a<800?20:80
+k=A.bm(a1,g,s).w.a.a<800?40:85
+j=A.bm(a1,g,s).w.a.a<800?20:90
+i=A.b9("Our Mission",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a1,g,s).w.a.a<800?30:50,g,g,B.K,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)
 h=A.bt(g,16,g)
-return A.QU(b,g,A.jB(A.cN(A.b([r,q,new A.c_(new A.aA(16,10,16,10),new A.l0(new A.b2Q(),g),g),o,A.iO(B.b9,A.b([n,A.cv(g,A.jB(A.cN(A.b([i,h,A.b9(u.A,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a0,g,s).w.a.a<800?18:24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],c),B.bd,B.x,B.v),g,g,g,B.a9),B.o,p,g,g,g,m,g,g,new A.aA(l,k,j,50),g,g,1/0)],c),B.G,B.aZ,g),A.bt(g,0,g),A.cv(g,A.cN(A.b([A.b9(u.r,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Phone : 01881 - 232601 ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Email : contact.awadh@iitrpr.ac.in",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],c),B.w,B.x,B.v),B.o,B.qA,g,g,g,g,g,g,new A.aA(20,20,20,20),g,g,1/0)],c),B.bd,B.x,B.v),g,g,g,B.a9),a,!1)},
+return A.QU(a,g,A.jB(A.cN(A.b([r,q,new A.c_(new A.aA(16,10,16,10),new A.l0(new A.b2Q(),g),g),o,A.iO(B.b9,A.b([n,A.cv(g,A.jB(A.cN(A.b([i,h,A.b9(u.A,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,A.bm(a1,g,s).w.a.a<800?18:24,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],b),B.bd,B.x,B.v),g,g,g,B.a9),B.o,p,g,g,g,m,g,g,new A.aA(l,k,j,50),g,g,1/0)],b),B.G,B.aZ,g),A.bt(g,0,g),A.cv(g,A.cN(A.b([A.b9(u.r,g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Phone : 01881 - 232601 ",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g),A.bt(g,18,g),A.b9("Email : contact.awadh@iitrpr.ac.in",g,g,g,g,A.bb(g,g,B.k,g,g,g,g,g,g,g,g,16,g,g,g,g,g,!0,g,g,g,g,g,g,g,g),g,g,g)],b),B.w,B.x,B.v),B.o,B.qA,g,g,g,g,g,g,new A.aA(20,20,20,20),g,g,1/0)],b),B.bd,B.x,B.v),g,g,g,B.a9),a0,!1)},
 $S:253}
 A.b2M.prototype={
 $0(){var s=A.l1(new A.b2L(),null,t.z)
