@@ -624,6 +624,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         majorGridLines: MajorGridLines(width: 1),
                       ),
                       tooltipBehavior: TooltipBehavior(enable: true),
+                      zoomPanBehavior: ZoomPanBehavior(
+                        zoomMode: ZoomMode.x,
+                        enablePanning: true,
+                        enablePinching: true,
+                      ),
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
                       ],
