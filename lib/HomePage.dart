@@ -159,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome to Cloud Sense ',
+                          'Welcome to Cloud Sense',
                           style: TextStyle(
                             fontFamily: 'OpenSans',
                             fontSize: MediaQuery.of(context).size.width < 800
