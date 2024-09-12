@@ -40,9 +40,9 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.grey[900],
           title: Row(
             children: [
-              if (!isMobile) SizedBox(width: 50),
+              isMobile ? SizedBox(width: 30) : SizedBox(width: 80),
               Icon(Icons.cloud, color: Colors.white, size: isMobile ? 24 : 32),
-              SizedBox(width: isMobile ? 8 : 16),
+              SizedBox(width: isMobile ? 10 : 20),
               Text(
                 'Cloud Sense',
                 style: TextStyle(
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                       bottom: 20,
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           'Welcome to Cloud Sense',
@@ -180,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                                   : 22,
                               color: Colors.white,
                             ),
-                            textAlign: TextAlign.left,
+                            textAlign: TextAlign.justify,
                           ),
                         ),
                       ],
@@ -188,104 +188,58 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              SizedBox(height: 80),
+              SizedBox(height: 50),
               // "What We Offer" Section
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    return constraints.maxWidth < 800
-                        ? Column(
-                            children: [
-                              Card(
-                                elevation: 5,
-                                shadowColor: Colors.black.withOpacity(0.5),
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'What We Offer?',
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      SizedBox(height: 16),
-                                      Text(
-                                        'Explore the sensors and dive into the live data they capture. With just a tap, you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. Track various factors to help you plan effectively and contribute to optimizing your usage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort and efficiency. With all the essential insights at your fingertips, you can create a more comfortable and sustainable living space.',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
+                    return Column(
+                      children: [
+                        Card(
+                          elevation: 5,
+                          shadowColor: Colors.black.withOpacity(0.5),
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'What We Offer?',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
                                 ),
-                              ),
-                              SizedBox(height: 16),
-                              Container(
-                                width: double.infinity,
-                                height: 400,
-                                child: Image.asset(
-                                  'assets/weather_.jpg', // Replace with your image path
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Card(
-                                  elevation: 5,
-                                  shadowColor: Colors.black.withOpacity(0.5),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'What We Offer?',
-                                          style: TextStyle(
-                                            fontSize: 46,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        SizedBox(height: 16),
-                                        Text(
-                                          'Explore the sensors and dive into the live data they capture. With just a tap, you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. Track various factors to help you plan effectively and contribute to optimizing your usage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort and efficiency. With all the essential insights at your fingertips, you can create a more comfortable and sustainable living space.',
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                SizedBox(height: 16),
+                                Text(
+                                  'Explore the sensors and dive into the live data they capture. With just a tap, you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. Track various factors to help you plan effectively and contribute to optimizing your usage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort and efficiency. With all the essential insights at your fingertips, you can create a more comfortable and sustainable living space.',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
                                   ),
+                                  textAlign: TextAlign.justify,
                                 ),
-                              ),
-                              SizedBox(width: 50),
-                              Container(
-                                width: 600,
-                                height: 500,
-                                child: Image.asset(
-                                  'assets/weather_.jpg', // Replace with your image path
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ],
-                          );
+                              ],
+                            ),
+                          ),
+                        ),
+                        // SizedBox(height: 16),
+                        // Container(
+                        //   width: double.infinity,
+                        //   height: 400,
+                        //   child: Image.asset(
+                        //     'assets/weather_.jpg', // Replace with your image path
+                        //     fit: BoxFit.cover,
+                        //   ),
+                        // ),
+                      ],
+                    );
                   },
                 ),
               ),
-              SizedBox(height: 100),
+              SizedBox(height: 50),
               // "Our Mission" Section
               Stack(
                 children: [
@@ -305,32 +259,31 @@ class _HomePageState extends State<HomePage> {
                       MediaQuery.of(context).size.width < 800 ? 20.0 : 90.0,
                       50.0,
                     ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Our Mission',
-                            style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width < 800
-                                  ? 30
-                                  : 50,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Our Mission',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width < 800
+                                ? 30
+                                : 50,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
-                          SizedBox(height: 16),
-                          Text(
-                            'At Cloud Sense, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
-                            style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width < 800
-                                  ? 18
-                                  : 24,
-                              color: Colors.white,
-                            ),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'At Cloud Sense, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width < 800
+                                ? 18
+                                : 24,
+                            color: Colors.white,
                           ),
-                        ],
-                      ),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ],
                     ),
                   ),
                 ],
