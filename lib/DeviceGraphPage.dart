@@ -5,6 +5,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'dart:html' as html;
+// import 'dart:ui' as ui;
 
 import 'package:intl/intl.dart';
 
@@ -34,12 +35,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> windDirectionData = [];
   List<ChartData> chlorineData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
+  bool _isHovering = false; // Track hover state
+  String _selectedRange = 'none'; // Tracks which button is selected
+  void _onRangeSelected(String range) {
+    setState(() {
+      _selectedRange = range;
+      _fetchDataForRange(range); // Fetch data based on the selected range
+    });
+  }
 
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
     _fetchDeviceDetails();
-    fetchData();
+    // fetchData();
+    _fetchDataForRange('single');
   }
 
   Future<void> _fetchDeviceDetails() async {
@@ -76,9 +87,44 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _message = "";
   String _lastWindDirection = "";
 
-  Future<void> fetchData() async {
-    final startdate = _formatDate(_selectedDay);
-    final enddate = startdate;
+  // Future<void> fetchData() async {
+  //   final startdate = _formatDate(_selectedDay);
+  //   final enddate = startdate;
+  //   final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
+  //   int deviceId =
+  //       int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
+
+  //   setState(() {
+  //     _selectedDeviceId = deviceId; // Set the selected device ID
+  //   });
+
+  Future<void> _fetchDataForRange(String range) async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+    DateTime startDate;
+    DateTime endDate = DateTime.now();
+
+    switch (range) {
+      case '7days':
+        startDate = endDate.subtract(Duration(days: 7));
+        break;
+      case '30days':
+        startDate = endDate.subtract(Duration(days: 30)); // 30 days range
+        break;
+      case '3months':
+        startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
+        break;
+      case 'single':
+        startDate = _selectedDay; // Use the selected day as startDate
+        endDate = startDate; // Single day means endDate is same as startDate
+        break;
+      default:
+        startDate = endDate; // Default to today
+    }
+
+    final startdate = _formatDate(startDate);
+    final enddate = _formatDate(endDate);
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
     int deviceId =
         int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
@@ -98,6 +144,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else {
       setState(() {
         _message = "Unknown device type";
+      });
+      setState(() {
+        _isLoading = false; // Stop loading
       });
       return;
     }
@@ -186,9 +235,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           }
         });
       }
+      //   } catch (e) {
+      //     setState(() {
+      //       _message = 'Error fetching data: $e';
+      //     });
+      //   }
+      // }
     } catch (e) {
       setState(() {
         _message = 'Error fetching data: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading
       });
     }
   }
@@ -304,7 +363,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       setState(() {
         _selectedDay = picked;
         chlorineData.clear();
-        fetchData(); // Fetch data for the selected date
+        _fetchDataForRange('single'); // Fetch data for the selected date
       });
     }
   }
@@ -346,8 +405,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: Text(
-                "Graphs for ${widget.sequentialName}",
-                style: TextStyle(color: Colors.white),
+                "${widget.sequentialName}",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               leading: IconButton(
                 icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -381,80 +444,206 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    'Device ID: ${widget.sequentialName}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:
-                                          MediaQuery.of(context).size.width *
-                                              0.013,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   'Device ID: ${widget.sequentialName}',
+                                  //   style: TextStyle(
+                                  //     fontWeight: FontWeight.bold,
+                                  //     fontSize:
+                                  //         MediaQuery.of(context).size.width *
+                                  //             0.013,
+                                  //     color: Colors.white,
+                                  //   ),
+                                  // ),
                                   Text(
                                     'Status: $_currentStatus',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
-                                              0.013,
+                                              0.011,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  Text(
-                                    'Received: $_dataReceivedTime',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:
-                                          MediaQuery.of(context).size.width *
-                                              0.013,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   'Received: $_dataReceivedTime',
+                                  //   style: TextStyle(
+                                  //     fontWeight: FontWeight.bold,
+                                  //     fontSize:
+                                  //         MediaQuery.of(context).size.width *
+                                  //             0.013,
+                                  //     color: Colors.white,
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                               SizedBox(
                                   height:
                                       20), // Space between status and buttons
-
-                              // Row for Date Picker and Download CSV button aligned to the left
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // Date Picker button
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: ElevatedButton(
-                                      onPressed: _selectDate,
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor:
-                                            Colors.blue, // Text color
-                                      ),
-                                      child: Text(
-                                        'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
-                                      ),
-                                    ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(0),
+                                    color: const Color.fromARGB(150, 0, 0, 0),
                                   ),
-                                  // Download CSV button
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: ElevatedButton(
-                                      onPressed: downloadCSV,
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor:
-                                            Colors.blue, // Text color
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceBetween, // Space out buttons evenly
+                                    children: [
+                                      // Date Picker button
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            _selectDate(); // Your date picker function
+                                            setState(() {
+                                              _selectedRange =
+                                                  'date'; // Mark this button as selected
+                                            });
+                                          },
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Colors
+                                                .transparent, // Make button background transparent
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 36, vertical: 28),
+                                            side: _selectedRange == 'date'
+                                                ? BorderSide(
+                                                    color: Colors.white,
+                                                    width:
+                                                        2) // Show border if selected
+                                                : BorderSide
+                                                    .none, // No border if not selected
+                                          ),
+                                          child: Text(
+                                            'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _selectedRange == 'date'
+                                                  ? Colors.blue
+                                                  : Colors
+                                                      .white, // Change text color based on selection
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                      child: Text('Download CSV'),
-                                    ),
+                                      SizedBox(
+                                          width: 8), // Space between buttons
+                                      // 7 Days button
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            _fetchDataForRange(
+                                                '7days'); // Your data fetching function
+                                            setState(() {
+                                              _selectedRange =
+                                                  '7days'; // Mark this button as selected
+                                            });
+                                          },
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Colors
+                                                .transparent, // Background color
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 36, vertical: 28),
+                                            side: _selectedRange == '7days'
+                                                ? BorderSide(
+                                                    color: Colors.white,
+                                                    width:
+                                                        2) // Show border if selected
+                                                : BorderSide
+                                                    .none, // No border if not selected
+                                          ),
+                                          child: Text(
+                                            'Last 7 Days',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _selectedRange == '7days'
+                                                  ? Colors.blue
+                                                  : Colors
+                                                      .white, // Change text color based on selection
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          width: 8), // Space between buttons
+                                      // 30 Days button
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            _fetchDataForRange(
+                                                '30days'); // Fetch data for 30 days range
+                                            setState(() {
+                                              _selectedRange =
+                                                  '30days'; // Mark this button as selected
+                                            });
+                                          },
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Colors.transparent,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 36, vertical: 28),
+                                            side: _selectedRange == '30days'
+                                                ? BorderSide(
+                                                    color: Colors.white,
+                                                    width: 2)
+                                                : BorderSide.none,
+                                          ),
+                                          child: Text(
+                                            'Last 30 Days',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _selectedRange == '30days'
+                                                  ? Colors.blue
+                                                  : Colors
+                                                      .white, // Change text color based on selection
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      // 3 Months button
+                                      Expanded(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            _fetchDataForRange(
+                                                '3months'); // Your data fetching function
+                                            setState(() {
+                                              _selectedRange =
+                                                  '3months'; // Mark this button as selected
+                                            });
+                                          },
+                                          style: TextButton.styleFrom(
+                                            backgroundColor: Colors
+                                                .transparent, // Background color
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 36, vertical: 28),
+                                            side: _selectedRange == '3months'
+                                                ? BorderSide(
+                                                    color: Colors.white,
+                                                    width:
+                                                        2) // Show border if selected
+                                                : BorderSide
+                                                    .none, // No border if not selected
+                                          ),
+                                          child: Text(
+                                            'Last 3 months',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _selectedRange ==
+                                                      '3months'
+                                                  ? Colors.blue
+                                                  : Colors
+                                                      .white, // Change text color based on selection
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
+
                               SizedBox(
                                   height:
-                                      20), // Space between buttons and Wind Direction
-
+                                      0), // Space between buttons and the next section
                               // Wind Direction widget in the center
                               if (widget.deviceName.startsWith('WD'))
                                 Column(
@@ -480,7 +669,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         },
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Text(
                       _message,
                       style: TextStyle(color: Colors.red),
@@ -507,13 +696,66 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ),
             ),
           ),
+          // Loader overlay
+          if (_isLoading) // Show loader only when _isLoading is true
+            Positioned.fill(
+              child: Container(
+                color: Colors.black
+                    .withOpacity(0.5), // Dark semi-transparent background
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ),
+            ),
+
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: MouseRegion(
+              onEnter: (_) =>
+                  setState(() => _isHovering = true), // Change hover state
+              onExit: (_) => setState(() => _isHovering = false),
+              child: ElevatedButton(
+                onPressed: downloadCSV,
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(
+                        255, 40, 41, 41) // Button background color
+                    ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.download,
+                      color: _isHovering ? Colors.blue : Colors.white,
+                    ), // Download icon
+                    SizedBox(width: 8),
+                    Text(
+                      'Download CSV',
+                      style: TextStyle(
+                        color: _isHovering
+                            ? Colors.blue
+                            : Colors.white, // Change color on hover
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildChartContainer(String title, List<ChartData> data,
-      String yAxisTitle, ChartType chartType) {
+  Widget _buildChartContainer(
+    String title,
+    List<ChartData> data,
+    String yAxisTitle,
+    ChartType chartType,
+  ) {
     return data.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.all(16.0),
@@ -523,15 +765,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade300,
-                    blurRadius: 5.0,
-                    spreadRadius: 1.0,
-                    offset: Offset(0.0, 0.0),
-                  ),
-                ],
+                color: const Color.fromARGB(150, 0, 0, 0),
               ),
               child: Column(
                 children: [
@@ -540,38 +774,74 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                     child: Text(
                       '$title Graph', // Displaying the chart's title
                       style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
                   Expanded(
                     child: SfCartesianChart(
-                      plotAreaBackgroundColor: Colors.white,
+                      plotAreaBackgroundColor:
+                          const Color.fromARGB(100, 0, 0, 0),
                       primaryXAxis: DateTimeAxis(
-                        dateFormat: DateFormat('hh:mm a'),
+                        dateFormat: DateFormat('MM/dd hh:mm a'),
                         title: AxisTitle(
                           text: 'Time',
-                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                          textStyle: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
+                        labelStyle: TextStyle(color: Colors.white),
                         labelRotation: 70,
                         edgeLabelPlacement: EdgeLabelPlacement.shift,
                         interval: 30,
                       ),
                       primaryYAxis: NumericAxis(
+                        labelStyle: TextStyle(color: Colors.white),
                         title: AxisTitle(
                           text: yAxisTitle,
-                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                          textStyle: TextStyle(
+                              fontWeight: FontWeight.w200, color: Colors.white),
                         ),
                         axisLine: AxisLine(width: 1),
-                        majorGridLines: MajorGridLines(width: 1),
+                        majorGridLines: MajorGridLines(width: 0),
                       ),
-                      tooltipBehavior: TooltipBehavior(enable: true),
+                      tooltipBehavior: TooltipBehavior(
+                        enable: true,
+                        builder: (dynamic data, dynamic point, dynamic series,
+                            int pointIndex, int seriesIndex) {
+                          final ChartData chartData = data as ChartData;
+                          return Container(
+                            padding: EdgeInsets.all(8),
+                            color: const Color.fromARGB(127, 0, 0, 0),
+                            constraints: BoxConstraints(
+                              maxWidth: 200, // Adjust the max width as needed
+                              maxHeight: 60, // Adjust the max height as needed
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${chartData.timestamp}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  'Value: ${chartData.value}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                       zoomPanBehavior: ZoomPanBehavior(
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
-                        // enableMouseWheelZooming: true,
+                        enableMouseWheelZooming: true,
                       ),
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
