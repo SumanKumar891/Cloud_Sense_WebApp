@@ -53,6 +53,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     _fetchDataForRange('single');
   }
 
+  bool _showCurrentData = false; // To toggle current data visibility
+
   Future<void> _fetchDeviceDetails() async {
     try {
       final response = await http.get(Uri.parse(
@@ -627,8 +629,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                             'Last 3 months',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                              color: _selectedRange ==
-                                                      '3months'
+                                              color: _selectedRange == '3months'
                                                   ? Colors.blue
                                                   : Colors
                                                       .white, // Change text color based on selection
@@ -864,8 +865,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           markerSettings: const MarkerSettings(
             height: 6.0,
             width: 6.0,
-            color: Colors.red,
-            borderColor: Colors.red,
+            // color: Colors.red,
+            // borderColor: Colors.red,
             isVisible: true,
           ),
           dataSource: data,
@@ -873,6 +874,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           yValueMapper: (ChartData data, _) => data.value,
           name: title,
           color: Colors.blue,
+          // Set marker colors based on the value
+          pointColorMapper: (ChartData data, _) {
+            if (data.value >= 0.01 && data.value <= 0.5) {
+              return Colors.green; // Green for values between 0.01 and 1
+            } else if (data.value > 0.5 && data.value <= 1.0) {
+              return Colors.yellow; // Yellow for values between 1.1 and 2
+            } else if (data.value > 1.0 && data.value <= 4.0) {
+              return Colors.orange; // Red for values between 2.1 and 5
+            } else if (data.value > 4.0) {
+              return Colors.red; // Red for values between 2.1 and 5
+            }
+            return Colors.white; // Default color (if needed)
+          },
         );
 
       default:
