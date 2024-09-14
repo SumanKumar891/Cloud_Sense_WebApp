@@ -298,7 +298,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QRScannerPage(),
+                      builder: (context) => QRScannerPage(
+                        devices: _deviceCategories,
+                      ),
                     ),
                   );
                 },
@@ -365,7 +367,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QRScannerPage(),
+                      builder: (context) =>
+                          QRScannerPage(devices: _deviceCategories),
                     ),
                   );
                 },
