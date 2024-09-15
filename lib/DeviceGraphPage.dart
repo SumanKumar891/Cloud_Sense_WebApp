@@ -44,7 +44,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     });
   }
 
+String _currentChlorineValue = '0.00' ;
   bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +54,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     // fetchData();
     _fetchDataForRange('single');
   }
-
   bool _showCurrentData = false; // To toggle current data visibility
 
   Future<void> _fetchDeviceDetails() async {
@@ -172,6 +173,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             windSpeedData = [];
             rainIntensityData = [];
             solarIrradianceData = [];
+
+              // Update current chlorine value
+            if (chlorineData.isNotEmpty) {
+              _currentChlorineValue = chlorineData.last.value.toStringAsFixed(2);
+            }
 
             // Prepare data for CSV
 
@@ -670,33 +676,63 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         },
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
-                      _message,
-                      style: TextStyle(color: Colors.red),
+          //           SizedBox(height: 10),
+          //           Text(
+          //             _message,
+          //             style: TextStyle(color: Colors.red),
+          //           ),
+          //           _buildChartContainer('Chlorine', chlorineData,
+          //               'chlorine (mg/L)', ChartType.line),
+          //           _buildChartContainer('Temperature', temperatureData,
+          //               'Temperature (°C)', ChartType.line),
+          //           _buildChartContainer('Humidity', humidityData,
+          //               'Humidity (%)', ChartType.line),
+          //           _buildChartContainer('Light Intensity', lightIntensityData,
+          //               'Light Intensity (Lux)', ChartType.line),
+          //           _buildChartContainer('Wind Speed', windSpeedData,
+          //               'Wind Speed (m/s)', ChartType.line),
+          //           _buildChartContainer('Rain Intensity', rainIntensityData,
+          //               'Rain Intensity (mm/h)', ChartType.line),
+          //           _buildChartContainer(
+          //               'Solar Irradiance',
+          //               solarIrradianceData,
+          //               'Solar Irradiance (W/M^2)',
+          //               ChartType.line),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
+         // Current values display section
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        _buildCurrentValue('Chlorine Level', _currentChlorineValue, 'mg/L'),
+                        // _buildCurrentValue('Temperature', _currentTemperature, '°C'),
+                        // _buildCurrentValue('Humidity', _currentHumidity, '%'),
+                        // _buildCurrentValue('Light Intensity', _currentLightIntensity, 'Lux'),
+                        // _buildCurrentValue('Wind Speed', _currentWindSpeed, 'm/s'),
+                        // _buildCurrentValue('Rain Intensity', _currentRainIntensity, 'mm/h'),
+                        // _buildCurrentValue('Solar Irradiance', _currentSolarIrradiance, 'W/M^2'),
+                      ],
                     ),
-                    _buildChartContainer('Chlorine', chlorineData,
-                        'chlorine (mg/L)', ChartType.line),
-                    _buildChartContainer('Temperature', temperatureData,
-                        'Temperature (°C)', ChartType.line),
-                    _buildChartContainer('Humidity', humidityData,
-                        'Humidity (%)', ChartType.line),
-                    _buildChartContainer('Light Intensity', lightIntensityData,
-                        'Light Intensity (Lux)', ChartType.line),
-                    _buildChartContainer('Wind Speed', windSpeedData,
-                        'Wind Speed (m/s)', ChartType.line),
-                    _buildChartContainer('Rain Intensity', rainIntensityData,
-                        'Rain Intensity (mm/h)', ChartType.line),
-                    _buildChartContainer(
-                        'Solar Irradiance',
-                        solarIrradianceData,
-                        'Solar Irradiance (W/M^2)',
-                        ChartType.line),
-                  ],
-                ),
+                  ),
+
+                  // Display charts for various parameters
+                  _buildChartContainer('Chlorine', chlorineData, 'Chlorine (mg/L)', ChartType.line),
+                  _buildChartContainer('Temperature', temperatureData, 'Temperature (°C)', ChartType.line),
+                  _buildChartContainer('Humidity', humidityData, 'Humidity (%)', ChartType.line),
+                  _buildChartContainer('Light Intensity', lightIntensityData, 'Light Intensity (Lux)', ChartType.line),
+                  _buildChartContainer('Wind Speed', windSpeedData, 'Wind Speed (m/s)', ChartType.line),
+                  _buildChartContainer('Rain Intensity', rainIntensityData, 'Rain Intensity (mm/h)', ChartType.line),
+                  _buildChartContainer('Solar Irradiance', solarIrradianceData, 'Solar Irradiance (W/M^2)', ChartType.line),
+                ],
               ),
             ),
           ),
+        ),
+ 
           // Loader overlay
           if (_isLoading) // Show loader only when _isLoading is true
             Positioned.fill(
@@ -750,6 +786,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ),
     );
   }
+  Widget _buildCurrentValue(String parameterName, String currentValue, String unit) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start, // Align text to the top
+      children: [
+        // Display both parameter and value together in a single text widget
+        Text(
+          '$parameterName: $currentValue $unit',
+          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _buildChartContainer(
     String title,
