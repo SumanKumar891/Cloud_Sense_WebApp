@@ -44,9 +44,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     });
   }
 
-String _currentChlorineValue = '0.00' ;
   bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -54,6 +52,7 @@ String _currentChlorineValue = '0.00' ;
     // fetchData();
     _fetchDataForRange('single');
   }
+
   bool _showCurrentData = false; // To toggle current data visibility
 
   Future<void> _fetchDeviceDetails() async {
@@ -173,11 +172,6 @@ String _currentChlorineValue = '0.00' ;
             windSpeedData = [];
             rainIntensityData = [];
             solarIrradianceData = [];
-
-              // Update current chlorine value
-            if (chlorineData.isNotEmpty) {
-              _currentChlorineValue = chlorineData.last.value.toStringAsFixed(2);
-            }
 
             // Prepare data for CSV
 
