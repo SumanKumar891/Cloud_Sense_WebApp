@@ -4,6 +4,7 @@
 
 import FlutterMacOS
 import Foundation
+import Cocoa
 
 
 import amplify_auth_cognito
