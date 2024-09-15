@@ -410,7 +410,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "${widget.sequentialName}",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 34,
+                  fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
