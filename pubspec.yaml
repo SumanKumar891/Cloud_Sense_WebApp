@@ -87,17 +87,13 @@ flutter:
   assets:
     - assets/weatherr.jpg
     - assets/weathericon.jpg
-    - assets/sensors.jpg
     - assets/weather_.jpg
-    - assets/weatherstation.jpg
     - assets/Nature.jpg
-    - assets/buildings.jpg
     - assets/loginImage.png
     - assets/signup3.png
-    - assets/clouds.jpg
+   
     - assets/backgroundd.jpg
-    - assets/leaves.jpg
-    - assets/blue.jpg
+    
     - assets/sunn.jpg
     - assets/tower.jpg
     - assets/Chloritron.PNG
