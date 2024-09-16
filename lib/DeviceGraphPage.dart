@@ -402,6 +402,8 @@ String _currentChlorineValue = '0.00' ;
                   ),
                 ),
               ),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.width < 800 ? 400 :500,
             ),
           ),
           // AppBar

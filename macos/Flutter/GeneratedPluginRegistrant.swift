@@ -5,8 +5,6 @@
 import FlutterMacOS
 import Foundation
 
-
-
 import amplify_auth_cognito
 import amplify_secure_storage
 import device_info_plus
