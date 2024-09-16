@@ -88,14 +88,12 @@ flutter:
     - assets/weatherr.jpg
     - assets/loginImage.png
     - assets/signup3.png
-   
     - assets/backgroundd.jpg
-    
     - assets/sunn.jpg
-   
     - assets/Chloritron.PNG
     - assets/soil.jpg
     - assets/tree.jpg
+    - assets/chlorine.jpeg
     # - assets/images/
   fonts:
       - family: DMSerifText
