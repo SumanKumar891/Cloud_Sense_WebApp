@@ -816,7 +816,7 @@ String _currentChlorineValue = '0.00' ;
             padding: const EdgeInsets.all(16.0),
             child: Container(
               width: double.infinity,
-              height: 400,
+              height: MediaQuery.of(context).size.width < 800 ? 300 :400,
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
@@ -829,7 +829,7 @@ String _currentChlorineValue = '0.00' ;
                     child: Text(
                       '$title Graph', // Displaying the chart's title
                       style: TextStyle(
-                          fontSize: 22,
+                          fontSize:MediaQuery.of(context).size.width < 800 ? 18 :22,
                           fontWeight: FontWeight.bold,
                           color: Colors.white),
                     ),

@@ -70841,27 +70841,33 @@ q=A.jt(B.Ts,k?B.bq:B.i,n,n)
 p=A.bv(n,n,8)
 s.push(A.FI(16,A.mW(A.zo(A.hu(A.b([q,p,A.b8("Download CSV",n,n,n,n,A.bb(n,n,k?B.bq:B.i,n,n,n,n,n,n,n,n,n,n,n,n,n,n,!0,n,n,n,n,n,n,n,n),n,n,n)],r),B.v,B.w,B.bZ),o.gaCb(),l),B.bG,n,new A.b1K(o),new A.b1L(o),n),n,n,n,16,n,n))
 return A.QU(n,B.OT,A.iP(B.bb,s,B.H,B.b_,n),n,!1)},
-r_(a,b,c,a0){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e=null,d="Segoe UI"
-if(b.length!==0){s=A.D4(16)
-r=A.b8(a+" Graph",e,e,e,e,A.bb(e,e,B.i,e,e,e,e,e,e,e,e,22,e,e,B.Q,e,e,!0,e,e,e,e,e,e,e,e),e,e,e)
-q=A.qr("MM/dd hh:mm a",e)
-p=A.bcy("Time",A.bb(e,e,B.i,e,e,e,e,e,e,e,e,e,e,e,B.Q,e,e,!0,e,e,e,e,e,e,e,e))
-o=A.bb(e,e,B.i,e,e,e,e,e,e,e,e,e,e,e,e,e,e,!0,e,e,e,e,e,e,e,e)
-o=A.rz(e,e,"Normal",12,B.cp,B.z,o)
-n=A.b([],t.Mq)
-m=A.bBq(new A.LV(1),A.bb(e,e,B.i,e,e,e,e,e,e,e,e,e,e,e,e,e,e,!0,e,e,e,e,e,e,e,e),new A.P5(0),A.bcy(c,A.bb(e,e,B.i,e,e,e,e,e,e,e,e,e,e,e,B.rP,e,e,!0,e,e,e,e,e,e,e,e)))
-l=A.bEQ(new A.b1c(),!0)
-k=A.bFD(!0,!0,!0,B.fd)
-j=A.b([this.am5(a0,b,a)],t.j1)
-i=A.rz(e,e,d,15,B.cp,B.z,e)
-h=A.b([],t.fK)
-g=A.rz(e,e,d,13,B.cp,e,e)
-f=A.rz(e,e,d,12,B.cp,e,e)
-f=new A.a4M(f,B.cK)
-f=new A.a4K(!1,B.tC,B.cK,!1,B.n,0,B.n,0,1,10,12,12,!0,g,!1,B.tB,f,B.h0,15)
-g=f
-f=A.b([],t.BK)
-s=new A.ca(B.dJ,A.cx(e,A.cR(A.b([new A.ca(B.Ru,r,e),A.jm(new A.Ri(new A.a03(i),g,B.NO,new A.qs(q,!0,!0,B.pt,B.pS,B.pU,B.z4,B.pT,o,p,B.en,e,3,0,70,B.fo,!1,!1,B.cL,B.h_,B.ka,B.fT,30,0,e,1,0,!0,B.fq,e,e,!0,n,e,e,e,e,B.pq,B.n,0,B.i2,B.pV,e,e,e),m,B.Rk,h,l,new A.a17(),new A.aaC(),k,B.E8,!1,B.fj,j,f,e),1)],t.p),B.v,B.w,B.x),B.o,e,e,new A.dQ(B.qt,e,e,s,e,e,B.af),e,400,e,new A.aA(10,10,10,10),e,e,e,1/0),e)}else s=A.cx(e,e,B.o,e,e,e,e,e,e,e,e,e,e,e)
+r_(a,b,a0,a1){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d=null,c="Segoe UI"
+if(b.length!==0){s=this.c
+s.toString
+r=t.l
+s=A.bm(s,d,r).w.a.a<800?300:400
+q=A.D4(16)
+p=this.c
+p.toString
+o=A.b8(a+" Graph",d,d,d,d,A.bb(d,d,B.i,d,d,d,d,d,d,d,d,A.bm(p,d,r).w.a.a<800?18:22,d,d,B.Q,d,d,!0,d,d,d,d,d,d,d,d),d,d,d)
+n=A.qr("MM/dd hh:mm a",d)
+m=A.bcy("Time",A.bb(d,d,B.i,d,d,d,d,d,d,d,d,d,d,d,B.Q,d,d,!0,d,d,d,d,d,d,d,d))
+l=A.bb(d,d,B.i,d,d,d,d,d,d,d,d,d,d,d,d,d,d,!0,d,d,d,d,d,d,d,d)
+r=A.rz(d,d,"Normal",12,B.cp,B.z,l)
+p=A.b([],t.Mq)
+l=A.bBq(new A.LV(1),A.bb(d,d,B.i,d,d,d,d,d,d,d,d,d,d,d,d,d,d,!0,d,d,d,d,d,d,d,d),new A.P5(0),A.bcy(a0,A.bb(d,d,B.i,d,d,d,d,d,d,d,d,d,d,d,B.rP,d,d,!0,d,d,d,d,d,d,d,d)))
+k=A.bEQ(new A.b1c(),!0)
+j=A.bFD(!0,!0,!0,B.fd)
+i=A.b([this.am5(a1,b,a)],t.j1)
+h=A.rz(d,d,c,15,B.cp,B.z,d)
+g=A.b([],t.fK)
+f=A.rz(d,d,c,13,B.cp,d,d)
+e=A.rz(d,d,c,12,B.cp,d,d)
+e=new A.a4M(e,B.cK)
+e=new A.a4K(!1,B.tC,B.cK,!1,B.n,0,B.n,0,1,10,12,12,!0,f,!1,B.tB,e,B.h0,15)
+f=e
+e=A.b([],t.BK)
+s=new A.ca(B.dJ,A.cx(d,A.cR(A.b([new A.ca(B.Ru,o,d),A.jm(new A.Ri(new A.a03(h),f,B.NO,new A.qs(n,!0,!0,B.pt,B.pS,B.pU,B.z4,B.pT,r,m,B.en,d,3,0,70,B.fo,!1,!1,B.cL,B.h_,B.ka,B.fT,30,0,d,1,0,!0,B.fq,d,d,!0,p,d,d,d,d,B.pq,B.n,0,B.i2,B.pV,d,d,d),l,B.Rk,g,k,new A.a17(),new A.aaC(),j,B.E8,!1,B.fj,i,e,d),1)],t.p),B.v,B.w,B.x),B.o,d,d,new A.dQ(B.qt,d,d,q,d,d,B.af),d,s,d,new A.aA(10,10,10,10),d,d,d,1/0),d)}else s=A.cx(d,d,B.o,d,d,d,d,d,d,d,d,d,d,d)
 return s},
 am5(a,b,c){var s=null,r=t.En,q=t.CG
 switch(a.a){case 0:return A.bkd(s,s,B.bq,s,b,B.a1i,c,new A.b1q(),s,s,new A.b1r(),s,new A.b1s(),r,q)
