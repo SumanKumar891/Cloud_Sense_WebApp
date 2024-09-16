@@ -383,8 +383,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     // Determine the background image based on the device type
     String backgroundImagePath = widget.deviceName.startsWith('WD')
         ? 'assets/tree.jpg'
-        // : 'assets/Chloritron.PNG';
-        : 'assets/soil.jpg';
+        : 'assets/Chloritron.PNG';
+    // : 'assets/soil.jpg';
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(
