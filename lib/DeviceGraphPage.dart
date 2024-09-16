@@ -395,13 +395,11 @@ String _currentChlorineValue = '0.00' ;
                 image: DecorationImage(
                   image: AssetImage(backgroundImagePath),
                   fit: BoxFit.cover,
-                  // colorFilter: ColorFilter.mode(
-                  //   Colors.black
-                  //       .withOpacity(0.3), // Add a semi-transparent overlay
-                  //   BlendMode.darken,
-                  // ),
-                  colorFilter: null, // No color filter applied
-
+                  colorFilter: ColorFilter.mode(
+                    Colors.black
+                        .withOpacity(0.3), // Add a semi-transparent overlay
+                    BlendMode.darken,
+                  ),
                 ),
               ),
               width: double.infinity,
