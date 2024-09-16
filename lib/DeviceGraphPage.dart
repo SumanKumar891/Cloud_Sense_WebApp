@@ -397,7 +397,7 @@ String _currentChlorineValue = '0.00' ;
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
                     Colors.black
-                        .withOpacity(0.3), // Add a semi-transparent overlay
+                        .withOpacity(0.1), // Add a semi-transparent overlay
                     BlendMode.darken,
                   ),
                 ),
