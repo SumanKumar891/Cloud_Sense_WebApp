@@ -418,7 +418,7 @@ String _currentChlorineValue = '0.00' ;
                 "${widget.sequentialName}",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 34,
+                  fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
