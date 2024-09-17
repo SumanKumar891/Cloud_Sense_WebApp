@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                       bottom: 20,
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Welcome to Cloud Sense',
