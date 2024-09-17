@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:convert';
 import 'package:csv/csv.dart';
-import 'dart:html' as html;
+import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
 // import 'dart:ui' as ui;
 
 import 'package:intl/intl.dart';
@@ -105,6 +109,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Future<void> _fetchDataForRange(String range) async {
     setState(() {
       _isLoading = true; // Start loading
+      _csvRows.clear();
     });
     DateTime startDate;
     DateTime endDate = DateTime.now();
@@ -262,25 +267,54 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  // Function to download CSV
-  void downloadCSV() {
+  void downloadCSV(BuildContext context) async {
     if (_csvRows.isEmpty) {
-      setState(() {
-        _message = "No data available for download.";
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No data available for download.")),
+      );
       return;
     }
 
-    // Convert rows to CSV
     String csvData = const ListToCsvConverter().convert(_csvRows);
 
-    // Trigger download in web
-    final blob = html.Blob([csvData], 'text/csv');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", "SensorData.csv")
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    if (kIsWeb) {
+      final blob = html.Blob([csvData], 'text/csv');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", "SensorData.csv")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Downloading"),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    } else {
+      // Android/iOS: Save the CSV file
+      try {
+        if (await Permission.storage.request().isGranted) {
+          final directory = await getExternalStorageDirectory();
+          final filePath = '${directory!.path}/SensorData.csv';
+
+          final file = File(filePath);
+          await file.writeAsString(csvData);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("File downloaded to $filePath")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Storage permission denied")),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error downloading: $e")),
+        );
+      }
+    }
   }
 
   List<ChartData> _parseBDChartData(Map<String, dynamic> data, String type) {
@@ -771,7 +805,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   setState(() => _isHovering = true), // Change hover state
               onExit: (_) => setState(() => _isHovering = false),
               child: ElevatedButton(
-                onPressed: downloadCSV,
+                onPressed: () {
+                  downloadCSV(context);
+                },
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: const Color.fromARGB(
