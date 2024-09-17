@@ -86,24 +86,14 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/weatherr.jpg
-    - assets/weathericon.jpg
-    - assets/sensors.jpg
-    - assets/weather_.jpg
-    - assets/weatherstation.jpg
-    - assets/Nature.jpg
-    - assets/buildings.jpg
     - assets/loginImage.png
     - assets/signup3.png
-    - assets/clouds.jpg
     - assets/backgroundd.jpg
-    - assets/leaves.jpg
-    - assets/blue.jpg
     - assets/sunn.jpg
-    - assets/tower.jpg
     - assets/Chloritron.PNG
     - assets/soil.jpg
     - assets/tree.jpg
-    - assets/images/
+    # - assets/images/
   fonts:
       - family: DMSerifText
         fonts:
