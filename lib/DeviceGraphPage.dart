@@ -9,6 +9,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
+import 'package:device_info_plus/device_info_plus.dart';
 // import 'dart:ui' as ui;
 
 import 'package:intl/intl.dart';
@@ -523,6 +524,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   // ),
                                 ],
                               ),
+
                               SizedBox(
                                   height:
                                       20), // Space between status and buttons
@@ -715,6 +717,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         },
                       ),
                     ),
+
                     //           SizedBox(height: 10),
                     //           Text(
                     //             _message,
@@ -758,7 +761,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         ],
                       ),
                     ),
-
                     // Display charts for various parameters
                     _buildChartContainer('Chlorine', chlorineData,
                         'Chlorine (mg/L)', ChartType.line),
@@ -887,6 +889,23 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           color: Colors.white),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildColorBox(Colors.white, '< 0.01 '),
+                        SizedBox(width: 45),
+                        _buildColorBox(Colors.green, '> 0.01 - 0.5'),
+                        SizedBox(width: 45),
+                        _buildColorBox(Colors.yellow, '> 0.5 - 1.0'),
+                        SizedBox(width: 45),
+                        _buildColorBox(Colors.orange, '> 1.0 - 4.0'),
+                        SizedBox(width: 45),
+                        _buildColorBox(Colors.red, ' Above 4.0'),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: SfCartesianChart(
                       plotAreaBackgroundColor:
@@ -956,12 +975,29 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ],
                     ),
                   ),
-                  // Add zoom control buttons
                 ],
               ),
             ),
           )
         : Container(); // Return empty container if no data
+  }
+
+  // Helper method to create colored box with range label
+  Widget _buildColorBox(Color color, String range) {
+    return Row(
+      children: [
+        Container(
+          width: 20,
+          height: 20,
+          color: color,
+        ),
+        SizedBox(width: 8),
+        Text(
+          range,
+          style: TextStyle(color: Colors.white),
+        ),
+      ],
+    );
   }
 
   ChartSeries<ChartData, DateTime> _getChartSeries(
