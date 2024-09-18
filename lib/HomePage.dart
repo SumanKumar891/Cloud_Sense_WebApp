@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 0.0),
                           child: Text(
-                            "At Cloud Sense, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings. Our advanced app leverages cutting-edge technology to deliver accurate and timely data.",
+                            "At Cloud Sense, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",
                             style: TextStyle(
                               fontSize: MediaQuery.of(context).size.width < 800
                                   ? 16
@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                           elevation: 5,
                           shadowColor: Colors.black.withOpacity(0.5),
                           child: Padding(
-                            padding: EdgeInsets.all(16.0),
+                            padding: EdgeInsets.all(60.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -216,7 +216,11 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   'Explore the sensors and dive into the live data they capture. With just a tap, you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. Track various factors to help you plan effectively and contribute to optimizing your usage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort and efficiency. With all the essential insights at your fingertips, you can create a more comfortable and sustainable living space.',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    // fontSize: 16,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width < 800
+                                            ? 14
+                                            : 20,
                                     color: Colors.black,
                                   ),
                                   textAlign: TextAlign.justify,

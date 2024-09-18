@@ -530,7 +530,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 padding: const EdgeInsets.all(16.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(0),
+                                    borderRadius: BorderRadius.circular(8.0),
                                     color: const Color.fromARGB(150, 0, 0, 0),
                                   ),
                                   child: Row(
