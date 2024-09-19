@@ -833,7 +833,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         if (screenWidth < 800) {
                           // For smaller screens (e.g., mobile devices)
                           boxSize = 5.0;
-                          spacing = 5.0;
+                          spacing = 6.0;
                           textSize = 6.0;
                         } else {
                           // For larger screens (e.g., PCs and laptops)
