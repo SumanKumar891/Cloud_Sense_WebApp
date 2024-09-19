@@ -252,6 +252,90 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  // void downloadCSV(BuildContext context) async {
+  //   if (_csvRows.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("No data available for download.")),
+  //     );
+  //     return;
+  //   }
+
+  //   String csvData = const ListToCsvConverter().convert(_csvRows);
+
+  //   if (kIsWeb) {
+  //     final blob = html.Blob([csvData], 'text/csv');
+  //     final url = html.Url.createObjectUrlFromBlob(blob);
+  //     final anchor = html.AnchorElement(href: url)
+  //       ..setAttribute("download", "SensorData.csv")
+  //       ..click();
+  //     html.Url.revokeObjectUrl(url);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Downloading"),
+  //         duration: Duration(seconds: 1),
+  //       ),
+  //     );
+  //   } else {
+  //     try {
+  //       // Check storage permission status
+  //       if (io.Platform.isAndroid) {
+  //         if (await Permission.storage.isGranted) {
+  //           // If already granted, continue with the download
+  //           await saveCSVFile(csvData);
+  //         } else {
+  //           // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
+  //           if (await Permission.manageExternalStorage.request().isGranted) {
+  //             await saveCSVFile(csvData);
+  //           } else if (await Permission
+  //               .manageExternalStorage.isPermanentlyDenied) {
+  //             // If permanently denied, prompt to enable from settings
+  //             await openAppSettings();
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               SnackBar(
+  //                   content:
+  //                       Text("Please enable storage permission from settings")),
+  //             );
+  //           }
+  //         }
+  //       } else {
+  //         // Handle for other platforms (iOS)
+  //         await saveCSVFile(csvData);
+  //       }
+  //     } catch (e) {
+  //       // Catch errors during download
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("Error downloading: $e")),
+  //       );
+  //     }
+  //   }
+  // }
+
+  // Future<void> saveCSVFile(String csvData) async {
+  //   final directory =
+  //       await getExternalStorageDirectory(); // Get the external directory
+
+  //   // Get the Downloads directory
+  //   final downloadsDirectory = Directory('/storage/emulated/0/Download');
+
+  //   if (downloadsDirectory.existsSync()) {
+  //     // Generate a unique filename based on the current date and time
+  //     final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+  //     final filePath = '${downloadsDirectory.path}/SensorData_$timestamp.csv';
+  //     final file = File(filePath);
+  //     await file.writeAsString(csvData);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //           content: Text(
+  //               "File downloaded to ${downloadsDirectory.path}/SensorData_$timestamp.csv")),
+  //     );
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Unable to find Downloads directory")),
+  //     );
+  //   }
+  // }
   void downloadCSV(BuildContext context) async {
     if (_csvRows.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -261,12 +345,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
 
     String csvData = const ListToCsvConverter().convert(_csvRows);
+    String fileName = _generateFileName(); // Generate a dynamic filename
 
     if (kIsWeb) {
       final blob = html.Blob([csvData], 'text/csv');
       final url = html.Url.createObjectUrlFromBlob(blob);
       final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", "SensorData.csv")
+        ..setAttribute("download", fileName) // Use the generated filename
         ..click();
       html.Url.revokeObjectUrl(url);
 
@@ -282,11 +367,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         if (io.Platform.isAndroid) {
           if (await Permission.storage.isGranted) {
             // If already granted, continue with the download
-            await saveCSVFile(csvData);
+            await saveCSVFile(
+                csvData, fileName); // Pass filename to saveCSVFile
           } else {
             // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
             if (await Permission.manageExternalStorage.request().isGranted) {
-              await saveCSVFile(csvData);
+              await saveCSVFile(
+                  csvData, fileName); // Pass filename to saveCSVFile
             } else if (await Permission
                 .manageExternalStorage.isPermanentlyDenied) {
               // If permanently denied, prompt to enable from settings
@@ -300,7 +387,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           }
         } else {
           // Handle for other platforms (iOS)
-          await saveCSVFile(csvData);
+          await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
         }
       } catch (e) {
         // Catch errors during download
@@ -311,24 +398,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  Future<void> saveCSVFile(String csvData) async {
-    final directory =
-        await getExternalStorageDirectory(); // Get the external directory
+  String _generateFileName() {
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    return 'SensorData_$timestamp.csv';
+  }
 
-    // Get the Downloads directory
+  Future<void> saveCSVFile(String csvData, String fileName) async {
+    final directory = await getExternalStorageDirectory();
     final downloadsDirectory = Directory('/storage/emulated/0/Download');
 
     if (downloadsDirectory.existsSync()) {
-      // Generate a unique filename based on the current date and time
-      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-      final filePath = '${downloadsDirectory.path}/SensorData_$timestamp.csv';
+      final filePath = '${downloadsDirectory.path}/$fileName';
       final file = File(filePath);
       await file.writeAsString(csvData);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                "File downloaded to ${downloadsDirectory.path}/SensorData_$timestamp.csv")),
+          content: Text("File downloaded to $filePath"),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
