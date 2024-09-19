@@ -1009,26 +1009,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           // For larger screens (e.g., PCs and laptops)
                           boxSize = 20.0;
                           textSize = 16.0;
-                          spacing = 20.0;
+                          spacing = 45.0;
 
-                          // Column layout for larger screens
+                          // Row layout for larger screens
                           return SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildColorBox(
                                     Colors.white, '< 0.01 ', boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.green, '> 0.01 - 0.5',
                                     boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
                                     boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.orange, '> 1.0 - 4.0',
                                     boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.red, ' Above 4.0',
                                     boxSize, textSize),
                               ],
