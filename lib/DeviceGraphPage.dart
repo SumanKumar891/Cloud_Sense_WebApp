@@ -965,23 +965,91 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           color: Colors.white),
                     ),
                   ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(20.0),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     children: [
+                  //       _buildColorBox(Colors.white, '< 0.01 '),
+                  //       SizedBox(width: 45),
+                  //       _buildColorBox(Colors.green, '> 0.01 - 0.5'),
+                  //       SizedBox(width: 45),
+                  //       _buildColorBox(Colors.yellow, '> 0.5 - 1.0'),
+                  //       SizedBox(width: 45),
+                  //       _buildColorBox(Colors.orange, '> 1.0 - 4.0'),
+                  //       SizedBox(width: 45),
+                  //       _buildColorBox(Colors.red, ' Above 4.0'),
+                  //     ],
+                  //   ),
+                  // ),
                   Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildColorBox(Colors.white, '< 0.01 '),
-                        SizedBox(width: 45),
-                        _buildColorBox(Colors.green, '> 0.01 - 0.5'),
-                        SizedBox(width: 45),
-                        _buildColorBox(Colors.yellow, '> 0.5 - 1.0'),
-                        SizedBox(width: 45),
-                        _buildColorBox(Colors.orange, '> 1.0 - 4.0'),
-                        SizedBox(width: 45),
-                        _buildColorBox(Colors.red, ' Above 4.0'),
-                      ],
+                    padding: EdgeInsets.all(20.0),
+                    child: Builder(
+                      builder: (BuildContext context) {
+                        final screenWidth = MediaQuery.of(context).size.width;
+
+                        // Define common properties
+                        double boxSize;
+                        double textSize;
+                        double spacing;
+
+                        if (screenWidth < 800) {
+                          // For smaller screens (e.g., mobile devices)
+                          boxSize = 5.0;
+                          textSize = 5.0;
+                          spacing = 8.0;
+
+                          // Row layout for small screens
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildColorBox(
+                                  Colors.white, '< 0.01 ', boxSize, textSize),
+                              SizedBox(width: spacing),
+                              _buildColorBox(Colors.green, '> 0.01 - 0.5',
+                                  boxSize, textSize),
+                              SizedBox(width: spacing),
+                              _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
+                                  boxSize, textSize),
+                              SizedBox(width: spacing),
+                              _buildColorBox(Colors.orange, '> 1.0 - 4.0',
+                                  boxSize, textSize),
+                              SizedBox(width: spacing),
+                              _buildColorBox(
+                                  Colors.red, ' Above 4.0', boxSize, textSize),
+                            ],
+                          );
+                        } else {
+                          // For larger screens (e.g., PCs and laptops)
+                          boxSize = 20.0;
+                          textSize = 16.0;
+                          spacing = 20.0;
+
+                          // Column layout for larger screens
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildColorBox(
+                                  Colors.white, '< 0.01 ', boxSize, textSize),
+                              SizedBox(height: spacing),
+                              _buildColorBox(Colors.green, '> 0.01 - 0.5',
+                                  boxSize, textSize),
+                              SizedBox(height: spacing),
+                              _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
+                                  boxSize, textSize),
+                              SizedBox(height: spacing),
+                              _buildColorBox(Colors.orange, '> 1.0 - 4.0',
+                                  boxSize, textSize),
+                              SizedBox(height: spacing),
+                              _buildColorBox(
+                                  Colors.red, ' Above 4.0', boxSize, textSize),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ),
+
                   Expanded(
                     child: SfCartesianChart(
                       plotAreaBackgroundColor:
@@ -1059,18 +1127,38 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   // Helper method to create colored box with range label
-  Widget _buildColorBox(Color color, String range) {
+  // Widget _buildColorBox(Color color, String range) {
+  //   return Row(
+  //     children: [
+  //       Container(
+  //         width: 20,
+  //         height: 20,
+  //         color: color,
+  //       ),
+  //       SizedBox(width: 8),
+  //       Text(
+  //         range,
+  //         style: TextStyle(color: Colors.white),
+  //       ),
+  //     ],
+  //   );
+  // }
+  Widget _buildColorBox(
+      Color color, String range, double boxSize, double textSize) {
     return Row(
       children: [
         Container(
-          width: 20,
-          height: 20,
+          width: boxSize,
+          height: boxSize,
           color: color,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8), // Fixed width between box and text
         Text(
           range,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: textSize,
+          ),
         ),
       ],
     );
