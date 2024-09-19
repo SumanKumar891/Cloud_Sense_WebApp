@@ -965,23 +965,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           color: Colors.white),
                     ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(20.0),
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       _buildColorBox(Colors.white, '< 0.01 '),
-                  //       SizedBox(width: 45),
-                  //       _buildColorBox(Colors.green, '> 0.01 - 0.5'),
-                  //       SizedBox(width: 45),
-                  //       _buildColorBox(Colors.yellow, '> 0.5 - 1.0'),
-                  //       SizedBox(width: 45),
-                  //       _buildColorBox(Colors.orange, '> 1.0 - 4.0'),
-                  //       SizedBox(width: 45),
-                  //       _buildColorBox(Colors.red, ' Above 4.0'),
-                  //     ],
-                  //   ),
-                  // ),
                   Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Builder(
@@ -1049,7 +1032,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       },
                     ),
                   ),
-
                   Expanded(
                     child: SfCartesianChart(
                       plotAreaBackgroundColor:
