@@ -6,7 +6,8 @@
  <application
         android:label="cloud_sense_webapp"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+          android:requestLegacyExternalStorage="true"> 
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -15,6 +16,7 @@
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
+             
             android:windowSoftInputMode="adjustResize">
             
             <!-- Specifies an Android theme to apply to this Activity as soon as
@@ -30,9 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-         <meta-data
+         <!-- <meta-data
         android:name="android:requestLegacyExternalStorage"
-        android:value="true" />
+        android:value="true" /> -->
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

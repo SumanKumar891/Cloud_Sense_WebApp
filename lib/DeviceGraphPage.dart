@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
 import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io' as io;
 // import 'dart:ui' as ui;
 
 import 'package:intl/intl.dart';
@@ -95,17 +96,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<List<dynamic>> _csvRows = [];
   String _message = "";
   String _lastWindDirection = "";
-
-  // Future<void> fetchData() async {
-  //   final startdate = _formatDate(_selectedDay);
-  //   final enddate = startdate;
-  //   final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
-  //   int deviceId =
-  //       int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
-
-  //   setState(() {
-  //     _selectedDeviceId = deviceId; // Set the selected device ID
-  //   });
 
   Future<void> _fetchDataForRange(String range) async {
     setState(() {
@@ -251,12 +241,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           }
         });
       }
-      //   } catch (e) {
-      //     setState(() {
-      //       _message = 'Error fetching data: $e';
-      //     });
-      //   }
-      // }
     } catch (e) {
       setState(() {
         _message = 'Error fetching data: $e';
@@ -293,28 +277,61 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         ),
       );
     } else {
-      // Android/iOS: Save the CSV file
       try {
-        if (await Permission.storage.request().isGranted) {
-          final directory = await getExternalStorageDirectory();
-          final filePath = '${directory!.path}/SensorData.csv';
-
-          final file = File(filePath);
-          await file.writeAsString(csvData);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("File downloaded to $filePath")),
-          );
+        // Check storage permission status
+        if (io.Platform.isAndroid) {
+          if (await Permission.storage.isGranted) {
+            // If already granted, continue with the download
+            await saveCSVFile(csvData);
+          } else {
+            // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
+            if (await Permission.manageExternalStorage.request().isGranted) {
+              await saveCSVFile(csvData);
+            } else if (await Permission
+                .manageExternalStorage.isPermanentlyDenied) {
+              // If permanently denied, prompt to enable from settings
+              await openAppSettings();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content:
+                        Text("Please enable storage permission from settings")),
+              );
+            }
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Storage permission denied")),
-          );
+          // Handle for other platforms (iOS)
+          await saveCSVFile(csvData);
         }
       } catch (e) {
+        // Catch errors during download
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error downloading: $e")),
         );
       }
+    }
+  }
+
+  Future<void> saveCSVFile(String csvData) async {
+    final directory =
+        await getExternalStorageDirectory(); // Get the external directory
+
+    // Get the Downloads directory
+    final downloadsDirectory = Directory('/storage/emulated/0/Download');
+
+    if (downloadsDirectory.existsSync()) {
+      final filePath = '${downloadsDirectory.path}/SensorData.csv';
+      final file = File(filePath);
+      await file.writeAsString(csvData);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                "File downloaded to ${downloadsDirectory.path}/SensorData.csv")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Unable to find Downloads directory")),
+      );
     }
   }
 
@@ -492,16 +509,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // Text(
-                                  //   'Device ID: ${widget.sequentialName}',
-                                  //   style: TextStyle(
-                                  //     fontWeight: FontWeight.bold,
-                                  //     fontSize:
-                                  //         MediaQuery.of(context).size.width *
-                                  //             0.013,
-                                  //     color: Colors.white,
-                                  //   ),
-                                  // ),
                                   Text(
                                     'Status: $_currentStatus',
                                     style: TextStyle(
@@ -512,16 +519,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  // Text(
-                                  //   'Received: $_dataReceivedTime',
-                                  //   style: TextStyle(
-                                  //     fontWeight: FontWeight.bold,
-                                  //     fontSize:
-                                  //         MediaQuery.of(context).size.width *
-                                  //             0.013,
-                                  //     color: Colors.white,
-                                  //   ),
-                                  // ),
                                 ],
                               ),
 
@@ -718,33 +715,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                     ),
 
-                    //           SizedBox(height: 10),
-                    //           Text(
-                    //             _message,
-                    //             style: TextStyle(color: Colors.red),
-                    //           ),
-                    //           _buildChartContainer('Chlorine', chlorineData,
-                    //               'chlorine (mg/L)', ChartType.line),
-                    //           _buildChartContainer('Temperature', temperatureData,
-                    //               'Temperature (°C)', ChartType.line),
-                    //           _buildChartContainer('Humidity', humidityData,
-                    //               'Humidity (%)', ChartType.line),
-                    //           _buildChartContainer('Light Intensity', lightIntensityData,
-                    //               'Light Intensity (Lux)', ChartType.line),
-                    //           _buildChartContainer('Wind Speed', windSpeedData,
-                    //               'Wind Speed (m/s)', ChartType.line),
-                    //           _buildChartContainer('Rain Intensity', rainIntensityData,
-                    //               'Rain Intensity (mm/h)', ChartType.line),
-                    //           _buildChartContainer(
-                    //               'Solar Irradiance',
-                    //               solarIrradianceData,
-                    //               'Solar Irradiance (W/M^2)',
-                    //               ChartType.line),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
                     // Current values display section
                     Padding(
                       padding: const EdgeInsets.all(16.0),

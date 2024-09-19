@@ -68,13 +68,6 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => SignInSignUpScreen()),
                   );
                 }),
-                // SizedBox(width: 20),
-                // _buildNavButton('CONTACT US', _contactUsColor, () {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) => ContactUsPage()),
-                //   );
-                // }),
               ],
             ],
           ),
@@ -117,16 +110,6 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ),
-                    // ListTile(
-                    //   leading: Icon(Icons.contact_mail),
-                    //   title: Text('CONTACT US'),
-                    //   onTap: () {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(builder: (context) => ContactUsPage()),
-                    //     );
-                    //   },
-                    // ),
                   ],
                 ),
               )
@@ -188,62 +171,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              // SizedBox(height: 50),
-              // // "What We Offer" Section
-              // Padding(
-              //   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              //   child: LayoutBuilder(
-              //     builder: (context, constraints) {
-              //       return Column(
-              //         children: [
-              //           Card(
-              //             elevation: 5,
-              //             color: const Color.fromARGB(255, 233, 229, 230),
-              //             shadowColor: Colors.green,
-              //             child: Padding(
-              //               padding: EdgeInsets.all(60.0),
-              //               child: Column(
-              //                 crossAxisAlignment: CrossAxisAlignment.center,
-              //                 children: [
-              //                   Text(
-              //                     'What We Offer?',
-              //                     style: TextStyle(
-              //                       fontSize: 24,
-              //                       fontWeight: FontWeight.bold,
-              //                       color: Colors.black,
-              //                     ),
-              //                   ),
-              //                   SizedBox(height: 16),
-              //                   Text(
-              //                     'Explore the sensors and dive into the live data they capture. With just a tap, you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. Track various factors to help you plan effectively and contribute to optimizing your usage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort and efficiency. With all the essential insights at your fingertips, you can create a more comfortable and sustainable living space.',
-              //                     style: TextStyle(
-              //                       // fontSize: 16,
-              //                       fontSize:
-              //                           MediaQuery.of(context).size.width < 800
-              //                               ? 14
-              //                               : 20,
-              //                       color: Colors.black,
-              //                     ),
-              //                     textAlign: TextAlign.justify,
-              //                   ),
-              //                 ],
-              //               ),
-              //             ),
-              //           ),
-              //           // SizedBox(height: 16),
-              //           // Container(
-              //           //   width: double.infinity,
-              //           //   height: 400,
-              //           //   child: Image.asset(
-              //           //     'assets/weather_.jpg', // Replace with your image path
-              //           //     fit: BoxFit.cover,
-              //           //   ),
-              //           // ),
-              //         ],
-              //       );
-              //     },
-              //   ),
-              // ),
+
               SizedBox(height: 50),
 // "What We Offer" Section
               Padding(
