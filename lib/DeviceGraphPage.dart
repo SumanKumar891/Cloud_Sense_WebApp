@@ -441,6 +441,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     String backgroundImagePath = widget.deviceName.startsWith('WD')
         ? 'assets/tree.jpg'
         : 'assets/Chloritronn.png';
+    String _selectedRange = 'ee';
     // : 'assets/soil.jpg';
 
     return Scaffold(
@@ -530,167 +531,103 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               SizedBox(
                                   height:
                                       20), // Space between status and buttons
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
+                              Align(
+                                // padding: const EdgeInsets.all(16.0),
+                                alignment: Alignment.centerLeft,
                                 child: Container(
+                                  width: 200,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(6),
                                     color: const Color.fromARGB(150, 0, 0, 0),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceBetween, // Space out buttons evenly
+                                    // mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space out buttons evenly
                                     children: [
-                                      // Date Picker button
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            _selectDate(); // Your date picker function
-                                            setState(() {
-                                              _selectedRange =
-                                                  'date'; // Mark this button as selected
-                                            });
-                                          },
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors
-                                                .transparent, // Make button background transparent
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 36, vertical: 28),
-                                            side: _selectedRange == 'date'
-                                                ? BorderSide(
-                                                    color: Colors.white,
-                                                    width:
-                                                        2) // Show border if selected
-                                                : BorderSide
-                                                    .none, // No border if not selected
-                                          ),
-                                          child: Text(
-                                            'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: _selectedRange == 'date'
-                                                  ? Colors.blue
-                                                  : Colors
-                                                      .white, // Change text color based on selection
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                          width: 8), // Space between buttons
-                                      // 7 Days button
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            _fetchDataForRange(
-                                                '7days'); // Your data fetching function
-                                            setState(() {
-                                              _selectedRange =
-                                                  '7days'; // Mark this button as selected
-                                            });
-                                          },
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors
-                                                .transparent, // Background color
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 36, vertical: 28),
-                                            side: _selectedRange == '7days'
-                                                ? BorderSide(
-                                                    color: Colors.white,
-                                                    width:
-                                                        2) // Show border if selected
-                                                : BorderSide
-                                                    .none, // No border if not selected
-                                          ),
-                                          child: Text(
-                                            'Last 7 Days',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: _selectedRange == '7days'
-                                                  ? Colors.blue
-                                                  : Colors
-                                                      .white, // Change text color based on selection
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                          width: 8), // Space between buttons
-                                      // 30 Days button
-                                      Expanded(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            _fetchDataForRange(
-                                                '30days'); // Fetch data for 30 days range
-                                            setState(() {
-                                              _selectedRange =
-                                                  '30days'; // Mark this button as selected
-                                            });
-                                          },
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 36, vertical: 28),
-                                            side: _selectedRange == '30days'
-                                                ? BorderSide(
-                                                    color: Colors.white,
-                                                    width: 2)
-                                                : BorderSide.none,
-                                          ),
-                                          child: Text(
-                                            'Last 30 Days',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: _selectedRange == '30days'
-                                                  ? Colors.blue
-                                                  : Colors
-                                                      .white, // Change text color based on selection
-                                            ),
-                                          ),
-                                        ),
-                                      ),
                                       SizedBox(width: 8),
-                                      // 3 Months button
                                       Expanded(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            _fetchDataForRange(
-                                                '3months'); // Your data fetching function
+                                        child: DropdownButton<String>(
+                                          isExpanded: true,
+                                          hint: Text('Select a time period'),
+                                          dropdownColor:
+                                              Colors.black.withOpacity(0.5),
+                                          value: _selectedRange,
+                                          onChanged: (value) {
                                             setState(() {
-                                              _selectedRange =
-                                                  '3months'; // Mark this button as selected
+                                              _selectedRange = value!;
+                                              if (value == 'date') {
+                                                _selectDate(); // Your date picker function
+                                              } else if (value == '7days') {
+                                                _fetchDataForRange(
+                                                    '7days'); // Your data fetching function
+                                              } else if (value == '30days') {
+                                                _fetchDataForRange(
+                                                    '30days'); // Fetch data for 30 days range
+                                              } else if (value == '3months') {
+                                                _fetchDataForRange(
+                                                    '3months'); // Your data fetching function
+                                              } else if (value == 'ee') {
+                                                // Your data fetching function
+                                              }
                                             });
                                           },
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Colors
-                                                .transparent, // Background color
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 36, vertical: 28),
-                                            side: _selectedRange == '3months'
-                                                ? BorderSide(
-                                                    color: Colors.white,
-                                                    width:
-                                                        2) // Show border if selected
-                                                : BorderSide
-                                                    .none, // No border if not selected
-                                          ),
-                                          child: Text(
-                                            'Last 3 months',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: _selectedRange == '3months'
-                                                  ? Colors.blue
-                                                  : Colors
-                                                      .white, // Change text color based on selection
+                                          items: [
+                                            DropdownMenuItem(
+                                              child: Text(
+                                                'Select Time Period',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              value: 'ee',
                                             ),
-                                          ),
+                                            DropdownMenuItem(
+                                              child: Text(
+                                                'Select One Day',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              value: 'date',
+                                            ),
+                                            DropdownMenuItem(
+                                              child: Text(
+                                                'Last 7 Days',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              value: '7days',
+                                            ),
+                                            DropdownMenuItem(
+                                              child: Text(
+                                                'Last 30 Days',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              value: '30days',
+                                            ),
+                                            DropdownMenuItem(
+                                              child: Text(
+                                                'Last 3 months,',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              value: '3months',
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-
                               SizedBox(
                                   height:
                                       0), // Space between buttons and the next section
