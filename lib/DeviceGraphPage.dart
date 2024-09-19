@@ -319,14 +319,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final downloadsDirectory = Directory('/storage/emulated/0/Download');
 
     if (downloadsDirectory.existsSync()) {
-      final filePath = '${downloadsDirectory.path}/SensorData.csv';
+      // Generate a unique filename based on the current date and time
+      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final filePath = '${downloadsDirectory.path}/SensorData_$timestamp.csv';
       final file = File(filePath);
       await file.writeAsString(csvData);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(
-                "File downloaded to ${downloadsDirectory.path}/SensorData.csv")),
+                "File downloaded to ${downloadsDirectory.path}/SensorData_$timestamp.csv")),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
