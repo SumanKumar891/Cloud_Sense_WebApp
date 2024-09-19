@@ -460,6 +460,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         : 'assets/Chloritronn.png';
     String _selectedRange = 'ee';
 
+    // : 'assets/soil.jpg';
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(
           255, 202, 213, 223), // Blue background color for the entire page
