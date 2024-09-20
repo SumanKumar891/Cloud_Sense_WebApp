@@ -43,6 +43,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
   bool _isHovering = false; // Track hover state
   String _selectedRange = 'none'; // Tracks which button is selected
+  String? _activeButton; // Add this variable
+
   void _onRangeSelected(String range) {
     setState(() {
       _selectedRange = range;
@@ -196,8 +198,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             chlorineData = [];
 
             // Extract the last wind direction from the data
-            if (data['items'].isNotEmpty) {
-              lastWindDirection = data['items'].last['WindDirection'];
+            if (data['weather_items'].isNotEmpty) {
+              lastWindDirection = data['weather_items'].last['WindDirection'];
             }
 
             // Prepare data for CSV
@@ -383,7 +385,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   DateTime _parseDate(String dateString) {
     final dateFormat = DateFormat(
-        'yyyy-MM-dd hh:mm:ss'); // Ensure this matches your date format
+        'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
     try {
       return dateFormat.parse(dateString);
     } catch (e) {
@@ -644,8 +646,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                   onPressed: () {
                                                     _selectDate(); // Your date picker function
                                                     setState(() {
-                                                      _selectedRange =
-                                                          'date'; // Mark this button as selected
+                                                      // _selectedRange =
+                                                      //     'date'; // Mark this button as selected
+                                                      _activeButton =
+                                                          'date'; // Set the active button
                                                     });
                                                   },
                                                   style: TextButton.styleFrom(
@@ -655,7 +659,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                         EdgeInsets.symmetric(
                                                             horizontal: 36,
                                                             vertical: 28),
-                                                    side: _selectedRange ==
+                                                    side: _activeButton ==
                                                             'date'
                                                         ? BorderSide(
                                                             color: Colors.white,
@@ -666,7 +670,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      color: _selectedRange ==
+                                                      color: _activeButton ==
                                                               'date'
                                                           ? Colors.blue
                                                           : Colors.white,
@@ -682,7 +686,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     _fetchDataForRange(
                                                         '7days'); // Fetch data for 7 days range
                                                     setState(() {
-                                                      _selectedRange = '7days';
+                                                      _activeButton = '7days';
                                                     });
                                                   },
                                                   style: TextButton.styleFrom(
@@ -692,7 +696,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                         EdgeInsets.symmetric(
                                                             horizontal: 36,
                                                             vertical: 28),
-                                                    side: _selectedRange ==
+                                                    side: _activeButton ==
                                                             '7days'
                                                         ? BorderSide(
                                                             color: Colors.white,
@@ -703,7 +707,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     'Last 7 Days',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      color: _selectedRange ==
+                                                      color: _activeButton ==
                                                               '7days'
                                                           ? Colors.blue
                                                           : Colors.white,
@@ -719,7 +723,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     _fetchDataForRange(
                                                         '30days'); // Fetch data for 30 days range
                                                     setState(() {
-                                                      _selectedRange = '30days';
+                                                      _activeButton = '30days';
                                                     });
                                                   },
                                                   style: TextButton.styleFrom(
@@ -729,7 +733,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                         EdgeInsets.symmetric(
                                                             horizontal: 36,
                                                             vertical: 28),
-                                                    side: _selectedRange ==
+                                                    side: _activeButton ==
                                                             '30days'
                                                         ? BorderSide(
                                                             color: Colors.white,
@@ -740,7 +744,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     'Last 30 Days',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      color: _selectedRange ==
+                                                      color: _activeButton ==
                                                               '30days'
                                                           ? Colors.blue
                                                           : Colors.white,
@@ -756,8 +760,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     _fetchDataForRange(
                                                         '3months'); // Fetch data for 3 months range
                                                     setState(() {
-                                                      _selectedRange =
-                                                          '3months';
+                                                      _activeButton = '3months';
                                                     });
                                                   },
                                                   style: TextButton.styleFrom(
@@ -767,7 +770,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                         EdgeInsets.symmetric(
                                                             horizontal: 36,
                                                             vertical: 28),
-                                                    side: _selectedRange ==
+                                                    side: _activeButton ==
                                                             '3months'
                                                         ? BorderSide(
                                                             color: Colors.white,
@@ -778,7 +781,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     'Last 3 months',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      color: _selectedRange ==
+                                                      color: _activeButton ==
                                                               '3months'
                                                           ? Colors.blue
                                                           : Colors.white,

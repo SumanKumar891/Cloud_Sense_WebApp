@@ -12994,10 +12994,11 @@ _.as=h
 _.at=i
 _.ax=0
 _.ay=!1
-_.CW="0.00"
-_.cx=!1
-_.db=j
-_.dy=""
+_.CW=null
+_.cx="0.00"
+_.cy=!1
+_.dx=j
+_.fr=""
 _.c=_.a=null},
 b2l:function b2l(a){this.a=a},
 b2m:function b2m(){},
@@ -13038,17 +13039,13 @@ this.b=b},
 b2A:function b2A(a,b,c){this.a=a
 this.b=b
 this.c=c},
-b2E:function b2E(a,b){this.a=a
-this.b=b},
+b2E:function b2E(a){this.a=a},
 b2z:function b2z(a){this.a=a},
-b2F:function b2F(a,b){this.a=a
-this.b=b},
+b2F:function b2F(a){this.a=a},
 b2y:function b2y(a){this.a=a},
-b2G:function b2G(a,b){this.a=a
-this.b=b},
+b2G:function b2G(a){this.a=a},
 b2x:function b2x(a){this.a=a},
-b2H:function b2H(a,b){this.a=a
-this.b=b},
+b2H:function b2H(a){this.a=a},
 b2w:function b2w(a){this.a=a},
 b2L:function b2L(a){this.a=a},
 b2C:function b2C(a){this.a=a},
@@ -71256,7 +71253,7 @@ return A.z($async$ku,r)},
 Qr(a){return this.aDj(a)},
 aDj(a){var s=0,r=A.A(t.H),q,p=this,o,n,m,l
 var $async$Qr=A.B(function(b,c){if(b===1)return A.x(c,r)
-while(true)switch(s){case 0:l=p.db
+while(true)switch(s){case 0:l=p.dx
 if(l.length===0){l=a.aH(t.Pu)
 l.toString
 l.f.Jm(A.aQv(null,null,null,null,null,B.C,null,A.aY("No data available for download.",null,null,null,null,null,null,null,null),null,B.rL,null,null,null,null,null,null,null,null,null))
@@ -71286,7 +71283,7 @@ auv(a){var s,r,q=A.p5("yyyy-MM-dd hh:mm a",null)
 try{s=q.yV(a,!1,!1)
 return s}catch(r){s=Date.now()
 return new A.bu(s,0,!1)}},
-auw(a){var s,r,q=A.p5("yyyy-MM-dd hh:mm:ss",null)
+auw(a){var s,r,q=A.p5("yyyy-MM-dd HH:mm:ss",null)
 try{s=q.yV(a,!1,!1)
 return s}catch(r){s=Date.now()
 return new A.bu(s,0,!1)}},
@@ -71322,9 +71319,9 @@ s=A.AX(m,A.D6(m,B.o,0,m,A.wt(m,A.jy(B.h9,B.i,m,m),m,new A.b2I(a),m,m),s),m,m,0,0
 q=A.D6(m,m,m,m,m,m)
 p=t.p
 o=A.b([],p)
-if(B.c.bl(n.a.c,"CL"))o.push(new A.bR(B.h4,A.eE(A.b([A.aY("Chlorine Level: "+n.CW+" mg/L",m,m,m,m,A.b4(m,m,B.i,m,m,m,m,m,m,m,m,16,m,m,B.O,m,m,!0,m,m,m,m,m,m,m,m),m,m,m)],p),B.bo,B.z,B.y),m))
+if(B.c.bl(n.a.c,"CL"))o.push(new A.bR(B.h4,A.eE(A.b([A.aY("Chlorine Level: "+n.cx+" mg/L",m,m,m,m,A.b4(m,m,B.i,m,m,m,m,m,m,m,m,16,m,m,B.O,m,m,!0,m,m,m,m,m,m,m,m),m,m,m)],p),B.bo,B.z,B.y),m))
 l=A.b([r,s,A.AX(0,A.jI(A.ci(m,A.cT(A.b([new A.bR(B.dP,new A.kj(new A.b2J(l,n),m),m),new A.bR(B.dP,A.cT(o,B.x,B.z,B.y),m),n.re("Chlorine",n.at,"Chlorine (mg/L)",B.dL),n.re("Temperature",n.r,"Temperature (\xb0C)",B.dL),n.re("Humidity",n.w,"Humidity (%)",B.dL),n.re("Light Intensity",n.x,"Light Intensity (Lux)",B.dL),n.re("Wind Speed",n.y,"Wind Speed (m/s)",B.dL),n.re("Rain Intensity",n.z,"Rain Intensity (mm/h)",B.dL),n.re("Solar Irradiance",n.Q,"Solar Irradiance (W/M^2)",B.dL)],p),B.x,B.z,B.y),B.n,m,m,m,m,m,m,m,new A.az(0,16,0,0),m,m,m),m,m,m,B.ad),m,m,0,0,q.fx.b,m)],p)
-if(n.cx){s=A.T(B.d.ac(127.5),0,0,0)
+if(n.cy){s=A.T(B.d.ac(127.5),0,0,0)
 l.push(A.bfe(0,A.ci(m,A.kQ(A.ax1(new A.LN(B.i,t.ZU)),m,m),B.n,s,m,m,m,m,m,m,m,m,m,m)))}s=A.El(m,m,B.Pl,m,m,m,m,m,m,B.i,m,m,m,m,m,m,m,m,m)
 r=n.ay
 q=A.jy(B.UA,r?B.bt:B.i,m,m)
@@ -71377,8 +71374,8 @@ p.i(q,s)},
 $S:0}
 A.b2c.prototype={
 $0(){var s=this.a
-s.cx=!0
-B.b.V(s.db)},
+s.cy=!0
+B.b.V(s.dx)},
 $S:0}
 A.b2d.prototype={
 $0(){this.a.ax=this.b},
@@ -71387,7 +71384,7 @@ A.b2e.prototype={
 $0(){},
 $S:0}
 A.b2f.prototype={
-$0(){this.a.cx=!1},
+$0(){this.a.cy=!1},
 $S:0}
 A.b2g.prototype={
 $0(){var s,r,q=this,p=q.b
@@ -71400,7 +71397,7 @@ p.y=A.b([],r)
 p.z=A.b([],r)
 p.Q=A.b([],r)
 r=p.at
-if(r.length!==0)p.CW=B.d.aC(B.b.gav(r).b,2)
+if(r.length!==0)p.cx=B.d.aC(B.b.gav(r).b,2)
 s=A.b([["Timestamp","Chlorine"]],t.X6)
 p=p.at
 J.ata(s,new A.af(p,new A.b2b(q.d),A.ad(p).h("af<1,J<@>>")))
@@ -71410,30 +71407,30 @@ A.b2b.prototype={
 $1(a){return[this.a.hE(a.a),a.b]},
 $S:420}
 A.b2h.prototype={
-$0(){var s,r,q,p,o=this,n=o.b,m=o.c
-n.r=n.vd(m,"Temperature")
-n.w=n.vd(m,"Humidity")
-n.x=n.vd(m,"LightIntensity")
-n.y=n.vd(m,"WindSpeed")
-n.z=n.vd(m,"RainIntensity")
-n.Q=n.vd(m,"SolarIrradiance")
-n.at=A.b([],t.HF)
-q=J.ab(m)
-if(J.nl(q.i(m,"items")))o.a.b=J.ap(J.yB(q.i(m,"items")),"WindDirection")
+$0(){var s,r,q,p,o=this,n="weather_items",m=o.b,l=o.c
+m.r=m.vd(l,"Temperature")
+m.w=m.vd(l,"Humidity")
+m.x=m.vd(l,"LightIntensity")
+m.y=m.vd(l,"WindSpeed")
+m.z=m.vd(l,"RainIntensity")
+m.Q=m.vd(l,"SolarIrradiance")
+m.at=A.b([],t.HF)
+q=J.ab(l)
+if(J.nl(q.i(l,n)))o.a.b=J.ap(J.yB(q.i(l,n)),"WindDirection")
 s=A.b([["Timestamp","Temperature","Humidity","LightIntensity","WindSpeed","RainIntensity","SolarIrradiance"]],t.X6)
-for(r=0,m=o.d;q=r,p=n.r,q<p.length;++r)J.ib(s,[m.hE(p[r].a),n.r[r].b,n.w[r].b,n.x[r].b,n.y[r].b,n.z[r].b,n.Q[r].b])
+for(r=0,l=o.d;q=r,p=m.r,q<p.length;++r)J.ib(s,[l.hE(p[r].a),m.r[r].b,m.w[r].b,m.x[r].b,m.y[r].b,m.z[r].b,m.Q[r].b])
 o.a.a=s},
 $S:0}
 A.b2i.prototype={
 $0(){var s=this.b,r=this.a
-s.db=r.a
-s.dy=r.b},
+s.dx=r.a
+s.fr=r.b},
 $S:0}
 A.b2j.prototype={
 $0(){A.p(this.b)},
 $S:0}
 A.b2k.prototype={
-$0(){this.a.cx=!1},
+$0(){this.a.cy=!1},
 $S:0}
 A.b2t.prototype={
 $1(a){var s,r,q
@@ -71465,34 +71462,35 @@ A.b2I.prototype={
 $0(){A.eL(this.a,!1).hg()},
 $S:0}
 A.b2J.prototype={
-$2(a0,a1){var s,r,q,p,o,n,m,l,k=null,j="Last 7 Days",i="Last 30 Days",h="Last 3 months",g=this.b,f=t.l,e=t.p,d=A.eE(A.b([A.aY("Status: "+g.e,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,A.bg(a0,k,f).w.a.a*0.011,k,k,B.O,k,k,!0,k,k,k,k,k,k,k,k),k,k,k)],e),B.x,B.hv,B.y),c=A.b8(k,20,k),b=A.b8(k,20,k),a=this.a
-if(A.bg(a0,k,f).w.a.a<800){f=A.yV(6)
+$2(a,a0){var s,r,q,p,o,n,m,l,k=null,j="Last 7 Days",i="Last 30 Days",h="Last 3 months",g=this.b,f=t.l,e=t.p,d=A.eE(A.b([A.aY("Status: "+g.e,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,A.bg(a,k,f).w.a.a*0.011,k,k,B.O,k,k,!0,k,k,k,k,k,k,k,k),k,k,k)],e),B.x,B.hv,B.y),c=A.b8(k,20,k),b=A.b8(k,20,k)
+if(A.bg(a,k,f).w.a.a<800){f=A.yV(6)
 s=A.b8(k,k,8)
 r=A.aY("Select a time period",k,k,k,k,k,k,k,k)
 q=A.T(B.d.ac(127.5),0,0,0)
-p=a.a
-o=t.N
-f=A.ci(k,A.eE(A.b([s,A.hs(new A.Ee(A.b([A.a2M(A.aY("Select Time Period",k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,15,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"ee",o),A.a2M(A.aY("Select One Day",k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"date",o),A.a2M(A.aY(j,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"7days",o),A.a2M(A.aY(i,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"30days",o),A.a2M(A.aY(h,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"3months",o)],t.FG),p,r,new A.b2D(a,g),!0,q,k,t.Af),1)],e),B.x,B.z,B.y),B.n,k,k,new A.dt(B.lt,k,k,f,k,k,B.a2),k,k,k,k,k,k,k,200)}else{f=A.yV(8)
-s=a.a==="date"?new A.c3(B.i,2,B.H,-1):B.t
+p=this.a
+o=p.a
+n=t.N
+f=A.ci(k,A.eE(A.b([s,A.hs(new A.Ee(A.b([A.a2M(A.aY("Select Time Period",k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,15,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"ee",n),A.a2M(A.aY("Select One Day",k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"date",n),A.a2M(A.aY(j,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"7days",n),A.a2M(A.aY(i,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"30days",n),A.a2M(A.aY(h,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k,k),"3months",n)],t.FG),o,r,new A.b2D(p,g),!0,q,k,t.Af),1)],e),B.x,B.z,B.y),B.n,k,k,new A.dt(B.lt,k,k,f,k,k,B.a2),k,k,k,k,k,k,k,200)}else{f=A.yV(8)
+s=g.CW==="date"?new A.c3(B.i,2,B.H,-1):B.t
 s=A.BI(k,k,B.o,k,k,k,k,k,k,k,k,k,new A.az(36,28,36,28),k,k,s,k,k,k,k)
 r=A.p5("yyyy-MM-dd",k).hE(g.d)
-s=A.hs(A.lm(!1,A.aY("Select Date: "+r,k,k,k,k,A.b4(k,k,a.a==="date"?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2E(a,g),k,s),1)
+s=A.hs(A.lm(!1,A.aY("Select Date: "+r,k,k,k,k,A.b4(k,k,g.CW==="date"?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2E(g),k,s),1)
 r=A.b8(k,k,8)
-q=a.a==="7days"
+q=g.CW==="7days"
 p=q?new A.c3(B.i,2,B.H,-1):B.t
 p=A.BI(k,k,B.o,k,k,k,k,k,k,k,k,k,new A.az(36,28,36,28),k,k,p,k,k,k,k)
-p=A.hs(A.lm(!1,A.aY(j,k,k,k,k,A.b4(k,k,q?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2F(a,g),k,p),1)
+p=A.hs(A.lm(!1,A.aY(j,k,k,k,k,A.b4(k,k,q?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2F(g),k,p),1)
 o=A.b8(k,k,8)
-q=a.a==="30days"
+q=g.CW==="30days"
 n=q?new A.c3(B.i,2,B.H,-1):B.t
 n=A.BI(k,k,B.o,k,k,k,k,k,k,k,k,k,new A.az(36,28,36,28),k,k,n,k,k,k,k)
-n=A.hs(A.lm(!1,A.aY(i,k,k,k,k,A.b4(k,k,q?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2G(a,g),k,n),1)
+n=A.hs(A.lm(!1,A.aY(i,k,k,k,k,A.b4(k,k,q?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2G(g),k,n),1)
 m=A.b8(k,k,8)
-q=a.a==="3months"
+q=g.CW==="3months"
 l=q?new A.c3(B.i,2,B.H,-1):B.t
 l=A.BI(k,k,B.o,k,k,k,k,k,k,k,k,k,new A.az(36,28,36,28),k,k,l,k,k,k,k)
-f=new A.bR(B.dP,A.ci(k,A.eE(A.b([s,r,p,o,n,m,A.hs(A.lm(!1,A.aY(h,k,k,k,k,A.b4(k,k,q?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2H(a,g),k,l),1)],e),B.x,B.hv,B.y),B.n,k,k,new A.dt(B.lt,k,k,f,k,k,B.a2),k,k,k,k,k,k,k,k),k)}f=A.b([d,c,b,new A.ff(B.de,k,k,f,k),A.b8(k,0,k)],e)
-if(B.c.bl(g.a.c,"WD"))f.push(A.cT(A.b([A.jy(B.UE,B.i,k,40),A.b8(k,8,k),A.aY("Wind Direction: "+g.dy,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,B.O,k,k,!0,k,k,k,k,k,k,k,k),k,k,k)],e),B.x,B.z,B.y))
+f=new A.bR(B.dP,A.ci(k,A.eE(A.b([s,r,p,o,n,m,A.hs(A.lm(!1,A.aY(h,k,k,k,k,A.b4(k,k,q?B.bt:B.i,k,k,k,k,k,k,k,k,k,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),B.bw,k,k),k,k,B.b1,k,k,k,k,new A.b2H(g),k,l),1)],e),B.x,B.hv,B.y),B.n,k,k,new A.dt(B.lt,k,k,f,k,k,B.a2),k,k,k,k,k,k,k,k),k)}f=A.b([d,c,b,new A.ff(B.de,k,k,f,k),A.b8(k,0,k)],e)
+if(B.c.bl(g.a.c,"WD"))f.push(A.cT(A.b([A.jy(B.UE,B.i,k,40),A.b8(k,8,k),A.aY("Wind Direction: "+g.fr,k,k,k,k,A.b4(k,k,B.i,k,k,k,k,k,k,k,k,20,k,k,B.O,k,k,!0,k,k,k,k,k,k,k,k),k,k,k)],e),B.x,B.z,B.y))
 return A.cT(f,B.x,B.z,B.y)},
 $S:122}
 A.b2D.prototype={
@@ -71507,36 +71505,36 @@ else if(r==="30days")s.b.ku("30days")
 else if(r==="3months")s.b.ku("3months")},
 $S:0}
 A.b2E.prototype={
-$0(){var s=this.b
+$0(){var s=this.a
 s.z2()
-s.a6(new A.b2z(this.a))},
+s.a6(new A.b2z(s))},
 $S:0}
 A.b2z.prototype={
-$0(){this.a.a="date"},
+$0(){this.a.CW="date"},
 $S:0}
 A.b2F.prototype={
-$0(){var s=this.b
+$0(){var s=this.a
 s.ku("7days")
-s.a6(new A.b2y(this.a))},
+s.a6(new A.b2y(s))},
 $S:0}
 A.b2y.prototype={
-$0(){this.a.a="7days"},
+$0(){this.a.CW="7days"},
 $S:0}
 A.b2G.prototype={
-$0(){var s=this.b
+$0(){var s=this.a
 s.ku("30days")
-s.a6(new A.b2x(this.a))},
+s.a6(new A.b2x(s))},
 $S:0}
 A.b2x.prototype={
-$0(){this.a.a="30days"},
+$0(){this.a.CW="30days"},
 $S:0}
 A.b2H.prototype={
-$0(){var s=this.b
+$0(){var s=this.a
 s.ku("3months")
-s.a6(new A.b2w(this.a))},
+s.a6(new A.b2w(s))},
 $S:0}
 A.b2w.prototype={
-$0(){this.a.a="3months"},
+$0(){this.a.CW="3months"},
 $S:0}
 A.b2L.prototype={
 $1(a){var s=this.a
