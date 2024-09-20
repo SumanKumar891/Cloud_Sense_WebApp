@@ -1138,33 +1138,48 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ChartType chartType, List<ChartData> data, String title) {
     switch (chartType) {
       case ChartType.line:
-        return LineSeries<ChartData, DateTime>(
-          markerSettings: const MarkerSettings(
-            height: 6.0,
-            width: 6.0,
-            // color: Colors.red,
-            // borderColor: Colors.red,
-            isVisible: true,
-          ),
-          dataSource: data,
-          xValueMapper: (ChartData data, _) => data.timestamp,
-          yValueMapper: (ChartData data, _) => data.value,
-          name: title,
-          color: Colors.blue,
-          // Set marker colors based on the value
-          pointColorMapper: (ChartData data, _) {
-            if (data.value >= 0.01 && data.value <= 0.5) {
-              return Colors.green; // Green for values between 0.01 and 1
-            } else if (data.value > 0.5 && data.value <= 1.0) {
-              return Colors.yellow; // Yellow for values between 1.1 and 2
-            } else if (data.value > 1.0 && data.value <= 4.0) {
-              return Colors.orange; // Red for values between 2.1 and 5
-            } else if (data.value > 4.0) {
-              return Colors.red; // Red for values between 2.1 and 5
-            }
-            return Colors.white; // Default color (if needed)
-          },
-        );
+        if (widget.deviceName.startsWith('CL')) {
+          // Chlorine sensor
+          return LineSeries<ChartData, DateTime>(
+            markerSettings: const MarkerSettings(
+              height: 6.0,
+              width: 6.0,
+              isVisible: true,
+            ),
+            dataSource: data,
+            xValueMapper: (ChartData data, _) => data.timestamp,
+            yValueMapper: (ChartData data, _) => data.value,
+            name: title,
+            color: Colors.blue,
+            pointColorMapper: (ChartData data, _) {
+              // Color range for chlorine sensor
+              if (data.value >= 0.01 && data.value <= 0.5) {
+                return Colors.green;
+              } else if (data.value > 0.5 && data.value <= 1.0) {
+                return Colors.yellow;
+              } else if (data.value > 1.0 && data.value <= 4.0) {
+                return Colors.orange;
+              } else if (data.value > 4.0) {
+                return Colors.red;
+              }
+              return Colors.white; // Default color
+            },
+          );
+        } else {
+          // Other devices
+          return LineSeries<ChartData, DateTime>(
+            markerSettings: const MarkerSettings(
+              height: 6.0,
+              width: 6.0,
+              isVisible: true,
+            ),
+            dataSource: data,
+            xValueMapper: (ChartData data, _) => data.timestamp,
+            yValueMapper: (ChartData data, _) => data.value,
+            name: title,
+            color: Colors.blue, // Single color for non-chlorine sensors
+          );
+        }
 
       default:
         return LineSeries<ChartData, DateTime>(
