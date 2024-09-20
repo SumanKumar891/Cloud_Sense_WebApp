@@ -70,7 +70,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final devices = data['chloritrone_data'] ?? [];
+        final devices = data['chloritrone_data'] ?? data['weather_data'] ?? [];
         final selectedDevice = devices.firstWhere(
             (device) => device['DeviceId'] == _selectedDeviceId.toString(),
             orElse: () => null);
@@ -356,7 +356,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
-    final List<dynamic> items = data['items'] ?? [];
+    final List<dynamic> items = data['weather_items'] ?? [];
     return items.map((item) {
       if (item == null) {
         return ChartData(
