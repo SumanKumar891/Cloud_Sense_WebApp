@@ -946,7 +946,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             padding: const EdgeInsets.all(16.0),
             child: Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.width < 800 ? 300 : 400,
+              height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
@@ -1009,26 +1009,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           // For larger screens (e.g., PCs and laptops)
                           boxSize = 20.0;
                           textSize = 16.0;
-                          spacing = 20.0;
+                          spacing = 45.0;
 
-                          // Column layout for larger screens
+                          // Row layout for larger screens
                           return SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildColorBox(
                                     Colors.white, '< 0.01 ', boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.green, '> 0.01 - 0.5',
                                     boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
                                     boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.orange, '> 1.0 - 4.0',
                                     boxSize, textSize),
-                                SizedBox(height: spacing),
+                                SizedBox(width: spacing),
                                 _buildColorBox(Colors.red, ' Above 4.0',
                                     boxSize, textSize),
                               ],
@@ -1114,23 +1114,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         : Container(); // Return empty container if no data
   }
 
-  // Helper method to create colored box with range label
-  // Widget _buildColorBox(Color color, String range) {
-  //   return Row(
-  //     children: [
-  //       Container(
-  //         width: 20,
-  //         height: 20,
-  //         color: color,
-  //       ),
-  //       SizedBox(width: 8),
-  //       Text(
-  //         range,
-  //         style: TextStyle(color: Colors.white),
-  //       ),
-  //     ],
-  //   );
-  // }
   Widget _buildColorBox(
       Color color, String range, double boxSize, double textSize) {
     return Row(

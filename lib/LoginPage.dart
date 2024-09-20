@@ -79,12 +79,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       if (res.isSignedIn) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', _emailController.text);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DataDisplayPage(),
-          ),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => DataDisplayPage(),
+        //   ),
+        // );
+        Navigator.pushReplacementNamed(context, '/devicelist');
       } else {
         setState(() {
           _errorMessage = 'Sign-in failed';
@@ -148,12 +149,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       );
 
       // Redirect to the DeviceListPage after successful verification
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DataDisplayPage(),
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => DataDisplayPage(),
+      //   ),
+      // );
+      Navigator.pushReplacementNamed(context, '/devicelist');
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;

@@ -249,7 +249,20 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 ),
                               ),
                             );
+                            
                           },
+                          // onPressed: () {
+//   Navigator.pushNamed(
+//     context,
+//     '/devicegraph',
+//     arguments: {
+//       'deviceName': _deviceCategories[category]![index],
+//       'sequentialName': sequentialName,
+//       'backgroundImagePath': 'assets/backgroundd.jpg',
+//     },
+//   );
+// },
+
                           child: Text(
                             sequentialName,
                             style: TextStyle(

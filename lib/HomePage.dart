@@ -51,22 +51,38 @@ class _HomePageState extends State<HomePage> {
                   fontSize: isMobile ? 20 : 32,
                 ),
               ),
-              Spacer(),
+            //   Spacer(),
+            //   if (!isMobile) ...[
+            //     SizedBox(width: 20),
+            //     _buildNavButton('ABOUT US', _aboutUsColor, () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => HomePage()),
+            //       );
+            //     }),
+            //     SizedBox(width: 20),
+            //     _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => SignInSignUpScreen()),
+            //       );
+            //     }),
+            //   ],
+            // ],
+          // ),
+       // ),
+        Spacer(),
               if (!isMobile) ...[
                 SizedBox(width: 20),
                 _buildNavButton('ABOUT US', _aboutUsColor, () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
+                  // Using named route for 'About Us' page
+                  Navigator.pushNamed(context, '/about-us');
                 }),
                 SizedBox(width: 20),
                 _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SignInSignUpScreen()),
-                  );
+                  // Using named route for 'Login/Signup' page
+                  Navigator.pushNamed(context, '/login');
                 }),
               ],
             ],
@@ -93,21 +109,25 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(Icons.info),
                       title: Text('ABOUT US'),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(builder: (context) => HomePage()),
+                        // );
+                        // Using named route for 'About Us' page
+                        Navigator.pushNamed(context, '/about-us');
                       },
                     ),
                     ListTile(
                       leading: Icon(Icons.login),
                       title: Text('LOGIN/SIGNUP'),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SignInSignUpScreen()),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => SignInSignUpScreen()),
+                        // );
+                        // Using named route for 'Login/Signup' page
+                        Navigator.pushNamed(context, '/login');
                       },
                     ),
                   ],
