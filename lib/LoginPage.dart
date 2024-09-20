@@ -155,7 +155,17 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       //     builder: (context) => DataDisplayPage(),
       //   ),
       // );
-      Navigator.pushReplacementNamed(context, '/devicelist');
+      // Navigator.pushReplacementNamed(context, '/devicelist');
+
+      // After successful sign-up and verification, redirect to the sign-in page
+      setState(() {
+        _isSignIn = true; // Switch to sign-in mode
+      });
+
+      // Display a success message or snackbar to notify the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Sign-up successful! Please sign in.')),
+      );
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;

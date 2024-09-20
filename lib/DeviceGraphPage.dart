@@ -66,7 +66,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Future<void> _fetchDeviceDetails() async {
     try {
       final response = await http.get(Uri.parse(
-          // 'https://c27wvohcuc.execute-api.us-east-1.amazonaws.com/default/beehive_activity_api'
           'https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function'));
 
       if (response.statusCode == 200) {
@@ -821,22 +820,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                     ),
 
-                    // Current values display section
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          _buildCurrentValue(
-                              'Chlorine Level', _currentChlorineValue, 'mg/L'),
-                          // _buildCurrentValue('Temperature', _currentTemperature, '°C'),
-                          // _buildCurrentValue('Humidity', _currentHumidity, '%'),
-                          // _buildCurrentValue('Light Intensity', _currentLightIntensity, 'Lux'),
-                          // _buildCurrentValue('Wind Speed', _currentWindSpeed, 'm/s'),
-                          // _buildCurrentValue('Rain Intensity', _currentRainIntensity, 'mm/h'),
-                          // _buildCurrentValue('Solar Irradiance', _currentSolarIrradiance, 'W/M^2'),
+                          // Check if the device is a chlorine sensor device
+                          if (widget.deviceName.startsWith('CL'))
+                            _buildCurrentValue('Chlorine Level',
+                                _currentChlorineValue, 'mg/L'),
                         ],
                       ),
                     ),
+
                     // Display charts for various parameters
                     _buildChartContainer('Chlorine', chlorineData,
                         'Chlorine (mg/L)', ChartType.line),
