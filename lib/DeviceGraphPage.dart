@@ -963,79 +963,80 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           color: Colors.white),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Builder(
-                      builder: (BuildContext context) {
-                        final screenWidth = MediaQuery.of(context).size.width;
+                  if (widget.deviceName.startsWith('CL'))
+                    Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Builder(
+                        builder: (BuildContext context) {
+                          final screenWidth = MediaQuery.of(context).size.width;
 
-                        // Define common properties
-                        double boxSize;
-                        double textSize;
-                        double spacing;
+                          // Define common properties
+                          double boxSize;
+                          double textSize;
+                          double spacing;
 
-                        if (screenWidth < 800) {
-                          // For smaller screens (e.g., mobile devices)
-                          boxSize = 15.0;
-                          textSize = 15.0;
-                          spacing = 12.0;
+                          if (screenWidth < 800) {
+                            // For smaller screens (e.g., mobile devices)
+                            boxSize = 15.0;
+                            textSize = 15.0;
+                            spacing = 12.0;
 
-                          // Row layout for small screens
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildColorBox(
-                                    Colors.white, '< 0.01 ', boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.green, '> 0.01 - 0.5',
-                                    boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
-                                    boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.orange, '> 1.0 - 4.0',
-                                    boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.red, ' Above 4.0',
-                                    boxSize, textSize),
-                              ],
-                            ),
-                          );
-                        } else {
-                          // For larger screens (e.g., PCs and laptops)
-                          boxSize = 20.0;
-                          textSize = 16.0;
-                          spacing = 45.0;
+                            // Row layout for small screens
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _buildColorBox(Colors.white, '< 0.01 ',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.green, '> 0.01 - 0.5',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.orange, '> 1.0 - 4.0',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.red, ' Above 4.0',
+                                      boxSize, textSize),
+                                ],
+                              ),
+                            );
+                          } else {
+                            // For larger screens (e.g., PCs and laptops)
+                            boxSize = 20.0;
+                            textSize = 16.0;
+                            spacing = 45.0;
 
-                          // Row layout for larger screens
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildColorBox(
-                                    Colors.white, '< 0.01 ', boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.green, '> 0.01 - 0.5',
-                                    boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
-                                    boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.orange, '> 1.0 - 4.0',
-                                    boxSize, textSize),
-                                SizedBox(width: spacing),
-                                _buildColorBox(Colors.red, ' Above 4.0',
-                                    boxSize, textSize),
-                              ],
-                            ),
-                          );
-                        }
-                      },
+                            // Row layout for larger screens
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildColorBox(Colors.white, '< 0.01 ',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.green, '> 0.01 - 0.5',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.orange, '> 1.0 - 4.0',
+                                      boxSize, textSize),
+                                  SizedBox(width: spacing),
+                                  _buildColorBox(Colors.red, ' Above 4.0',
+                                      boxSize, textSize),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      ),
                     ),
-                  ),
                   Expanded(
                     child: SfCartesianChart(
                       plotAreaBackgroundColor:
