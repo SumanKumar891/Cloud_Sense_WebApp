@@ -1047,17 +1047,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Check if the device is a chlorine sensor device
-                          if (widget.deviceName.startsWith('CL'))
-                            _buildCurrentValue('Chlorine Level',
-                                _currentChlorineValue, 'mg/L'),
-                        ],
-                      ),
-                    ),
+
                     if (widget.deviceName.startsWith('WQ'))
                       buildStatisticsTable(),
 
