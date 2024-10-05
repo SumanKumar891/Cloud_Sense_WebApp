@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'dart:ui'; // Import for BackdropFilter
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +22,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   bool _isLoading = false;
   String? _verificationCode;
   String? _emailToVerify;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   void initState() {
@@ -100,6 +101,222 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  // Method to handle password reset process
+  Future<void> _forgotPassword() async {
+    String? email = await _showEmailInputDialog();
+    if (email != null && _emailValid) {
+      try {
+        // Send password reset request
+        await Amplify.Auth.resetPassword(username: email);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text('A password reset code has been sent to your email.')),
+        );
+
+        // After the email is sent, show the dialog to enter the reset code and new password
+        _showPasswordResetCodeDialog(email);
+      } on AuthException catch (e) {
+        setState(() {
+          _errorMessage = e.message;
+        });
+      }
+    }
+  }
+
+  // Dialog to enter the reset code
+  Future<void> _showPasswordResetCodeDialog(String email) async {
+    String? resetCode;
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController resetCodeController = TextEditingController();
+
+        return AlertDialog(
+          title: Text('Enter Reset Code'),
+          content: TextField(
+            controller: resetCodeController,
+            decoration: InputDecoration(labelText: 'Reset Code'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                resetCode = resetCodeController.text;
+                Navigator.of(context).pop();
+                if (resetCode != null && resetCode!.isNotEmpty) {
+                  // Show the new password dialog after the reset code is entered
+                  _showNewPasswordDialog(email, resetCode!);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Dialog to enter the new password and confirm password
+  Future<void> _showNewPasswordDialog(String email, String resetCode) async {
+    String? newPassword;
+    String? confirmPassword;
+    bool passwordsMatch = true;
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController newPasswordController = TextEditingController();
+        TextEditingController confirmPasswordController =
+            TextEditingController();
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Enter New Password'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: newPasswordController,
+                    obscureText: !_isPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'New Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: confirmPasswordController,
+                    obscureText: !_isConfirmPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  if (!passwordsMatch)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Passwords do not match',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Submit'),
+                  onPressed: () async {
+                    newPassword = newPasswordController.text;
+                    confirmPassword = confirmPasswordController.text;
+
+                    if (newPassword == confirmPassword) {
+                      Navigator.of(context).pop();
+                      await _confirmResetPassword(
+                          email, resetCode, newPassword!);
+                    } else {
+                      setState(() {
+                        passwordsMatch = false;
+                      });
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _confirmResetPassword(
+      String email, String resetCode, String newPassword) async {
+    try {
+      await Amplify.Auth.confirmResetPassword(
+        username: email,
+        newPassword: newPassword,
+        confirmationCode: resetCode,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Password has been reset. Please log in with your new password.')),
+      );
+    } on AuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    }
+  }
+
+  Future<String?> _showEmailInputDialog() async {
+    String? email;
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController emailController = TextEditingController();
+        return AlertDialog(
+          title: Text('Reset Password'),
+          content: TextField(
+            controller: emailController,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                email = emailController.text;
+                Navigator.of(context).pop(email);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _signUp() async {
@@ -377,17 +594,31 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
+              obscureText:
+                  _isPasswordVisible, // Toggle visibility based on _isPasswordVisible
               decoration: InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
               ),
-              obscureText: true,
             ),
+
             if (_isLoading)
               CircularProgressIndicator()
             else
               Padding(
-                padding: const EdgeInsets.only(top: 30.0),
+                padding: const EdgeInsets.only(top: 20.0),
                 child: ElevatedButton(
                   onPressed: _signIn,
                   child: Text(
@@ -401,7 +632,32 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   ),
                 ),
               ),
-            SizedBox(height: 32),
+            SizedBox(height: 32), // Add space before the forgot password row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(181, 113, 5, 214),
+                  ),
+                ),
+                SizedBox(width: 4),
+                TextButton(
+                  onPressed: _forgotPassword,
+                  child: Text(
+                    'Reset',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      // color: Color.fromARGB(243, 173, 21, 211),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -413,7 +669,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                       fontWeight: FontWeight.bold,
                       color: const Color.fromARGB(181, 113, 5, 214)),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: 4),
                 TextButton(
                   onPressed: () {
                     setState(() {
@@ -532,6 +788,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                       fontWeight: FontWeight.bold,
                       color: const Color.fromARGB(181, 113, 5, 214)),
                 ),
+                SizedBox(width: 4),
                 TextButton(
                   onPressed: () {
                     setState(() {
