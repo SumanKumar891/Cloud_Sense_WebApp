@@ -51,28 +51,28 @@ class _HomePageState extends State<HomePage> {
                   fontSize: isMobile ? 20 : 32,
                 ),
               ),
-            //   Spacer(),
-            //   if (!isMobile) ...[
-            //     SizedBox(width: 20),
-            //     _buildNavButton('ABOUT US', _aboutUsColor, () {
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(builder: (context) => HomePage()),
-            //       );
-            //     }),
-            //     SizedBox(width: 20),
-            //     _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //             builder: (context) => SignInSignUpScreen()),
-            //       );
-            //     }),
-            //   ],
-            // ],
-          // ),
-       // ),
-        Spacer(),
+              //   Spacer(),
+              //   if (!isMobile) ...[
+              //     SizedBox(width: 20),
+              //     _buildNavButton('ABOUT US', _aboutUsColor, () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(builder: (context) => HomePage()),
+              //       );
+              //     }),
+              //     SizedBox(width: 20),
+              //     _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //             builder: (context) => SignInSignUpScreen()),
+              //       );
+              //     }),
+              //   ],
+              // ],
+              // ),
+              // ),
+              Spacer(),
               if (!isMobile) ...[
                 SizedBox(width: 20),
                 _buildNavButton('ABOUT US', _aboutUsColor, () {

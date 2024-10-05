@@ -45,8 +45,11 @@ class MyApp extends StatelessWidget {
         '/about-us': (context) => HomePage(),
         '/login': (context) => SignInSignUpScreen(),
         '/devicelist': (context) => DataDisplayPage(),
-         '/devicegraph': (context) => DeviceGraphPage(deviceName: '', sequentialName: null, backgroundImagePath: '',),
-        
+        '/devicegraph': (context) => DeviceGraphPage(
+              deviceName: '',
+              sequentialName: null,
+              backgroundImagePath: '',
+            ),
       },
     );
   }

@@ -78,6 +78,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Weather Sensors';
       case 'SS':
         return 'Soil Sensors';
+      case 'WQ':
+        return 'Water Quality Sensors';
       default:
         return key;
     }
@@ -226,8 +228,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     itemCount: _deviceCategories[category]?.length ?? 0,
                     itemBuilder: (context, index) {
                       // Generate a sequential name like "Chlorine Sensor 1"
-                      String sequentialName =
-                          '${category.split(" ").first} Sensor ${index + 1}';
+                      String sequentialName;
+                      if (category.toLowerCase().contains("water")) {
+                        sequentialName = 'Water Quality Sensor ${index + 1}';
+                      } else {
+                        sequentialName =
+                            '${category.split(" ").first} Sensor ${index + 1}';
+                      }
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ElevatedButton(
@@ -249,7 +256,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 ),
                               ),
                             );
-                            
                           },
                           // onPressed: () {
 //   Navigator.pushNamed(
@@ -405,6 +411,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'Weather Sensors':
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Soil Sensors': // Add color for Soil Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Water Quality Sensors': // Add color for Water Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

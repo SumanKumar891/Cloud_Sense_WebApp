@@ -3,9 +3,9 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.bin": "7290e403e99f13c7f92a4c8263de34e9",
-"assets/AssetManifest.bin.json": "8025266b995dcb597a1698c546537243",
-"assets/AssetManifest.json": "98cbfb7ac21d52b210ebbfc218e5471e",
+const RESOURCES = {"assets/AssetManifest.bin": "032b79bbeced9477ffcb163e96a0f899",
+"assets/AssetManifest.bin.json": "81f0335e382967d4925249e4867945a1",
+"assets/AssetManifest.json": "c562006e1d4a649da23dc9582db8a630",
 "assets/assets/backgroundd.jpg": "03c56935fdf2d8682da17b033e37c012",
 "assets/assets/Chloritron.PNG": "322a9958ba5b556829e4c521e0cea421",
 "assets/assets/Chloritronn.png": "63cf58bcf21ab3c4e1479daf44702b6d",
@@ -18,6 +18,8 @@ const RESOURCES = {"assets/AssetManifest.bin": "7290e403e99f13c7f92a4c8263de34e9
 "assets/assets/soil.jpg": "72ee5870b77de1c5fba3641e06807e1b",
 "assets/assets/sunn.jpg": "78761d26feda572137c41c4a063014ae",
 "assets/assets/tree.jpg": "474a61bd17c3381840a5684d707486f3",
+"assets/assets/water_quality.jpg": "b4bf7dfbb24eb7e8caa713f0090c9267",
+"assets/assets/water_quality.png": "182785373df3a5926ea7f0e73dbd24f1",
 "assets/assets/weatherr.jpg": "392959e1b8e013ffc18053f53308b46c",
 "assets/FontManifest.json": "179513f8cdcc671da1d499dcbaaf2491",
 "assets/fonts/DMSerifText-Italic.ttf": "48d9b180aa132af0fe0d8ad1d5f8184d",
@@ -25,7 +27,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "7290e403e99f13c7f92a4c8263de34e9
 "assets/fonts/MaterialIcons-Regular.otf": "0e90b54dfb6ceb3cc7f016094ef1d603",
 "assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf": "31d95e96058490552ea28f732456d002",
 "assets/fonts/OpenSans-VariableFont_wdth,wght.ttf": "78609089d3dad36318ae0190321e6f3e",
-"assets/NOTICES": "ed8b501239807ff2a544ea9b6dda83a8",
+"assets/NOTICES": "95bfe09e4e3e41b525282d22a67b884a",
 "assets/packages/amplify_authenticator/assets/social-buttons/google.png": "a1e1d65465c69a65f8d01226ff5237ec",
 "assets/packages/amplify_authenticator/assets/social-buttons/SocialIcons.ttf": "1566e823935d5fe33901f5a074480a20",
 "assets/packages/amplify_auth_cognito_dart/lib/src/workers/workers.min.js": "d439755124d125cf0a5ead2ea8993c20",
@@ -90,14 +92,14 @@ const RESOURCES = {"assets/AssetManifest.bin": "7290e403e99f13c7f92a4c8263de34e9
 "flutter_assets/packages/flutter_map/lib/assets/flutter_map_logo.png": "208d63cc917af9713fc9572bd5c09362",
 "flutter_assets/packages/wakelock_plus/assets/no_sleep.js": "9c3aa3cd0b217305aa860decab3d9f42",
 "flutter_assets/shaders/ink_sparkle.frag": "9bb2aaa0f9a9213b623947fa682efa76",
-"flutter_bootstrap.js": "d5645ddc899565e6e280d10d9793fc48",
+"flutter_bootstrap.js": "4315647837568584a5e5cfe037771e7d",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
 "index.html": "ac3d76aa9e36fe5b3bb2600f7c12437d",
 "/": "ac3d76aa9e36fe5b3bb2600f7c12437d",
-"main.dart.js": "94002ddbfba412ae193d3ed6353188e5",
+"main.dart.js": "c4cf20a166edf16ffd299ed1adc4ed04",
 "manifest.json": "1945d941ea0a66a4fc873921c259c902",
 "version.json": "c99f477bf3954abaf222bbd37a2f300d"};
 // The application shell files that are downloaded before a service worker can

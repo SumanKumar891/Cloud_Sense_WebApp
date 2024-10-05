@@ -6,10 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
-import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io' as io;
 // import 'dart:ui' as ui;
 
@@ -30,8 +28,6 @@ class DeviceGraphPage extends StatefulWidget {
 
 class _DeviceGraphPageState extends State<DeviceGraphPage> {
   DateTime _selectedDay = DateTime.now();
-  String _currentStatus = 'Unknown';
-  String _dataReceivedTime = 'Unknown';
   List<ChartData> temperatureData = [];
   List<ChartData> humidityData = [];
   List<ChartData> lightIntensityData = [];
@@ -40,20 +36,28 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> solarIrradianceData = [];
   List<ChartData> windDirectionData = [];
   List<ChartData> chlorineData = [];
+  // List<ChartData> electricalSignalData = [];
+  // List<ChartData> hypochlorousData = [];
+  // List<ChartData> residualchlorineData = [];
+  List<ChartData> tempData = [];
+  List<ChartData> tdsData = [];
+  List<ChartData> codData = [];
+  List<ChartData> bodData = [];
+  List<ChartData> pHData = [];
+  List<ChartData> doData = [];
+  List<ChartData> ecData = [];
+
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
   bool _isHovering = false; // Track hover state
-  String _selectedRange = 'none'; // Tracks which button is selected
   String? _activeButton; // Add this variable
+  String _currentChlorineValue = '0.00';
+  bool _isLoading = false;
 
   void _onRangeSelected(String range) {
     setState(() {
-      _selectedRange = range;
       _fetchDataForRange(range); // Fetch data based on the selected range
     });
   }
-
-  String _currentChlorineValue = '0.00';
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -63,7 +67,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     _fetchDataForRange('single');
   }
 
-  bool _showCurrentData = false; // To toggle current data visibility
+// To toggle current data visibility
 
   Future<void> _fetchDeviceDetails() async {
     try {
@@ -78,11 +82,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             orElse: () => null);
 
         if (selectedDevice != null) {
-          setState(() {
-            _currentStatus =
-                _getDeviceStatus(selectedDevice['lastReceivedTime']);
-            _dataReceivedTime = selectedDevice['lastReceivedTime'] ?? 'Unknown';
-          });
+          setState(() {});
         } else {
           print('Device ${widget.deviceName} not found.');
         }
@@ -95,7 +95,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   List<List<dynamic>> _csvRows = [];
-  String _message = "";
   String _lastWindDirection = "";
 
   Future<void> _fetchDataForRange(String range) async {
@@ -142,10 +141,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
           'https://b0e4z6nczh.execute-api.us-east-1.amazonaws.com/CloudSense_Chloritrone_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('WQ')) {
+      apiUrl =
+          'https://oy7qhc1me7.execute-api.us-west-2.amazonaws.com/default/k_wqm_api?deviceid=${widget.deviceName}&startdate=$startdate&enddate=$enddate';
     } else {
-      setState(() {
-        _message = "Unknown device type";
-      });
+      setState(() {});
       setState(() {
         _isLoading = false; // Stop loading
       });
@@ -171,6 +171,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             windSpeedData = [];
             rainIntensityData = [];
             solarIrradianceData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
 
             // Update current chlorine value
             if (chlorineData.isNotEmpty) {
@@ -187,6 +194,48 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('WQ')) {
+          setState(() {
+            tempData = _parseWaterChartData(data, 'temperature');
+            tdsData = _parseWaterChartData(data, 'TDS');
+            codData = _parseWaterChartData(data, 'COD');
+            bodData = _parseWaterChartData(data, 'BOD');
+            pHData = _parseWaterChartData(data, 'pH');
+            doData = _parseWaterChartData(data, 'DO');
+            ecData = _parseWaterChartData(data, 'EC');
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainIntensityData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+
+            rows = [
+              [
+                "Timestamp",
+                "temperature",
+                "TDS ",
+                "COD",
+                "BOD",
+                "pH",
+                "DO",
+                "EC"
+              ],
+              for (int i = 0; i < tempData.length; i++)
+                [
+                  formatter.format(tempData[i].timestamp),
+                  tempData[i].value,
+                  tdsData[i].value,
+                  codData[i].value,
+                  bodData[i].value,
+                  pHData[i].value,
+                  doData[i].value,
+                  ecData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
         } else {
           setState(() {
             temperatureData = _parseChartData(data, 'Temperature');
@@ -196,6 +245,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             rainIntensityData = _parseChartData(data, 'RainIntensity');
             solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
             chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
 
             // Extract the last wind direction from the data
             if (data['weather_items'].isNotEmpty) {
@@ -236,16 +292,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               lastWindDirection; // Store the last wind direction
 
           if (_csvRows.isEmpty) {
-            _message = "No data available for download.";
           } else {
-            _message = ""; // Clear the message if data is available
+// Clear the message if data is available
           }
         });
       }
     } catch (e) {
-      setState(() {
-        _message = 'Error fetching data: $e';
-      });
+      setState(() {});
     } finally {
       setState(() {
         _isLoading = false; // Stop loading
@@ -373,6 +426,144 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  List<ChartData> _parseWaterChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parseWaterDate(item['time_stamp']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+// Calculate average, min, and max values
+  Map<String, List<double>> _calculateStatistics(List<ChartData> data) {
+    double sum = 0.0;
+    double min = double.infinity;
+    double max = double.negativeInfinity;
+
+    for (var entry in data) {
+      sum += entry.value;
+      if (entry.value < min) min = entry.value;
+      if (entry.value > max) max = entry.value;
+    }
+
+    double avg = data.isNotEmpty ? sum / data.length : 0.0;
+    return {
+      'average': [avg],
+      'min': [min],
+      'max': [max],
+    };
+  }
+
+  // Create a table displaying statistics
+  Widget buildStatisticsTable() {
+    final tempStats = _calculateStatistics(tempData);
+    final tdsStats = _calculateStatistics(tdsData);
+    final codStats = _calculateStatistics(codData);
+    final bodStats = _calculateStatistics(bodData);
+    final pHStats = _calculateStatistics(pHData);
+    final doStats = _calculateStatistics(doData);
+    final ecStats = _calculateStatistics(ecData);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 500,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Avg',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Min',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Max',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                buildDataRow('Temp', tempStats, fontSize),
+                buildDataRow('TDS', tdsStats, fontSize),
+                buildDataRow('COD', codStats, fontSize),
+                buildDataRow('BOD', bodStats, fontSize),
+                buildDataRow('pH', pHStats, fontSize),
+                buildDataRow('DO', doStats, fontSize),
+                buildDataRow('EC', ecStats, fontSize),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  DataRow buildDataRow(
+      String parameter, Map<String, List<double>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(stats['average']?[0].toStringAsFixed(2) ?? 'N/A',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(stats['min']?[0].toStringAsFixed(2) ?? 'N/A',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(stats['max']?[0].toStringAsFixed(2) ?? 'N/A',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
@@ -384,6 +575,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   DateTime _parseDate(String dateString) {
+    final dateFormat = DateFormat(
+        'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
+  DateTime _parseWaterDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
     try {
@@ -439,9 +640,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   @override
   Widget build(BuildContext context) {
     // Determine the background image based on the device type
-    String backgroundImagePath = widget.deviceName.startsWith('WD')
-        ? 'assets/tree.jpg'
-        : 'assets/Chloritronn.png';
+    // String backgroundImagePath = widget.deviceName.startsWith('WD')
+    //     ? 'assets/tree.jpg'
+    //     : 'assets/Chloritronn.png';
+    // Determine the background image based on the device type
+    String backgroundImagePath;
+
+    // Check the device name and assign the appropriate image
+    if (widget.deviceName.startsWith('WD')) {
+      backgroundImagePath = 'assets/tree.jpg';
+    } else if (widget.deviceName.startsWith('CL')) {
+      backgroundImagePath = 'assets/Chloritronn.png';
+    } else {
+      // For water quality sensor
+      backgroundImagePath = 'assets/water_quality.jpg';
+    }
     String _selectedRange = 'ee';
     // : 'assets/soil.jpg';
 
@@ -480,7 +693,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "${widget.sequentialName}",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 32,
+                  fontSize: MediaQuery.of(context).size.width < 800 ? 20 : 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -512,26 +725,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           return Column(
                             children: [
                               // Display Device ID, Status, and Received time
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Status: $_currentStatus',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize:
-                                          MediaQuery.of(context).size.width *
-                                              0.011,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // Row(
+                              //   mainAxisAlignment:
+                              //       MainAxisAlignment.spaceBetween,
+                              //   children: [
+                              //     Text(
+                              //       'Status: $_currentStatus',
+                              //       style: TextStyle(
+                              //         fontWeight: FontWeight.bold,
+                              //         fontSize:
+                              //             MediaQuery.of(context).size.width *
+                              //                 0.011,
+                              //         color: Colors.white,
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
 
-                              SizedBox(
-                                  height:
-                                      20), // Space between status and buttons
+                              SizedBox(height: 20),
+
+                              // Space between status and buttons
                               SizedBox(height: 20),
                               Align(
                                 alignment: Alignment.centerLeft,
@@ -796,7 +1009,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               ),
                               SizedBox(
                                   height:
-                                      0), // Space between buttons and the next section
+                                      20), // Space between buttons and the next section
                               // Wind Direction widget in the center
                               if (widget.deviceName.startsWith('WD'))
                                 Column(
@@ -834,6 +1047,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          // Check if the device is a chlorine sensor device
+                          if (widget.deviceName.startsWith('CL'))
+                            _buildCurrentValue('Chlorine Level',
+                                _currentChlorineValue, 'mg/L'),
+                        ],
+                      ),
+                    ),
+                    if (widget.deviceName.startsWith('WQ'))
+                      buildStatisticsTable(),
 
                     // Display charts for various parameters
                     _buildChartContainer('Chlorine', chlorineData,
@@ -853,6 +1079,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         solarIrradianceData,
                         'Solar Irradiance (W/M^2)',
                         ChartType.line),
+                    _buildChartContainer(' Temperature ', tempData,
+                        'Temperature (°C)', ChartType.line),
+                    _buildChartContainer(
+                        ' TDS ', tdsData, 'TDS (ppm)', ChartType.line),
+                    _buildChartContainer(
+                        'COD ', bodData, 'COD (mg/L)', ChartType.line),
+                    _buildChartContainer(
+                        ' BOD ', codData, 'BOD (mg/L)', ChartType.line),
+                    _buildChartContainer('pH ', pHData, 'pH()', ChartType.line),
+                    _buildChartContainer(
+                        ' DO ', doData, 'DO (mg/L)', ChartType.line),
+                    _buildChartContainer(
+                        ' EC ', ecData, 'EC (mS/cm)', ChartType.line),
                   ],
                 ),
               ),
@@ -1202,14 +1441,4 @@ class ChartData {
   final double value;
 
   ChartData({required this.timestamp, required this.value});
-
-  factory ChartData.fromJson(Map<String, dynamic> json, String type) {
-    final dateFormat = DateFormat('yyyy-MM-dd hh:mm a'); // Match this format
-    return ChartData(
-      timestamp: dateFormat.parse(json['HumanTime']),
-      value: json[type] != null
-          ? double.tryParse(json[type].toString()) ?? 0.0
-          : 0.0,
-    );
-  }
 }
