@@ -54,11 +54,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _currentChlorineValue = '0.00';
   bool _isLoading = false;
 
-  void _onRangeSelected(String range) {
-    setState(() {
-      _fetchDataForRange(range); // Fetch data based on the selected range
-    });
-  }
+//   void _onRangeSelected(String range) {
+//     setState(() {
+//       _fetchDataForRange(range);
+// // Fetch data based on the selected range
+//     });
+//   }
 
   @override
   void initState() {
@@ -102,6 +103,25 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     setState(() {
       _isLoading = true; // Start loading
       _csvRows.clear();
+      chlorineData.clear();
+      temperatureData.clear();
+      humidityData.clear();
+      lightIntensityData.clear();
+      windSpeedData.clear();
+      rainIntensityData.clear();
+      solarIrradianceData.clear();
+      windDirectionData.clear();
+      electricalSignalData.clear();
+      hypochlorousData.clear();
+      temppData.clear();
+      residualchlorineData.clear();
+      tempData.clear();
+      tdsData.clear();
+      codData.clear();
+      bodData.clear();
+      pHData.clear();
+      doData.clear();
+      ecData.clear();
     });
     DateTime startDate;
     DateTime endDate = DateTime.now();
@@ -710,10 +730,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       lastDate: DateTime(2025),
     );
 
-    if (picked != null && picked != _selectedDay) {
+    if (picked != null) {
       setState(() {
         _selectedDay = picked;
-        chlorineData.clear();
+
         _fetchDataForRange('single'); // Fetch data for the selected date
       });
     }
@@ -721,6 +741,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the background image based on the device type
     String backgroundImagePath;
 
     // Check the device name and assign the appropriate image
