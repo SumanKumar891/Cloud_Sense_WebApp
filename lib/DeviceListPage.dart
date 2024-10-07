@@ -80,6 +80,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Soil Sensors';
       case 'WQ':
         return 'Water Quality Sensors';
+      case 'WS':
+        return 'Water Sensors';
       default:
         return key;
     }
@@ -229,7 +231,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     itemBuilder: (context, index) {
                       // Generate a sequential name like "Chlorine Sensor 1"
                       String sequentialName;
-                      if (category.toLowerCase().contains("water")) {
+                      if (category.toLowerCase().contains("water quality")) {
                         sequentialName = 'Water Quality Sensor ${index + 1}';
                       } else {
                         sequentialName =
@@ -413,6 +415,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'Soil Sensors': // Add color for Soil Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Water Quality Sensors': // Add color for Water Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Water Sensors': // Add color for Water Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

@@ -36,9 +36,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> solarIrradianceData = [];
   List<ChartData> windDirectionData = [];
   List<ChartData> chlorineData = [];
-  // List<ChartData> electricalSignalData = [];
-  // List<ChartData> hypochlorousData = [];
-  // List<ChartData> residualchlorineData = [];
+  List<ChartData> electricalSignalData = [];
+  List<ChartData> hypochlorousData = [];
+  List<ChartData> temppData = [];
+  List<ChartData> residualchlorineData = [];
   List<ChartData> tempData = [];
   List<ChartData> tdsData = [];
   List<ChartData> codData = [];
@@ -144,6 +145,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('WQ')) {
       apiUrl =
           'https://oy7qhc1me7.execute-api.us-west-2.amazonaws.com/default/k_wqm_api?deviceid=${widget.deviceName}&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('WS')) {
+      apiUrl =
+          'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else {
       setState(() {});
       setState(() {
@@ -203,6 +207,46 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             pHData = _parseWaterChartData(data, 'pH');
             doData = _parseWaterChartData(data, 'DO');
             ecData = _parseWaterChartData(data, 'EC');
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainIntensityData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+
+            rows = [
+              [
+                "Timestamp",
+                "temperature",
+                "TDS ",
+                "COD",
+                "BOD",
+                "pH",
+                "DO",
+                "EC"
+              ],
+              for (int i = 0; i < tempData.length; i++)
+                [
+                  formatter.format(tempData[i].timestamp),
+                  tempData[i].value,
+                  tdsData[i].value,
+                  codData[i].value,
+                  bodData[i].value,
+                  pHData[i].value,
+                  doData[i].value,
+                  ecData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('WS')) {
+          setState(() {
+            tempData = _parsewaterChartData(data, 'temperature');
+            tdsData = _parsewaterChartData(data, 'Electrical Signal');
+            codData = _parsewaterChartData(data, 'Chlorine');
+            bodData = _parsewaterChartData(data, 'Hypochlorous');
+
             temperatureData = [];
             humidityData = [];
             lightIntensityData = [];
@@ -426,6 +470,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  List<ChartData> _parsewaterChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parseBDDate(item['human_time']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
   List<ChartData> _parseWaterChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -443,7 +503,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
 // Calculate average, min, and max values
-  Map<String, List<double>> _calculateStatistics(List<ChartData> data) {
+  Map<String, List<double?>> _calculateStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        'average': [null],
+        'min': [null],
+        'max': [null],
+      };
+    }
     double sum = 0.0;
     double min = double.infinity;
     double max = double.negativeInfinity;
@@ -550,16 +617,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+  // DataRow buildDataRow(
+  //     String parameter, Map<String, List<double>> stats, double fontSize) {
+  //   return DataRow(cells: [
+  //     DataCell(Text(parameter,
+  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
+  //     DataCell(Text(stats['average']?[0].toStringAsFixed(2) ?? 'N/A',
+  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
+  //     DataCell(Text(stats['min']?[0].toStringAsFixed(2) ?? 'N/A',
+  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
+  //     DataCell(Text(stats['max']?[0].toStringAsFixed(2) ?? 'N/A',
+  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
+  //   ]);
+  // }
   DataRow buildDataRow(
-      String parameter, Map<String, List<double>> stats, double fontSize) {
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
     return DataRow(cells: [
       DataCell(Text(parameter,
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
-      DataCell(Text(stats['average']?[0].toStringAsFixed(2) ?? 'N/A',
+      DataCell(Text(
+          stats['average']?[0] != null
+              ? stats['average']![0]!.toStringAsFixed(2)
+              : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
-      DataCell(Text(stats['min']?[0].toStringAsFixed(2) ?? 'N/A',
+      DataCell(Text(
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
-      DataCell(Text(stats['max']?[0].toStringAsFixed(2) ?? 'N/A',
+      DataCell(Text(
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
@@ -585,6 +670,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   DateTime _parseWaterDate(String dateString) {
+    final dateFormat = DateFormat(
+        'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
+  DateTime _parsewaterDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
     try {
