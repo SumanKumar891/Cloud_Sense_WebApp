@@ -20,6 +20,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
   String message = "Position the QR code inside the scanner";
   late MobileScannerController _controller;
   String? _email;
+  Color messageColor = Colors.teal;
 
   @override
   void initState() {
@@ -62,8 +63,11 @@ class _QRScannerPageState extends State<QRScannerPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Success'),
-          content: Text('Device added successfully.'),
+          content: Text(message,
+              style: TextStyle(
+                color: messageColor,
+                fontSize: 16,
+              )),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
@@ -177,16 +181,19 @@ class _QRScannerPageState extends State<QRScannerPage> {
 
       if (response.statusCode == 200) {
         setState(() {
-          message = "Device ID updated successfully.";
+          message = "Device added successfully.";
+          messageColor = Colors.green;
         });
       } else {
         setState(() {
           message = "Failed to add device. Please try again.";
+          messageColor = Colors.red;
         });
       }
     } catch (e) {
       setState(() {
         message = "An error occurred: $e";
+        messageColor = Colors.red;
       });
     }
   }
@@ -235,6 +242,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
                 },
               ),
             ),
+            SizedBox(height: 20),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: resetScanner,
