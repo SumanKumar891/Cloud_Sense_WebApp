@@ -617,19 +617,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
-  // DataRow buildDataRow(
-  //     String parameter, Map<String, List<double>> stats, double fontSize) {
-  //   return DataRow(cells: [
-  //     DataCell(Text(parameter,
-  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
-  //     DataCell(Text(stats['average']?[0].toStringAsFixed(2) ?? 'N/A',
-  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
-  //     DataCell(Text(stats['min']?[0].toStringAsFixed(2) ?? 'N/A',
-  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
-  //     DataCell(Text(stats['max']?[0].toStringAsFixed(2) ?? 'N/A',
-  //         style: TextStyle(fontSize: fontSize, color: Colors.white))),
-  //   ]);
-  // }
   DataRow buildDataRow(
       String parameter, Map<String, List<double?>> stats, double fontSize) {
     return DataRow(cells: [
@@ -734,11 +721,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the background image based on the device type
-    // String backgroundImagePath = widget.deviceName.startsWith('WD')
-    //     ? 'assets/tree.jpg'
-    //     : 'assets/Chloritronn.png';
-    // Determine the background image based on the device type
     String backgroundImagePath;
 
     // Check the device name and assign the appropriate image
