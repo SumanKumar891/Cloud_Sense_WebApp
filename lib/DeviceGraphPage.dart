@@ -36,7 +36,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> solarIrradianceData = [];
   List<ChartData> windDirectionData = [];
   List<ChartData> chlorineData = [];
-  List<ChartData> electricalSignalData = [];
+  List<ChartData> electrodeSignalData = [];
   List<ChartData> hypochlorousData = [];
   List<ChartData> temppData = [];
   List<ChartData> residualchlorineData = [];
@@ -111,7 +111,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       rainIntensityData.clear();
       solarIrradianceData.clear();
       windDirectionData.clear();
-      electricalSignalData.clear();
+      electrodeSignalData.clear();
       hypochlorousData.clear();
       temppData.clear();
       residualchlorineData.clear();
@@ -262,10 +262,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           await _fetchDeviceDetails();
         } else if (widget.deviceName.startsWith('WS')) {
           setState(() {
-            tempData = _parsewaterChartData(data, 'temperature');
-            tdsData = _parsewaterChartData(data, 'Electrical Signal');
-            codData = _parsewaterChartData(data, 'Chlorine');
-            bodData = _parsewaterChartData(data, 'Hypochlorous');
+            temppData = _parsewaterChartData(data, 'Temperature');
+            electrodeSignalData =
+                _parsewaterChartData(data, 'Electrode_signal');
+            residualchlorineData = _parsewaterChartData(data, 'Chlorine_value');
+            hypochlorousData = _parsewaterChartData(data, 'Hypochlorous_value');
 
             temperatureData = [];
             humidityData = [];
@@ -278,24 +279,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             rows = [
               [
                 "Timestamp",
-                "temperature",
-                "TDS ",
-                "COD",
-                "BOD",
-                "pH",
-                "DO",
-                "EC"
+                "Temperature",
+                "Electrode Signal ",
+                "Chlorine",
+                "Hypochlorous",
               ],
               for (int i = 0; i < tempData.length; i++)
                 [
                   formatter.format(tempData[i].timestamp),
-                  tempData[i].value,
-                  tdsData[i].value,
-                  codData[i].value,
-                  bodData[i].value,
-                  pHData[i].value,
-                  doData[i].value,
-                  ecData[i].value,
+                  temppData[i].value,
+                  electrodeSignalData[i].value,
+                  residualchlorineData[i].value,
+                  hypochlorousData[i].value,
+                  
                 ]
             ];
           });
@@ -498,7 +494,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             timestamp: DateTime.now(), value: 0.0); // Provide default value
       }
       return ChartData(
-        timestamp: _parseBDDate(item['human_time']),
+        timestamp: _parsewaterDate(item['HumanTime']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -1180,6 +1176,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         ' DO ', doData, 'DO (mg/L)', ChartType.line),
                     _buildChartContainer(
                         ' EC ', ecData, 'EC (mS/cm)', ChartType.line),
+                    _buildChartContainer(' Temperature ', temppData,
+                        'Temperature (°C)', ChartType.line),
+                    _buildChartContainer(
+                        ' Electrode Signal ',
+                        electrodeSignalData,
+                        ' Electrode Signal ()',
+                        ChartType.line),
+                    _buildChartContainer(' Chlorine ', residualchlorineData,
+                        'Chlorine  (mg/L)', ChartType.line),
+                    _buildChartContainer(' Hypochlorous ', hypochlorousData,
+                        ' Hypochlorous  (mg/L)', ChartType.line),
                   ],
                 ),
               ),
