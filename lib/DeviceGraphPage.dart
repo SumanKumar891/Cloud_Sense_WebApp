@@ -1180,7 +1180,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                     _buildChartContainer(
                         ' Electrode Signal ',
                         electrodeSignalData,
-                        ' Electrode Signal ()',
+                        ' Electrode Signal (mV)',
                         ChartType.line),
                     _buildChartContainer(' Chlorine ', residualchlorineData,
                         'Chlorine  (mg/L)', ChartType.line),
