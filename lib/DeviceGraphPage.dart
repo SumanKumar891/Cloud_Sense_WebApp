@@ -282,16 +282,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Temperature",
                 "Electrode Signal ",
                 "Chlorine",
-                "Hypochlorous",
+                "HypochlorouS",
               ],
-              for (int i = 0; i < tempData.length; i++)
+              for (int i = 0; i < temppData.length; i++)
                 [
-                  formatter.format(tempData[i].timestamp),
+                  formatter.format(temppData[i].timestamp),
                   temppData[i].value,
                   electrodeSignalData[i].value,
                   residualchlorineData[i].value,
                   hypochlorousData[i].value,
-                  
                 ]
             ];
           });
@@ -1385,7 +1384,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         labelStyle: TextStyle(color: Colors.white),
                         labelRotation: 70,
                         edgeLabelPlacement: EdgeLabelPlacement.shift,
-                        interval: 30,
+                        intervalType: DateTimeIntervalType
+                            .minutes, // Adjust based on your data frequency
+
+                        majorGridLines: MajorGridLines(width: 1.0),
+                        // interval: 10,
                       ),
                       primaryYAxis: NumericAxis(
                         labelStyle: TextStyle(color: Colors.white),
