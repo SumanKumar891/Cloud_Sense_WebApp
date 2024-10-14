@@ -47,19 +47,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> pHData = [];
   List<ChartData> doData = [];
   List<ChartData> ecData = [];
-
+  List<ChartData> temmppData = [];
+  List<ChartData> humidityyData = [];
+  List<ChartData> lightIntensityyData = [];
+  List<ChartData> windSpeeddData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
   bool _isHovering = false; // Track hover state
   String? _activeButton; // Add this variable
   String _currentChlorineValue = '0.00';
   bool _isLoading = false;
-
-//   void _onRangeSelected(String range) {
-//     setState(() {
-//       _fetchDataForRange(range);
-// // Fetch data based on the selected range
-//     });
-//   }
+  String _lastSelectedRange = 'single'; // Default to single
 
   @override
   void initState() {
@@ -99,7 +96,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
 
-  Future<void> _fetchDataForRange(String range) async {
+  Future<void> _fetchDataForRange(String range,
+      [DateTime? selectedDate]) async {
     setState(() {
       _isLoading = true; // Start loading
       _csvRows.clear();
@@ -122,6 +120,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       pHData.clear();
       doData.clear();
       ecData.clear();
+      temmppData.clear();
+      humidityyData.clear();
+      lightIntensityyData.clear();
+      windSpeeddData.clear();
     });
     DateTime startDate;
     DateTime endDate = DateTime.now();
@@ -136,6 +138,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       case '3months':
         startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
         break;
+      case '6months':
+        startDate = endDate.subtract(Duration(days: 180)); // Roughly 6 months
+        break;
       case 'single':
         startDate = _selectedDay; // Use the selected day as startDate
         endDate = startDate; // Single day means endDate is same as startDate
@@ -143,6 +148,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       default:
         startDate = endDate; // Default to today
     }
+    // Update the last selected range
+    _lastSelectedRange = range; // Store the currently selected range
 
     final startdate = _formatDate(startDate);
     final enddate = _formatDate(endDate);
@@ -155,7 +162,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     });
 
     String apiUrl;
-    if (widget.deviceName.startsWith('WD')) {
+    if (widget.deviceName.startsWith('WD2')) {
+      apiUrl =
+          'https://qj8bo2ik1a.execute-api.us-east-1.amazonaws.com/default/wind_api_function?deviceId=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CL') ||
@@ -295,6 +305,47 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('WD2')) {
+          setState(() {
+            temmppData = _parsewindChartData(data, 'temperature');
+            humidityyData = _parsewindChartData(data, 'humidity');
+            lightIntensityyData = _parsewindChartData(data, 'light_intensity');
+            windSpeeddData = _parsewindChartData(data, 'wind_speed');
+
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainIntensityData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+
+            rows = [
+              [
+                "Timestamp",
+                "Temperature",
+                "Humidity ",
+                "Light Intensity",
+                "Wind Speed",
+              ],
+              for (int i = 0; i < temppData.length; i++)
+                [
+                  formatter.format(temmppData[i].timestamp),
+                  temppData[i].value,
+                  humidityyData[i].value,
+                  lightIntensityyData[i].value,
+                  windSpeeddData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
         } else {
           setState(() {
             temperatureData = _parseChartData(data, 'Temperature');
@@ -312,7 +363,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             doData = [];
             ecData = [];
 
-            // Extract the last wind direction from the data
+            //Extract the last wind direction from the data
             if (data['weather_items'].isNotEmpty) {
               lastWindDirection = data['weather_items'].last['WindDirection'];
             }
@@ -453,6 +504,252 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+// // Method to show the download options dialog
+//   void _showDownloadOptionsDialog(BuildContext context) {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('Download Options'),
+//           content: Container(
+//             child: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               children: [
+//                 Text('Choose how you want to download the data:'),
+//                 SizedBox(height: 16),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     Navigator.of(context).pop(); // Close the popup
+//                     downloadCSV(context,
+//                         selectedRangeData: true); // Download selected range
+//                   },
+//                   child: Text('Download Selected Date Range'),
+//                 ),
+//                 SizedBox(height: 16), // Add space between the buttons
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     Navigator.of(context).pop(); // Close the options dialog
+//                     _showCustomDateRangeDialog(
+//                         context); // Open custom date range dialog
+//                   },
+//                   child: Text('Choose Custom Date Range'),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () => Navigator.of(context).pop(), // Close the dialog
+//               child: Text('Cancel'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+
+// // Method to show the custom date range dialog
+//   void _showCustomDateRangeDialog(BuildContext context) {
+//     // Initialize start and end dates
+//     DateTime startDate = DateTime.now();
+//     DateTime endDate = DateTime.now();
+
+//     // Create ValueNotifiers to manage the selected dates
+//     final ValueNotifier<DateTime> startDateNotifier =
+//         ValueNotifier<DateTime>(startDate);
+//     final ValueNotifier<DateTime> endDateNotifier =
+//         ValueNotifier<DateTime>(endDate);
+
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('Select Date Range'),
+//           content: SizedBox(
+//             height: 150,
+//             width: 250, // Adjust width as necessary
+//             child: Column(
+//               children: [
+//                 Text('Choose the start and end dates:'),
+//                 SizedBox(height: 16),
+//                 // Start Date Picker
+//                 ValueListenableBuilder<DateTime>(
+//                   valueListenable: startDateNotifier,
+//                   builder: (context, value, child) {
+//                     return ListTile(
+//                       title: Text(
+//                           "Start Date: ${value.toLocal().toString().split(' ')[0]}"),
+//                       trailing: Icon(Icons.calendar_today),
+//                       onTap: () async {
+//                         DateTime? pickedStartDate = await showDatePicker(
+//                           context: context,
+//                           initialDate: value, // Use the selected date
+//                           firstDate: DateTime(2020), // Set first available date
+//                           lastDate: endDateNotifier
+//                               .value, // Limit to the current end date
+//                         );
+//                         if (pickedStartDate != null) {
+//                           startDateNotifier.value =
+//                               pickedStartDate; // Update the start date
+//                         }
+//                       },
+//                     );
+//                   },
+//                 ),
+//                 // End Date Picker
+//                 ValueListenableBuilder<DateTime>(
+//                   valueListenable: endDateNotifier,
+//                   builder: (context, value, child) {
+//                     return ListTile(
+//                       title: Text(
+//                           "End Date: ${value.toLocal().toString().split(' ')[0]}"),
+//                       trailing: Icon(Icons.calendar_today),
+//                       onTap: () async {
+//                         DateTime? pickedEndDate = await showDatePicker(
+//                           context: context,
+//                           initialDate: value, // Use the selected date
+//                           firstDate: startDateNotifier
+//                               .value, // Limit to the current start date
+//                           lastDate: DateTime.now(), // Set last available date
+//                         );
+//                         if (pickedEndDate != null) {
+//                           endDateNotifier.value =
+//                               pickedEndDate; // Update the end date
+//                         }
+//                       },
+//                     );
+//                   },
+//                 ),
+//               ],
+//             ),
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop(); // Close the dialog
+//                 // Call the download function with the selected date range
+//                 downloadCSVWithCustomRange(
+//                   context,
+//                   startDate: startDateNotifier.value,
+//                   endDate: endDateNotifier.value,
+//                 );
+//               },
+//               child: Text('Download'),
+//             ),
+//             TextButton(
+//               onPressed: () => Navigator.of(context).pop(), // Close the dialog
+//               child: Text('Cancel'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+
+  // void downloadCSV(BuildContext context) async {
+  //   if (_csvRows.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("No data available for download.")),
+  //     );
+  //     return;
+  //   }
+  // Method to download CSV for selected range data
+  // void downloadCSV(BuildContext context,
+  //     {bool selectedRangeData = false}) async {
+  //   if (_csvRows.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("No data available for download.")),
+  //     );
+  //     return;
+  //   }
+  //   String csvData = const ListToCsvConverter().convert(_csvRows);
+  //   String fileName = _generateFileName(); // Generate a dynamic filename
+
+  //   if (kIsWeb) {
+  //     final blob = html.Blob([csvData], 'text/csv');
+  //     final url = html.Url.createObjectUrlFromBlob(blob);
+  //     final anchor = html.AnchorElement(href: url)
+  //       ..setAttribute("download", fileName) // Use the generated filename
+  //       ..click();
+  //     html.Url.revokeObjectUrl(url);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Downloading"),
+  //         duration: Duration(seconds: 1),
+  //       ),
+  //     );
+  //   } else {
+  //     try {
+  //       // Check storage permission status
+  //       if (io.Platform.isAndroid) {
+  //         if (await Permission.storage.isGranted) {
+  //           // If already granted, continue with the download
+  //           await saveCSVFile(
+  //               csvData, fileName); // Pass filename to saveCSVFile
+  //         } else {
+  //           // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
+  //           if (await Permission.manageExternalStorage.request().isGranted) {
+  //             await saveCSVFile(
+  //                 csvData, fileName); // Pass filename to saveCSVFile
+  //           } else if (await Permission
+  //               .manageExternalStorage.isPermanentlyDenied) {
+  //             // If permanently denied, prompt to enable from settings
+  //             await openAppSettings();
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               SnackBar(
+  //                   content:
+  //                       Text("Please enable storage permission from settings")),
+  //             );
+  //           }
+  //         }
+  //       } else {
+  //         // Handle for other platforms (iOS)
+  //         await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
+  //       }
+  //     } catch (e) {
+  //       // Catch errors during download
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("Error downloading: $e")),
+  //       );
+  //     }
+  //   }
+  // }
+
+  // // Method to download CSV with custom date range
+  // void downloadCSVWithCustomRange(BuildContext context,
+  //     {required DateTime startDate, required DateTime endDate}) {
+  //   // Here, you can filter or modify your CSV data based on the custom date range
+  //   print("Downloading CSV from $startDate to $endDate...");
+  //   downloadCSV(context); // Call your CSV download logic
+  // }
+
+  // String _generateFileName() {
+  //   final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+  //   return 'SensorData_$timestamp.csv';
+  // }
+
+  // Future<void> saveCSVFile(String csvData, String fileName) async {
+  //   final directory = await getExternalStorageDirectory();
+  //   final downloadsDirectory = Directory('/storage/emulated/0/Download');
+
+  //   if (downloadsDirectory.existsSync()) {
+  //     final filePath = '${downloadsDirectory.path}/$fileName';
+  //     final file = File(filePath);
+  //     await file.writeAsString(csvData);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("File downloaded to $filePath"),
+  //       ),
+  //     );
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Unable to find Downloads directory")),
+  //     );
+  //   }
+  // }
+
   List<ChartData> _parseBDChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -494,6 +791,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       }
       return ChartData(
         timestamp: _parsewaterDate(item['HumanTime']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parsewindChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parsewindDate(item['human_time']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -671,6 +984,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parsewindDate(String dateString) {
+    final dateFormat = DateFormat(
+        'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
   DateTime _parseWaterDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
@@ -732,6 +1055,25 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         _fetchDataForRange('single'); // Fetch data for the selected date
       });
     }
+  }
+
+  void _reloadData({DateTime? selectedDate}) async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    if (selectedDate != null) {
+      // If a single date is selected, pass 'single' to fetch data for that day
+      _lastSelectedRange = 'single'; // Update last selected range
+      await _fetchDataForRange('single', selectedDate);
+    } else {
+      // If no date is selected, reload the last selected range
+      await _fetchDataForRange(_lastSelectedRange);
+    }
+
+    setState(() {
+      _isLoading = false; // Stop loading once data is fetched
+    });
   }
 
   @override
@@ -796,6 +1138,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   Navigator.of(context).pop();
                 },
               ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      right: 16.0), // Adjust the right value as needed
+                  child: IconButton(
+                    icon: Icon(Icons.refresh, color: Colors.white, size: 30),
+                    onPressed: () {
+                      // Call the function to reload data up to the present date
+                      _reloadData();
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           // Main content
@@ -878,6 +1233,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                         '3months') {
                                                       _fetchDataForRange(
                                                           '3months'); // Fetch data for 3 months
+                                                    } else if (value ==
+                                                        '6months') {
+                                                      _fetchDataForRange(
+                                                          '6months'); // Fetch data for 6 months
                                                     }
                                                   });
                                                 },
@@ -926,6 +1285,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                           color: Colors.white),
                                                     ),
                                                     value: '3months',
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: Text(
+                                                      'Last 6 months',
+                                                      style: TextStyle(
+                                                          fontSize: 20,
+                                                          color: Colors.white),
+                                                    ),
+                                                    value: '6months',
                                                   ),
                                                 ],
                                               ),
@@ -1095,6 +1463,43 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                   ),
                                                 ),
                                               ),
+                                              SizedBox(width: 8),
+                                              // 3 Months button
+                                              Expanded(
+                                                child: TextButton(
+                                                  onPressed: () {
+                                                    _fetchDataForRange(
+                                                        '6months'); // Fetch data for 6 months range
+                                                    setState(() {
+                                                      _activeButton = '6months';
+                                                    });
+                                                  },
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 36,
+                                                            vertical: 28),
+                                                    side: _activeButton ==
+                                                            '6months'
+                                                        ? BorderSide(
+                                                            color: Colors.white,
+                                                            width: 2)
+                                                        : BorderSide.none,
+                                                  ),
+                                                  child: Text(
+                                                    'Last 6 months',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      color: _activeButton ==
+                                                              '6months'
+                                                          ? Colors.blue
+                                                          : Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -1186,6 +1591,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         'Chlorine  (mg/L)', ChartType.line),
                     _buildChartContainer(' Hypochlorous ', hypochlorousData,
                         ' Hypochlorous  (mg/L)', ChartType.line),
+
+                    _buildChartContainer('Temperature', temmppData,
+                        'Temperature (°C)', ChartType.line),
+                    _buildChartContainer('Humidity', humidityyData,
+                        'Humidity (%)', ChartType.line),
+                    _buildChartContainer('Light Intensity', lightIntensityyData,
+                        'Light Intensity (Lux)', ChartType.line),
+                    _buildChartContainer('Wind Speed', windSpeeddData,
+                        'Wind Speed (m/s)', ChartType.line),
                   ],
                 ),
               ),
@@ -1216,6 +1630,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               child: ElevatedButton(
                 onPressed: () {
                   downloadCSV(context);
+                  // _showDownloadOptionsDialog(context); // Show popup
                 },
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -1402,6 +1817,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                       tooltipBehavior: TooltipBehavior(
                         enable: true,
+                        duration:
+                            4000, // Tooltip will remain for 4 seconds (4000 milliseconds)
                         builder: (dynamic data, dynamic point, dynamic series,
                             int pointIndex, int seriesIndex) {
                           final ChartData chartData = data as ChartData;
@@ -1432,12 +1849,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           );
                         },
                       ),
+                      // tooltipBehavior: _tooltipBehavior,
                       zoomPanBehavior: ZoomPanBehavior(
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
                         enableMouseWheelZooming: true,
                       ),
+
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
                       ],
