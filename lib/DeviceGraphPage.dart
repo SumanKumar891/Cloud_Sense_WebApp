@@ -170,12 +170,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     });
 
     String apiUrl;
-    if (widget.deviceName.startsWith('WD2')) {
+    if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://qj8bo2ik1a.execute-api.us-east-1.amazonaws.com/default/wind_api_function?deviceId=$deviceId&startdate=$startdate&enddate=$enddate';
-    } else if (widget.deviceName.startsWith('WD')) {
-      apiUrl =
-          'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
+          'https://x9sji7grw5.execute-api.us-east-1.amazonaws.com/default/CloudSense_Weather_data_api_function_2?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CL') ||
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
@@ -312,47 +309,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   electrodeSignalData[i].value,
                   residualchlorineData[i].value,
                   hypochlorousData[i].value,
-                ]
-            ];
-          });
-          await _fetchDeviceDetails();
-        } else if (widget.deviceName.startsWith('WD2')) {
-          setState(() {
-            temmppData = _parsewindChartData(data, 'temperature');
-            humidityyData = _parsewindChartData(data, 'humidity');
-            lightIntensityyData = _parsewindChartData(data, 'light_intensity');
-            windSpeeddData = _parsewindChartData(data, 'wind_speed');
-
-            temperatureData = [];
-            humidityData = [];
-            lightIntensityData = [];
-            windSpeedData = [];
-            rainIntensityData = [];
-            solarIrradianceData = [];
-            chlorineData = [];
-            tempData = [];
-            tdsData = [];
-            codData = [];
-            bodData = [];
-            pHData = [];
-            doData = [];
-            ecData = [];
-
-            rows = [
-              [
-                "Timestamp",
-                "Temperature",
-                "Humidity ",
-                "Light Intensity",
-                "Wind Speed",
-              ],
-              for (int i = 0; i < temmppData.length; i++)
-                [
-                  formatter.format(temmppData[i].timestamp),
-                  temmppData[i].value,
-                  humidityyData[i].value,
-                  lightIntensityyData[i].value,
-                  windSpeeddData[i].value,
                 ]
             ];
           });

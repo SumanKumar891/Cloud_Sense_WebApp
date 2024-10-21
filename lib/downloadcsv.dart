@@ -52,12 +52,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
 
     String apiUrl;
 
-    if (widget.deviceName.startsWith('WD2')) {
+    if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://qj8bo2ik1a.execute-api.us-east-1.amazonaws.com/default/wind_api_function?deviceId=$deviceId&startdate=$startDate&enddate=$endDate';
-    } else if (widget.deviceName.startsWith('WD')) {
-      apiUrl =
-          'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startDate&enddate=$endDate';
+          'https://x9sji7grw5.execute-api.us-east-1.amazonaws.com/default/CloudSense_Weather_data_api_function_2?DeviceId=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('CL') ||
         widget.deviceName.startsWith('BD')) {
       apiUrl =
@@ -128,23 +125,6 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['Electrode_signal'],
             item['Chlorine_value'],
             item['Hypochlorous_value'],
-          ]);
-        });
-      } else if (widget.deviceName.startsWith('WD2')) {
-        _csvRows.add([
-          "Timestamp",
-          "Temperature",
-          "Humidity ",
-          "Light Intensity",
-          "Wind Speed",
-        ]);
-        data['items'].forEach((item) {
-          _csvRows.add([
-            item['human_time'],
-            item['temperature'],
-            item['humidity'],
-            item['light_intensity'],
-            item['wind_speed'],
           ]);
         });
       } else if (widget.deviceName.startsWith('DO')) {
