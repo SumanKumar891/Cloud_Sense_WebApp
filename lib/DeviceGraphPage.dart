@@ -769,24 +769,27 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Map<String, List<double?>> _calculateStatistics(List<ChartData> data) {
     if (data.isEmpty) {
       return {
-        'average': [null],
+        // 'average': [null],
+        'current': [null],
         'min': [null],
         'max': [null],
       };
     }
-    double sum = 0.0;
+    // double sum = 0.0;
+    double? current = data.last.value; // Get the most recent (current) value
     double min = double.infinity;
     double max = double.negativeInfinity;
 
     for (var entry in data) {
-      sum += entry.value;
+      // sum += entry.value;
       if (entry.value < min) min = entry.value;
       if (entry.value > max) max = entry.value;
     }
 
-    double avg = data.isNotEmpty ? sum / data.length : 0.0;
+    // double avg = data.isNotEmpty ? sum / data.length : 0.0;
     return {
-      'average': [avg],
+      // 'average': [avg],
+      'current': [current], // Return the last (current) value
       'min': [min],
       'max': [max],
     };
@@ -838,7 +841,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
                 DataColumn(
                   label: Text(
-                    'Avg',
+                    'Current',
                     style: TextStyle(
                         fontSize: headerFontSize,
                         fontWeight: FontWeight.bold,
@@ -886,8 +889,137 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       DataCell(Text(parameter,
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          stats['average']?[0] != null
-              ? stats['average']![0]!.toStringAsFixed(2)
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
+              : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
+// Calculate average, min, and max values
+  Map<String, List<double?>> _calculateDOStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        // 'average': [null],
+        'current': [null],
+        'min': [null],
+        'max': [null],
+      };
+    }
+    // double sum = 0.0;
+    double? current = data.last.value; // Get the most recent (current) value
+    double min = double.infinity;
+    double max = double.negativeInfinity;
+
+    for (var entry in data) {
+      // sum += entry.value;
+      if (entry.value < min) min = entry.value;
+      if (entry.value > max) max = entry.value;
+    }
+
+    // double avg = data.isNotEmpty ? sum / data.length : 0.0;
+    return {
+      // 'average': [avg],
+      'current': [current], // Return the last (current) value
+      'min': [min],
+      'max': [max],
+    };
+  }
+
+  // Create a table displaying statistics
+  Widget buildDOStatisticsTable() {
+    final ttempStats = _calculateStatistics(ttempData);
+    final dovalueStats = _calculateStatistics(dovaluedata);
+    final dopercentageStats = _calculateStatistics(dopercentagedata);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 500,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Min',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Max',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                buildDataRow('Temp', ttempStats, fontSize),
+                buildDataRow('DO Value', dovalueStats, fontSize),
+                buildDataRow('DO Percentage', dopercentageStats, fontSize),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  DataRow buildDODataRow(
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
               : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
@@ -1492,6 +1624,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
                     if (widget.deviceName.startsWith('WQ'))
                       buildStatisticsTable(),
+                    if (widget.deviceName.startsWith('DO'))
+                      buildDOStatisticsTable(),
 
                     // Display charts for various parameters
                     _buildChartContainer('Chlorine', chlorineData,
@@ -1516,9 +1650,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                     _buildChartContainer(
                         ' TDS ', tdsData, 'TDS (ppm)', ChartType.line),
                     _buildChartContainer(
-                        'COD ', bodData, 'COD (mg/L)', ChartType.line),
+                        'COD ', codData, 'COD (mg/L)', ChartType.line),
                     _buildChartContainer(
-                        ' BOD ', codData, 'BOD (mg/L)', ChartType.line),
+                        ' BOD ', bodData, 'BOD (mg/L)', ChartType.line),
                     _buildChartContainer('pH ', pHData, 'pH()', ChartType.line),
                     _buildChartContainer(
                         ' DO ', doData, 'DO (mg/L)', ChartType.line),
