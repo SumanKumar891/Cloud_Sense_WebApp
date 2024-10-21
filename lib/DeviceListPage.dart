@@ -1,11 +1,10 @@
 import 'dart:ui';
-import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'AddDevice.dart';
 import 'DeviceGraphPage.dart';
-import 'HomePage.dart'; // Import your HomePage here
+import 'HomePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 
@@ -82,6 +81,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Water Quality Sensors';
       case 'WS':
         return 'Water Sensors';
+      case 'DO':
+        return 'DO Sensors';
       default:
         return key;
     }
@@ -125,7 +126,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 AppBar(
                   title: Text(
                     'Your Chosen Devices',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize:
+                          MediaQuery.of(context).size.width < 800 ? 16 : 32,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -149,10 +155,18 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                           // Handle error during logout if necessary
                         }
                       }, // Logout function
-                      icon: Icon(Icons.logout, color: Colors.white),
+                      icon: Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                        size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
+                      ),
                       label: Text(
                         'Log out',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize:
+                              MediaQuery.of(context).size.width < 800 ? 12 : 24,
+                        ),
                       ),
                     ),
                   ],
@@ -417,6 +431,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'Water Quality Sensors': // Add color for Water Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Water Sensors': // Add color for Water Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'DO Sensors': // Add color for Water Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

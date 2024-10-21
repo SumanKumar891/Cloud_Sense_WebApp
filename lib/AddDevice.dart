@@ -112,6 +112,10 @@ class _QRScannerPageState extends State<QRScannerPage> {
       sensorType = 'Water Sensor';
 
       sensorNumber = (widget.devices['Water Sensors']?.length ?? 0) + 1;
+    } else if (scannedQRCode.startsWith('DO')) {
+      sensorType = 'DO Sensor';
+
+      sensorNumber = (widget.devices['DO Sensors']?.length ?? 0) + 1;
     } else {
       sensorType = 'Unknown Sensor';
       sensorNumber = (widget.devices['Unknown Sensors']?.length ?? 0) + 1;

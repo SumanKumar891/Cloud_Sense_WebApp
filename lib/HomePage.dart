@@ -1,9 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'HomePage.dart';
-
-import 'LoginPage.dart';
-import 'ContactUsPage.dart';
 
 void main() {
   runApp(MyApp());

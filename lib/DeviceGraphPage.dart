@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_sense_webapp/downloadcsv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,6 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
 import 'dart:io' as io;
-// import 'dart:ui' as ui;
 
 import 'package:intl/intl.dart';
 
@@ -51,12 +51,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> humidityyData = [];
   List<ChartData> lightIntensityyData = [];
   List<ChartData> windSpeeddData = [];
+  List<ChartData> ttempData = [];
+  List<ChartData> dovaluedata = [];
+  List<ChartData> dopercentagedata = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
   bool _isHovering = false; // Track hover state
-  String? _activeButton; // Add this variable
+  String? _activeButton;
   String _currentChlorineValue = '0.00';
   bool _isLoading = false;
   String _lastSelectedRange = 'single'; // Default to single
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void initState() {
@@ -124,6 +129,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       humidityyData.clear();
       lightIntensityyData.clear();
       windSpeeddData.clear();
+      ttempData.clear();
+      dovaluedata.clear();
+      dopercentagedata.clear();
     });
     DateTime startDate;
     DateTime endDate = DateTime.now();
@@ -178,6 +186,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('DO')) {
+      apiUrl =
+          'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else {
       setState(() {});
       setState(() {
@@ -335,13 +346,59 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Light Intensity",
                 "Wind Speed",
               ],
-              for (int i = 0; i < temppData.length; i++)
+              for (int i = 0; i < temmppData.length; i++)
                 [
                   formatter.format(temmppData[i].timestamp),
-                  temppData[i].value,
+                  temmppData[i].value,
                   humidityyData[i].value,
                   lightIntensityyData[i].value,
                   windSpeeddData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('DO')) {
+          setState(() {
+            ttempData = _parsedoChartData(data, 'Temperature');
+            dovaluedata = _parsedoChartData(data, 'DO Value');
+            dopercentagedata = _parsedoChartData(data, 'DO Percentage');
+            print("Temperature Data: ${ttempData.map((e) => e.value)}");
+            print("DO Value Data: ${dovaluedata.map((e) => e.value)}");
+            print(
+                "DO Percentage Data: ${dopercentagedata.map((e) => e.value)}");
+
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainIntensityData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+            temmppData = [];
+            humidityyData = [];
+            lightIntensityData = [];
+            windSpeeddData = [];
+
+            rows = [
+              [
+                "Timestamp",
+                "Temperature",
+                "DO Value ",
+                "DO Percentage",
+              ],
+              for (int i = 0; i < ttempData.length; i++)
+                [
+                  formatter.format(ttempData[i].timestamp),
+                  ttempData[i].value,
+                  dovaluedata[i].value,
+                  dopercentagedata[i].value,
                 ]
             ];
           });
@@ -416,7 +473,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  void downloadCSV(BuildContext context) async {
+  void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
     if (_csvRows.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No data available for download.")),
@@ -479,7 +536,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   String _generateFileName() {
-    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    final timestamp = DateFormat('yyyy-MM-dd_HH:mm:ss').format(DateTime.now());
     return 'SensorData_$timestamp.csv';
   }
 
@@ -504,251 +561,113 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-// // Method to show the download options dialog
-//   void _showDownloadOptionsDialog(BuildContext context) {
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('Download Options'),
-//           content: Container(
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 Text('Choose how you want to download the data:'),
-//                 SizedBox(height: 16),
-//                 ElevatedButton(
-//                   onPressed: () {
-//                     Navigator.of(context).pop(); // Close the popup
-//                     downloadCSV(context,
-//                         selectedRangeData: true); // Download selected range
-//                   },
-//                   child: Text('Download Selected Date Range'),
-//                 ),
-//                 SizedBox(height: 16), // Add space between the buttons
-//                 ElevatedButton(
-//                   onPressed: () {
-//                     Navigator.of(context).pop(); // Close the options dialog
-//                     _showCustomDateRangeDialog(
-//                         context); // Open custom date range dialog
-//                   },
-//                   child: Text('Choose Custom Date Range'),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           actions: [
-//             TextButton(
-//               onPressed: () => Navigator.of(context).pop(), // Close the dialog
-//               child: Text('Cancel'),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
+  Future<void> _showDownloadOptionsDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Download Options'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  downloadCSV(context); // Download for selected range
+                },
+                child: const Text('Download for Selected Range'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  // Trigger the download immediately
+                  // downloadCSVWithCustomRange(context, startDate!, endDate!);
+                  // Navigator.of(context)
+                  //     .pop(); // Close the dialog after download
 
-// // Method to show the custom date range dialog
-//   void _showCustomDateRangeDialog(BuildContext context) {
-//     // Initialize start and end dates
-//     DateTime startDate = DateTime.now();
-//     DateTime endDate = DateTime.now();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CsvDownloader(
+                              deviceName: widget.deviceName,
+                            )),
+                  );
+                },
+                child: const Text('Download for Custom Range'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-//     // Create ValueNotifiers to manage the selected dates
-//     final ValueNotifier<DateTime> startDateNotifier =
-//         ValueNotifier<DateTime>(startDate);
-//     final ValueNotifier<DateTime> endDateNotifier =
-//         ValueNotifier<DateTime>(endDate);
+  Future<void> downloadCSVWithCustomRange(
+      BuildContext context, DateTime startDate, DateTime endDate) async {
+    // Filter _csvRows based on the selected date range
+    List<List<dynamic>> filteredRows = _csvRows.where((row) {
+      try {
+        // print("Attempting to parse date: ${row[0]}"); // Debug print
+        DateTime timestamp = DateTime.parse(
+            row[0]); // Adjust this line if the format is different
+        return timestamp.isAfter(startDate.subtract(Duration(days: 1))) &&
+            timestamp.isBefore(endDate.add(Duration(days: 1)));
+      } catch (e) {
+        // print("Error parsing date: $e"); // Log parsing errors
+        return false; // Exclude rows with invalid timestamps
+      }
+    }).toList();
 
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('Select Date Range'),
-//           content: SizedBox(
-//             height: 150,
-//             width: 250, // Adjust width as necessary
-//             child: Column(
-//               children: [
-//                 Text('Choose the start and end dates:'),
-//                 SizedBox(height: 16),
-//                 // Start Date Picker
-//                 ValueListenableBuilder<DateTime>(
-//                   valueListenable: startDateNotifier,
-//                   builder: (context, value, child) {
-//                     return ListTile(
-//                       title: Text(
-//                           "Start Date: ${value.toLocal().toString().split(' ')[0]}"),
-//                       trailing: Icon(Icons.calendar_today),
-//                       onTap: () async {
-//                         DateTime? pickedStartDate = await showDatePicker(
-//                           context: context,
-//                           initialDate: value, // Use the selected date
-//                           firstDate: DateTime(2020), // Set first available date
-//                           lastDate: endDateNotifier
-//                               .value, // Limit to the current end date
-//                         );
-//                         if (pickedStartDate != null) {
-//                           startDateNotifier.value =
-//                               pickedStartDate; // Update the start date
-//                         }
-//                       },
-//                     );
-//                   },
-//                 ),
-//                 // End Date Picker
-//                 ValueListenableBuilder<DateTime>(
-//                   valueListenable: endDateNotifier,
-//                   builder: (context, value, child) {
-//                     return ListTile(
-//                       title: Text(
-//                           "End Date: ${value.toLocal().toString().split(' ')[0]}"),
-//                       trailing: Icon(Icons.calendar_today),
-//                       onTap: () async {
-//                         DateTime? pickedEndDate = await showDatePicker(
-//                           context: context,
-//                           initialDate: value, // Use the selected date
-//                           firstDate: startDateNotifier
-//                               .value, // Limit to the current start date
-//                           lastDate: DateTime.now(), // Set last available date
-//                         );
-//                         if (pickedEndDate != null) {
-//                           endDateNotifier.value =
-//                               pickedEndDate; // Update the end date
-//                         }
-//                       },
-//                     );
-//                   },
-//                 ),
-//               ],
-//             ),
-//           ),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(); // Close the dialog
-//                 // Call the download function with the selected date range
-//                 downloadCSVWithCustomRange(
-//                   context,
-//                   startDate: startDateNotifier.value,
-//                   endDate: endDateNotifier.value,
-//                 );
-//               },
-//               child: Text('Download'),
-//             ),
-//             TextButton(
-//               onPressed: () => Navigator.of(context).pop(), // Close the dialog
-//               child: Text('Cancel'),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
+    if (filteredRows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No data available for the selected range.")),
+      );
+      return;
+    }
 
-  // void downloadCSV(BuildContext context) async {
-  //   if (_csvRows.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("No data available for download.")),
-  //     );
-  //     return;
-  //   }
-  // Method to download CSV for selected range data
-  // void downloadCSV(BuildContext context,
-  //     {bool selectedRangeData = false}) async {
-  //   if (_csvRows.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("No data available for download.")),
-  //     );
-  //     return;
-  //   }
-  //   String csvData = const ListToCsvConverter().convert(_csvRows);
-  //   String fileName = _generateFileName(); // Generate a dynamic filename
+    String csvData = const ListToCsvConverter().convert(filteredRows);
+    String fileName = _generateFileName(); // Generate a dynamic filename
 
-  //   if (kIsWeb) {
-  //     final blob = html.Blob([csvData], 'text/csv');
-  //     final url = html.Url.createObjectUrlFromBlob(blob);
-  //     final anchor = html.AnchorElement(href: url)
-  //       ..setAttribute("download", fileName) // Use the generated filename
-  //       ..click();
-  //     html.Url.revokeObjectUrl(url);
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text("Downloading"),
-  //         duration: Duration(seconds: 1),
-  //       ),
-  //     );
-  //   } else {
-  //     try {
-  //       // Check storage permission status
-  //       if (io.Platform.isAndroid) {
-  //         if (await Permission.storage.isGranted) {
-  //           // If already granted, continue with the download
-  //           await saveCSVFile(
-  //               csvData, fileName); // Pass filename to saveCSVFile
-  //         } else {
-  //           // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
-  //           if (await Permission.manageExternalStorage.request().isGranted) {
-  //             await saveCSVFile(
-  //                 csvData, fileName); // Pass filename to saveCSVFile
-  //           } else if (await Permission
-  //               .manageExternalStorage.isPermanentlyDenied) {
-  //             // If permanently denied, prompt to enable from settings
-  //             await openAppSettings();
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               SnackBar(
-  //                   content:
-  //                       Text("Please enable storage permission from settings")),
-  //             );
-  //           }
-  //         }
-  //       } else {
-  //         // Handle for other platforms (iOS)
-  //         await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
-  //       }
-  //     } catch (e) {
-  //       // Catch errors during download
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text("Error downloading: $e")),
-  //       );
-  //     }
-  //   }
-  // }
-
-  // // Method to download CSV with custom date range
-  // void downloadCSVWithCustomRange(BuildContext context,
-  //     {required DateTime startDate, required DateTime endDate}) {
-  //   // Here, you can filter or modify your CSV data based on the custom date range
-  //   print("Downloading CSV from $startDate to $endDate...");
-  //   downloadCSV(context); // Call your CSV download logic
-  // }
-
-  // String _generateFileName() {
-  //   final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-  //   return 'SensorData_$timestamp.csv';
-  // }
-
-  // Future<void> saveCSVFile(String csvData, String fileName) async {
-  //   final directory = await getExternalStorageDirectory();
-  //   final downloadsDirectory = Directory('/storage/emulated/0/Download');
-
-  //   if (downloadsDirectory.existsSync()) {
-  //     final filePath = '${downloadsDirectory.path}/$fileName';
-  //     final file = File(filePath);
-  //     await file.writeAsString(csvData);
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text("File downloaded to $filePath"),
-  //       ),
-  //     );
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Unable to find Downloads directory")),
-  //     );
-  //   }
-  // }
+    // Same download logic as above
+    if (kIsWeb) {
+      final blob = html.Blob([csvData], 'text/csv');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", fileName) // Use the generated filename
+        ..click();
+      html.Url.revokeObjectUrl(url);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Downloading"), duration: Duration(seconds: 1)),
+      );
+    } else {
+      try {
+        // Check storage permission status
+        if (io.Platform.isAndroid) {
+          if (await Permission.storage.isGranted) {
+            await saveCSVFile(csvData, fileName);
+          } else {
+            if (await Permission.manageExternalStorage.request().isGranted) {
+              await saveCSVFile(csvData, fileName);
+            } else if (await Permission
+                .manageExternalStorage.isPermanentlyDenied) {
+              await openAppSettings();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content:
+                        Text("Please enable storage permission from settings")),
+              );
+            }
+          }
+        } else {
+          await saveCSVFile(csvData, fileName);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error downloading: $e")),
+        );
+      }
+    }
+  }
 
   List<ChartData> _parseBDChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
@@ -807,6 +726,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       }
       return ChartData(
         timestamp: _parsewindDate(item['human_time']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parsedoChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parsedoDate(item['HumanTime']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -975,8 +910,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   DateTime _parseDate(String dateString) {
-    final dateFormat = DateFormat(
-        'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
     try {
       return dateFormat.parse(dateString);
     } catch (e) {
@@ -1004,9 +938,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  DateTime _parsewaterDate(String dateString) {
+  DateTime _parsedoDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
+  DateTime _parsewaterDate(String dateString) {
+    final dateFormat = DateFormat(
+        'yyyy-MM-dd hh:MM:ss'); // Ensure this matches your date format
     try {
       return dateFormat.parse(dateString);
     } catch (e) {
@@ -1600,6 +1544,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         'Light Intensity (Lux)', ChartType.line),
                     _buildChartContainer('Wind Speed', windSpeeddData,
                         'Wind Speed (m/s)', ChartType.line),
+                    _buildChartContainer('Temperature', ttempData,
+                        'Temperature (°C)', ChartType.line),
+                    _buildChartContainer(
+                        'DO Value', dovaluedata, 'DO (mg/L)', ChartType.line),
+                    _buildChartContainer('DO Percentage', dopercentagedata,
+                        'DO Percentage (%)', ChartType.line),
                   ],
                 ),
               ),
@@ -1629,8 +1579,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               onExit: (_) => setState(() => _isHovering = false),
               child: ElevatedButton(
                 onPressed: () {
-                  downloadCSV(context);
-                  // _showDownloadOptionsDialog(context); // Show popup
+                  //downloadCSV(context);
+                  _showDownloadOptionsDialog(context); // Show popup
                 },
                 style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
