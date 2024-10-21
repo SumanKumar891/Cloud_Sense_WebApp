@@ -1001,7 +1001,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
               ],
               rows: [
-                buildDataRow('Temp', ttempStats, fontSize),
+                buildDataRow('Temperature', ttempStats, fontSize),
                 buildDataRow('DO Value', dovalueStats, fontSize),
                 buildDataRow('DO Percentage', dopercentageStats, fontSize),
               ],

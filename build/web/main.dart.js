@@ -72263,7 +72263,7 @@ return A.l(q.mh(q.p3),$async$F_)
 case 2:q.a2(new A.b4L(q))
 return A.w(null,r)}})
 return A.x($async$F_,r)},
-V(c1){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4=this,a5=null,a6="Parameter",a7="DO Value",a8="DO Percentage",a9="Temperature",b0="Temperature (\xb0C)",b1="Humidity",b2="Humidity (%)",b3="Light Intensity",b4="Light Intensity (Lux)",b5="Wind Speed",b6="Wind Speed (m/s)",b7=" Temperature ",b8="DO (mg/L)",b9={},c0=a4.a.c
+V(c1){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4=this,a5=null,a6="Parameter",a7="Temperature",a8="DO Value",a9="DO Percentage",b0="Temperature (\xb0C)",b1="Humidity",b2="Humidity (%)",b3="Light Intensity",b4="Light Intensity (Lux)",b5="Wind Speed",b6="Wind Speed (m/s)",b7=" Temperature ",b8="DO (mg/L)",b9={},c0=a4.a.c
 if(B.c.aU(c0,"WD"))s="assets/tree.jpg"
 else s=B.c.aU(c0,"CL")?"assets/Chloritronn.png":"assets/water_quality.jpg"
 b9.a="ee"
@@ -72312,8 +72312,8 @@ c=A.t8(16)
 b=A.Q(153,0,0,0)
 a=r?1/0:500
 r=r?f-32:500
-b9.push(new A.bI(B.d6,A.c8(a5,A.ie(new A.iB(new A.aC(r,1/0,0,1/0),A.bmu(16,A.b([A.zR(A.aB(a6,a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5)),A.zR(A.aB("Current",a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5)),A.zR(A.aB("Min",a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5)),A.zR(A.aB("Max",a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5))],t.UR),16,A.b([a4.nn("Temp",a1,e),a4.nn(a7,a2,e),a4.nn(a8,a3,e)],t.yy)),a5),a5,a5,a5,B.af),B.n,a5,a5,new A.db(b,a5,n,c,a5,a5,B.a0),a5,a5,a5,new A.ay(10,10,10,10),new A.ay(8,8,8,8),a5,a5,a),a5))}b9.push(a4.eX("Chlorine",a4.Q,"Chlorine (mg/L)",B.av))
-b9.push(a4.eX(a9,a4.e,b0,B.av))
+b9.push(new A.bI(B.d6,A.c8(a5,A.ie(new A.iB(new A.aC(r,1/0,0,1/0),A.bmu(16,A.b([A.zR(A.aB(a6,a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5)),A.zR(A.aB("Current",a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5)),A.zR(A.aB("Min",a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5)),A.zR(A.aB("Max",a5,a5,a5,a5,A.aT(a5,a5,B.aw,a5,a5,a5,a5,a5,a5,a5,a5,d,a5,a5,B.F,a5,a5,!0,a5,a5,a5,a5,a5,a5,a5,a5),a5,a5,a5))],t.UR),16,A.b([a4.nn(a7,a1,e),a4.nn(a8,a2,e),a4.nn(a9,a3,e)],t.yy)),a5),a5,a5,a5,B.af),B.n,a5,a5,new A.db(b,a5,n,c,a5,a5,B.a0),a5,a5,a5,new A.ay(10,10,10,10),new A.ay(8,8,8,8),a5,a5,a),a5))}b9.push(a4.eX("Chlorine",a4.Q,"Chlorine (mg/L)",B.av))
+b9.push(a4.eX(a7,a4.e,b0,B.av))
 b9.push(a4.eX(b1,a4.f,b2,B.av))
 b9.push(a4.eX(b3,a4.r,b4,B.av))
 b9.push(a4.eX(b5,a4.w,b6,B.av))
@@ -72330,13 +72330,13 @@ b9.push(a4.eX(b7,a4.ax,b0,B.av))
 b9.push(a4.eX(" Electrode Signal ",a4.as," Electrode Signal (mV)",B.av))
 b9.push(a4.eX(" Chlorine ",a4.ay,"Chlorine  (mg/L)",B.av))
 b9.push(a4.eX(" Hypochlorous ",a4.at," Hypochlorous  (mg/L)",B.av))
-b9.push(a4.eX(a9,a4.fr,b0,B.av))
+b9.push(a4.eX(a7,a4.fr,b0,B.av))
 b9.push(a4.eX(b1,a4.fx,b2,B.av))
 b9.push(a4.eX(b3,a4.fy,b4,B.av))
 b9.push(a4.eX(b5,a4.go,b6,B.av))
-b9.push(a4.eX(a9,a4.id,b0,B.av))
-b9.push(a4.eX(a7,a4.k1,b8,B.av))
-b9.push(a4.eX(a8,a4.k2,"DO Percentage (%)",B.av))
+b9.push(a4.eX(a7,a4.id,b0,B.av))
+b9.push(a4.eX(a8,a4.k1,b8,B.av))
+b9.push(a4.eX(a9,a4.k2,"DO Percentage (%)",B.av))
 b9=A.b([q,c0,A.Bp(0,A.ie(A.c8(a5,A.cL(b9,B.u,B.y,B.z),B.n,a5,a5,a5,a5,a5,a5,a5,new A.ay(0,16,0,0),a5,a5,a5),a5,a5,a5,B.ag),a5,a5,0,0,p.fx.b,a5)],o)
 if(a4.p2){c0=A.Q(B.d.a7(127.5),0,0,0)
 b9.push(A.bi_(0,A.c8(a5,A.iw(A.a1y(new A.Mr(B.i,t.ZU)),a5,a5),B.n,c0,a5,a5,a5,a5,a5,a5,a5,a5,a5,a5)))}c0=A.ES(a5,a5,B.PO,a5,a5,a5,a5,a5,a5,B.i,a5,a5,a5,a5,a5,a5,a5,a5,a5)
