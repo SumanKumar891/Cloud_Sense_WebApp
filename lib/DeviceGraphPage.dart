@@ -172,7 +172,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://x9sji7grw5.execute-api.us-east-1.amazonaws.com/default/CloudSense_Weather_data_api_function_2?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
+          'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CL') ||
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
