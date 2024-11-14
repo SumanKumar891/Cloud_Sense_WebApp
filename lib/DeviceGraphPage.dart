@@ -318,10 +318,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ttempData = _parsedoChartData(data, 'Temperature');
             dovaluedata = _parsedoChartData(data, 'DO Value');
             dopercentagedata = _parsedoChartData(data, 'DO Percentage');
-            print("Temperature Data: ${ttempData.map((e) => e.value)}");
-            print("DO Value Data: ${dovaluedata.map((e) => e.value)}");
-            print(
-                "DO Percentage Data: ${dopercentagedata.map((e) => e.value)}");
 
             temperatureData = [];
             humidityData = [];
