@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_sense_webapp/downloadcsv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -10,7 +11,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
 import 'dart:io' as io;
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 class DeviceGraphPage extends StatefulWidget {
@@ -32,7 +33,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> humidityData = [];
   List<ChartData> lightIntensityData = [];
   List<ChartData> windSpeedData = [];
-  List<ChartData> rainIntensityData = [];
+  List<ChartData> rainLevelData = [];
+  List<ChartData> rainDifferenceData = [];
   List<ChartData> solarIrradianceData = [];
   List<ChartData> windDirectionData = [];
   List<ChartData> chlorineData = [];
@@ -54,14 +56,41 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> ttempData = [];
   List<ChartData> dovaluedata = [];
   List<ChartData> dopercentagedata = [];
+  List<Map<String, dynamic>> rainHourlyItems = [];
+  double _precipitationProbability = 0.0;
+  List<double> _weeklyPrecipitationData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
   bool _isHovering = false; // Track hover state
   String? _activeButton;
   String _currentChlorineValue = '0.00';
   bool _isLoading = false;
   String _lastSelectedRange = 'single'; // Default to single
-  DateTime? _startDate;
-  DateTime? _endDate;
+  bool isWindDirectionValid(String? windDirection) {
+    return windDirection != null && windDirection != "-";
+  }
+
+  // New variables to store rain forecasting data for WD 211
+  String _totalRainLast24Hours = '0.00 mm';
+  String _mostRecentHourRain = '0.00 mm';
+
+// bool hasNonZeroValues(List<dynamic> data) {
+  //   // Return false if list is empty or contains only zeros
+  //   return data.isNotEmpty && data.any((entry) => entry.value != 0);
+  // }
+  bool hasNonZeroValues(List<dynamic> data,
+      {bool includePrecipitation = true}) {
+    // Exclude precipitation from the zero check if `includePrecipitation` is false
+    if (includePrecipitation) {
+      return data.isNotEmpty && data.any((entry) => entry.value != 0);
+    } else {
+      return data.isNotEmpty &&
+          data.any((entry) =>
+              entry.value != 0 && entry.type != 'precipitationProbability');
+    }
+  }
+
+  double? _latitude;
+  double? _longitude;
 
   @override
   void initState() {
@@ -69,6 +98,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     _fetchDeviceDetails();
     // fetchData();
     _fetchDataForRange('single');
+    _loadLocationFromPrefs();
   }
 
 // To toggle current data visibility
@@ -87,9 +117,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
         if (selectedDevice != null) {
           setState(() {});
-        } else {
-          print('Device ${widget.deviceName} not found.');
         }
+        // } else {
+        //   print('Device ${widget.deviceName} not found.');
+        // }
       } else {
         throw Exception('Failed to load device details');
       }
@@ -102,7 +133,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _lastWindDirection = "";
 
   Future<void> _fetchDataForRange(String range,
-      [DateTime? selectedDate]) async {
+      [DateTime? selectedDate, double? latitude, double? longitude]) async {
     setState(() {
       _isLoading = true; // Start loading
       _csvRows.clear();
@@ -111,7 +142,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       humidityData.clear();
       lightIntensityData.clear();
       windSpeedData.clear();
-      rainIntensityData.clear();
+      rainLevelData.clear();
       solarIrradianceData.clear();
       windDirectionData.clear();
       electrodeSignalData.clear();
@@ -132,6 +163,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ttempData.clear();
       dovaluedata.clear();
       dopercentagedata.clear();
+      _weeklyPrecipitationData.clear();
     });
     DateTime startDate;
     DateTime endDate = DateTime.now();
@@ -168,6 +200,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     setState(() {
       _selectedDeviceId = deviceId; // Set the selected device ID
     });
+    // Call the additional rain data API for WD211
+    if (widget.deviceName == 'WD211') {
+      await _fetchRainForecastingData();
+    }
 
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
@@ -196,6 +232,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
+      // double? precipitationProbability;
+
+      // if (widget.deviceName == 'WD311') {
+      //   final rainForecastApiUrl =
+      //       'https://api.tomorrow.io/v4/weather/forecast?location=$latitude,$longitude&apikey=VCusVsCI9zp6B89kZv5lxb8zDFI7mtoi';
+
+      //   final rainResponse = await http.get(Uri.parse(rainForecastApiUrl));
+
+      //   if (rainResponse.statusCode == 200) {
+      //     final rainData = json.decode(rainResponse.body);
+      //     precipitationProbability = rainData['timelines']['hourly'][0]
+      //             ['values']['precipitationProbability'] ??
+      //         0.0;
+      //   }
+      // }
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -211,7 +262,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             humidityData = [];
             lightIntensityData = [];
             windSpeedData = [];
-            rainIntensityData = [];
+            rainLevelData = [];
             solarIrradianceData = [];
             tempData = [];
             tdsData = [];
@@ -249,7 +300,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             humidityData = [];
             lightIntensityData = [];
             windSpeedData = [];
-            rainIntensityData = [];
+            rainLevelData = [];
             solarIrradianceData = [];
             chlorineData = [];
 
@@ -290,7 +341,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             humidityData = [];
             lightIntensityData = [];
             windSpeedData = [];
-            rainIntensityData = [];
+            rainLevelData = [];
             solarIrradianceData = [];
             chlorineData = [];
 
@@ -323,7 +374,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             humidityData = [];
             lightIntensityData = [];
             windSpeedData = [];
-            rainIntensityData = [];
+            rainLevelData = [];
             solarIrradianceData = [];
             chlorineData = [];
             tempData = [];
@@ -361,8 +412,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             humidityData = _parseChartData(data, 'Humidity');
             lightIntensityData = _parseChartData(data, 'LightIntensity');
             windSpeedData = _parseChartData(data, 'WindSpeed');
-            rainIntensityData = _parseChartData(data, 'RainIntensity');
+            // rainLevelData = _parseChartData(data, 'RainLevel');
+            rainDifferenceData = _parseRainDifferenceData(data);
             solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
+
+            // Calculate the current rain difference (most recent data)
+            // double currentRainDifference =
+            //     _getCurrentRainDifference(data['rain_hourly_items']);
+
+            // // Calculate total rain difference for the last 24 hours
+            // double totalRainDifference24h =
+            //     _calculateRainSumLast24Hours(data['rain_hourly_items']);
+
+            // // Store the values in state variables
+            // _currentRainDifference = currentRainDifference;
+            // _totalRainDifference24h = totalRainDifference24h;
             chlorineData = [];
             tempData = [];
             tdsData = [];
@@ -384,9 +448,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Temperature",
                 "Humidity",
                 "LightIntensity",
-                "WindSpeed",
-                "RainIntensity",
-                "SolarIrradiance"
+                // "WindSpeed",
+                // "RainLevel",
+                // "RainDifference",
+                "SolarIrradiance",
+                // if (widget.deviceName == 'WD211') "PrecipitationProbability"
               ],
               for (int i = 0; i < temperatureData.length; i++)
                 [
@@ -394,9 +460,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   temperatureData[i].value,
                   humidityData[i].value,
                   lightIntensityData[i].value,
-                  windSpeedData[i].value,
-                  rainIntensityData[i].value,
+                  // windSpeedData[i].value,
+                  // rainLevelData[i].value,
+                  // Find the closest hourly rain difference data for each 15-min timestamp
+                  // rainDifferenceData.isNotEmpty
+                  //     ? rainDifferenceData
+                  //         .lastWhere(
+                  //           (rd) => rd.timestamp.isBefore(temperatureData[i]
+                  //               .timestamp
+                  //               .add(Duration(minutes: 15))),
+                  //           orElse: () => ChartData(
+                  //               timestamp: DateTime.now(), value: 0.0),
+                  //         )
+                  //         .value
+                  //     : 0.0,
                   solarIrradianceData[i].value,
+                  // if (widget.deviceName == 'WD211') precipitationProbability
                 ]
             ];
           });
@@ -488,7 +567,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   String _generateFileName() {
-    final timestamp = DateFormat('yyyy-MM-dd_HH:mm:ss').format(DateTime.now());
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
     return 'SensorData_$timestamp.csv';
   }
 
@@ -511,6 +590,390 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         SnackBar(content: Text("Unable to find Downloads directory")),
       );
     }
+  }
+
+  Future<void> _fetchRainForecastingData() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://w6dzlucugb.execute-api.us-east-1.amazonaws.com/default/CloudSense_rain_data_api?DeviceId=211'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          _totalRainLast24Hours =
+              data['TotalRainLast24Hours']?.toString() ?? '0.00 mm';
+          _mostRecentHourRain =
+              data['MostRecentHourRain']?.toString() ?? '0.00 mm';
+        });
+      } else {
+        throw Exception('Failed to load rain forecasting data');
+      }
+    } catch (e) {
+      print('Error fetching rain forecasting data: $e');
+    }
+  }
+
+  Future<void> _showWeeklyPrecipitationProbability(
+      double latitude, double longitude) async {
+    try {
+      final apiUrl =
+          'https://api.tomorrow.io/v4/weather/forecast?location=$latitude,$longitude&apikey=VCusVsCI9zp6B89kZv5lxb8zDFI7mtoi';
+
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final rainData = json.decode(response.body);
+
+        // Extract weekly precipitation probabilities for 7 days
+        List<Map<String, dynamic>> weeklyPrecipitation = [];
+        for (int i = 0; i < 6; i++) {
+          final dayData = rainData['timelines']['daily'][i];
+          final date = dayData['time'];
+          final precipitationProbability =
+              dayData['values']['precipitationProbabilityAvg'] ?? 0.0;
+          final rainIntensity = dayData['values']['rainIntensityAvg'] ?? 0.0;
+
+          weeklyPrecipitation.add({
+            'date': DateFormat('dd-MM-yyyy').format(DateTime.parse(date)),
+            'precipitationProbabilityAvg': precipitationProbability,
+            'rainIntensityAvg': rainIntensity,
+          });
+        }
+
+        // Show the weekly precipitation data in a dialog
+        showDialog(
+          context: context,
+          builder: (context) {
+            double screenWidth = MediaQuery.of(context).size.width;
+            double dialogWidth = screenWidth < 800 ? 300 : 400;
+            double dialogHeight = screenWidth < 800 ? 350 : 350;
+
+            return AlertDialog(
+              title: Center(
+                child: Text('Weekly Rain Forecasting'),
+              ),
+
+              content: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                  width: dialogWidth,
+                  height: dialogHeight,
+                  child: DataTable(
+                    columnSpacing: 20,
+                    horizontalMargin: 10,
+                    columns: [
+                      DataColumn(label: Text('Date')),
+                      DataColumn(label: Text('Avg Rain\nIntensity')),
+                      DataColumn(label: Text('Avg Rain\nProbability')),
+                    ],
+                    rows: weeklyPrecipitation.map((day) {
+                      return DataRow(cells: [
+                        DataCell(Text(day['date'])),
+                        DataCell(Text('${day['rainIntensityAvg']}')),
+                        DataCell(Text('${day['precipitationProbabilityAvg']}')),
+                      ]);
+                    }).toList(),
+                  ),
+                ),
+              ),
+              actionsAlignment: MainAxisAlignment
+                  .spaceBetween, // Aligns actions to left and right
+              actions: [
+                // Left-aligned "Hourly Insights" button
+                TextButton(
+                  onPressed: () async {
+                    await _showHourlyPrecipitationForWeek();
+                  },
+                  child: Text('Hourly Insights'),
+                ),
+                // Right-aligned "Close" button
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print('Failed to load weather data');
+      }
+    } catch (e) {
+      print('Error fetching precipitation data: $e');
+    }
+  }
+
+  Future<void> _showHourlyPrecipitationForWeek() async {
+    try {
+      final apiUrl =
+          'https://api.tomorrow.io/v4/weather/forecast?location=$_latitude,$_longitude&apikey=VCusVsCI9zp6B89kZv5lxb8zDFI7mtoi';
+
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final rainData = json.decode(response.body);
+
+        // Organize hourly data for each day of the week
+        Map<String, List<Map<String, dynamic>>> weeklyHourlyData = {};
+
+        for (var entry in rainData['timelines']['hourly']) {
+          final dateTime = DateTime.parse(entry['time']);
+          final date = DateFormat('dd-MM-yyyy').format(dateTime);
+          final hour = DateFormat('HH:mm').format(dateTime);
+
+          // Create a new date entry if it doesn't exist
+          if (!weeklyHourlyData.containsKey(date)) {
+            weeklyHourlyData[date] = [];
+          }
+
+          // Add hourly data to the appropriate date
+          weeklyHourlyData[date]?.add({
+            'time': hour,
+            'precipitationProbability':
+                entry['values']['precipitationProbability'] ?? 0.0,
+            'rainIntensity': entry['values']['rainIntensity'] ?? 0.0,
+          });
+        }
+        // Show the hourly data in a new dialog
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Center(
+                child: Text('Hourly Rain Forecasting - Weekly Insights'),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: weeklyHourlyData.keys.map((date) {
+                    return ExpansionTile(
+                      title: Text(date),
+                      children: [
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columnSpacing: 20,
+                            horizontalMargin: 10,
+                            columns: [
+                              DataColumn(label: Text('Time')),
+                              DataColumn(label: Text('Rain Intensity\n(mm/h)')),
+                              DataColumn(label: Text('Rain Probability\n(%)')),
+                            ],
+                            rows: weeklyHourlyData[date]!.map((hour) {
+                              return DataRow(cells: [
+                                DataCell(Text(hour['time'])),
+                                DataCell(Text('${hour['rainIntensity']}')),
+                                DataCell(Text(
+                                    '${hour['precipitationProbability']}')),
+                              ]);
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print('Failed to load hourly weather data');
+      }
+    } catch (e) {
+      print('Error fetching hourly precipitation data: $e');
+    }
+  }
+
+// Function to get the current location based on platform
+  Future<void> _getUserCurrentLocation() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    // For web
+    if (kIsWeb) {
+      try {
+        html.window.navigator.geolocation.getCurrentPosition().then((position) {
+          final latitude = position.coords?.latitude;
+          final longitude = position.coords?.longitude;
+
+          setState(() {
+            _latitude = latitude as double?;
+            _longitude = longitude as double?;
+            _isLoading = false; // Stop loading after fetching location
+            _saveLocationToPrefs(); // Save location to SharedPreferences
+          });
+        }).catchError((e) {
+          print("Error getting location: $e");
+          setState(() {
+            _isLoading = false; // Stop loading if there's an error
+          });
+        });
+      } catch (e) {
+        print("Error accessing geolocation: $e");
+        setState(() {
+          _isLoading = false; // Stop loading if an error occurs
+        });
+      }
+    } else {
+      // Mobile specific location fetching
+      bool serviceEnabled;
+      geolocator.LocationPermission permission;
+
+      serviceEnabled = await geolocator.Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print('Location services are disabled.');
+        setState(() {
+          _isLoading = false; // Stop loading if location services are disabled
+        });
+        return;
+      }
+
+      permission = await geolocator.Geolocator.checkPermission();
+      if (permission == geolocator.LocationPermission.denied) {
+        permission = await geolocator.Geolocator.requestPermission();
+        if (permission == geolocator.LocationPermission.denied) {
+          print('Location permissions are denied');
+          setState(() {
+            _isLoading = false; // Stop loading
+          });
+          return;
+        }
+      }
+
+      if (permission == geolocator.LocationPermission.deniedForever) {
+        print('Location permissions are permanently denied');
+        setState(() {
+          _isLoading = false; // Stop loading
+        });
+        return;
+      }
+
+      geolocator.Position position =
+          await geolocator.Geolocator.getCurrentPosition(
+        desiredAccuracy: geolocator.LocationAccuracy.high,
+      );
+
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+        _isLoading = false; // Stop loading after fetching location
+        _saveLocationToPrefs(); // Save location to SharedPreferences
+      });
+    }
+  }
+
+  // Save latitude and longitude to SharedPreferences
+  Future<void> _saveLocationToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setDouble('latitude', _latitude ?? 0.0);
+    prefs.setDouble('longitude', _longitude ?? 0.0);
+  }
+
+  // Load latitude and longitude from SharedPreferences
+  Future<void> _loadLocationFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _latitude = prefs.getDouble('latitude');
+      _longitude = prefs.getDouble('longitude');
+    });
+  }
+
+  // Function to show the location input dialog
+  Future<void> _showLocationInputDialog() async {
+    TextEditingController latitudeController =
+        TextEditingController(text: _latitude?.toString() ?? '');
+    TextEditingController longitudeController =
+        TextEditingController(text: _longitude?.toString() ?? '');
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter Location'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Show input fields for latitude and longitude
+              TextField(
+                controller: latitudeController,
+                decoration: InputDecoration(
+                  labelText: 'Latitude',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: longitudeController,
+                decoration: InputDecoration(
+                  labelText: 'Longitude',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 10),
+              // Show the "Use Current Location" button
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (!_isLoading) {
+                          await _getUserCurrentLocation(); // Fetch current location
+                          latitudeController.text = _latitude?.toString() ?? '';
+                          longitudeController.text =
+                              _longitude?.toString() ?? '';
+                        }
+                      },
+                      child: _isLoading
+                          ? CircularProgressIndicator() // Show loading while fetching
+                          : Text('Use Current Location'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog without action
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final latitude = double.tryParse(latitudeController.text);
+                final longitude = double.tryParse(longitudeController.text);
+
+                if (latitude != null && longitude != null) {
+                  setState(() {
+                    _latitude = latitude;
+                    _longitude = longitude;
+                  });
+
+                  Navigator.of(context).pop();
+                  await _saveLocationToPrefs(); // Save updated location to prefs
+                  await _showWeeklyPrecipitationProbability(
+                      _latitude!, _longitude!);
+                } else {
+                  print("Please enter valid coordinates.");
+                }
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _showDownloadOptionsDialog(BuildContext context) async {
@@ -637,6 +1100,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  // List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
+  //   final List<dynamic> items = data['weather_items'] ?? [];
+  //   return items.map((item) {
+  //     if (item == null) {
+  //       return ChartData(
+  //           timestamp: DateTime.now(), value: 0.0); // Provide default value
+  //     }
+  //     return ChartData(
+  //       timestamp: _parseDate(item['HumanTime']),
+  //       value: item[type] != null
+  //           ? double.tryParse(item[type].toString()) ?? 0.0
+  //           : 0.0,
+  //     );
+  //   }).toList();
+  // }
   List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['weather_items'] ?? [];
     return items.map((item) {
@@ -644,11 +1122,42 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         return ChartData(
             timestamp: DateTime.now(), value: 0.0); // Provide default value
       }
+
+      // Parse the value based on the `type`
+      double value;
+      if (type == 'RainLevel' && item[type] is String) {
+        // Remove unit from RainLevel string and parse the numeric part
+        String rainLevelStr =
+            item[type].split(' ')[0]; // Extract "2.51" from "2.51 mm"
+        value = double.tryParse(rainLevelStr) ?? 0.0;
+      } else {
+        // For other types, parse directly
+        value = double.tryParse(item[type].toString()) ?? 0.0;
+      }
+
       return ChartData(
         timestamp: _parseDate(item['HumanTime']),
-        value: item[type] != null
-            ? double.tryParse(item[type].toString()) ?? 0.0
-            : 0.0,
+        value: value,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parseRainDifferenceData(Map<String, dynamic> data) {
+    final List<dynamic> items = data['rain_hourly_items'] ?? [];
+
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Default value
+      }
+
+      // Extract and parse RainDifference value, removing unit "mm"
+      String rainDifferenceStr = item['RainDifference'].split(' ')[0];
+      double rainDifferenceValue = double.tryParse(rainDifferenceStr) ?? 0.0;
+
+      return ChartData(
+        timestamp: DateTime.parse(item['HourTimestamp']),
+        value: rainDifferenceValue,
       );
     }).toList();
   }
@@ -886,9 +1395,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   // Create a table displaying statistics
   Widget buildDOStatisticsTable() {
-    final ttempStats = _calculateStatistics(ttempData);
-    final dovalueStats = _calculateStatistics(dovaluedata);
-    final dopercentageStats = _calculateStatistics(dopercentagedata);
+    final ttempStats = _calculateDOStatistics(ttempData);
+    final dovalueStats = _calculateDOStatistics(dovaluedata);
+    final dopercentageStats = _calculateDOStatistics(dopercentagedata);
 
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 16;
@@ -981,6 +1490,210 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
+  }
+
+  Map<String, List<double?>> _calculateWeatherStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        'current': [null],
+      };
+    }
+
+    double? current = data.last.value; // Get the most recent (current) value
+
+    return {
+      'current': [current], // Return the last (current) value
+    };
+  }
+
+  Widget buildWeatherStatisticsTable() {
+    final temperatureStats = _calculateWeatherStatistics(temperatureData);
+    final humidityStats = _calculateWeatherStatistics(humidityData);
+    final lightIntensityStats = _calculateWeatherStatistics(lightIntensityData);
+    final solarIrradianceStats =
+        _calculateWeatherStatistics(solarIrradianceData);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 400,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Centered heading for the table
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Center(
+                child: Text(
+                  'Data',
+                  style: TextStyle(
+                    fontSize: headerFontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+                ),
+                child: DataTable(
+                  horizontalMargin: 16,
+                  columnSpacing: 4,
+                  columns: [
+                    DataColumn(
+                      label: Text(
+                        'Parameter',
+                        style: TextStyle(
+                            fontSize: headerFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Current',
+                        style: TextStyle(
+                            fontSize: headerFontSize,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue),
+                      ),
+                    ),
+                  ],
+                  rows: [
+                    buildWeatherDataRow(
+                        'Temperature', temperatureStats, fontSize),
+                    buildWeatherDataRow('Humidity', humidityStats, fontSize),
+                    buildWeatherDataRow(
+                        'Light Intensity', lightIntensityStats, fontSize),
+                    buildWeatherDataRow(
+                        'Solar Irradiance', solarIrradianceStats, fontSize),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  DataRow buildWeatherDataRow(
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
+              : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
+  Widget buildRainDataTable() {
+    // Use the string values directly from the API
+    String currentRain = _mostRecentHourRain ?? "-"; // If null, show "-"
+    String totalRainLast24Hours =
+        _totalRainLast24Hours ?? "-"; // If null, show "-"
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6), // Semi-transparent background
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 300,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Rain Data',
+                style: TextStyle(
+                  fontSize: headerFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            DataTable(
+              columnSpacing: 36,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Timeframe',
+                    style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Rain Amount',
+                    style: TextStyle(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                DataRow(
+                  cells: [
+                    DataCell(Text(
+                      'Current Hour',
+                      style: TextStyle(fontSize: fontSize, color: Colors.white),
+                    )),
+                    DataCell(Text(
+                      currentRain,
+                      style: TextStyle(fontSize: fontSize, color: Colors.white),
+                    )),
+                  ],
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text(
+                      'Last 24 Hours',
+                      style: TextStyle(fontSize: fontSize, color: Colors.white),
+                    )),
+                    DataCell(Text(
+                      totalRainLast24Hours,
+                      style: TextStyle(fontSize: fontSize, color: Colors.white),
+                    )),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   DateTime _parseBDDate(String dateString) {
@@ -1533,11 +2246,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                         ),
                                       ),
                               ),
+
                               SizedBox(
                                   height:
                                       20), // Space between buttons and the next section
-                              // Wind Direction widget in the center
-                              if (widget.deviceName.startsWith('WD'))
+// Wind Direction widget in the center
+                              if (widget.deviceName.startsWith('WD') &&
+                                  isWindDirectionValid(_lastWindDirection))
                                 Column(
                                   children: [
                                     Icon(
@@ -1547,7 +2262,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     ),
                                     SizedBox(height: 8),
                                     Text(
-                                      'Wind Direction: $_lastWindDirection',
+                                      'Wind Direction : $_lastWindDirection',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20,
@@ -1556,12 +2271,121 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     ),
                                   ],
                                 ),
+
+                              // if (widget.deviceName == 'WD311')
+                              //   Padding(
+                              //     padding: const EdgeInsets.only(
+                              //       top: 4.0,
+                              //     ), // Spacing between elements
+                              //     child: Row(
+                              //       mainAxisAlignment: MainAxisAlignment
+                              //           .end, // Aligns the text to the right
+                              //       children: [
+                              //         // Text(
+                              //         //   'Rain Probability : $_precipitationProbability%',
+                              //         //   style: TextStyle(
+                              //         //     fontWeight: FontWeight.bold,
+                              //         //     fontSize: 20,
+                              //         //     color: Colors.white,
+                              //         //   ),
+                              //         // ),
+                              //         SizedBox(
+                              //             width:
+                              //                 10), // Adds some space between text and button
+                              //         ElevatedButton(
+                              //           onPressed: () async {
+                              //             await _showWeeklyPrecipitationProbability();
+                              //           },
+                              //           child: Text('Weekly Forecast'),
+                              //           style: ElevatedButton.styleFrom(
+                              //             foregroundColor: Colors.white,
+                              //             backgroundColor: const Color.fromARGB(
+                              //                 255, 40, 41, 41), // Text color
+                              //           ),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ),
+                              if (widget.deviceName == 'WD311')
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 4.0,
+                                  ), // Spacing between elements
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .end, // Aligns the text to the right
+                                    children: [
+                                      SizedBox(
+                                          width:
+                                              10), // Adds some space between text and button
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          // Call a function to show the input dialog for latitude and longitude
+                                          await _showLocationInputDialog();
+                                        },
+                                        child: Text('Weekly Forecast'),
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: const Color.fromARGB(
+                                              255, 40, 41, 41), // Text color
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              // if (widget.deviceName == 'WD211')
+                              //   Column(
+                              //     children: [
+                              //       SizedBox(height: 16),
+                              //       ElevatedButton(
+                              //         onPressed: () {
+                              //           _showRainDataDialog(
+                              //               context); // Call the function to show the dialog
+                              //         },
+                              //         style: ElevatedButton.styleFrom(
+                              //           padding: EdgeInsets.symmetric(
+                              //               vertical: 12, horizontal: 24),
+                              //           textStyle: TextStyle(fontSize: 16),
+                              //           foregroundColor: Colors.black,
+                              //           backgroundColor: const Color.fromARGB(
+                              //               255, 102, 174, 233),
+                              //           shape: RoundedRectangleBorder(
+                              //             borderRadius:
+                              //                 BorderRadius.circular(8),
+                              //           ),
+                              //         ),
+                              //         child: Row(
+                              //           mainAxisSize: MainAxisSize
+                              //               .min, // Ensure that the Row does not take up extra space
+                              //           mainAxisAlignment: MainAxisAlignment
+                              //               .center, // Center the content of the Row
+                              //           children: [
+                              //             Icon(
+                              //               Icons
+                              //                   .thunderstorm, // Rain or cloud icon
+                              //               size: 24, // Icon size
+                              //               color: Colors.white, // Icon color
+                              //             ),
+                              //             SizedBox(
+                              //                 width:
+                              //                     8), // Spacing between the icon and the text
+                              //             Text(
+                              //               'Rain Data',
+                              //               style: TextStyle(
+                              //                   color:
+                              //                       Colors.black), // Text color
+                              //             ),
+                              //           ],
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
                             ],
                           );
                         },
                       ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -1573,69 +2397,152 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         ],
                       ),
                     ),
-
                     if (widget.deviceName.startsWith('WQ'))
                       buildStatisticsTable(),
                     if (widget.deviceName.startsWith('DO'))
                       buildDOStatisticsTable(),
+                    // if (widget.deviceName.startsWith('WD211'))
+                    //   Center(
+                    //     // This centers the entire Row
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment
+                    //           .center, // This centers the tables horizontally within the Row
+                    //       children: [
+                    //         buildWeatherStatisticsTable(), // Weather Statistics Table
+                    //         SizedBox(
+                    //             width: 5), // Optional: Space between the tables
+                    //         buildRainDataTable(), // Rain Data Table
+                    //       ],
+                    //     ),
+                    //   ),
+                    if (widget.deviceName.startsWith('WD211'))
+                      SingleChildScrollView(
+                        // Make the whole layout scrollable
+                        child: Center(
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              double screenWidth = constraints.maxWidth;
 
-                    // Display charts for various parameters
-                    _buildChartContainer('Chlorine', chlorineData,
-                        'Chlorine (mg/L)', ChartType.line),
-                    _buildChartContainer('Temperature', temperatureData,
-                        'Temperature (°C)', ChartType.line),
-                    _buildChartContainer('Humidity', humidityData,
-                        'Humidity (%)', ChartType.line),
-                    _buildChartContainer('Light Intensity', lightIntensityData,
-                        'Light Intensity (Lux)', ChartType.line),
-                    _buildChartContainer('Wind Speed', windSpeedData,
-                        'Wind Speed (m/s)', ChartType.line),
-                    _buildChartContainer('Rain Intensity', rainIntensityData,
-                        'Rain Intensity (mm/h)', ChartType.line),
-                    _buildChartContainer(
-                        'Solar Irradiance',
-                        solarIrradianceData,
-                        'Solar Irradiance (W/M^2)',
-                        ChartType.line),
-                    _buildChartContainer(' Temperature ', tempData,
-                        'Temperature (°C)', ChartType.line),
-                    _buildChartContainer(
-                        ' TDS ', tdsData, 'TDS (ppm)', ChartType.line),
-                    _buildChartContainer(
-                        'COD ', codData, 'COD (mg/L)', ChartType.line),
-                    _buildChartContainer(
-                        ' BOD ', bodData, 'BOD (mg/L)', ChartType.line),
-                    _buildChartContainer('pH ', pHData, 'pH()', ChartType.line),
-                    _buildChartContainer(
-                        ' DO ', doData, 'DO (mg/L)', ChartType.line),
-                    _buildChartContainer(
-                        ' EC ', ecData, 'EC (mS/cm)', ChartType.line),
-                    _buildChartContainer(' Temperature ', temppData,
-                        'Temperature (°C)', ChartType.line),
-                    _buildChartContainer(
-                        ' Electrode Signal ',
-                        electrodeSignalData,
-                        ' Electrode Signal (mV)',
-                        ChartType.line),
-                    _buildChartContainer(' Chlorine ', residualchlorineData,
-                        'Chlorine  (mg/L)', ChartType.line),
-                    _buildChartContainer(' Hypochlorous ', hypochlorousData,
-                        ' Hypochlorous  (mg/L)', ChartType.line),
+                              // Check if the screen width is large enough to show the tables side by side
+                              bool isLargeScreen = screenWidth > 800;
 
-                    _buildChartContainer('Temperature', temmppData,
-                        'Temperature (°C)', ChartType.line),
-                    _buildChartContainer('Humidity', humidityyData,
-                        'Humidity (%)', ChartType.line),
-                    _buildChartContainer('Light Intensity', lightIntensityyData,
-                        'Light Intensity (Lux)', ChartType.line),
-                    _buildChartContainer('Wind Speed', windSpeeddData,
-                        'Wind Speed (m/s)', ChartType.line),
-                    _buildChartContainer('Temperature', ttempData,
-                        'Temperature (°C)', ChartType.line),
-                    _buildChartContainer(
-                        'DO Value', dovaluedata, 'DO (mg/L)', ChartType.line),
-                    _buildChartContainer('DO Percentage', dopercentagedata,
-                        'DO Percentage (%)', ChartType.line),
+                              return isLargeScreen
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        buildWeatherStatisticsTable(), // Weather Statistics Table
+                                        SizedBox(
+                                            width: 5), // Space between tables
+                                        buildRainDataTable(), // Rain Data Table
+                                      ],
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        buildWeatherStatisticsTable(), // Weather Statistics Table
+                                        SizedBox(
+                                            height: 5), // Space between tables
+                                        buildRainDataTable(), // Rain Data Table
+                                      ],
+                                    );
+                            },
+                          ),
+                        ),
+                      ),
+
+                    Column(
+                      children: [
+                        if (hasNonZeroValues(chlorineData))
+                          _buildChartContainer('Chlorine', chlorineData,
+                              'Chlorine (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(temperatureData))
+                          _buildChartContainer('Temperature', temperatureData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(humidityData))
+                          _buildChartContainer('Humidity', humidityData,
+                              'Humidity (%)', ChartType.line),
+                        if (hasNonZeroValues(lightIntensityData))
+                          _buildChartContainer(
+                              'Light Intensity',
+                              lightIntensityData,
+                              'Light Intensity (Lux)',
+                              ChartType.line),
+                        if (hasNonZeroValues(windSpeedData))
+                          _buildChartContainer('Wind Speed', windSpeedData,
+                              'Wind Speed (m/s)', ChartType.line),
+                        if (hasNonZeroValues(solarIrradianceData))
+                          _buildChartContainer(
+                              'Solar Irradiance',
+                              solarIrradianceData,
+                              'Solar Irradiance (W/M^2)',
+                              ChartType.line),
+                        if (hasNonZeroValues(tempData))
+                          _buildChartContainer('Temperature', tempData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(tdsData))
+                          _buildChartContainer(
+                              'TDS', tdsData, 'TDS (ppm)', ChartType.line),
+                        if (hasNonZeroValues(codData))
+                          _buildChartContainer(
+                              'COD', codData, 'COD (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(bodData))
+                          _buildChartContainer(
+                              'BOD', bodData, 'BOD (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(pHData))
+                          _buildChartContainer(
+                              'pH', pHData, 'pH', ChartType.line),
+                        if (hasNonZeroValues(doData))
+                          _buildChartContainer(
+                              'DO', doData, 'DO (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(ecData))
+                          _buildChartContainer(
+                              'EC', ecData, 'EC (mS/cm)', ChartType.line),
+                        if (hasNonZeroValues(temppData))
+                          _buildChartContainer('Temperature', temppData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(electrodeSignalData))
+                          _buildChartContainer(
+                              'Electrode Signal',
+                              electrodeSignalData,
+                              'Electrode Signal (mV)',
+                              ChartType.line),
+                        if (hasNonZeroValues(residualchlorineData))
+                          _buildChartContainer('Chlorine', residualchlorineData,
+                              'Chlorine (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(hypochlorousData))
+                          _buildChartContainer('Hypochlorous', hypochlorousData,
+                              'Hypochlorous (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(temmppData))
+                          _buildChartContainer('Temperature', temmppData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(humidityyData))
+                          _buildChartContainer('Humidity', humidityyData,
+                              'Humidity (%)', ChartType.line),
+                        if (hasNonZeroValues(lightIntensityyData))
+                          _buildChartContainer(
+                              'Light Intensity',
+                              lightIntensityyData,
+                              'Light Intensity (Lux)',
+                              ChartType.line),
+                        if (hasNonZeroValues(windSpeeddData))
+                          _buildChartContainer('Wind Speed', windSpeeddData,
+                              'Wind Speed (m/s)', ChartType.line),
+                        if (hasNonZeroValues(ttempData))
+                          _buildChartContainer('Temperature', ttempData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(dovaluedata))
+                          _buildChartContainer('DO Value', dovaluedata,
+                              'DO (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(dopercentagedata))
+                          _buildChartContainer(
+                              'DO Percentage',
+                              dopercentagedata,
+                              'DO Percentage (%)',
+                              ChartType.line),
+                      ],
+                    )
                   ],
                 ),
               ),

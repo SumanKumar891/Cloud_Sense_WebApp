@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/AccountInfo.dart';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/about-us': (context) => HomePage(),
         '/login': (context) => SignInSignUpScreen(),
+        '/accountinfo': (context) => AccountInfoPage(),
         '/devicelist': (context) => DataDisplayPage(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',

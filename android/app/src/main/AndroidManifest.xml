@@ -3,10 +3,19 @@
 
 <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+
+
  <application
-        android:label="cloud_sense_webapp"
+        android:label="Cloud Sense"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+         android:roundIcon="@mipmap/ic_launcher"
           android:requestLegacyExternalStorage="true"> 
         <activity
             android:name=".MainActivity"
@@ -50,6 +59,11 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
         </intent>
     </queries>
 </manifest>

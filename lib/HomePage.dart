@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
+  Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -47,27 +49,6 @@ class _HomePageState extends State<HomePage> {
                   fontSize: isMobile ? 20 : 32,
                 ),
               ),
-              //   Spacer(),
-              //   if (!isMobile) ...[
-              //     SizedBox(width: 20),
-              //     _buildNavButton('ABOUT US', _aboutUsColor, () {
-              //       Navigator.push(
-              //         context,
-              //         MaterialPageRoute(builder: (context) => HomePage()),
-              //       );
-              //     }),
-              //     SizedBox(width: 20),
-              //     _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-              //       Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //             builder: (context) => SignInSignUpScreen()),
-              //       );
-              //     }),
-              //   ],
-              // ],
-              // ),
-              // ),
               Spacer(),
               if (!isMobile) ...[
                 SizedBox(width: 20),
@@ -79,6 +60,11 @@ class _HomePageState extends State<HomePage> {
                 _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
                   // Using named route for 'Login/Signup' page
                   Navigator.pushNamed(context, '/login');
+                }),
+                SizedBox(width: 20),
+                _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
+                  // Using named route for 'Login/Signup' page
+                  Navigator.pushNamed(context, '/accountinfo');
                 }),
               ],
             ],
@@ -105,11 +91,6 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(Icons.info),
                       title: Text('ABOUT US'),
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (context) => HomePage()),
-                        // );
-                        // Using named route for 'About Us' page
                         Navigator.pushNamed(context, '/about-us');
                       },
                     ),
@@ -117,13 +98,14 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(Icons.login),
                       title: Text('LOGIN/SIGNUP'),
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => SignInSignUpScreen()),
-                        // );
-                        // Using named route for 'Login/Signup' page
                         Navigator.pushNamed(context, '/login');
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.login),
+                      title: Text('ACCOUNT INFO'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
                   ],
@@ -313,7 +295,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               SizedBox(height: 0),
-              // Footer Section
+
               Container(
                 color: const Color.fromARGB(255, 10, 10, 10),
                 width: double.infinity,
@@ -328,20 +310,115 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 16,
                       ),
                     ),
+                    // SizedBox(height: 18),
+                    // GestureDetector(
+                    //   onTap: () async {
+                    //     final Uri launchUri = Uri(
+                    //       scheme: 'tel',
+                    //       path: '01881-232601',
+                    //     );
+
+                    //     if (await canLaunchUrl(launchUri)) {
+                    //       await launchUrl(launchUri);
+                    //     } else {
+                    //       throw 'Could not launch $launchUri';
+                    //     }
+                    //   },
+                    //   child: Text(
+                    //     'Phone : 01881 - 232601 ',
+                    //     style: TextStyle(
+                    //       color: Colors.white,
+                    //       fontSize: 16,
+                    //       decoration: TextDecoration
+                    //           .underline, // Optional: to indicate it's clickable
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(height: 18),
+                    // GestureDetector(
+                    //   onTap: () async {
+                    //     final Uri params = Uri(
+                    //       scheme: 'mailto',
+                    //       path: 'contact.awadh@iitrpr.ac.in',
+                    //     );
+
+                    //     // Check if the email URL can be launched
+                    //     if (await canLaunchUrl(params)) {
+                    //       await launchUrl(
+                    //           params); // Launch the email client with the pre-filled data
+                    //     } else {
+                    //       throw ('Could not launch $params'); // Log the error if URL can't be launched
+                    //     }
+                    //   },
+                    //   child: Text(
+                    //     'Email: contact.awadh@iitrpr.ac.in',
+                    //     style: TextStyle(
+                    //       color: Colors.white,
+                    //       fontSize: 16,
+                    //       decoration: TextDecoration
+                    //           .underline, // Optional: to indicate it's clickable
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(height: 18),
-                    Text(
-                      'Phone : 01881 - 232601 ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                    GestureDetector(
+                      onTap: () async {
+                        final Uri launchUri = Uri(
+                          scheme: 'tel',
+                          path: '01881-232601',
+                        );
+
+                        if (await canLaunchUrl(launchUri)) {
+                          await launchUrl(launchUri);
+                        } else {
+                          throw 'Could not launch $launchUri';
+                        }
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          children: [
+                            TextSpan(text: 'Phone : '), // No underline
+                            TextSpan(
+                              text: '01881 - 232601',
+                              style: TextStyle(
+                                decoration:
+                                    TextDecoration.underline, // Underlined
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: 18),
-                    Text(
-                      'Email : contact.awadh@iitrpr.ac.in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                    GestureDetector(
+                      onTap: () async {
+                        final Uri params = Uri(
+                          scheme: 'mailto',
+                          path: 'contact.awadh@iitrpr.ac.in',
+                        );
+
+                        // Check if the email URL can be launched
+                        if (await canLaunchUrl(params)) {
+                          await launchUrl(params);
+                        } else {
+                          throw ('Could not launch $params');
+                        }
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          children: [
+                            TextSpan(text: 'Email : '), // No underline
+                            TextSpan(
+                              text: 'contact.awadh@iitrpr.ac.in',
+                              style: TextStyle(
+                                decoration:
+                                    TextDecoration.underline, // Underlined
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -359,6 +436,7 @@ class _HomePageState extends State<HomePage> {
       onEnter: (_) => setState(() {
         if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
         if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
+        if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
         // if (text == 'CONTACT US') _contactUsColor = Colors.blue;
       }),
       onExit: (_) => setState(() {
@@ -366,6 +444,8 @@ class _HomePageState extends State<HomePage> {
           _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
         if (text == 'LOGIN/SIGNUP')
           _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
+        if (text == 'ACCOUNT INFO')
+          _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
         // if (text == 'CONTACT US')
         //   _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
       }),

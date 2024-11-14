@@ -631,32 +631,52 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   ),
                 ),
               ),
-            SizedBox(height: 32), // Add space before the forgot password row
+
+            SizedBox(height: 22), // Add space before the forgot password row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Forgot Password?',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(181, 113, 5, 214),
                   ),
                 ),
-                SizedBox(width: 4),
-                TextButton(
-                  onPressed: _forgotPassword,
-                  child: Text(
-                    'Reset',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      // color: Color.fromARGB(243, 173, 21, 211),
-                    ),
+                SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _forgotPassword,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Custom underline positioned slightly below the text
+                      Positioned(
+                        bottom:
+                            -1, // Adjust this value to increase/decrease gap between text and underline
+                        child: Container(
+                          height: 1.5, // Thickness of the underline
+                          width: 40, // Adjust width as needed
+                          color: Color.fromARGB(
+                              243, 32, 39, 230), // Color of underline
+                        ),
+                      ),
+                      Text(
+                        'Reset',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(243, 32, 39, 230), // Text color
+                          decoration:
+                              TextDecoration.none, // Disable default underline
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 4),
+
+            SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -664,24 +684,47 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 Text(
                   'Don\'t have an Account?',
                   style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: const Color.fromARGB(181, 113, 5, 214)),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(181, 113, 5, 214),
+                  ),
                 ),
-                SizedBox(width: 4),
-                TextButton(
-                  onPressed: () {
+                SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
                     setState(() {
                       _isSignIn = false;
                     });
                   },
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Custom underline positioned slightly below the text
+                      Positioned(
+                        bottom:
+                            -1, // Adjust this value for spacing between text and underline
+                        child: Container(
+                          height: 1.5, // Thickness of the underline
+                          width:
+                              45, // Width of the underline to match the text length
+                          color: Color.fromARGB(
+                              243, 32, 39, 230), // Underline color
+                        ),
+                      ),
+                      Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(243, 32, 39, 230), // Text color
+                          decoration:
+                              TextDecoration.none, // Disable default underline
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
@@ -748,14 +791,36 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 errorText: _emailValid ? null : 'Invalid email format',
               ),
             ),
+            // SizedBox(height: 16),
+            // TextField(
+            //   controller: _passwordController,
+            //   decoration: InputDecoration(
+            //     labelText: 'Password',
+            //     border: OutlineInputBorder(),
+            //   ),
+            //   obscureText: true,
+            // ),
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
+              obscureText:
+                  _isPasswordVisible, // Toggle visibility based on _isPasswordVisible
               decoration: InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
               ),
-              obscureText: true,
             ),
             if (_isLoading)
               CircularProgressIndicator()
@@ -775,7 +840,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   ),
                 ),
               ),
-            SizedBox(height: 32),
+
+            SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -783,24 +849,47 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 Text(
                   'Already have an Account?',
                   style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: const Color.fromARGB(181, 113, 5, 214)),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(181, 113, 5, 214),
+                  ),
                 ),
-                SizedBox(width: 4),
-                TextButton(
-                  onPressed: () {
+                SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
                     setState(() {
                       _isSignIn = true;
                     });
                   },
-                  child: Text(
-                    'Sign In',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Custom underline positioned slightly below the text
+                      Positioned(
+                        bottom:
+                            -1, // Adjust this value for spacing between text and underline
+                        child: Container(
+                          height: 1.5, // Thickness of the underline
+                          width:
+                              45, // Width of the underline to match the text length
+                          color: Color.fromARGB(
+                              243, 32, 39, 230), // Underline color
+                        ),
+                      ),
+                      Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(243, 32, 39, 230), // Text color
+                          decoration:
+                              TextDecoration.none, // Disable default underline
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),

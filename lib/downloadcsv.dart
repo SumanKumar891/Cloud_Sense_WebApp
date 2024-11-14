@@ -54,7 +54,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
 
     if (widget.deviceName.startsWith('WD')) {
       apiUrl =
-          'https://x9sji7grw5.execute-api.us-east-1.amazonaws.com/default/CloudSense_Weather_data_api_function_2?DeviceId=$deviceId&startdate=$startDate&enddate=$endDate';
+          'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('CL') ||
         widget.deviceName.startsWith('BD')) {
       apiUrl =
@@ -144,21 +144,22 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         });
       } else {
         _csvRows.add([
-          'Timestamp',
-          'Temperature',
-          'WindSpeed',
-          'LightIntensity',
-          'SolarIrradiance',
-          'Humidity'
+          "Timestamp",
+          "Temperature",
+          "Humidity",
+          "LightIntensity",
+          // "WindSpeed",
+          // "RainLevel",
+          // "RainDifference",
+          "SolarIrradiance",
         ]);
         data['weather_items'].forEach((item) {
           _csvRows.add([
             item['HumanTime'],
             item['Temperature'],
-            item['WindSpeed'],
+            item['Humidity'],
             item['LightIntensity'],
             item['SolarIrradiance'],
-            item['Humidity'],
           ]);
         });
       }
@@ -168,7 +169,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
   }
 
   String _generateFileName() {
-    final timestamp = DateFormat('yyyy-MM-dd_HH:mm:ss').format(DateTime.now());
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
     return 'SensorData_$timestamp.csv';
   }
 
