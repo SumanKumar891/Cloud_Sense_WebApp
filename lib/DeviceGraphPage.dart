@@ -57,6 +57,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> dovaluedata = [];
   List<ChartData> dopercentagedata = [];
   List<Map<String, dynamic>> rainHourlyItems = [];
+  List<List<dynamic>> _csvRainRows = [];
+
   double _precipitationProbability = 0.0;
   List<double> _weeklyPrecipitationData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
@@ -489,6 +491,65 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  void downloadRainCSV(BuildContext context) async {
+    if (_csvRainRows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No rain data available for download.")),
+      );
+      return;
+    }
+
+    String csvData = const ListToCsvConverter().convert(_csvRainRows);
+    String fileName = _generateRainFileName();
+
+    if (kIsWeb) {
+      final blob = html.Blob([csvData], 'text/csv');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", fileName)
+        ..click();
+      html.Url.revokeObjectUrl(url);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Downloading Rain Data"),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    } else {
+      try {
+        if (io.Platform.isAndroid) {
+          if (await Permission.storage.isGranted) {
+            await saveCSVFile(csvData, fileName);
+          } else if (await Permission.manageExternalStorage
+              .request()
+              .isGranted) {
+            await saveCSVFile(csvData, fileName);
+          } else if (await Permission
+              .manageExternalStorage.isPermanentlyDenied) {
+            await openAppSettings();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content:
+                      Text("Please enable storage permission from settings")),
+            );
+          }
+        } else {
+          await saveCSVFile(csvData, fileName);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error downloading rain data: $e")),
+        );
+      }
+    }
+  }
+
+  String _generateRainFileName() {
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    return 'RainData_$timestamp.csv';
+  }
+
   void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
     if (_csvRows.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -597,6 +658,37 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       print('Error fetching rain forecasting data: $e');
     }
   }
+
+  // Future<void> _fetchRainForecastingData() async {
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         'https://w6dzlucugb.execute-api.us-east-1.amazonaws.com/default/CloudSense_rain_data_api?DeviceId=211'));
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       setState(() {
+  //         _totalRainLast24Hours =
+  //             data['TotalRainLast24Hours']?.toString() ?? '0.00 mm';
+  //         _mostRecentHourRain =
+  //             data['MostRecentHourRain']?.toString() ?? '0.00 mm';
+
+  //         // Prepare CSV rows
+  //         _csvRainRows = [
+  //           ["Timestamp", "TotalRainLast24Hours", "MostRecentHourRain"],
+  //           [
+  //             DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+  //             _totalRainLast24Hours,
+  //             _mostRecentHourRain
+  //           ],
+  //         ];
+  //       });
+  //     } else {
+  //       throw Exception('Failed to load rain forecasting data');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching rain forecasting data: $e');
+  //   }
+  // }
 
   Future<void> _showWeeklyPrecipitationProbability(
       double latitude, double longitude) async {
@@ -2478,6 +2570,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               child: ElevatedButton(
                 onPressed: () {
                   //downloadCSV(context);
+                  // downloadRainCSV(context);
                   _showDownloadOptionsDialog(context); // Show popup
                 },
                 style: ElevatedButton.styleFrom(

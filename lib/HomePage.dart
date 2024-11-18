@@ -310,56 +310,6 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 16,
                       ),
                     ),
-                    // SizedBox(height: 18),
-                    // GestureDetector(
-                    //   onTap: () async {
-                    //     final Uri launchUri = Uri(
-                    //       scheme: 'tel',
-                    //       path: '01881-232601',
-                    //     );
-
-                    //     if (await canLaunchUrl(launchUri)) {
-                    //       await launchUrl(launchUri);
-                    //     } else {
-                    //       throw 'Could not launch $launchUri';
-                    //     }
-                    //   },
-                    //   child: Text(
-                    //     'Phone : 01881 - 232601 ',
-                    //     style: TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: 16,
-                    //       decoration: TextDecoration
-                    //           .underline, // Optional: to indicate it's clickable
-                    //     ),
-                    //   ),
-                    // ),
-                    // SizedBox(height: 18),
-                    // GestureDetector(
-                    //   onTap: () async {
-                    //     final Uri params = Uri(
-                    //       scheme: 'mailto',
-                    //       path: 'contact.awadh@iitrpr.ac.in',
-                    //     );
-
-                    //     // Check if the email URL can be launched
-                    //     if (await canLaunchUrl(params)) {
-                    //       await launchUrl(
-                    //           params); // Launch the email client with the pre-filled data
-                    //     } else {
-                    //       throw ('Could not launch $params'); // Log the error if URL can't be launched
-                    //     }
-                    //   },
-                    //   child: Text(
-                    //     'Email: contact.awadh@iitrpr.ac.in',
-                    //     style: TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: 16,
-                    //       decoration: TextDecoration
-                    //           .underline, // Optional: to indicate it's clickable
-                    //     ),
-                    //   ),
-                    // ),
                     SizedBox(height: 18),
                     GestureDetector(
                       onTap: () async {
