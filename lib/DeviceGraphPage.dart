@@ -232,21 +232,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
-      // double? precipitationProbability;
-
-      // if (widget.deviceName == 'WD311') {
-      //   final rainForecastApiUrl =
-      //       'https://api.tomorrow.io/v4/weather/forecast?location=$latitude,$longitude&apikey=VCusVsCI9zp6B89kZv5lxb8zDFI7mtoi';
-
-      //   final rainResponse = await http.get(Uri.parse(rainForecastApiUrl));
-
-      //   if (rainResponse.statusCode == 200) {
-      //     final rainData = json.decode(rainResponse.body);
-      //     precipitationProbability = rainData['timelines']['hourly'][0]
-      //             ['values']['precipitationProbability'] ??
-      //         0.0;
-      //   }
-      // }
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -1435,7 +1420,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
                 DataColumn(
                   label: Text(
-                    'Current',
+                    'Current Value',
                     style: TextStyle(
                         fontSize: headerFontSize,
                         fontWeight: FontWeight.bold,
@@ -1564,13 +1549,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             color: Colors.blue),
                       ),
                     ),
+                    // DataColumn(
+                    //   label: Text(
+                    //     'Current Value',
+                    //     style: TextStyle(
+                    //         fontSize: headerFontSize,
+                    //         fontWeight: FontWeight.bold,
+                    //         color: Colors.blue),
+                    //   ),
+                    // ),
                     DataColumn(
-                      label: Text(
-                        'Current',
-                        style: TextStyle(
-                            fontSize: headerFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue),
+                      label: Padding(
+                        padding: EdgeInsets.only(
+                            right: 20), // Adjust the value as needed
+                        child: Text(
+                          'Current Value',
+                          style: TextStyle(
+                              fontSize: headerFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue),
+                        ),
                       ),
                     ),
                   ],
@@ -1655,7 +1653,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
                 DataColumn(
                   label: Text(
-                    'Rain Amount',
+                    'Value',
                     style: TextStyle(
                         fontSize: fontSize,
                         fontWeight: FontWeight.bold,
@@ -1667,7 +1665,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 DataRow(
                   cells: [
                     DataCell(Text(
-                      'Current Hour',
+                      'Recent Hour',
                       style: TextStyle(fontSize: fontSize, color: Colors.white),
                     )),
                     DataCell(Text(
@@ -2276,40 +2274,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   ],
                                 ),
 
-                              // if (widget.deviceName == 'WD311')
-                              //   Padding(
-                              //     padding: const EdgeInsets.only(
-                              //       top: 4.0,
-                              //     ), // Spacing between elements
-                              //     child: Row(
-                              //       mainAxisAlignment: MainAxisAlignment
-                              //           .end, // Aligns the text to the right
-                              //       children: [
-                              //         // Text(
-                              //         //   'Rain Probability : $_precipitationProbability%',
-                              //         //   style: TextStyle(
-                              //         //     fontWeight: FontWeight.bold,
-                              //         //     fontSize: 20,
-                              //         //     color: Colors.white,
-                              //         //   ),
-                              //         // ),
-                              //         SizedBox(
-                              //             width:
-                              //                 10), // Adds some space between text and button
-                              //         ElevatedButton(
-                              //           onPressed: () async {
-                              //             await _showWeeklyPrecipitationProbability();
-                              //           },
-                              //           child: Text('Weekly Forecast'),
-                              //           style: ElevatedButton.styleFrom(
-                              //             foregroundColor: Colors.white,
-                              //             backgroundColor: const Color.fromARGB(
-                              //                 255, 40, 41, 41), // Text color
-                              //           ),
-                              //         ),
-                              //       ],
-                              //     ),
-                              //   ),
                               if (widget.deviceName == 'WD311')
                                 Padding(
                                   padding: const EdgeInsets.only(
@@ -2337,54 +2301,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     ],
                                   ),
                                 ),
-
-                              // if (widget.deviceName == 'WD211')
-                              //   Column(
-                              //     children: [
-                              //       SizedBox(height: 16),
-                              //       ElevatedButton(
-                              //         onPressed: () {
-                              //           _showRainDataDialog(
-                              //               context); // Call the function to show the dialog
-                              //         },
-                              //         style: ElevatedButton.styleFrom(
-                              //           padding: EdgeInsets.symmetric(
-                              //               vertical: 12, horizontal: 24),
-                              //           textStyle: TextStyle(fontSize: 16),
-                              //           foregroundColor: Colors.black,
-                              //           backgroundColor: const Color.fromARGB(
-                              //               255, 102, 174, 233),
-                              //           shape: RoundedRectangleBorder(
-                              //             borderRadius:
-                              //                 BorderRadius.circular(8),
-                              //           ),
-                              //         ),
-                              //         child: Row(
-                              //           mainAxisSize: MainAxisSize
-                              //               .min, // Ensure that the Row does not take up extra space
-                              //           mainAxisAlignment: MainAxisAlignment
-                              //               .center, // Center the content of the Row
-                              //           children: [
-                              //             Icon(
-                              //               Icons
-                              //                   .thunderstorm, // Rain or cloud icon
-                              //               size: 24, // Icon size
-                              //               color: Colors.white, // Icon color
-                              //             ),
-                              //             SizedBox(
-                              //                 width:
-                              //                     8), // Spacing between the icon and the text
-                              //             Text(
-                              //               'Rain Data',
-                              //               style: TextStyle(
-                              //                   color:
-                              //                       Colors.black), // Text color
-                              //             ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     ],
-                              //   ),
                             ],
                           );
                         },
@@ -2405,20 +2321,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildStatisticsTable(),
                     if (widget.deviceName.startsWith('DO'))
                       buildDOStatisticsTable(),
-                    // if (widget.deviceName.startsWith('WD211'))
-                    //   Center(
-                    //     // This centers the entire Row
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment
-                    //           .center, // This centers the tables horizontally within the Row
-                    //       children: [
-                    //         buildWeatherStatisticsTable(), // Weather Statistics Table
-                    //         SizedBox(
-                    //             width: 5), // Optional: Space between the tables
-                    //         buildRainDataTable(), // Rain Data Table
-                    //       ],
-                    //     ),
-                    //   ),
                     if (widget.deviceName.startsWith('WD211'))
                       SingleChildScrollView(
                         // Make the whole layout scrollable
@@ -2455,7 +2357,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           ),
                         ),
                       ),
-
                     Column(
                       children: [
                         if (hasNonZeroValues(chlorineData))
