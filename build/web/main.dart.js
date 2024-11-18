@@ -73878,9 +73878,9 @@ i=p?new A.bF(B.i,2,B.B,-1):B.t
 i=A.yn(h,h,B.n,h,h,h,h,h,h,h,h,h,new A.ax(36,28,36,28),h,h,i,h,h,h,h)
 s=new A.bz(B.cu,A.bO(h,A.ea(A.b([r,q,o,n,m,l,k,j,A.fN(A.ec(!1,A.ab(d,h,h,h,h,A.aC(h,h,p?B.ah:B.i,h,h,h,h,h,h,h,h,h,h,h,h,h,h,!0,h,h,h,h,h,h,h,h),B.bv,h,h),h,h,B.a6,h,h,h,h,new A.b6H(a),h,i),1)],t.p),B.r,B.hE,B.w,h),B.m,h,h,new A.d7(B.lJ,h,h,s,h,h,B.V),h,h,h,h,h,h,h,h),h)}r=t.p
 s=A.b([c,b,new A.f2(B.dx,h,h,s,h),A.aU(h,20,h)],r)
-if(B.c.aU(a.a.c,"WD"))c=a.y1!=="-"
-else c=!1
-if(c)s.push(A.cg(A.b([A.fw(B.VA,B.i,h,40),A.aU(h,8,h),A.ab("Wind Direction : "+a.y1,h,h,h,h,A.aC(h,h,B.i,h,h,h,h,h,h,h,h,20,h,h,B.C,h,h,!0,h,h,h,h,h,h,h,h),h,h,h)],r),B.r,B.u,B.w))
+c=!1
+if(B.c.aU(a.a.c,"WD")){b=a.y1
+if(b!=="-")c=b.length!==0}if(c)s.push(A.cg(A.b([A.fw(B.VA,B.i,h,40),A.aU(h,8,h),A.ab("Wind Direction : "+a.y1,h,h,h,h,A.aC(h,h,B.i,h,h,h,h,h,h,h,h,20,h,h,B.C,h,h,!0,h,h,h,h,h,h,h,h),h,h,h)],r),B.r,B.u,B.w))
 if(a.a.c==="WD311")s.push(new A.bz(B.Tk,A.ea(A.b([A.aU(h,h,10),A.na(A.ab("Weekly Forecast",h,h,h,h,h,h,h,h),new A.b6I(a),A.tX(h,h,B.ro,h,h,h,h,h,h,B.i,h,h,h,h,h,h,h,h,h))],r),B.r,B.f_,B.w,h),h))
 return A.cg(s,B.r,B.u,B.w)},
 $S:144}

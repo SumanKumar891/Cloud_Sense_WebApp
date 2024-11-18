@@ -2251,8 +2251,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   height:
                                       20), // Space between buttons and the next section
 // Wind Direction widget in the center
+                              // if (widget.deviceName.startsWith('WD') &&
+                              //     isWindDirectionValid(_lastWindDirection))
                               if (widget.deviceName.startsWith('WD') &&
-                                  isWindDirectionValid(_lastWindDirection))
+                                  isWindDirectionValid(_lastWindDirection) &&
+                                  _lastWindDirection != null &&
+                                  _lastWindDirection.isNotEmpty)
                                 Column(
                                   children: [
                                     Icon(
