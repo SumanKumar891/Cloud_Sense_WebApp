@@ -133,6 +133,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
+  String _lastBatteryPercentage = ""; // Default value
 
   Future<void> _fetchDataForRange(String range,
       [DateTime? selectedDate, double? latitude, double? longitude]) async {
@@ -190,7 +191,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       default:
         startDate = endDate; // Default to today
     }
-    // Update the last selected range
     _lastSelectedRange = range; // Store the currently selected range
 
     final startdate = _formatDate(startDate);
@@ -227,7 +227,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else {
       setState(() {});
       setState(() {
-        _isLoading = false; // Stop loading
+        _isLoading = false;
       });
       return;
     }
@@ -240,6 +240,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
         List<List<dynamic>> rows = [];
         String lastWindDirection = 'Unknown';
+        String lastBatteryPercentage = 'Unknown';
 
         if (widget.deviceName.startsWith('CL') ||
             widget.deviceName.startsWith('BD')) {
@@ -426,6 +427,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             //Extract the last wind direction from the data
             if (data['weather_items'].isNotEmpty) {
               lastWindDirection = data['weather_items'].last['WindDirection'];
+              lastBatteryPercentage =
+                  data['weather_items'].last['BatteryPercentage'];
             }
 
             // Prepare data for CSV
@@ -435,11 +438,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Temperature",
                 "Humidity",
                 "LightIntensity",
-                // "WindSpeed",
-                // "RainLevel",
-                // "RainDifference",
                 "SolarIrradiance",
-                // if (widget.deviceName == 'WD211') "PrecipitationProbability"
               ],
               for (int i = 0; i < temperatureData.length; i++)
                 [
@@ -475,6 +474,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           _csvRows = rows;
           _lastWindDirection =
               lastWindDirection; // Store the last wind direction
+          _lastBatteryPercentage = lastBatteryPercentage;
 
           if (_csvRows.isEmpty) {
           } else {
@@ -1970,14 +1970,41 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 },
               ),
               actions: [
+                if (widget.deviceName
+                    .startsWith('WD')) // Check if it's a WD sensor
+
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 16.0), // Adjust padding as needed
+                    child: Row(
+                      children: [
+                        Icon(
+                          _getBatteryIcon(_parseBatteryPercentage(
+                              _lastBatteryPercentage)), // Convert to int before passing
+                          size: 26,
+                          color: Colors.white,
+                          // color: _getBatteryIconColor(_parseBatteryPercentage(
+                          //     _lastBatteryPercentage)), // Change color based on percentage
+                        ),
+                        SizedBox(width: 2),
+                        Text(
+                          ':  $_lastBatteryPercentage', // Battery percentage
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.only(
-                      right: 16.0), // Adjust the right value as needed
+                      right: 16.0), // Adjust padding as needed
                   child: IconButton(
                     icon: Icon(Icons.refresh, color: Colors.white, size: 30),
                     onPressed: () {
-                      // Call the function to reload data up to the present date
-                      _reloadData();
+                      _reloadData(); // Function to reload data
                     },
                   ),
                 ),
@@ -2020,8 +2047,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               //     ),
                               //   ],
                               // ),
-
-                              SizedBox(height: 20),
 
                               // Space between status and buttons
                               SizedBox(height: 20),
@@ -2621,6 +2646,44 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ),
     );
   }
+
+// This method will parse the percentage string (e.g., "84%") and return the numeric value
+  int _parseBatteryPercentage(String batteryPercentage) {
+    try {
+      // Remove the '%' symbol and parse the number
+      return int.parse(batteryPercentage.replaceAll('%', ''));
+    } catch (e) {
+      // If parsing fails, return a default value (e.g., 0)
+      return 0;
+    }
+  }
+
+  IconData _getBatteryIcon(int batteryPercentage) {
+    if (batteryPercentage <= 0) {
+      return Icons.battery_0_bar; // Empty battery
+    } else if (batteryPercentage > 0 && batteryPercentage <= 20) {
+      return Icons.battery_1_bar; // 20% battery
+    } else if (batteryPercentage > 20 && batteryPercentage <= 40) {
+      return Icons.battery_2_bar; // 40% battery
+    } else if (batteryPercentage > 40 && batteryPercentage <= 60) {
+      return Icons.battery_3_bar; // 60% battery
+    } else if (batteryPercentage > 60 && batteryPercentage <= 80) {
+      return Icons.battery_4_bar; // 80% battery
+    } else if (batteryPercentage > 80 && batteryPercentage < 100) {
+      return Icons.battery_5_bar; // 90% battery
+    } else {
+      return Icons.battery_full; // Full battery
+    }
+  }
+
+  // // Method to get color based on the battery percentage
+  // Color _getBatteryIconColor(int batteryPercentage) {
+  //   if (batteryPercentage < 20) {
+  //     return Colors.red; // Color for battery < 20%
+  //   } else {
+  //     return Colors.white; // Default color
+  //   }
+  // }
 
   Widget _buildChartContainer(
     String title,
