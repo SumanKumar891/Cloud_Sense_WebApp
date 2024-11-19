@@ -1959,7 +1959,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "${widget.sequentialName}",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: MediaQuery.of(context).size.width < 800 ? 20 : 32,
+                  fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1975,8 +1975,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
                   Padding(
                     padding: const EdgeInsets.only(
-                        right: 16.0), // Adjust padding as needed
+                        right: 0.0), // Adjust padding as needed
                     child: Row(
+                      mainAxisSize: MainAxisSize
+                          .min, // Ensure Row uses only required space
                       children: [
                         Icon(
                           _getBatteryIcon(_parseBatteryPercentage(
@@ -1986,9 +1988,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           // color: _getBatteryIconColor(_parseBatteryPercentage(
                           //     _lastBatteryPercentage)), // Change color based on percentage
                         ),
-                        SizedBox(width: 2),
                         Text(
-                          ':  $_lastBatteryPercentage', // Battery percentage
+                          ': $_lastBatteryPercentage', // Battery percentage
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -2000,9 +2001,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   ),
                 Padding(
                   padding: const EdgeInsets.only(
-                      right: 16.0), // Adjust padding as needed
+                      right: 0.0), // Adjust padding as needed
                   child: IconButton(
-                    icon: Icon(Icons.refresh, color: Colors.white, size: 30),
+                    icon: Icon(Icons.refresh, color: Colors.white, size: 26),
                     onPressed: () {
                       _reloadData(); // Function to reload data
                     },
