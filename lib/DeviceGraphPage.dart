@@ -1970,9 +1970,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 },
               ),
               actions: [
-                if (widget.deviceName
-                    .startsWith('WD')) // Check if it's a WD sensor
-
+                if (widget.deviceName.startsWith('WD'))
                   Padding(
                     padding: const EdgeInsets.only(
                         right: 0.0), // Adjust padding as needed
