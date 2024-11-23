@@ -56,6 +56,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> ttempData = [];
   List<ChartData> dovaluedata = [];
   List<ChartData> dopercentagedata = [];
+  List<ChartData> temperaturData = [];
+  List<ChartData> humData = [];
+  List<ChartData> luxData = [];
+
   List<Map<String, dynamic>> rainHourlyItems = [];
   List<List<dynamic>> _csvRainRows = [];
 
@@ -133,7 +137,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
-  String _lastBatteryPercentage = ""; // Default value
+  String _lastBatteryPercentage = "";
+  String _lastRSSI_Value = ""; // Default value
 
   Future<void> _fetchDataForRange(String range,
       [DateTime? selectedDate, double? latitude, double? longitude]) async {
@@ -171,25 +176,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     DateTime startDate;
     DateTime endDate = DateTime.now();
 
-    switch (range) {
-      case '7days':
-        startDate = endDate.subtract(Duration(days: 7));
-        break;
-      case '30days':
-        startDate = endDate.subtract(Duration(days: 30)); // 30 days range
-        break;
-      case '3months':
-        startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
-        break;
-      case '6months':
-        startDate = endDate.subtract(Duration(days: 180)); // Roughly 6 months
-        break;
-      case 'single':
-        startDate = _selectedDay; // Use the selected day as startDate
-        endDate = startDate; // Single day means endDate is same as startDate
-        break;
-      default:
-        startDate = endDate; // Default to today
+    // Assign dates based on range selection
+    if (['LU', 'TE', 'AC']
+        .any((prefix) => widget.deviceName.startsWith(prefix))) {
+      // For LU, TE, AC sensors, bypass date selection and fetch all data
+      startDate =
+          DateTime(1970); // Use a very early date to ensure all data is fetched
+      endDate = DateTime.now();
+    } else {
+      switch (range) {
+        case '7days':
+          startDate = endDate.subtract(Duration(days: 7));
+          break;
+        case '30days':
+          startDate = endDate.subtract(Duration(days: 30)); // 30 days range
+          break;
+        case '3months':
+          startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
+          break;
+        case '6months':
+          startDate = endDate.subtract(Duration(days: 180)); // Roughly 6 months
+          break;
+        case 'single':
+          startDate = _selectedDay; // Use the selected day as startDate
+          endDate = startDate; // Single day means endDate is same as startDate
+          break;
+        default:
+          startDate = endDate; // Default to today
+      }
     }
     _lastSelectedRange = range; // Store the currently selected range
 
@@ -224,6 +238,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('DO')) {
       apiUrl =
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('LU') ||
+        widget.deviceName.startsWith('TE') ||
+        widget.deviceName.startsWith('AC')) {
+      // For LU, TE, and AC sensors in CPS lab
+      // final nodeId =
+      //     int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
+      apiUrl =
+          'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId';
     } else {
       setState(() {});
       setState(() {
@@ -241,6 +263,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         List<List<dynamic>> rows = [];
         String lastWindDirection = 'Unknown';
         String lastBatteryPercentage = 'Unknown';
+        String lastRSSI_Value = 'Unknown';
 
         if (widget.deviceName.startsWith('CL') ||
             widget.deviceName.startsWith('BD')) {
@@ -394,6 +417,51 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('TE')) {
+          setState(() {
+            temperaturData = _parsesensorChartData(data, 'Temperature');
+            humData = _parsesensorChartData(data, 'Humidity');
+            print('API Response: ${data}');
+
+            if (data['data'].isNotEmpty) {
+              lastRSSI_Value =
+                  data['data'].last['RSSI_Value']?.toString() ?? 'Unknown';
+              print(
+                  'RSSI Value: $lastRSSI_Value'); // Debugging the fetched value
+            }
+
+            rows = [
+              [
+                "Timestamp",
+                "Temperature",
+                "Humidity ",
+              ],
+              for (int i = 0; i < temppData.length; i++)
+                [
+                  formatter.format(temperaturData[i].timestamp),
+                  temperaturData[i].value,
+                  humData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('LU')) {
+          setState(() {
+            luxData = _parsesensorChartData(data, 'LUX');
+
+            rows = [
+              [
+                "Timestamp",
+                "Lux",
+              ],
+              for (int i = 0; i < temppData.length; i++)
+                [
+                  formatter.format(luxData[i].timestamp),
+                  luxData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
         } else {
           setState(() {
             temperatureData = _parseChartData(data, 'Temperature');
@@ -475,6 +543,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           _lastWindDirection =
               lastWindDirection; // Store the last wind direction
           _lastBatteryPercentage = lastBatteryPercentage;
+          _lastRSSI_Value = lastRSSI_Value;
 
           if (_csvRows.isEmpty) {
           } else {
@@ -1287,6 +1356,45 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  List<ChartData> _parsesensorChartData(
+      Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['data'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parsesensorDate(item['HumanTime']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  // List<ChartData> _parsesensorChartData(
+  //     Map<String, dynamic> data, String type) {
+  //   final List<dynamic> items = data['data'] ?? [];
+  //   return items.map((item) {
+  //     if (item == null) {
+  //       return ChartData(
+  //           timestamp: DateTime.now(),
+  //           value: 0.0); // Default value and timestamp
+  //     }
+
+  //     return ChartData(
+  //       // Use the timestamp from the data or fallback to current time
+  //       timestamp: item['HumanTime'] != null
+  //           ? DateTime.tryParse(item['HumanTime']) ?? DateTime.now()
+  //           : DateTime.now(),
+  //       value: item[type] != null
+  //           ? double.tryParse(item[type].toString()) ?? 0.0
+  //           : 0.0,
+  //     );
+  //   }).toList();
+  // }
+
   List<ChartData> _parseWaterChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -1835,6 +1943,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parsesensorDate(String dateString) {
+    final dateFormat = DateFormat(
+        'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
   DateTime _parsewaterDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:MM:ss'); // Ensure this matches your date format
@@ -1917,6 +2035,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       backgroundImagePath = 'assets/tree.jpg';
     } else if (widget.deviceName.startsWith('CL')) {
       backgroundImagePath = 'assets/Chloritronn.png';
+    } else if (widget.deviceName.startsWith('LU') ||
+        widget.deviceName.startsWith('TE') ||
+        widget.deviceName.startsWith('AC')) {
+      backgroundImagePath = 'assets/tree.jpg';
     } else {
       // For water quality sensor
       backgroundImagePath = 'assets/water_quality.jpg';
@@ -2390,6 +2512,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   ],
                                 ),
 
+                              SizedBox(height: 20),
+                              if (widget.deviceName.startsWith('TE'))
+                                Text(
+                                  'RSSI Value : $_lastRSSI_Value',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
+
                               if (widget.deviceName == 'WD311')
                                 Padding(
                                   padding: const EdgeInsets.only(
@@ -2562,6 +2695,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               dopercentagedata,
                               'DO Percentage (%)',
                               ChartType.line),
+                        if (hasNonZeroValues(temperaturData))
+                          _buildChartContainer('Temperature', temperaturData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(humData))
+                          _buildChartContainer('Humidity', humData,
+                              'Humidity (%)', ChartType.line),
+                        if (hasNonZeroValues(luxData))
+                          _buildChartContainer('Light Intensity', luxData,
+                              'Lux (Lux)', ChartType.line),
                       ],
                     )
                   ],

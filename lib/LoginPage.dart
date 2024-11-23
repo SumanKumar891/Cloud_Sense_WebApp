@@ -364,15 +364,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         confirmationCode: _verificationCode!,
       );
 
-      // Redirect to the DeviceListPage after successful verification
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => DataDisplayPage(),
-      //   ),
-      // );
-      // Navigator.pushReplacementNamed(context, '/devicelist');
-
       // After successful sign-up and verification, redirect to the sign-in page
       setState(() {
         _isSignIn = true; // Switch to sign-in mode
@@ -425,6 +416,139 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       },
     );
   }
+
+  // Future<void> _signUp() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //   try {
+  //     await Amplify.Auth.signUp(
+  //       username: _emailController.text,
+  //       password: _passwordController.text,
+  //       options: SignUpOptions(
+  //         userAttributes: {
+  //           CognitoUserAttributeKey.email: _emailController.text,
+  //           CognitoUserAttributeKey.name: _nameController.text,
+  //         },
+  //       ),
+  //     );
+  //     _emailToVerify = _emailController.text;
+  //     _showVerificationDialog();
+  //   } on UsernameExistsException {
+  //     setState(() {
+  //       _errorMessage =
+  //           'An account with this email already exists. Please verify your email or use a different email to sign up.';
+  //     });
+  //     _emailToVerify = _emailController.text; // Save email for verification
+  //     _showVerificationDialog(); // Force verification if user already exists
+  //   } on AuthException catch (e) {
+  //     setState(() {
+  //       _errorMessage = e.message;
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  // Future<void> _confirmSignUp() async {
+  //   if (_verificationCode == null || _emailToVerify == null) return;
+
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   try {
+  //     final result = await Amplify.Auth.confirmSignUp(
+  //       username: _emailToVerify!,
+  //       confirmationCode: _verificationCode!,
+  //     );
+
+  //     if (result.isSignUpComplete) {
+  //       setState(() {
+  //         _isSignIn = true; // Switch to sign-in mode
+  //       });
+
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Sign-up successful! Please sign in.')),
+  //       );
+  //     }
+  //   } on CodeMismatchException {
+  //     setState(() {
+  //       _errorMessage = 'The verification code is incorrect. Please try again.';
+  //     });
+  //   } on AuthException catch (e) {
+  //     setState(() {
+  //       _errorMessage = e.message;
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  // Future<void> _resendVerificationCode() async {
+  //   if (_emailToVerify == null) return;
+
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   try {
+  //     await Amplify.Auth.resendSignUpCode(username: _emailToVerify!);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Verification code has been resent.')),
+  //     );
+  //   } on AuthException catch (e) {
+  //     setState(() {
+  //       _errorMessage = e.message;
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
+  // void _showVerificationDialog() {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false, // Prevent closing the dialog without action
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Verify Your Email'),
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Text(
+  //                 'A verification code has been sent to your email. Please enter the code below to verify and activate your account:'),
+  //             TextField(
+  //               onChanged: (value) {
+  //                 _verificationCode = value;
+  //               },
+  //               decoration: InputDecoration(labelText: 'Verification Code'),
+  //             ),
+  //           ],
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: _resendVerificationCode,
+  //             child: Text('Resend Code'),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //               _confirmSignUp();
+  //             },
+  //             child: Text('Submit'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

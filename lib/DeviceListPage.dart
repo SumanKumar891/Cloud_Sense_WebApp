@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -24,6 +25,21 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     _loadEmail();
   }
 
+  // Future<void> _loadEmail() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? email = prefs.getString('email');
+
+  //   if (email != null) {
+  //     setState(() {
+  //       _email = email;
+  //     });
+  //     _fetchData();
+  //   } else {
+  //     // Handle case where email is not found, e.g., navigate to sign-in page
+  //     Navigator.pushReplacementNamed(context, '/devicelist');
+  //   }
+  // }
+
   Future<void> _loadEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
@@ -34,8 +50,22 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       });
       _fetchData();
     } else {
-      // Handle case where email is not found, e.g., navigate to sign-in page
-      Navigator.pushReplacementNamed(context, '/signin');
+      // Email not found, clear any authentication and redirect to login/signup page
+      try {
+        await Amplify.Auth
+            .signOut(); // Optional: Sign out from Amplify if authenticated
+      } catch (e) {
+        print("Error signing out from Amplify: $e");
+      }
+
+      // Clear saved data in SharedPreferences
+      await prefs.clear();
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => SignInSignUpScreen()),
+        (Route<dynamic> route) => false,
+      );
     }
   }
 
@@ -81,8 +111,17 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Water Quality Sensors';
       case 'WS':
         return 'Water Sensors';
-      case 'DO':
-        return 'DO Sensors';
+      // case 'LU': // LE -> CPS Lab Sensors
+      // case 'TE': // TE -> CPS Lab Sensors
+      // case 'AC': // ACC -> CPS Lab Sensors
+      //   return 'CPS Lab Sensors'; // All grouped under CPS Lab Sensors
+      case 'TE':
+        return 'Temperature Sensors';
+      case 'LU':
+        return 'Lux Sensors';
+      case 'AC':
+        return 'Accelerometer Sensors';
+
       default:
         return key;
     }
@@ -213,8 +252,150 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     );
   }
 
+  // Widget _buildDeviceCards() {
+  //   List<Widget> cardList = _deviceCategories.keys.map((category) {
+  //     return Container(
+  //       width: 300,
+  //       height: 300,
+  //       margin: EdgeInsets.all(10),
+  //       child: Card(
+  //         color: _getCardColor(category),
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(8.0),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.center,
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               SizedBox(height: 30),
+  //               Text(
+  //                 category,
+  //                 textAlign: TextAlign.center,
+  //                 style: TextStyle(
+  //                   fontSize: 18,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.black,
+  //                 ),
+  //               ),
+  //               SizedBox(height: 10),
+  //               Expanded(
+  //                 child: ListView.builder(
+  //                   shrinkWrap: true,
+  //                   itemCount: _deviceCategories[category]?.length ?? 0,
+  //                   itemBuilder: (context, index) {
+  //                     // Generate a sequential name like "Chlorine Sensor 1"
+  //                     String sequentialName;
+  //                     if (category.toLowerCase().contains("water quality")) {
+  //                       sequentialName = 'Water Quality Sensor ${index + 1}';
+  //                     } else {
+  //                       sequentialName =
+  //                           '${category.split(" ").first} Sensor ${index + 1}';
+  //                     }
+  //                     return Padding(
+  //                       padding: const EdgeInsets.symmetric(vertical: 8.0),
+  //                       child: ElevatedButton(
+  //                         style: ElevatedButton.styleFrom(
+  //                           foregroundColor: Colors.white,
+  //                           backgroundColor: Colors.black, // Text color
+  //                           padding: EdgeInsets.symmetric(
+  //                               horizontal: 20, vertical: 10),
+  //                         ),
+  //                         onPressed: () {
+  //                           Navigator.push(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                               builder: (context) => DeviceGraphPage(
+  //                                 deviceName:
+  //                                     _deviceCategories[category]![index],
+  //                                 sequentialName: sequentialName,
+  //                                 backgroundImagePath: 'assets/backgroundd.jpg',
+  //                               ),
+  //                             ),
+  //                           );
+  //                         },
+  //                         // onPressed: () {
+
+  //                         child: Text(
+  //                           sequentialName,
+  //                           style: TextStyle(
+  //                             fontSize: 14,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     );
+  //                   },
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }).toList();
+
+  //   // Add the "Add Devices" button as a card
+  //   cardList.add(
+  //     Container(
+  //       width: 300,
+  //       height: 300,
+  //       margin: EdgeInsets.all(10),
+  //       child: Card(
+  //         color: const Color.fromARGB(255, 167, 158, 172),
+  //         child: Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             // Plus sign above the button
+  //             Padding(
+  //               padding: const EdgeInsets.all(16.0),
+  //               child: Icon(
+  //                 Icons.add,
+  //                 size: 80,
+  //                 color: Colors.black,
+  //               ),
+  //             ),
+  //             // Add Devices button
+  //             ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+  //                 backgroundColor: Colors.black,
+  //               ),
+  //               onPressed: () {
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                     builder: (context) => QRScannerPage(
+  //                       devices: _deviceCategories,
+  //                     ),
+  //                   ),
+  //                 );
+  //               },
+  //               child: Text(
+  //                 'Add Devices',
+  //                 style: TextStyle(
+  //                     color: const Color.fromARGB(255, 245, 241, 240)),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+
+  //   return SingleChildScrollView(
+  //     scrollDirection: Axis.horizontal,
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: cardList,
+  //     ),
+  //   );
+  // }
+
   Widget _buildDeviceCards() {
     List<Widget> cardList = _deviceCategories.keys.map((category) {
+      // Grouping CPS Lab sensors
+      // if (category == 'CPS Lab Sensors') {
+      //   return _buildCPSLabCard();
+      // }
+
       return Container(
         width: 300,
         height: 300,
@@ -243,14 +424,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     shrinkWrap: true,
                     itemCount: _deviceCategories[category]?.length ?? 0,
                     itemBuilder: (context, index) {
-                      // Generate a sequential name like "Chlorine Sensor 1"
-                      String sequentialName;
-                      if (category.toLowerCase().contains("water quality")) {
-                        sequentialName = 'Water Quality Sensor ${index + 1}';
-                      } else {
-                        sequentialName =
-                            '${category.split(" ").first} Sensor ${index + 1}';
-                      }
+                      String sequentialName =
+                          '${category.split(" ").first} Sensor ${index + 1}';
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ElevatedButton(
@@ -273,18 +449,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                               ),
                             );
                           },
-                          // onPressed: () {
-//   Navigator.pushNamed(
-//     context,
-//     '/devicegraph',
-//     arguments: {
-//       'deviceName': _deviceCategories[category]![index],
-//       'sequentialName': sequentialName,
-//       'backgroundImagePath': 'assets/backgroundd.jpg',
-//     },
-//   );
-// },
-
                           child: Text(
                             sequentialName,
                             style: TextStyle(
@@ -314,7 +478,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Plus sign above the button
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Icon(
@@ -323,7 +486,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   color: Colors.black,
                 ),
               ),
-              // Add Devices button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -340,9 +502,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   );
                 },
                 child: Text(
-                  'Add Devices',
-                  style: TextStyle(
-                      color: const Color.fromARGB(255, 245, 241, 240)),
+                  'Add Device',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -359,6 +520,130 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       ),
     );
   }
+
+//   Widget _buildCPSLabCard() {
+//     // Categorize CPS Lab sensors by their prefixes (LU, TE, AC)
+//     List<String> cpsLabSensors = _deviceCategories['CPS Lab Sensors'] ?? [];
+//     Map<String, List<String>> groupedSensors = {
+//       'LU': [],
+//       'TE': [],
+//       'AC': [],
+//     };
+
+//     // Group sensors based on their prefixes
+//     for (String sensor in cpsLabSensors) {
+//       if (sensor.startsWith('LU')) {
+//         groupedSensors['LU']?.add(sensor);
+//       } else if (sensor.startsWith('TE')) {
+//         groupedSensors['TE']?.add(sensor);
+//       } else if (sensor.startsWith('AC')) {
+//         groupedSensors['AC']?.add(sensor);
+//       }
+//     }
+
+//     return Container(
+//       width: 300,
+//       height: 300,
+//       margin: EdgeInsets.all(10),
+//       child: Card(
+//         color: _getCardColor('CPS Lab Sensors'),
+//         child: Padding(
+//           padding: const EdgeInsets.all(8.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.center,
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               SizedBox(height: 10),
+//               Text(
+//                 'CPS Lab Sensors',
+//                 textAlign: TextAlign.center,
+//                 style: TextStyle(
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.black,
+//                 ),
+//               ),
+//               SizedBox(height: 10),
+//               Expanded(
+//                 child: ListView(
+//                   shrinkWrap: true,
+//                   children: [
+//                     // Group LU Sensors
+//                     if (groupedSensors['LU']?.isNotEmpty ?? false)
+//                       _buildSensorGroup('LU', groupedSensors['LU']!),
+
+//                     // Group TE Sensors
+//                     if (groupedSensors['TE']?.isNotEmpty ?? false)
+//                       _buildSensorGroup('TE', groupedSensors['TE']!),
+
+//                     // Group AC Sensors
+//                     if (groupedSensors['AC']?.isNotEmpty ?? false)
+//                       _buildSensorGroup('AC', groupedSensors['AC']!),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+// // Helper function to build a sensor group (LU, TE, AC)
+//   Widget _buildSensorGroup(String sensorType, List<String> sensors) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 16.0),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           // Subheading for sensor type (LU, TE, AC)
+//           Text(
+//             '$sensorType Sensors',
+//             style: TextStyle(
+//               fontSize: 16,
+//               fontWeight: FontWeight.bold,
+//               color: Colors.black54,
+//             ),
+//           ),
+//           SizedBox(height: 10),
+//           // List of sensors for the group
+//           ...sensors.asMap().entries.map((entry) {
+//             int index = entry.key;
+//             String sensorName = entry.value;
+
+//             return Padding(
+//               padding: const EdgeInsets.symmetric(vertical: 8.0),
+//               child: ElevatedButton(
+//                 style: ElevatedButton.styleFrom(
+//                   foregroundColor: Colors.white,
+//                   backgroundColor: Colors.black, // Button color
+//                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                 ),
+//                 onPressed: () {
+//                   Navigator.push(
+//                     context,
+//                     MaterialPageRoute(
+//                       builder: (context) => DeviceGraphPage(
+//                         deviceName: sensorName,
+//                         sequentialName: '$sensorType Sensor ${index + 1}',
+//                         backgroundImagePath: 'assets/backgroundd.jpg',
+//                       ),
+//                     ),
+//                   );
+//                 },
+//                 child: Text(
+//                   '$sensorType Sensor ${index + 1}',
+//                   style: TextStyle(
+//                     fontSize: 14,
+//                   ),
+//                 ),
+//               ),
+//             );
+//           }).toList(),
+//         ],
+//       ),
+//     );
+//   }
 
   Widget _buildNoDevicesCard() {
     return Center(
@@ -434,6 +719,15 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return const Color.fromARGB(255, 167, 158, 172);
       case 'DO Sensors': // Add color for Water Sensors
         return const Color.fromARGB(255, 167, 158, 172);
+      case 'Temperature Sensors':
+        return const Color.fromARGB(
+            255, 167, 158, 172); // Custom color for CPS Lab
+      case 'Lux Sensors':
+        return const Color.fromARGB(
+            255, 167, 158, 172); // Custom color for CPS Lab
+      case 'Accelerometer Sensors':
+        return const Color.fromARGB(
+            255, 167, 158, 172); // Custom color for CPS Lab
       default:
         return const Color.fromARGB(255, 167, 158, 172);
     }

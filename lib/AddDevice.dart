@@ -89,6 +89,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
   Future<void> _showConfirmationDialog(String scannedQRCode) async {
     bool deviceExists = false;
     String sensorType = '';
+    String sensorPrefix = '';
     int sensorNumber = 0;
 
     if (scannedQRCode.startsWith('WD')) {
@@ -116,6 +117,15 @@ class _QRScannerPageState extends State<QRScannerPage> {
       sensorType = 'DO Sensor';
 
       sensorNumber = (widget.devices['DO Sensors']?.length ?? 0) + 1;
+    } else if (scannedQRCode.startsWith('LU')) {
+      sensorType = 'LU Sensor';
+      sensorNumber = (widget.devices['Lux Sensors']?.length ?? 0) + 1;
+    } else if (scannedQRCode.startsWith('TE')) {
+      sensorType = 'TE Sensor';
+      sensorNumber = (widget.devices['Temperature Sensors']?.length ?? 0) + 1;
+    } else if (scannedQRCode.startsWith('AC')) {
+      sensorType = 'AC Sensor';
+      sensorNumber = (widget.devices['Accelerometer Sensors']?.length ?? 0) + 1;
     } else {
       sensorType = 'Unknown Sensor';
       sensorNumber = (widget.devices['Unknown Sensors']?.length ?? 0) + 1;
@@ -145,6 +155,17 @@ class _QRScannerPageState extends State<QRScannerPage> {
         },
       );
     } else {
+      // // Get all sensors under "CPS Lab Sensors"
+      // List<String> cpsLabSensors = widget.devices['CPS Lab Sensors'] ?? [];
+
+      // // Determine the number of existing sensors with the same prefix
+      // List<String> specificSensors = cpsLabSensors
+      //     .where((device) => device.startsWith(sensorPrefix))
+      //     .toList();
+
+      // // Sensor number is determined by the count of existing sensors + 1
+      // sensorNumber = specificSensors.length + 1;
+
       showDialog<void>(
         context: context,
         barrierDismissible: false,
@@ -165,6 +186,11 @@ class _QRScannerPageState extends State<QRScannerPage> {
                 child: Text('Yes'),
                 onPressed: () async {
                   await _addDevice(scannedQRCode);
+                  // Update the devices map to include the new sensor under "CPS Lab Sensors"
+                  setState(() {
+                    widget.devices.putIfAbsent('CPS Lab Sensors', () => []);
+                    widget.devices['CPS Lab Sensors']?.add(scannedQRCode);
+                  });
                   Navigator.pop(context);
                   await _showSuccessMessage();
                 },
