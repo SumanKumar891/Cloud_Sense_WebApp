@@ -2035,9 +2035,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       backgroundImagePath = 'assets/tree.jpg';
     } else if (widget.deviceName.startsWith('CL')) {
       backgroundImagePath = 'assets/Chloritronn.png';
-    } else if (widget.deviceName.startsWith('LU') ||
-        widget.deviceName.startsWith('TE') ||
-        widget.deviceName.startsWith('AC')) {
+    } else if (widget.deviceName.startsWith('TE')) {
+      backgroundImagePath = 'assets/tree.jpg';
+    } else if (widget.deviceName.startsWith('LU')) {
       backgroundImagePath = 'assets/tree.jpg';
     } else {
       // For water quality sensor
