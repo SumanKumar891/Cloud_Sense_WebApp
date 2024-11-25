@@ -825,7 +825,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: _fetchData,
                   style: ElevatedButton.styleFrom(
