@@ -932,28 +932,30 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                             style: TextStyle(fontSize: 18, color: Colors.black),
                           ),
                 Spacer(), // Pushes the buttons to the bottom
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: _deleteDevices,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _deleteDevices,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text("Delete Devices"),
                       ),
-                      child: Text("Delete Devices"),
-                    ),
-                    SizedBox(width: 20),
-                    ElevatedButton(
-                      onPressed: _deleteAccount,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: _deleteAccount,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text("Delete Account"),
                       ),
-                      child: Text("Delete Account"),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
