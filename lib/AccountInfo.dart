@@ -862,9 +862,14 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                             fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width <
-                                                    800
-                                                ? 13
-                                                : 22,
+                                                    400
+                                                ? 10
+                                                : MediaQuery.of(context)
+                                                            .size
+                                                            .width <
+                                                        800
+                                                    ? 13
+                                                    : 22,
                                             fontWeight: FontWeight.bold,
                                           ),
                                           textAlign: TextAlign.center,
@@ -890,8 +895,13 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                 Text(
                                                   '• ',
                                                   style: TextStyle(
-                                                    fontSize:
-                                                        MediaQuery.of(context)
+                                                    fontSize: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width <
+                                                            400
+                                                        ? 7
+                                                        : MediaQuery.of(context)
                                                                     .size
                                                                     .width <
                                                                 800
@@ -906,8 +916,13 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                   child: Text(
                                                     'Device ID - $device',
                                                     style: TextStyle(
-                                                      fontSize:
-                                                          MediaQuery.of(context)
+                                                      fontSize: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width <
+                                                              400
+                                                          ? 7
+                                                          : MediaQuery.of(context)
                                                                       .size
                                                                       .width <
                                                                   800
@@ -932,6 +947,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                             style: TextStyle(fontSize: 18, color: Colors.black),
                           ),
                 Spacer(), // Pushes the buttons to the bottom
+
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
