@@ -119,18 +119,28 @@ class _QRScannerPageState extends State<QRScannerPage> {
       sensorNumber = (widget.devices['DO Sensors']?.length ?? 0) + 1;
     } else if (scannedQRCode.startsWith('LU')) {
       sensorType = 'LU Sensor';
-      sensorNumber = (widget.devices['Lux Sensors']?.length ?? 0) + 1;
+      // sensorNumber = (widget.devices['Lux Sensors']?.length ?? 0) + 1;
+      sensorPrefix = 'LU';
     } else if (scannedQRCode.startsWith('TE')) {
       sensorType = 'TE Sensor';
-      sensorNumber = (widget.devices['Temperature Sensors']?.length ?? 0) + 1;
+      // sensorNumber = (widget.devices['Temperature Sensors']?.length ?? 0) + 1;
+      sensorPrefix = 'TE';
     } else if (scannedQRCode.startsWith('AC')) {
       sensorType = 'AC Sensor';
-      sensorNumber = (widget.devices['Accelerometer Sensors']?.length ?? 0) + 1;
+      // sensorNumber = (widget.devices['Accelerometer Sensors']?.length ?? 0) + 1;
+      sensorPrefix = 'AC';
     } else {
       sensorType = 'Unknown Sensor';
       sensorNumber = (widget.devices['Unknown Sensors']?.length ?? 0) + 1;
     }
 
+    // Filter existing devices in CPS Lab Sensors for the specific sensor type
+    final filteredDevices = widget.devices['CPS Lab Sensors']
+            ?.where((device) => device.startsWith(sensorPrefix))
+            .toList() ??
+        [];
+    sensorNumber =
+        filteredDevices.length + 1; // Calculate the next sensor number
     deviceExists = widget.devices.values
         .any((deviceList) => deviceList.contains(scannedQRCode));
 
@@ -155,17 +165,6 @@ class _QRScannerPageState extends State<QRScannerPage> {
         },
       );
     } else {
-      // // Get all sensors under "CPS Lab Sensors"
-      // List<String> cpsLabSensors = widget.devices['CPS Lab Sensors'] ?? [];
-
-      // // Determine the number of existing sensors with the same prefix
-      // List<String> specificSensors = cpsLabSensors
-      //     .where((device) => device.startsWith(sensorPrefix))
-      //     .toList();
-
-      // // Sensor number is determined by the count of existing sensors + 1
-      // sensorNumber = specificSensors.length + 1;
-
       showDialog<void>(
         context: context,
         barrierDismissible: false,
