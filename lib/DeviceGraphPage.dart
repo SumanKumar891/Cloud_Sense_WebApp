@@ -59,6 +59,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> temperaturData = [];
   List<ChartData> humData = [];
   List<ChartData> luxData = [];
+  List<ChartData> coddata = [];
+  List<ChartData> boddata = [];
+  List<ChartData> phdata = [];
 
   List<Map<String, dynamic>> rainHourlyItems = [];
   List<List<dynamic>> _csvRainRows = [];
@@ -241,9 +244,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
-      // For LU, TE, and AC sensors in CPS lab
-      // final nodeId =
-      //     int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
       apiUrl =
           'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId';
     } else {
@@ -2704,6 +2704,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         if (hasNonZeroValues(luxData))
                           _buildChartContainer('Light Intensity', luxData,
                               'Lux (Lux)', ChartType.line),
+                        if (hasNonZeroValues(coddata))
+                          _buildChartContainer(
+                              'COD', coddata, 'COD (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(boddata))
+                          _buildChartContainer(
+                              'BOD', boddata, 'BOD (mg/L)', ChartType.line),
+                        if (hasNonZeroValues(phdata))
+                          _buildChartContainer(
+                              'pH', luxData, 'pH', ChartType.line),
                       ],
                     )
                   ],
