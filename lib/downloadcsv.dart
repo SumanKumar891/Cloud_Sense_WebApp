@@ -68,6 +68,11 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('DO')) {
       apiUrl =
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceId=$deviceId&startdate=$startDate&enddate=$endDate';
+    } else if (widget.deviceName.startsWith('LU') ||
+        widget.deviceName.startsWith('TE') ||
+        widget.deviceName.startsWith('AC')) {
+      apiUrl =
+          'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId';
     } else {
       setState(() {});
       return;
@@ -140,6 +145,26 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['Temperature'],
             item['DO Value'],
             item['DO Percentage'],
+          ]);
+        });
+      } else if (widget.deviceName.startsWith('LU')) {
+        _csvRows.add([
+          "Timestamp",
+          "Lux",
+        ]);
+        data['data'].forEach((item) {
+          _csvRows.add([
+            item['HumanTime'],
+            item['Lux'],
+          ]);
+        });
+      } else if (widget.deviceName.startsWith('TE')) {
+        _csvRows.add(["Timestamp", "Temperature", "Humidity"]);
+        data['data'].forEach((item) {
+          _csvRows.add([
+            item['HumanTime'],
+            item['Temperature'],
+            item['Humidity'],
           ]);
         });
       } else {

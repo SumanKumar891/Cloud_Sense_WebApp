@@ -223,6 +223,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     if (widget.deviceName == 'WD211') {
       await _fetchRainForecastingData();
     }
+    if (widget.deviceName == 'WD511') {
+      await _fetchRainForecastData();
+    }
 
     String apiUrl;
     if (widget.deviceName.startsWith('WD')) {
@@ -711,6 +714,27 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     try {
       final response = await http.get(Uri.parse(
           'https://w6dzlucugb.execute-api.us-east-1.amazonaws.com/default/CloudSense_rain_data_api?DeviceId=211'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          _totalRainLast24Hours =
+              data['TotalRainLast24Hours']?.toString() ?? '0.00 mm';
+          _mostRecentHourRain =
+              data['MostRecentHourRain']?.toString() ?? '0.00 mm';
+        });
+      } else {
+        throw Exception('Failed to load rain forecasting data');
+      }
+    } catch (e) {
+      print('Error fetching rain forecasting data: $e');
+    }
+  }
+
+  Future<void> _fetchRainForecastData() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://w6dzlucugb.execute-api.us-east-1.amazonaws.com/default/CloudSense_rain_data_api?DeviceId=511'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -1620,7 +1644,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
                 DataColumn(
                   label: Text(
-                    'Current Value',
+                    'Recent Value',
                     style: TextStyle(
                         fontSize: headerFontSize,
                         fontWeight: FontWeight.bold,
@@ -1700,7 +1724,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 16;
-    double headerFontSize = screenWidth < 800 ? 16 : 22;
+    double headerFontSize = screenWidth < 800 ? 18 : 22;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -1738,7 +1762,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 ),
                 child: DataTable(
                   horizontalMargin: 16,
-                  columnSpacing: 4,
+                  // columnSpacing: screenWidth < 700 ? 70 : 30,
+
+                  columnSpacing: screenWidth < 362
+                      ? 50 // For very narrow screens (less than 350)
+                      : screenWidth < 392
+                          ? 80 // For very narrow screens (less than 350)
+                          : screenWidth < 500
+                              ? 120 // For small screens (350–499)
+                              : screenWidth < 800
+                                  ? 180 // For medium screens (500–799)
+                                  : 70, // For larger screens (800 and above),
+
                   columns: [
                     DataColumn(
                       label: Text(
@@ -1749,21 +1784,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             color: Colors.blue),
                       ),
                     ),
-                    // DataColumn(
-                    //   label: Text(
-                    //     'Current Value',
-                    //     style: TextStyle(
-                    //         fontSize: headerFontSize,
-                    //         fontWeight: FontWeight.bold,
-                    //         color: Colors.blue),
-                    //   ),
-                    // ),
                     DataColumn(
                       label: Padding(
                         padding: EdgeInsets.only(
-                            right: 20), // Adjust the value as needed
+                          right: MediaQuery.of(context).size.width *
+                              0.04, // Adjust padding based on screen width
+                        ), // Adjust the value as needed
                         child: Text(
-                          'Current Value',
+                          'Recent Value',
                           style: TextStyle(
                               fontSize: headerFontSize,
                               fontWeight: FontWeight.bold,
@@ -1811,7 +1839,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 16;
-    double headerFontSize = screenWidth < 800 ? 16 : 22;
+    double headerFontSize = screenWidth < 800 ? 18 : 22;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -1840,13 +1868,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ),
             SizedBox(height: 16),
             DataTable(
-              columnSpacing: 36,
+              columnSpacing: screenWidth < 380
+                  ? 70 // For very narrow screens (less than 350)
+                  : screenWidth < 500
+                      ? 120 // For small screens (350–499)
+                      : screenWidth < 800
+                          ? 200 // For medium screens (500–799)
+                          : 50, // For larger screens (800 and above),
+
               columns: [
                 DataColumn(
                   label: Text(
                     'Timeframe',
                     style: TextStyle(
-                        fontSize: fontSize,
+                        fontSize: screenWidth < 800 ? 18 : 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue),
                   ),
@@ -1855,7 +1890,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   label: Text(
                     'Value',
                     style: TextStyle(
-                        fontSize: fontSize,
+                        fontSize: screenWidth < 800 ? 18 : 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue),
                   ),
@@ -2570,7 +2605,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildStatisticsTable(),
                     if (widget.deviceName.startsWith('DO'))
                       buildDOStatisticsTable(),
-                    if (widget.deviceName.startsWith('WD211'))
+                    if (widget.deviceName.startsWith('WD211') ||
+                        (widget.deviceName.startsWith('WD511')))
                       SingleChildScrollView(
                         // Make the whole layout scrollable
                         child: Center(
