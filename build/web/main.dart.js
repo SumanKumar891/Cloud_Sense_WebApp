@@ -73884,6 +73884,9 @@ B.b.N(s.id)
 B.b.N(s.k1)
 B.b.N(s.k2)
 B.b.N(s.k3)
+B.b.N(s.k4)
+B.b.N(s.ok)
+B.b.N(s.p1)
 B.b.N(s.ry)},
 $S:0}
 A.b65.prototype={

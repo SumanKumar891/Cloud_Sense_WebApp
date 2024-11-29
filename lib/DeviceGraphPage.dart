@@ -175,6 +175,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ttempData.clear();
       dovaluedata.clear();
       dopercentagedata.clear();
+      temperaturData.clear();
+      humData.clear();
+      luxData.clear();
       _weeklyPrecipitationData.clear();
     });
     DateTime startDate;
