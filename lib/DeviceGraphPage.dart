@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_sense_webapp/downloadcsv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
@@ -563,64 +564,152 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  void downloadRainCSV(BuildContext context) async {
-    if (_csvRainRows.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No rain data available for download.")),
-      );
-      return;
-    }
+  // void downloadRainCSV(BuildContext context) async {
+  //   if (_csvRainRows.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("No rain data available for download.")),
+  //     );
+  //     return;
+  //   }
 
-    String csvData = const ListToCsvConverter().convert(_csvRainRows);
-    String fileName = _generateRainFileName();
+  //   String csvData = const ListToCsvConverter().convert(_csvRainRows);
+  //   String fileName = _generateRainFileName();
 
-    if (kIsWeb) {
-      final blob = html.Blob([csvData], 'text/csv');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", fileName)
-        ..click();
-      html.Url.revokeObjectUrl(url);
+  //   if (kIsWeb) {
+  //     final blob = html.Blob([csvData], 'text/csv');
+  //     final url = html.Url.createObjectUrlFromBlob(blob);
+  //     final anchor = html.AnchorElement(href: url)
+  //       ..setAttribute("download", fileName)
+  //       ..click();
+  //     html.Url.revokeObjectUrl(url);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Downloading Rain Data"),
-          duration: Duration(seconds: 1),
-        ),
-      );
-    } else {
-      try {
-        if (io.Platform.isAndroid) {
-          if (await Permission.storage.isGranted) {
-            await saveCSVFile(csvData, fileName);
-          } else if (await Permission.manageExternalStorage
-              .request()
-              .isGranted) {
-            await saveCSVFile(csvData, fileName);
-          } else if (await Permission
-              .manageExternalStorage.isPermanentlyDenied) {
-            await openAppSettings();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content:
-                      Text("Please enable storage permission from settings")),
-            );
-          }
-        } else {
-          await saveCSVFile(csvData, fileName);
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error downloading rain data: $e")),
-        );
-      }
-    }
-  }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Downloading Rain Data"),
+  //         duration: Duration(seconds: 1),
+  //       ),
+  //     );
+  //   } else {
+  //     try {
+  //       if (io.Platform.isAndroid) {
+  //         if (await Permission.storage.isGranted) {
+  //           await saveCSVFile(csvData, fileName);
+  //         } else if (await Permission.manageExternalStorage
+  //             .request()
+  //             .isGranted) {
+  //           await saveCSVFile(csvData, fileName);
+  //         } else if (await Permission
+  //             .manageExternalStorage.isPermanentlyDenied) {
+  //           await openAppSettings();
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //                 content:
+  //                     Text("Please enable storage permission from settings")),
+  //           );
+  //         }
+  //       } else {
+  //         await saveCSVFile(csvData, fileName);
+  //       }
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("Error downloading rain data: $e")),
+  //       );
+  //     }
+  //   }
+  // }
 
-  String _generateRainFileName() {
-    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-    return 'RainData_$timestamp.csv';
-  }
+  // String _generateRainFileName() {
+  //   final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+  //   return 'RainData_$timestamp.csv';
+  // }
+
+  // void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
+  //   if (_csvRows.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("No data available for download.")),
+  //     );
+  //     return;
+  //   }
+
+  //   String csvData = const ListToCsvConverter().convert(_csvRows);
+  //   String fileName = _generateFileName(); // Generate a dynamic filename
+
+  //   if (kIsWeb) {
+  //     final blob = html.Blob([csvData], 'text/csv');
+  //     final url = html.Url.createObjectUrlFromBlob(blob);
+  //     final anchor = html.AnchorElement(href: url)
+  //       ..setAttribute("download", fileName) // Use the generated filename
+  //       ..click();
+  //     html.Url.revokeObjectUrl(url);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Downloading"),
+  //         duration: Duration(seconds: 1),
+  //       ),
+  //     );
+  //   } else {
+  //     try {
+  //       // Check storage permission status
+  //       if (io.Platform.isAndroid) {
+  //         if (await Permission.storage.isGranted) {
+  //           // If already granted, continue with the download
+  //           await saveCSVFile(
+  //               csvData, fileName); // Pass filename to saveCSVFile
+  //         } else {
+  //           // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
+  //           if (await Permission.manageExternalStorage.request().isGranted) {
+  //             await saveCSVFile(
+  //                 csvData, fileName); // Pass filename to saveCSVFile
+  //           } else if (await Permission
+  //               .manageExternalStorage.isPermanentlyDenied) {
+  //             // If permanently denied, prompt to enable from settings
+  //             await openAppSettings();
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               SnackBar(
+  //                   content:
+  //                       Text("Please enable storage permission from settings")),
+  //             );
+  //           }
+  //         }
+  //       } else {
+  //         // Handle for other platforms (iOS)
+  //         await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
+  //       }
+  //     } catch (e) {
+  //       // Catch errors during download
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("Error downloading: $e")),
+  //       );
+  //     }
+  //   }
+  // }
+
+  // String _generateFileName() {
+  //   final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+  //   return 'SensorData_$timestamp.csv';
+  // }
+
+  // Future<void> saveCSVFile(String csvData, String fileName) async {
+  //   final directory = await getExternalStorageDirectory();
+  //   final downloadsDirectory = Directory('/storage/emulated/0/Download');
+
+  //   if (downloadsDirectory.existsSync()) {
+  //     final filePath = '${downloadsDirectory.path}/$fileName';
+  //     final file = File(filePath);
+  //     await file.writeAsString(csvData);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("File downloaded to $filePath"),
+  //       ),
+  //     );
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Unable to find Downloads directory")),
+  //     );
+  //   }
+  // }
 
   void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
     if (_csvRows.isEmpty) {
@@ -649,34 +738,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       );
     } else {
       try {
-        // Check storage permission status
-        if (io.Platform.isAndroid) {
-          if (await Permission.storage.isGranted) {
-            // If already granted, continue with the download
-            await saveCSVFile(
-                csvData, fileName); // Pass filename to saveCSVFile
-          } else {
-            // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
-            if (await Permission.manageExternalStorage.request().isGranted) {
-              await saveCSVFile(
-                  csvData, fileName); // Pass filename to saveCSVFile
-            } else if (await Permission
-                .manageExternalStorage.isPermanentlyDenied) {
-              // If permanently denied, prompt to enable from settings
-              await openAppSettings();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content:
-                        Text("Please enable storage permission from settings")),
-              );
-            }
-          }
-        } else {
-          // Handle for other platforms (iOS)
-          await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
-        }
+        // Use Storage Access Framework for non-web platforms
+        await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
       } catch (e) {
-        // Catch errors during download
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error downloading: $e")),
         );
@@ -690,22 +754,30 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   Future<void> saveCSVFile(String csvData, String fileName) async {
-    final directory = await getExternalStorageDirectory();
-    final downloadsDirectory = Directory('/storage/emulated/0/Download');
+    try {
+      // Get the Downloads directory.
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      if (downloadsDirectory.existsSync()) {
+        final filePath =
+            '${downloadsDirectory.path}/$fileName'; // Ensure the full path is correct
+        final file = File(filePath);
 
-    if (downloadsDirectory.existsSync()) {
-      final filePath = '${downloadsDirectory.path}/$fileName';
-      final file = File(filePath);
-      await file.writeAsString(csvData);
+        // Ensure the directory is writable and save the file.
+        await file.writeAsString(csvData);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("File downloaded to $filePath"),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unable to find Downloads directory")),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("File downloaded to $filePath"),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Unable to find Downloads directory")),
+        SnackBar(content: Text("Error saving file: $e")),
       );
     }
   }
@@ -1187,72 +1259,72 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
-  Future<void> downloadCSVWithCustomRange(
-      BuildContext context, DateTime startDate, DateTime endDate) async {
-    // Filter _csvRows based on the selected date range
-    List<List<dynamic>> filteredRows = _csvRows.where((row) {
-      try {
-        // print("Attempting to parse date: ${row[0]}"); // Debug print
-        DateTime timestamp = DateTime.parse(
-            row[0]); // Adjust this line if the format is different
-        return timestamp.isAfter(startDate.subtract(Duration(days: 1))) &&
-            timestamp.isBefore(endDate.add(Duration(days: 1)));
-      } catch (e) {
-        // print("Error parsing date: $e"); // Log parsing errors
-        return false; // Exclude rows with invalid timestamps
-      }
-    }).toList();
+  // Future<void> downloadCSVWithCustomRange(
+  //     BuildContext context, DateTime startDate, DateTime endDate) async {
+  //   // Filter _csvRows based on the selected date range
+  //   List<List<dynamic>> filteredRows = _csvRows.where((row) {
+  //     try {
+  //       // print("Attempting to parse date: ${row[0]}"); // Debug print
+  //       DateTime timestamp = DateTime.parse(
+  //           row[0]); // Adjust this line if the format is different
+  //       return timestamp.isAfter(startDate.subtract(Duration(days: 1))) &&
+  //           timestamp.isBefore(endDate.add(Duration(days: 1)));
+  //     } catch (e) {
+  //       // print("Error parsing date: $e"); // Log parsing errors
+  //       return false; // Exclude rows with invalid timestamps
+  //     }
+  //   }).toList();
 
-    if (filteredRows.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No data available for the selected range.")),
-      );
-      return;
-    }
+  //   if (filteredRows.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("No data available for the selected range.")),
+  //     );
+  //     return;
+  //   }
 
-    String csvData = const ListToCsvConverter().convert(filteredRows);
-    String fileName = _generateFileName(); // Generate a dynamic filename
+  //   String csvData = const ListToCsvConverter().convert(filteredRows);
+  //   String fileName = _generateFileName(); // Generate a dynamic filename
 
-    // Same download logic as above
-    if (kIsWeb) {
-      final blob = html.Blob([csvData], 'text/csv');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", fileName) // Use the generated filename
-        ..click();
-      html.Url.revokeObjectUrl(url);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Downloading"), duration: Duration(seconds: 1)),
-      );
-    } else {
-      try {
-        // Check storage permission status
-        if (io.Platform.isAndroid) {
-          if (await Permission.storage.isGranted) {
-            await saveCSVFile(csvData, fileName);
-          } else {
-            if (await Permission.manageExternalStorage.request().isGranted) {
-              await saveCSVFile(csvData, fileName);
-            } else if (await Permission
-                .manageExternalStorage.isPermanentlyDenied) {
-              await openAppSettings();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content:
-                        Text("Please enable storage permission from settings")),
-              );
-            }
-          }
-        } else {
-          await saveCSVFile(csvData, fileName);
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error downloading: $e")),
-        );
-      }
-    }
-  }
+  //   // Same download logic as above
+  //   if (kIsWeb) {
+  //     final blob = html.Blob([csvData], 'text/csv');
+  //     final url = html.Url.createObjectUrlFromBlob(blob);
+  //     final anchor = html.AnchorElement(href: url)
+  //       ..setAttribute("download", fileName) // Use the generated filename
+  //       ..click();
+  //     html.Url.revokeObjectUrl(url);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Downloading"), duration: Duration(seconds: 1)),
+  //     );
+  //   } else {
+  //     try {
+  //       // Check storage permission status
+  //       if (io.Platform.isAndroid) {
+  //         if (await Permission.storage.isGranted) {
+  //           await saveCSVFile(csvData, fileName);
+  //         } else {
+  //           if (await Permission.manageExternalStorage.request().isGranted) {
+  //             await saveCSVFile(csvData, fileName);
+  //           } else if (await Permission
+  //               .manageExternalStorage.isPermanentlyDenied) {
+  //             await openAppSettings();
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               SnackBar(
+  //                   content:
+  //                       Text("Please enable storage permission from settings")),
+  //             );
+  //           }
+  //         }
+  //       } else {
+  //         await saveCSVFile(csvData, fileName);
+  //       }
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text("Error downloading: $e")),
+  //       );
+  //     }
+  //   }
+  // }
 
   List<ChartData> _parseBDChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
@@ -1765,14 +1837,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   // columnSpacing: screenWidth < 700 ? 70 : 30,
 
                   columnSpacing: screenWidth < 362
-                      ? 50 // For very narrow screens (less than 350)
+                      ? 50
                       : screenWidth < 392
-                          ? 80 // For very narrow screens (less than 350)
+                          ? 80
                           : screenWidth < 500
-                              ? 120 // For small screens (350–499)
+                              ? 120
                               : screenWidth < 800
-                                  ? 180 // For medium screens (500–799)
-                                  : 70, // For larger screens (800 and above),
+                                  ? 180
+                                  : 70,
 
                   columns: [
                     DataColumn(
@@ -1869,13 +1941,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             SizedBox(height: 16),
             DataTable(
               columnSpacing: screenWidth < 380
-                  ? 70 // For very narrow screens (less than 350)
+                  ? 70
                   : screenWidth < 500
-                      ? 120 // For small screens (350–499)
+                      ? 120
                       : screenWidth < 800
-                          ? 200 // For medium screens (500–799)
-                          : 50, // For larger screens (800 and above),
-
+                          ? 200
+                          : 50,
               columns: [
                 DataColumn(
                   label: Text(

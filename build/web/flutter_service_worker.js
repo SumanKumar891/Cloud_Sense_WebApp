@@ -94,7 +94,7 @@ const RESOURCES = {"applogo.png": "c7a45a6b470c51e13cf48e8b24a56e70",
 "flutter_assets/packages/flutter_map/lib/assets/flutter_map_logo.png": "208d63cc917af9713fc9572bd5c09362",
 "flutter_assets/packages/wakelock_plus/assets/no_sleep.js": "9c3aa3cd0b217305aa860decab3d9f42",
 "flutter_assets/shaders/ink_sparkle.frag": "9bb2aaa0f9a9213b623947fa682efa76",
-"flutter_bootstrap.js": "a08d614702589bbdcd1cc1279a175dd2",
+"flutter_bootstrap.js": "a37e00a02c6881d206d41227c39b7928",
 "icons/applogo192.png": "e6bd6af14a627b8bbf1a5575270d4442",
 "icons/applogo512.png": "0174a2c2b56977a602e9f38b1b195220",
 "icons/csicon.png": "2c1cd70bbd7ad9b45101d5e76e68d200",
@@ -106,7 +106,7 @@ const RESOURCES = {"applogo.png": "c7a45a6b470c51e13cf48e8b24a56e70",
 "main.dart.js": "8c2a433855099edd5e7b5ba6791a4d95",
 "manifest.json": "a69e3ca8f06e88480e7af21cfc411c9d",
 "smartphone.png": "07c28484887d1e8f958e7975763a2d2b",
-"version.json": "516800b603df756eaf5609d2289c056c"};
+"version.json": "9701e6da68fea6504a6dc921d9939667"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",

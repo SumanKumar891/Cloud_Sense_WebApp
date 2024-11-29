@@ -223,28 +223,39 @@ class _CsvDownloaderState extends State<CsvDownloader> {
       });
 
       // Delay for Snackbar to be visible before popping
+      //   } else {
+      //     try {
+      //       // Check storage permission status
+      //       if (io.Platform.isAndroid) {
+      //         if (await Permission.storage.isGranted) {
+      //           await saveCSVFile(csvData, fileName);
+      //         } else {
+      //           if (await Permission.manageExternalStorage.request().isGranted) {
+      //             await saveCSVFile(csvData, fileName);
+      //           } else if (await Permission
+      //               .manageExternalStorage.isPermanentlyDenied) {
+      //             await openAppSettings();
+      //             ScaffoldMessenger.of(context).showSnackBar(
+      //               SnackBar(
+      //                   content:
+      //                       Text("Please enable storage permission from settings")),
+      //             );
+      //           }
+      //         }
+      //       } else {
+      //         await saveCSVFile(csvData, fileName);
+      //       }
+      //     } catch (e) {
+      //       ScaffoldMessenger.of(context).showSnackBar(
+      //         SnackBar(content: Text("Error downloading: $e")),
+      //       );
+      //     }
+      //   }
+      // }
     } else {
       try {
-        // Check storage permission status
-        if (io.Platform.isAndroid) {
-          if (await Permission.storage.isGranted) {
-            await saveCSVFile(csvData, fileName);
-          } else {
-            if (await Permission.manageExternalStorage.request().isGranted) {
-              await saveCSVFile(csvData, fileName);
-            } else if (await Permission
-                .manageExternalStorage.isPermanentlyDenied) {
-              await openAppSettings();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content:
-                        Text("Please enable storage permission from settings")),
-              );
-            }
-          }
-        } else {
-          await saveCSVFile(csvData, fileName);
-        }
+        // Use Storage Access Framework for non-web platforms
+        await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error downloading: $e")),
@@ -253,32 +264,61 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     }
   }
 
+  // Future<void> saveCSVFile(String csvData, String fileName) async {
+  //   final directory = await getExternalStorageDirectory();
+  //   final downloadsDirectory = Directory('/storage/emulated/0/Download');
+
+  //   if (downloadsDirectory.existsSync()) {
+  //     final filePath = '${downloadsDirectory.path}/$fileName';
+  //     final file = File(filePath);
+  //     await file.writeAsString(csvData);
+
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("File downloaded to $filePath"),
+  //       ),
+  //     );
+  //     Future.delayed(Duration(seconds: 1), () {
+  //       Navigator.pop(context);
+  //       Navigator.pop(context); // Pop the page
+  //     });
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Unable to find Downloads directory")),
+  //     );
+  //   }
+  // }
+
   Future<void> saveCSVFile(String csvData, String fileName) async {
-    final directory = await getExternalStorageDirectory();
-    final downloadsDirectory = Directory('/storage/emulated/0/Download');
+    try {
+      // Get the Downloads directory.
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      if (downloadsDirectory.existsSync()) {
+        final filePath =
+            '${downloadsDirectory.path}/$fileName'; // Ensure the full path is correct
+        final file = File(filePath);
 
-    if (downloadsDirectory.existsSync()) {
-      final filePath = '${downloadsDirectory.path}/$fileName';
-      final file = File(filePath);
-      await file.writeAsString(csvData);
+        // Ensure the directory is writable and save the file.
+        await file.writeAsString(csvData);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("File downloaded to $filePath"),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unable to find Downloads directory")),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("File downloaded to $filePath"),
-        ),
-      );
-      Future.delayed(Duration(seconds: 1), () {
-        Navigator.pop(context);
-        Navigator.pop(context); // Pop the page
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Unable to find Downloads directory")),
+        SnackBar(content: Text("Error saving file: $e")),
       );
     }
   }
 
-  // Method to show the custom date range dialog
+// Method to show the custom date range dialog
   Future<void> _showCustomDateRangeDialog(BuildContext context) async {
     DateTime? startDate;
     DateTime? endDate;
