@@ -180,35 +180,27 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     DateTime startDate;
     DateTime endDate = DateTime.now();
 
-    // Assign dates based on range selection
-    if (['LU', 'TE', 'AC']
-        .any((prefix) => widget.deviceName.startsWith(prefix))) {
-      // For LU, TE, AC sensors, bypass date selection and fetch all data
-      startDate =
-          DateTime(1970); // Use a very early date to ensure all data is fetched
-      endDate = DateTime.now();
-    } else {
-      switch (range) {
-        case '7days':
-          startDate = endDate.subtract(Duration(days: 7));
-          break;
-        case '30days':
-          startDate = endDate.subtract(Duration(days: 30)); // 30 days range
-          break;
-        case '3months':
-          startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
-          break;
-        case '6months':
-          startDate = endDate.subtract(Duration(days: 180)); // Roughly 6 months
-          break;
-        case 'single':
-          startDate = _selectedDay; // Use the selected day as startDate
-          endDate = startDate; // Single day means endDate is same as startDate
-          break;
-        default:
-          startDate = endDate; // Default to today
-      }
+    switch (range) {
+      case '7days':
+        startDate = endDate.subtract(Duration(days: 7));
+        break;
+      case '30days':
+        startDate = endDate.subtract(Duration(days: 30)); // 30 days range
+        break;
+      case '3months':
+        startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
+        break;
+      case '6months':
+        startDate = endDate.subtract(Duration(days: 180)); // Roughly 6 months
+        break;
+      case 'single':
+        startDate = _selectedDay; // Use the selected day as startDate
+        endDate = startDate; // Single day means endDate is same as startDate
+        break;
+      default:
+        startDate = endDate; // Default to today
     }
+
     _lastSelectedRange = range; // Store the currently selected range
 
     final startdate = _formatDate(startDate);
@@ -249,7 +241,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
       apiUrl =
-          'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId';
+          'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
     } else {
       setState(() {});
       setState(() {
@@ -425,11 +417,30 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           setState(() {
             temperaturData = _parsesensorChartData(data, 'Temperature');
             humData = _parsesensorChartData(data, 'Humidity');
-            print('API Response: ${data}');
 
-            if (data['data'].isNotEmpty) {
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainLevelData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+            temmppData = [];
+            humidityyData = [];
+            lightIntensityData = [];
+            windSpeeddData = [];
+
+            if (data['sensor_data_items'].isNotEmpty) {
               lastRSSI_Value =
-                  data['data'].last['RSSI_Value']?.toString() ?? 'Unknown';
+                  data['sensor_data_items'].last['RSSI_Value']?.toString() ??
+                      'Unknown';
               print(
                   'RSSI Value: $lastRSSI_Value'); // Debugging the fetched value
             }
@@ -438,9 +449,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               [
                 "Timestamp",
                 "Temperature",
-                "Humidity ",
+                "Humidity",
               ],
-              for (int i = 0; i < temppData.length; i++)
+              for (int i = 0; i < temperaturData.length; i++)
                 [
                   formatter.format(temperaturData[i].timestamp),
                   temperaturData[i].value,
@@ -453,12 +464,31 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           setState(() {
             luxData = _parsesensorChartData(data, 'LUX');
 
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainLevelData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+            temmppData = [];
+            humidityyData = [];
+            lightIntensityData = [];
+            windSpeeddData = [];
+
             rows = [
               [
                 "Timestamp",
-                "Lux",
+                "LUX",
               ],
-              for (int i = 0; i < temppData.length; i++)
+              for (int i = 0; i < luxData.length; i++)
                 [
                   formatter.format(luxData[i].timestamp),
                   luxData[i].value,
@@ -1420,6 +1450,23 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  List<ChartData> _parsesensorChartData(
+      Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['sensor_data_items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(
+            timestamp: DateTime.now(), value: 0.0); // Provide default value
+      }
+      return ChartData(
+        timestamp: _parsesensorDate(item['HumanTime']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
   List<ChartData> _parsewindChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -1451,45 +1498,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       );
     }).toList();
   }
-
-  List<ChartData> _parsesensorChartData(
-      Map<String, dynamic> data, String type) {
-    final List<dynamic> items = data['data'] ?? [];
-    return items.map((item) {
-      if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
-      }
-      return ChartData(
-        timestamp: _parsesensorDate(item['HumanTime']),
-        value: item[type] != null
-            ? double.tryParse(item[type].toString()) ?? 0.0
-            : 0.0,
-      );
-    }).toList();
-  }
-
-  // List<ChartData> _parsesensorChartData(
-  //     Map<String, dynamic> data, String type) {
-  //   final List<dynamic> items = data['data'] ?? [];
-  //   return items.map((item) {
-  //     if (item == null) {
-  //       return ChartData(
-  //           timestamp: DateTime.now(),
-  //           value: 0.0); // Default value and timestamp
-  //     }
-
-  //     return ChartData(
-  //       // Use the timestamp from the data or fallback to current time
-  //       timestamp: item['HumanTime'] != null
-  //           ? DateTime.tryParse(item['HumanTime']) ?? DateTime.now()
-  //           : DateTime.now(),
-  //       value: item[type] != null
-  //           ? double.tryParse(item[type].toString()) ?? 0.0
-  //           : 0.0,
-  //     );
-  //   }).toList();
-  // }
 
   List<ChartData> _parseWaterChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];

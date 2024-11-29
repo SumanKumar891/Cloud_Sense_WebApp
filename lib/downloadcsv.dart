@@ -72,7 +72,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
       apiUrl =
-          'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId';
+          'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId&startdate=$startDate&enddate=$endDate';
     } else {
       setState(() {});
       return;
@@ -152,7 +152,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
           "Timestamp",
           "Lux",
         ]);
-        data['data'].forEach((item) {
+        data['sensor_data_items'].forEach((item) {
           _csvRows.add([
             item['HumanTime'],
             item['Lux'],
@@ -160,7 +160,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         });
       } else if (widget.deviceName.startsWith('TE')) {
         _csvRows.add(["Timestamp", "Temperature", "Humidity"]);
-        data['data'].forEach((item) {
+        data['sensor_data_items'].forEach((item) {
           _csvRows.add([
             item['HumanTime'],
             item['Temperature'],
