@@ -1,21 +1,78 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(MyApp());
+// void main() {
+//   runApp(MyApp());
+// }
+// void main() {
+//   runApp(
+//     ChangeNotifierProvider(
+//       create: (_) => ThemeProvider(),
+//       child: MyApp(),
+//     ),
+//   );
+// }
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Cloud Sense',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      // theme: ThemeData(
+      //   primarySwatch: Colors.blue,
+      // ),
+      theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: HomePage(),
     );
+  }
+}
+
+// class ThemeProvider extends ChangeNotifier {
+//   bool _isDarkMode = false;
+
+//   bool get isDarkMode => _isDarkMode;
+
+//   void toggleTheme() {
+//     _isDarkMode = !_isDarkMode;
+//     notifyListeners();
+//   }
+// }
+class ThemeProvider extends ChangeNotifier {
+  bool _isDarkMode = false;
+
+  bool get isDarkMode => _isDarkMode;
+
+  ThemeProvider() {
+    _loadTheme(); // Load the saved theme preference during initialization
+  }
+
+  void toggleTheme() async {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', _isDarkMode); // Save the preference
+  }
+
+  void _loadTheme() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isDarkMode =
+        prefs.getBool('isDarkMode') ?? false; // Default to light theme
+    notifyListeners(); // Notify listeners after loading the theme
   }
 }
 
@@ -30,6 +87,7 @@ class _HomePageState extends State<HomePage> {
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return LayoutBuilder(builder: (context, constraints) {
       bool isMobile = constraints.maxWidth < 800;
       return Scaffold(
@@ -50,20 +108,36 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Spacer(),
+              if (isMobile)
+                IconButton(
+                  icon: Icon(
+                    themeProvider.isDarkMode
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => themeProvider.toggleTheme(),
+                ),
               if (!isMobile) ...[
+                IconButton(
+                  icon: Icon(
+                    themeProvider.isDarkMode
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => themeProvider.toggleTheme(),
+                ),
                 SizedBox(width: 20),
                 _buildNavButton('ABOUT US', _aboutUsColor, () {
-                  // Using named route for 'About Us' page
                   Navigator.pushNamed(context, '/about-us');
                 }),
                 SizedBox(width: 20),
                 _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-                  // Using named route for 'Login/Signup' page
                   Navigator.pushNamed(context, '/login');
                 }),
                 SizedBox(width: 20),
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
-                  // Using named route for 'Login/Signup' page
                   Navigator.pushNamed(context, '/accountinfo');
                 }),
               ],

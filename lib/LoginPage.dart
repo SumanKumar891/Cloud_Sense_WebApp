@@ -79,12 +79,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       if (res.isSignedIn) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', _emailController.text);
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => DataDisplayPage(),
-        //   ),
-        // );
+
         Navigator.pushReplacementNamed(context, '/devicelist');
       } else {
         setState(() {
@@ -417,147 +412,16 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-  // Future<void> _signUp() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   try {
-  //     await Amplify.Auth.signUp(
-  //       username: _emailController.text,
-  //       password: _passwordController.text,
-  //       options: SignUpOptions(
-  //         userAttributes: {
-  //           CognitoUserAttributeKey.email: _emailController.text,
-  //           CognitoUserAttributeKey.name: _nameController.text,
-  //         },
-  //       ),
-  //     );
-  //     _emailToVerify = _emailController.text;
-  //     _showVerificationDialog();
-  //   } on UsernameExistsException {
-  //     setState(() {
-  //       _errorMessage =
-  //           'An account with this email already exists. Please verify your email or use a different email to sign up.';
-  //     });
-  //     _emailToVerify = _emailController.text; // Save email for verification
-  //     _showVerificationDialog(); // Force verification if user already exists
-  //   } on AuthException catch (e) {
-  //     setState(() {
-  //       _errorMessage = e.message;
-  //     });
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
-
-  // Future<void> _confirmSignUp() async {
-  //   if (_verificationCode == null || _emailToVerify == null) return;
-
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   try {
-  //     final result = await Amplify.Auth.confirmSignUp(
-  //       username: _emailToVerify!,
-  //       confirmationCode: _verificationCode!,
-  //     );
-
-  //     if (result.isSignUpComplete) {
-  //       setState(() {
-  //         _isSignIn = true; // Switch to sign-in mode
-  //       });
-
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Sign-up successful! Please sign in.')),
-  //       );
-  //     }
-  //   } on CodeMismatchException {
-  //     setState(() {
-  //       _errorMessage = 'The verification code is incorrect. Please try again.';
-  //     });
-  //   } on AuthException catch (e) {
-  //     setState(() {
-  //       _errorMessage = e.message;
-  //     });
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
-
-  // Future<void> _resendVerificationCode() async {
-  //   if (_emailToVerify == null) return;
-
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   try {
-  //     await Amplify.Auth.resendSignUpCode(username: _emailToVerify!);
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Verification code has been resent.')),
-  //     );
-  //   } on AuthException catch (e) {
-  //     setState(() {
-  //       _errorMessage = e.message;
-  //     });
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
-
-  // void _showVerificationDialog() {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false, // Prevent closing the dialog without action
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Verify Your Email'),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Text(
-  //                 'A verification code has been sent to your email. Please enter the code below to verify and activate your account:'),
-  //             TextField(
-  //               onChanged: (value) {
-  //                 _verificationCode = value;
-  //               },
-  //               decoration: InputDecoration(labelText: 'Verification Code'),
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: _resendVerificationCode,
-  //             child: Text('Resend Code'),
-  //           ),
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               _confirmSignUp();
-  //             },
-  //             child: Text('Submit'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBodyBehindAppBar:
           true, // This allows the body to extend behind the app bar
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back,
+              color: isDarkMode ? Colors.black : Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -577,7 +441,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
               child: Container(
-                color: Colors.black.withOpacity(0.2),
+                color: isDarkMode
+                    ? Colors.black
+                        .withOpacity(0.7) // Darker overlay for dark mode
+                    : Colors.black
+                        .withOpacity(0.5), // Lighter overlay for light mode
               ),
             ),
           ),
@@ -593,7 +461,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: child,
                 );
               },
-              child: _isSignIn ? _buildSignIn() : _buildSignUp(),
+              child: _isSignIn ? _buildSignIn(isDarkMode) : _buildSignUp(),
             ),
           ),
           if (_errorMessage.isNotEmpty)
@@ -616,7 +484,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-  Widget _buildSignIn() {
+  Widget _buildSignIn(bool isDarkMode) {
     return SingleChildScrollView(
       key: ValueKey('SignIn'),
       child: LayoutBuilder(
@@ -627,24 +495,27 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildContent(isSmallScreen),
+                  children: _buildContent(isSmallScreen, isDarkMode),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildContent(isSmallScreen),
+                  children: _buildContent(isSmallScreen, isDarkMode),
                 );
         },
       ),
     );
   }
 
-  List<Widget> _buildContent(bool isSmallScreen) {
+  List<Widget> _buildContent(bool isSmallScreen, bool isDarkMode) {
     return [
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
-        color: const Color.fromARGB(155, 0, 0, 0),
+        color: isDarkMode
+            ? Color.fromARGB(
+                155, 255, 255, 255) // Dark background for dark mode
+            : Color.fromARGB(155, 0, 0, 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -655,7 +526,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(223, 216, 226, 231)),
+                  color: isDarkMode
+                      ? Colors.black
+                      : Color.fromARGB(223, 216, 226, 231)),
             ),
             SizedBox(height: 15),
             Padding(
@@ -665,7 +538,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(223, 205, 108, 230)),
+                    color: isDarkMode
+                        ? Colors.purple
+                        : Color.fromARGB(223, 205, 108, 230)),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -691,7 +566,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
         padding: EdgeInsets.all(32.0),
-        color: const Color.fromARGB(155, 255, 255, 255),
+        color: isDarkMode
+            ? const Color.fromARGB(255, 38, 37, 37)
+            : const Color.fromARGB(155, 255, 255, 255),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -702,7 +579,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(243, 173, 21, 211),
+                color: isDarkMode
+                    ? Colors.white
+                    : Color.fromARGB(243, 173, 21, 211),
               ),
             ),
             SizedBox(height: 42),
@@ -710,9 +589,43 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                labelStyle:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 border: OutlineInputBorder(),
                 errorText: _emailValid ? null : 'Invalid email format',
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode ? Colors.redAccent : Colors.red),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.white30
+                          : Colors
+                              .black), // Border color for non-focused state in dark mode
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.redAccent
+                          : Colors.red), // Darker red for dark mode
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.redAccent
+                          : Colors.red), // Focused border with error
+                ),
+                errorStyle: TextStyle(
+                  color: isDarkMode
+                      ? Colors.redAccent
+                      : Colors.red, // Error text color
+                ),
               ),
+              style: TextStyle(
+                  color: isDarkMode
+                      ? Colors.white
+                      : Colors.black), // Input text color for dark mode
             ),
             SizedBox(height: 16),
             TextField(
@@ -721,18 +634,28 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   _isPasswordVisible, // Toggle visibility based on _isPasswordVisible
               decoration: InputDecoration(
                 labelText: 'Password',
+                labelStyle:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _isPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                   onPressed: () {
                     setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     });
                   },
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.blue
+                          : const Color.fromARGB(
+                              255, 76, 39, 176)), // Purple border on focus
                 ),
               ),
             ),
@@ -747,11 +670,15 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: Text(
                     'Sign In',
                     style: TextStyle(
-                        color: const Color.fromARGB(255, 245, 241, 240)),
+                        color: isDarkMode
+                            ? Colors.black
+                            : const Color.fromARGB(255, 245, 241, 240)),
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    backgroundColor: Color.fromARGB(223, 205, 108, 230),
+                    backgroundColor: isDarkMode
+                        ? Colors.purple
+                        : Color.fromARGB(223, 205, 108, 230),
                   ),
                 ),
               ),
@@ -765,7 +692,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(181, 113, 5, 214),
+                    color: isDarkMode
+                        ? Colors.white
+                        : Color.fromARGB(181, 113, 5, 214),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -781,15 +710,19 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                         child: Container(
                           height: 1.5, // Thickness of the underline
                           width: 40, // Adjust width as needed
-                          color: Color.fromARGB(
-                              243, 32, 39, 230), // Color of underline
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(
+                                  243, 32, 39, 230), // Color of underline
                         ),
                       ),
                       Text(
                         'Reset',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(243, 32, 39, 230), // Text color
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(243, 32, 39, 230), // Text color
                           decoration:
                               TextDecoration.none, // Disable default underline
                         ),
@@ -810,7 +743,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(181, 113, 5, 214),
+                    color: isDarkMode
+                        ? Colors.white
+                        : Color.fromARGB(181, 113, 5, 214),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -831,15 +766,19 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           height: 1.5, // Thickness of the underline
                           width:
                               45, // Width of the underline to match the text length
-                          color: Color.fromARGB(
-                              243, 32, 39, 230), // Underline color
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(
+                                  243, 32, 39, 230), // Underline color
                         ),
                       ),
                       Text(
                         'Sign Up',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(243, 32, 39, 230), // Text color
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(243, 32, 39, 230), // Text color
                           decoration:
                               TextDecoration.none, // Disable default underline
                         ),
@@ -856,6 +795,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   }
 
   Widget _buildSignUp() {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return SingleChildScrollView(
       key: ValueKey('SignUp'),
       child: LayoutBuilder(
@@ -866,25 +806,27 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildSignUpContent(isSmallScreen),
+                  children: _buildSignUpContent(isSmallScreen, isDarkMode),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildSignUpContent(isSmallScreen),
+                  children: _buildSignUpContent(isSmallScreen, isDarkMode),
                 );
         },
       ),
     );
   }
 
-  List<Widget> _buildSignUpContent(bool isSmallScreen) {
+  List<Widget> _buildSignUpContent(bool isSmallScreen, bool isDarkMode) {
     return [
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
         padding: EdgeInsets.all(32.0),
-        color: const Color.fromARGB(155, 255, 255, 255),
+        color: isDarkMode
+            ? const Color.fromARGB(255, 38, 37, 37)
+            : Color.fromARGB(155, 255, 255, 255),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -895,7 +837,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(243, 173, 21, 211),
+                color: isDarkMode
+                    ? Colors.white
+                    : Color.fromARGB(243, 173, 21, 211),
               ),
             ),
             SizedBox(height: 24),
@@ -903,27 +847,59 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Name',
+                labelStyle:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.blue
+                          : const Color.fromARGB(
+                              255, 76, 39, 176)), // Border color when focused
+                ),
               ),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                labelStyle:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 border: OutlineInputBorder(),
                 errorText: _emailValid ? null : 'Invalid email format',
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode ? Colors.redAccent : Colors.red),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.white30
+                          : Colors
+                              .black), // Border color for non-focused state in dark mode
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.redAccent
+                          : Colors.red), // Darker red for dark mode
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.redAccent
+                          : Colors.red), // Focused border with error
+                ),
+                errorStyle: TextStyle(
+                  color: isDarkMode
+                      ? Colors.redAccent
+                      : Colors.red, // Error text color
+                ),
               ),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
-            // SizedBox(height: 16),
-            // TextField(
-            //   controller: _passwordController,
-            //   decoration: InputDecoration(
-            //     labelText: 'Password',
-            //     border: OutlineInputBorder(),
-            //   ),
-            //   obscureText: true,
-            // ),
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
@@ -931,12 +907,15 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   _isPasswordVisible, // Toggle visibility based on _isPasswordVisible
               decoration: InputDecoration(
                 labelText: 'Password',
+                labelStyle:
+                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _isPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                   onPressed: () {
                     setState(() {
@@ -944,7 +923,15 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     });
                   },
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.blue
+                          : const Color.fromARGB(
+                              255, 76, 39, 176)), // Purple border on focus
+                ),
               ),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             if (_isLoading)
               CircularProgressIndicator()
@@ -956,15 +943,18 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: Text(
                     'Sign Up',
                     style: TextStyle(
-                        color: const Color.fromARGB(255, 245, 241, 240)),
+                        color: isDarkMode
+                            ? Colors.black
+                            : const Color.fromARGB(255, 245, 241, 240)),
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    backgroundColor: Color.fromARGB(223, 205, 108, 230),
+                    backgroundColor: isDarkMode
+                        ? Colors.purple
+                        : Color.fromARGB(223, 205, 108, 230),
                   ),
                 ),
               ),
-
             SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -975,7 +965,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(181, 113, 5, 214),
+                    color: isDarkMode
+                        ? Colors.white
+                        : Color.fromARGB(181, 113, 5, 214),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -996,15 +988,19 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           height: 1.5, // Thickness of the underline
                           width:
                               45, // Width of the underline to match the text length
-                          color: Color.fromARGB(
-                              243, 32, 39, 230), // Underline color
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(
+                                  243, 32, 39, 230), // Underline color
                         ),
                       ),
                       Text(
                         'Sign In',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(243, 32, 39, 230), // Text color
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(243, 32, 39, 230), // Text color
                           decoration:
                               TextDecoration.none, // Disable default underline
                         ),
@@ -1021,7 +1017,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
-        color: const Color.fromARGB(155, 0, 0, 0),
+        color: isDarkMode
+            ? Color.fromARGB(155, 255, 255, 255)
+            : const Color.fromARGB(155, 0, 0, 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1032,7 +1030,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(223, 216, 226, 231)),
+                  color: isDarkMode
+                      ? Colors.black
+                      : Color.fromARGB(223, 216, 226, 231)),
             ),
             SizedBox(height: 15),
             Padding(
@@ -1042,7 +1042,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(223, 205, 108, 230)),
+                    color: isDarkMode
+                        ? Colors.purple
+                        : Color.fromARGB(223, 205, 108, 230)),
                 textAlign: TextAlign.center,
               ),
             ),
