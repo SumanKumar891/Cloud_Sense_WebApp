@@ -83,10 +83,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _totalRainLast24Hours = '0.00 mm';
   String _mostRecentHourRain = '0.00 mm';
 
-// bool hasNonZeroValues(List<dynamic> data) {
-  //   // Return false if list is empty or contains only zeros
-  //   return data.isNotEmpty && data.any((entry) => entry.value != 0);
-  // }
   bool hasNonZeroValues(List<dynamic> data,
       {bool includePrecipitation = true}) {
     // Exclude precipitation from the zero check if `includePrecipitation` is false
@@ -505,21 +501,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             humidityData = _parseChartData(data, 'Humidity');
             lightIntensityData = _parseChartData(data, 'LightIntensity');
             windSpeedData = _parseChartData(data, 'WindSpeed');
-            // rainLevelData = _parseChartData(data, 'RainLevel');
             rainDifferenceData = _parseRainDifferenceData(data);
             solarIrradianceData = _parseChartData(data, 'SolarIrradiance');
 
-            // Calculate the current rain difference (most recent data)
-            // double currentRainDifference =
-            //     _getCurrentRainDifference(data['rain_hourly_items']);
-
-            // // Calculate total rain difference for the last 24 hours
-            // double totalRainDifference24h =
-            //     _calculateRainSumLast24Hours(data['rain_hourly_items']);
-
-            // // Store the values in state variables
-            // _currentRainDifference = currentRainDifference;
-            // _totalRainDifference24h = totalRainDifference24h;
             chlorineData = [];
             tempData = [];
             tdsData = [];
@@ -551,22 +535,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   temperatureData[i].value,
                   humidityData[i].value,
                   lightIntensityData[i].value,
-                  // windSpeedData[i].value,
-                  // rainLevelData[i].value,
-                  // Find the closest hourly rain difference data for each 15-min timestamp
-                  // rainDifferenceData.isNotEmpty
-                  //     ? rainDifferenceData
-                  //         .lastWhere(
-                  //           (rd) => rd.timestamp.isBefore(temperatureData[i]
-                  //               .timestamp
-                  //               .add(Duration(minutes: 15))),
-                  //           orElse: () => ChartData(
-                  //               timestamp: DateTime.now(), value: 0.0),
-                  //         )
-                  //         .value
-                  //     : 0.0,
                   solarIrradianceData[i].value,
-                  // if (widget.deviceName == 'WD211') precipitationProbability
                 ]
             ];
           });
@@ -596,153 +565,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       });
     }
   }
-
-  // void downloadRainCSV(BuildContext context) async {
-  //   if (_csvRainRows.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("No rain data available for download.")),
-  //     );
-  //     return;
-  //   }
-
-  //   String csvData = const ListToCsvConverter().convert(_csvRainRows);
-  //   String fileName = _generateRainFileName();
-
-  //   if (kIsWeb) {
-  //     final blob = html.Blob([csvData], 'text/csv');
-  //     final url = html.Url.createObjectUrlFromBlob(blob);
-  //     final anchor = html.AnchorElement(href: url)
-  //       ..setAttribute("download", fileName)
-  //       ..click();
-  //     html.Url.revokeObjectUrl(url);
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text("Downloading Rain Data"),
-  //         duration: Duration(seconds: 1),
-  //       ),
-  //     );
-  //   } else {
-  //     try {
-  //       if (io.Platform.isAndroid) {
-  //         if (await Permission.storage.isGranted) {
-  //           await saveCSVFile(csvData, fileName);
-  //         } else if (await Permission.manageExternalStorage
-  //             .request()
-  //             .isGranted) {
-  //           await saveCSVFile(csvData, fileName);
-  //         } else if (await Permission
-  //             .manageExternalStorage.isPermanentlyDenied) {
-  //           await openAppSettings();
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             SnackBar(
-  //                 content:
-  //                     Text("Please enable storage permission from settings")),
-  //           );
-  //         }
-  //       } else {
-  //         await saveCSVFile(csvData, fileName);
-  //       }
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text("Error downloading rain data: $e")),
-  //       );
-  //     }
-  //   }
-  // }
-
-  // String _generateRainFileName() {
-  //   final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-  //   return 'RainData_$timestamp.csv';
-  // }
-
-  // void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
-  //   if (_csvRows.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("No data available for download.")),
-  //     );
-  //     return;
-  //   }
-
-  //   String csvData = const ListToCsvConverter().convert(_csvRows);
-  //   String fileName = _generateFileName(); // Generate a dynamic filename
-
-  //   if (kIsWeb) {
-  //     final blob = html.Blob([csvData], 'text/csv');
-  //     final url = html.Url.createObjectUrlFromBlob(blob);
-  //     final anchor = html.AnchorElement(href: url)
-  //       ..setAttribute("download", fileName) // Use the generated filename
-  //       ..click();
-  //     html.Url.revokeObjectUrl(url);
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text("Downloading"),
-  //         duration: Duration(seconds: 1),
-  //       ),
-  //     );
-  //   } else {
-  //     try {
-  //       // Check storage permission status
-  //       if (io.Platform.isAndroid) {
-  //         if (await Permission.storage.isGranted) {
-  //           // If already granted, continue with the download
-  //           await saveCSVFile(
-  //               csvData, fileName); // Pass filename to saveCSVFile
-  //         } else {
-  //           // For Android 11 and above, use MANAGE_EXTERNAL_STORAGE
-  //           if (await Permission.manageExternalStorage.request().isGranted) {
-  //             await saveCSVFile(
-  //                 csvData, fileName); // Pass filename to saveCSVFile
-  //           } else if (await Permission
-  //               .manageExternalStorage.isPermanentlyDenied) {
-  //             // If permanently denied, prompt to enable from settings
-  //             await openAppSettings();
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               SnackBar(
-  //                   content:
-  //                       Text("Please enable storage permission from settings")),
-  //             );
-  //           }
-  //         }
-  //       } else {
-  //         // Handle for other platforms (iOS)
-  //         await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
-  //       }
-  //     } catch (e) {
-  //       // Catch errors during download
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text("Error downloading: $e")),
-  //       );
-  //     }
-  //   }
-  // }
-
-  // String _generateFileName() {
-  //   final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-  //   return 'SensorData_$timestamp.csv';
-  // }
-
-  // Future<void> saveCSVFile(String csvData, String fileName) async {
-  //   final directory = await getExternalStorageDirectory();
-  //   final downloadsDirectory = Directory('/storage/emulated/0/Download');
-
-  //   if (downloadsDirectory.existsSync()) {
-  //     final filePath = '${downloadsDirectory.path}/$fileName';
-  //     final file = File(filePath);
-  //     await file.writeAsString(csvData);
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text("File downloaded to $filePath"),
-  //       ),
-  //     );
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Unable to find Downloads directory")),
-  //     );
-  //   }
-  // }
 
   void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
     if (_csvRows.isEmpty) {
@@ -856,37 +678,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       print('Error fetching rain forecasting data: $e');
     }
   }
-
-  // Future<void> _fetchRainForecastingData() async {
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         'https://w6dzlucugb.execute-api.us-east-1.amazonaws.com/default/CloudSense_rain_data_api?DeviceId=211'));
-
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.body);
-  //       setState(() {
-  //         _totalRainLast24Hours =
-  //             data['TotalRainLast24Hours']?.toString() ?? '0.00 mm';
-  //         _mostRecentHourRain =
-  //             data['MostRecentHourRain']?.toString() ?? '0.00 mm';
-
-  //         // Prepare CSV rows
-  //         _csvRainRows = [
-  //           ["Timestamp", "TotalRainLast24Hours", "MostRecentHourRain"],
-  //           [
-  //             DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-  //             _totalRainLast24Hours,
-  //             _mostRecentHourRain
-  //           ],
-  //         ];
-  //       });
-  //     } else {
-  //       throw Exception('Failed to load rain forecasting data');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching rain forecasting data: $e');
-  //   }
-  // }
 
   Future<void> _showWeeklyPrecipitationProbability(
       double latitude, double longitude) async {
@@ -1292,73 +1083,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
-  // Future<void> downloadCSVWithCustomRange(
-  //     BuildContext context, DateTime startDate, DateTime endDate) async {
-  //   // Filter _csvRows based on the selected date range
-  //   List<List<dynamic>> filteredRows = _csvRows.where((row) {
-  //     try {
-  //       // print("Attempting to parse date: ${row[0]}"); // Debug print
-  //       DateTime timestamp = DateTime.parse(
-  //           row[0]); // Adjust this line if the format is different
-  //       return timestamp.isAfter(startDate.subtract(Duration(days: 1))) &&
-  //           timestamp.isBefore(endDate.add(Duration(days: 1)));
-  //     } catch (e) {
-  //       // print("Error parsing date: $e"); // Log parsing errors
-  //       return false; // Exclude rows with invalid timestamps
-  //     }
-  //   }).toList();
-
-  //   if (filteredRows.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("No data available for the selected range.")),
-  //     );
-  //     return;
-  //   }
-
-  //   String csvData = const ListToCsvConverter().convert(filteredRows);
-  //   String fileName = _generateFileName(); // Generate a dynamic filename
-
-  //   // Same download logic as above
-  //   if (kIsWeb) {
-  //     final blob = html.Blob([csvData], 'text/csv');
-  //     final url = html.Url.createObjectUrlFromBlob(blob);
-  //     final anchor = html.AnchorElement(href: url)
-  //       ..setAttribute("download", fileName) // Use the generated filename
-  //       ..click();
-  //     html.Url.revokeObjectUrl(url);
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Downloading"), duration: Duration(seconds: 1)),
-  //     );
-  //   } else {
-  //     try {
-  //       // Check storage permission status
-  //       if (io.Platform.isAndroid) {
-  //         if (await Permission.storage.isGranted) {
-  //           await saveCSVFile(csvData, fileName);
-  //         } else {
-  //           if (await Permission.manageExternalStorage.request().isGranted) {
-  //             await saveCSVFile(csvData, fileName);
-  //           } else if (await Permission
-  //               .manageExternalStorage.isPermanentlyDenied) {
-  //             await openAppSettings();
-  //             ScaffoldMessenger.of(context).showSnackBar(
-  //               SnackBar(
-  //                   content:
-  //                       Text("Please enable storage permission from settings")),
-  //             );
-  //           }
-  //         }
-  //       } else {
-  //         await saveCSVFile(csvData, fileName);
-  //       }
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text("Error downloading: $e")),
-  //       );
-  //     }
-  //   }
-  // }
-
   List<ChartData> _parseBDChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -1375,21 +1099,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
-  // List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
-  //   final List<dynamic> items = data['weather_items'] ?? [];
-  //   return items.map((item) {
-  //     if (item == null) {
-  //       return ChartData(
-  //           timestamp: DateTime.now(), value: 0.0); // Provide default value
-  //     }
-  //     return ChartData(
-  //       timestamp: _parseDate(item['HumanTime']),
-  //       value: item[type] != null
-  //           ? double.tryParse(item[type].toString()) ?? 0.0
-  //           : 0.0,
-  //     );
-  //   }).toList();
-  // }
   List<ChartData> _parseChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['weather_items'] ?? [];
     return items.map((item) {
@@ -2943,15 +2652,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       return Icons.battery_full; // Full battery
     }
   }
-
-  // // Method to get color based on the battery percentage
-  // Color _getBatteryIconColor(int batteryPercentage) {
-  //   if (batteryPercentage < 20) {
-  //     return Colors.red; // Color for battery < 20%
-  //   } else {
-  //     return Colors.white; // Default color
-  //   }
-  // }
 
   Widget _buildChartContainer(
     String title,

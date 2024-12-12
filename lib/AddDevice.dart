@@ -92,58 +92,6 @@ class _QRScannerPageState extends State<QRScannerPage> {
     String sensorPrefix = '';
     int sensorNumber = 0;
 
-    // if (scannedQRCode.startsWith('WD')) {
-    //   sensorType = 'Weather Sensor';
-
-    //   sensorNumber = (widget.devices['Weather Sensors']?.length ?? 0) + 1;
-    // } else if (scannedQRCode.startsWith('CL') ||
-    //     scannedQRCode.startsWith('BD')) {
-    //   sensorType = 'Chlorine Sensor';
-
-    //   sensorNumber = (widget.devices['Chlorine Sensors']?.length ?? 0) + 1;
-    // } else if (scannedQRCode.startsWith('SS')) {
-    //   sensorType = 'Soil Sensor';
-
-    //   sensorNumber = (widget.devices['Soil Sensors']?.length ?? 0) + 1;
-    // } else if (scannedQRCode.startsWith('WQ')) {
-    //   sensorType = 'Water Quality Sensor';
-
-    //   sensorNumber = (widget.devices['Water Quality Sensors']?.length ?? 0) + 1;
-    // } else if (scannedQRCode.startsWith('WS')) {
-    //   sensorType = 'Water Sensor';
-
-    //   sensorNumber = (widget.devices['Water Sensors']?.length ?? 0) + 1;
-    // } else if (scannedQRCode.startsWith('DO')) {
-    //   sensorType = 'DO Sensor';
-
-    //   sensorNumber = (widget.devices['DO Sensors']?.length ?? 0) + 1;
-    // } else if (scannedQRCode.startsWith('LU')) {
-    //   sensorType = 'LU Sensor';
-    //   // sensorNumber = (widget.devices['Lux Sensors']?.length ?? 0) + 1;
-    //   sensorPrefix = 'LU';
-    // } else if (scannedQRCode.startsWith('TE')) {
-    //   sensorType = 'TE Sensor';
-    //   // sensorNumber = (widget.devices['Temperature Sensors']?.length ?? 0) + 1;
-    //   sensorPrefix = 'TE';
-    // } else if (scannedQRCode.startsWith('AC')) {
-    //   sensorType = 'AC Sensor';
-    //   // sensorNumber = (widget.devices['Accelerometer Sensors']?.length ?? 0) + 1;
-    //   sensorPrefix = 'AC';
-    // } else {
-    //   sensorType = 'Unknown Sensor';
-    //   sensorNumber = (widget.devices['Unknown Sensors']?.length ?? 0) + 1;
-    // }
-
-    // // Filter existing devices in CPS Lab Sensors for the specific sensor type
-    // final filteredDevices = widget.devices['CPS Lab Sensors']
-    //         ?.where((device) => device.startsWith(sensorPrefix))
-    //         .toList() ??
-    //     [];
-    // sensorNumber =
-    //     filteredDevices.length + 1; // Calculate the next sensor number
-    // deviceExists = widget.devices.values
-    //     .any((deviceList) => deviceList.contains(scannedQRCode));
-
     if (scannedQRCode.startsWith('WD')) {
       sensorType = 'Weather Sensor';
       sensorPrefix = 'WD';

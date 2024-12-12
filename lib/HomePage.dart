@@ -4,18 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
-// void main() {
-//   runApp(MyApp());
-// }
-// void main() {
-//   runApp(
-//     ChangeNotifierProvider(
-//       create: (_) => ThemeProvider(),
-//       child: MyApp(),
-//     ),
-//   );
-// }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -41,16 +29,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// class ThemeProvider extends ChangeNotifier {
-//   bool _isDarkMode = false;
-
-//   bool get isDarkMode => _isDarkMode;
-
-//   void toggleTheme() {
-//     _isDarkMode = !_isDarkMode;
-//     notifyListeners();
-//   }
-// }
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
 
