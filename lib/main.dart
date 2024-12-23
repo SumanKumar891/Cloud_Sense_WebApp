@@ -2,9 +2,10 @@ import 'package:cloud_sense_webapp/AccountInfo.dart';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
+import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'HomePage.dart'; // Assuming ThemeProvider is inside HomePage
+import 'HomePage.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:cloud_sense_webapp/amplifyconfiguration.dart';
@@ -26,7 +27,7 @@ void main() async {
 
   runApp(
     ChangeNotifierProvider(
-      create: (_) => ThemeProvider(), // Provide ThemeProvider directly
+      create: (_) => ThemeProvider(),
       child: MyApp(initialEmail: email),
     ),
   );
@@ -56,6 +57,11 @@ class MyApp extends StatelessWidget {
               deviceName: '',
               sequentialName: null,
               backgroundImagePath: '',
+            ),
+        '/buffalodata': (context) => BuffaloData(
+              startDateTime: null ?? DateTime.now(),
+              endDateTime: null ?? DateTime.now(),
+              nodeId: '',
             ),
       },
     );

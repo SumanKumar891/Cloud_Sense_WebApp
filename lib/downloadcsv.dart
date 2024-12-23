@@ -173,9 +173,6 @@ class _CsvDownloaderState extends State<CsvDownloader> {
           "Temperature",
           "Humidity",
           "LightIntensity",
-          // "WindSpeed",
-          // "RainLevel",
-          // "RainDifference",
           "SolarIrradiance",
         ]);
         data['weather_items'].forEach((item) {
@@ -214,17 +211,17 @@ class _CsvDownloaderState extends State<CsvDownloader> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Downloading $fileName"),
-          duration: Duration(seconds: 1), // Show for 2 seconds
+          duration: Duration(seconds: 1),
         ),
       );
       Future.delayed(Duration(seconds: 1), () {
         Navigator.pop(context);
-        Navigator.pop(context); // Pop the page
+        Navigator.pop(context);
       });
     } else {
       try {
         // Use Storage Access Framework for non-web platforms
-        await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
+        await saveCSVFile(csvData, fileName);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error downloading: $e")),
@@ -238,8 +235,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
       // Get the Downloads directory.
       final downloadsDirectory = Directory('/storage/emulated/0/Download');
       if (downloadsDirectory.existsSync()) {
-        final filePath =
-            '${downloadsDirectory.path}/$fileName'; // Ensure the full path is correct
+        final filePath = '${downloadsDirectory.path}/$fileName';
         final file = File(filePath);
 
         // Ensure the directory is writable and save the file.
@@ -328,15 +324,15 @@ class _CsvDownloaderState extends State<CsvDownloader> {
                         _startDate = startDate;
                         _endDate = endDate;
                       });
-                      Navigator.of(context).pop(); // Close the dialog
-                      _downloadCsv(); // Trigger the download
+                      Navigator.of(context).pop();
+                      _downloadCsv();
                     },
                     child: const Text('Download'),
                   ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Cancel'),
                 ),

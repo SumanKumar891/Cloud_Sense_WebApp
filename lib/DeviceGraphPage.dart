@@ -10,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:csv/csv.dart';
-import 'package:universal_html/html.dart' as html; //import 'dart:html' as html;
+import 'package:universal_html/html.dart' as html;
 import 'dart:io' as io;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -70,7 +70,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   double _precipitationProbability = 0.0;
   List<double> _weeklyPrecipitationData = [];
   int _selectedDeviceId = 0; // Variable to hold the selected device ID
-  bool _isHovering = false; // Track hover state
+  bool _isHovering = false;
   String? _activeButton;
   String _currentChlorineValue = '0.00';
   bool _isLoading = false;
@@ -102,12 +102,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   void initState() {
     super.initState();
     _fetchDeviceDetails();
-    // fetchData();
+
     _fetchDataForRange('single');
     _loadLocationFromPrefs();
   }
-
-// To toggle current data visibility
 
   Future<void> _fetchDeviceDetails() async {
     try {
@@ -124,9 +122,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         if (selectedDevice != null) {
           setState(() {});
         }
-        // } else {
-        //   print('Device ${widget.deviceName} not found.');
-        // }
       } else {
         throw Exception('Failed to load device details');
       }
@@ -138,12 +133,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
   String _lastBatteryPercentage = "";
-  String _lastRSSI_Value = ""; // Default value
+  String _lastRSSI_Value = "";
 
   Future<void> _fetchDataForRange(String range,
       [DateTime? selectedDate, double? latitude, double? longitude]) async {
     setState(() {
-      _isLoading = true; // Start loading
+      _isLoading = true;
       _csvRows.clear();
       chlorineData.clear();
       temperatureData.clear();
@@ -184,13 +179,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         startDate = endDate.subtract(Duration(days: 7));
         break;
       case '30days':
-        startDate = endDate.subtract(Duration(days: 30)); // 30 days range
+        startDate = endDate.subtract(Duration(days: 30));
         break;
       case '3months':
-        startDate = endDate.subtract(Duration(days: 90)); // Roughly 3 months
+        startDate = endDate.subtract(Duration(days: 90));
         break;
       case '6months':
-        startDate = endDate.subtract(Duration(days: 180)); // Roughly 6 months
+        startDate = endDate.subtract(Duration(days: 180));
         break;
       case 'single':
         startDate = _selectedDay; // Use the selected day as startDate
@@ -440,8 +435,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               lastRSSI_Value =
                   data['sensor_data_items'].last['RSSI_Value']?.toString() ??
                       'Unknown';
-              print(
-                  'RSSI Value: $lastRSSI_Value'); // Debugging the fetched value
             }
 
             rows = [
@@ -552,16 +545,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           _lastRSSI_Value = lastRSSI_Value;
 
           if (_csvRows.isEmpty) {
-          } else {
-// Clear the message if data is available
-          }
+          } else {}
         });
       }
     } catch (e) {
       setState(() {});
     } finally {
       setState(() {
-        _isLoading = false; // Stop loading
+        _isLoading = false;
       });
     }
   }
@@ -613,11 +604,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       // Get the Downloads directory.
       final downloadsDirectory = Directory('/storage/emulated/0/Download');
       if (downloadsDirectory.existsSync()) {
-        final filePath =
-            '${downloadsDirectory.path}/$fileName'; // Ensure the full path is correct
+        final filePath = '${downloadsDirectory.path}/$fileName';
         final file = File(filePath);
 
-        // Ensure the directory is writable and save the file.
         await file.writeAsString(csvData);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -718,7 +707,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               title: Center(
                 child: Text('Weekly Rain Forecasting'),
               ),
-
               content: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Container(
@@ -742,17 +730,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   ),
                 ),
               ),
-              actionsAlignment: MainAxisAlignment
-                  .spaceBetween, // Aligns actions to left and right
+              actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
-                // Left-aligned "Hourly Insights" button
                 TextButton(
                   onPressed: () async {
                     await _showHourlyPrecipitationForWeek();
                   },
                   child: Text('Hourly Insights'),
                 ),
-                // Right-aligned "Close" button
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -876,19 +861,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           setState(() {
             _latitude = latitude as double?;
             _longitude = longitude as double?;
-            _isLoading = false; // Stop loading after fetching location
-            _saveLocationToPrefs(); // Save location to SharedPreferences
+            _isLoading = false;
+            _saveLocationToPrefs();
           });
         }).catchError((e) {
           print("Error getting location: $e");
           setState(() {
-            _isLoading = false; // Stop loading if there's an error
+            _isLoading = false;
           });
         });
       } catch (e) {
         print("Error accessing geolocation: $e");
         setState(() {
-          _isLoading = false; // Stop loading if an error occurs
+          _isLoading = false;
         });
       }
     } else {
@@ -911,7 +896,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         if (permission == geolocator.LocationPermission.denied) {
           print('Location permissions are denied');
           setState(() {
-            _isLoading = false; // Stop loading
+            _isLoading = false;
           });
           return;
         }
@@ -920,7 +905,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       if (permission == geolocator.LocationPermission.deniedForever) {
         print('Location permissions are permanently denied');
         setState(() {
-          _isLoading = false; // Stop loading
+          _isLoading = false;
         });
         return;
       }
@@ -933,8 +918,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       setState(() {
         _latitude = position.latitude;
         _longitude = position.longitude;
-        _isLoading = false; // Stop loading after fetching location
-        _saveLocationToPrefs(); // Save location to SharedPreferences
+        _isLoading = false;
+        _saveLocationToPrefs();
       });
     }
   }
@@ -1053,19 +1038,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                  downloadCSV(context); // Download for selected range
+                  Navigator.of(context).pop();
+                  downloadCSV(context);
                 },
                 child: const Text('Download for Selected Range'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  // Trigger the download immediately
-                  // downloadCSVWithCustomRange(context, startDate!, endDate!);
-                  // Navigator.of(context)
-                  //     .pop(); // Close the dialog after download
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -1087,8 +1067,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
         timestamp: _parseBDDate(item['human_time']),
@@ -1103,8 +1082,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['weather_items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
 
       // Parse the value based on the `type`
@@ -1150,8 +1128,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
         timestamp: _parsewaterDate(item['HumanTime']),
@@ -1167,8 +1144,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['sensor_data_items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
         timestamp: _parsesensorDate(item['HumanTime']),
@@ -1183,8 +1159,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
         timestamp: _parsewindDate(item['human_time']),
@@ -1199,8 +1174,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
         timestamp: _parsedoDate(item['HumanTime']),
@@ -1215,8 +1189,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
       if (item == null) {
-        return ChartData(
-            timestamp: DateTime.now(), value: 0.0); // Provide default value
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
         timestamp: _parseWaterDate(item['time_stamp']),
@@ -1238,20 +1211,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       };
     }
     // double sum = 0.0;
-    double? current = data.last.value; // Get the most recent (current) value
+    double? current = data.last.value;
     double min = double.infinity;
     double max = double.negativeInfinity;
 
     for (var entry in data) {
-      // sum += entry.value;
       if (entry.value < min) min = entry.value;
       if (entry.value > max) max = entry.value;
     }
 
-    // double avg = data.isNotEmpty ? sum / data.length : 0.0;
     return {
-      // 'average': [avg],
-      'current': [current], // Return the last (current) value
+      'current': [current],
       'min': [min],
       'max': [max],
     };
@@ -2675,7 +2645,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: Text(
-                      '$title Graph', // Displaying the chart's title
+                      '$title Graph',
                       style: TextStyle(
                           fontSize:
                               MediaQuery.of(context).size.width < 800 ? 18 : 22,

@@ -35,7 +35,7 @@ class ThemeProvider extends ChangeNotifier {
   bool get isDarkMode => _isDarkMode;
 
   ThemeProvider() {
-    _loadTheme(); // Load the saved theme preference during initialization
+    _loadTheme();
   }
 
   void toggleTheme() async {
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/soil.jpg', // Replace with your image path
+                    'assets/soil.jpg',
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width < 800 ? 400 : 550,
                     fit: BoxFit.cover,
@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/weatherr.jpg', // Replace with your image path
+                    'assets/weatherr.jpg',
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
                     fit: BoxFit.cover,
@@ -380,12 +380,11 @@ class _HomePageState extends State<HomePage> {
                         text: TextSpan(
                           style: TextStyle(color: Colors.white, fontSize: 16),
                           children: [
-                            TextSpan(text: 'Phone : '), // No underline
+                            TextSpan(text: 'Phone : '),
                             TextSpan(
                               text: '01881 - 232601',
                               style: TextStyle(
-                                decoration:
-                                    TextDecoration.underline, // Underlined
+                                decoration: TextDecoration.underline,
                               ),
                             ),
                           ],
@@ -411,12 +410,11 @@ class _HomePageState extends State<HomePage> {
                         text: TextSpan(
                           style: TextStyle(color: Colors.white, fontSize: 16),
                           children: [
-                            TextSpan(text: 'Email : '), // No underline
+                            TextSpan(text: 'Email : '),
                             TextSpan(
                               text: 'contact.awadh@iitrpr.ac.in',
                               style: TextStyle(
-                                decoration:
-                                    TextDecoration.underline, // Underlined
+                                decoration: TextDecoration.underline,
                               ),
                             ),
                           ],

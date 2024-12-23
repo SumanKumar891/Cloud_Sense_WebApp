@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:cloud_sense_webapp/LoginPage.dart';
+import 'package:cloud_sense_webapp/buffalodata.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -24,21 +26,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     super.initState();
     _loadEmail();
   }
-
-  // Future<void> _loadEmail() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? email = prefs.getString('email');
-
-  //   if (email != null) {
-  //     setState(() {
-  //       _email = email;
-  //     });
-  //     _fetchData();
-  //   } else {
-  //     // Handle case where email is not found, e.g., navigate to sign-in page
-  //     Navigator.pushReplacementNamed(context, '/devicelist');
-  //   }
-  // }
 
   Future<void> _loadEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -127,17 +114,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Water Quality Sensors';
       case 'WS':
         return 'Water Sensors';
-      case 'LU': // LE -> CPS Lab Sensors
-      case 'TE': // TE -> CPS Lab Sensors
-      case 'AC': // ACC -> CPS Lab Sensors
+      case 'LU':
+      case 'TE':
+      case 'AC':
         return 'CPS Lab Sensors'; // All grouped under CPS Lab Sensors
-      // case 'TE':
-      //   return 'Temperature Sensors';
-      // case 'LU':
-      //   return 'Lux Sensors';
-      // case 'AC':
-      //   return 'Accelerometer Sensors';
-
+      case 'BF':
+        return 'Buffalo Sensors';
       default:
         return key;
     }
@@ -270,9 +252,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   Widget _buildDeviceCards() {
     // Separate counters for each sensor type
-    int luxSensorCount = 0; // Lux sensors
-    int tempSensorCount = 0; // Temperature sensors
-    int accelerometerSensorCount = 0; // Accelerometer sensors
+    int luxSensorCount = 0;
+    int tempSensorCount = 0;
+    int accelerometerSensorCount = 0;
 
     List<Widget> cardList = _deviceCategories.keys.map((category) {
       return Container(
@@ -335,17 +317,37 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 horizontal: 20, vertical: 10),
                           ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DeviceGraphPage(
-                                  deviceName:
-                                      _deviceCategories[category]![index],
-                                  sequentialName: sequentialName,
-                                  backgroundImagePath: 'assets/backgroundd.jpg',
+                            if (sensorName.startsWith('BF')) {
+                              // If sensor starts with 'BF', navigate to BuffaloDataPage
+                              String numericNodeId =
+                                  sensorName.replaceAll(RegExp(r'\D'), '');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BuffaloData(
+                                    startDateTime: DateTime.now(),
+                                    endDateTime:
+                                        DateTime.now().add(Duration(days: 1)),
+                                    nodeId:
+                                        numericNodeId, // Pass the sensor ID or name here
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              // Otherwise, navigate to DeviceGraphPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DeviceGraphPage(
+                                    deviceName:
+                                        _deviceCategories[category]![index],
+                                    sequentialName: sequentialName,
+                                    backgroundImagePath:
+                                        'assets/backgroundd.jpg',
+                                  ),
+                                ),
+                              );
+                            }
                           },
                           child: Text(
                             sequentialName,
@@ -493,17 +495,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return const Color.fromARGB(255, 167, 158, 172);
       case 'DO Sensors': // Add color for Water Sensors
         return const Color.fromARGB(255, 167, 158, 172);
-      // case 'Temperature Sensors':
-      //   return const Color.fromARGB(
-      //       255, 167, 158, 172); // Custom color for CPS Lab
-      // case 'Lux Sensors':
-      //   return const Color.fromARGB(
-      //       255, 167, 158, 172); // Custom color for CPS Lab
-      // case 'Accelerometer Sensors':
-      //   return const Color.fromARGB(
-      //       255, 167, 158, 172); // Custom color for CPS Lab
 
       case 'CPS Lab Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Buffalo Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

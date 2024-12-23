@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'dart:ui'; // Import for BackdropFilter
@@ -46,9 +47,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           ),
         );
       }
-    } catch (e) {
-      // No user signed in, continue to show the sign-in/sign-up screen
-    }
+    } catch (e) {}
   }
 
   @override
@@ -97,7 +96,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     }
   }
 
-  // Method to handle password reset process
+// Method to handle password reset process
   Future<void> _forgotPassword() async {
     String? email = await _showEmailInputDialog();
     if (email != null && _emailValid) {
@@ -416,8 +415,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      extendBodyBehindAppBar:
-          true, // This allows the body to extend behind the app bar
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
@@ -513,8 +511,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
         color: isDarkMode
-            ? Color.fromARGB(
-                155, 255, 255, 255) // Dark background for dark mode
+            ? Color.fromARGB(155, 255, 255, 255)
             : Color.fromARGB(155, 0, 0, 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -599,39 +596,26 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.white30
-                          : Colors
-                              .black), // Border color for non-focused state in dark mode
+                      color: isDarkMode ? Colors.white30 : Colors.black),
                 ),
                 errorBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.redAccent
-                          : Colors.red), // Darker red for dark mode
+                      color: isDarkMode ? Colors.redAccent : Colors.red),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.redAccent
-                          : Colors.red), // Focused border with error
+                      color: isDarkMode ? Colors.redAccent : Colors.red),
                 ),
                 errorStyle: TextStyle(
-                  color: isDarkMode
-                      ? Colors.redAccent
-                      : Colors.red, // Error text color
+                  color: isDarkMode ? Colors.redAccent : Colors.red,
                 ),
               ),
-              style: TextStyle(
-                  color: isDarkMode
-                      ? Colors.white
-                      : Colors.black), // Input text color for dark mode
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              obscureText:
-                  _isPasswordVisible, // Toggle visibility based on _isPasswordVisible
+              obscureText: _isPasswordVisible,
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle:
@@ -654,12 +638,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   borderSide: BorderSide(
                       color: isDarkMode
                           ? Colors.blue
-                          : const Color.fromARGB(
-                              255, 76, 39, 176)), // Purple border on focus
+                          : const Color.fromARGB(255, 76, 39, 176)),
                 ),
               ),
             ),
-
             if (_isLoading)
               CircularProgressIndicator()
             else
@@ -682,8 +664,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   ),
                 ),
               ),
-
-            SizedBox(height: 22), // Add space before the forgot password row
+            SizedBox(height: 22),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -703,17 +684,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Custom underline positioned slightly below the text
                       Positioned(
-                        bottom:
-                            -1, // Adjust this value to increase/decrease gap between text and underline
+                        bottom: -1,
                         child: Container(
-                          height: 1.5, // Thickness of the underline
-                          width: 40, // Adjust width as needed
+                          height: 1.5,
+                          width: 40,
                           color: isDarkMode
                               ? Colors.blue
-                              : Color.fromARGB(
-                                  243, 32, 39, 230), // Color of underline
+                              : Color.fromARGB(243, 32, 39, 230),
                         ),
                       ),
                       Text(
@@ -722,9 +700,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           fontWeight: FontWeight.bold,
                           color: isDarkMode
                               ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230), // Text color
-                          decoration:
-                              TextDecoration.none, // Disable default underline
+                              : Color.fromARGB(243, 32, 39, 230),
+                          decoration: TextDecoration.none,
                         ),
                       ),
                     ],
@@ -732,7 +709,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 ),
               ],
             ),
-
             SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -758,18 +734,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Custom underline positioned slightly below the text
                       Positioned(
-                        bottom:
-                            -1, // Adjust this value for spacing between text and underline
+                        bottom: -1,
                         child: Container(
-                          height: 1.5, // Thickness of the underline
-                          width:
-                              45, // Width of the underline to match the text length
+                          height: 1.5,
+                          width: 45,
                           color: isDarkMode
                               ? Colors.blue
-                              : Color.fromARGB(
-                                  243, 32, 39, 230), // Underline color
+                              : Color.fromARGB(243, 32, 39, 230),
                         ),
                       ),
                       Text(
@@ -778,9 +750,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           fontWeight: FontWeight.bold,
                           color: isDarkMode
                               ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230), // Text color
-                          decoration:
-                              TextDecoration.none, // Disable default underline
+                              : Color.fromARGB(243, 32, 39, 230),
+                          decoration: TextDecoration.none,
                         ),
                       ),
                     ],
@@ -854,8 +825,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   borderSide: BorderSide(
                       color: isDarkMode
                           ? Colors.blue
-                          : const Color.fromARGB(
-                              255, 76, 39, 176)), // Border color when focused
+                          : const Color.fromARGB(255, 76, 39, 176)),
                 ),
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
@@ -875,27 +845,18 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.white30
-                          : Colors
-                              .black), // Border color for non-focused state in dark mode
+                      color: isDarkMode ? Colors.white30 : Colors.black),
                 ),
                 errorBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.redAccent
-                          : Colors.red), // Darker red for dark mode
+                      color: isDarkMode ? Colors.redAccent : Colors.red),
                 ),
                 focusedErrorBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.redAccent
-                          : Colors.red), // Focused border with error
+                      color: isDarkMode ? Colors.redAccent : Colors.red),
                 ),
                 errorStyle: TextStyle(
-                  color: isDarkMode
-                      ? Colors.redAccent
-                      : Colors.red, // Error text color
+                  color: isDarkMode ? Colors.redAccent : Colors.red,
                 ),
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
@@ -903,8 +864,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              obscureText:
-                  _isPasswordVisible, // Toggle visibility based on _isPasswordVisible
+              obscureText: _isPasswordVisible,
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle:
@@ -927,8 +887,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   borderSide: BorderSide(
                       color: isDarkMode
                           ? Colors.blue
-                          : const Color.fromARGB(
-                              255, 76, 39, 176)), // Purple border on focus
+                          : const Color.fromARGB(255, 76, 39, 176)),
                 ),
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
@@ -980,7 +939,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Custom underline positioned slightly below the text
                       Positioned(
                         bottom:
                             -1, // Adjust this value for spacing between text and underline
@@ -1000,7 +958,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           fontWeight: FontWeight.bold,
                           color: isDarkMode
                               ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230), // Text color
+                              : Color.fromARGB(243, 32, 39, 230),
                           decoration:
                               TextDecoration.none, // Disable default underline
                         ),

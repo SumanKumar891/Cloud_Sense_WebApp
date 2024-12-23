@@ -120,6 +120,9 @@ class _QRScannerPageState extends State<QRScannerPage> {
     } else if (scannedQRCode.startsWith('AC')) {
       sensorType = 'AC Sensor';
       sensorPrefix = 'AC';
+    } else if (scannedQRCode.startsWith('BF')) {
+      sensorType = 'BF Sensor';
+      sensorPrefix = 'BF';
     } else {
       sensorType = 'Unknown Sensor';
       sensorPrefix = ''; // Unknown sensors have no prefix
