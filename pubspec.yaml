@@ -75,6 +75,9 @@ dependencies:
   google_maps_flutter: ^2.9.0
   excel: ^4.0.6
   fl_chart: ^0.69.2
+  geocoding: ^3.0.0
+  ftpconnect: ^2.0.7
+  webview_flutter: ^4.10.0
  
 
   
@@ -90,7 +93,7 @@ flutter_launcher_icons:
   image_path: "assets/maskable-icon512.png" # Replace this with your actual icon path
   adaptive_icon_background: "#040926"
   adaptive_icon_foreground: "assets/maskable-icon512.png"
-  
+   
  
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -114,17 +117,18 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/maskable-icon512.png
-    - assets/weatherr.jpg
-    - assets/loginImage.png
+    - assets/weather.png
+    - assets/login.png
     - assets/signup3.png
-    - assets/backgroundd.jpg
-    - assets/sunn.jpg
+    - assets/background.jpg
+    - assets/sun.jpg
     - assets/Chloritronn.png
     - assets/soil.jpg
     - assets/tree.jpg
     - assets/water_quality.jpg
     - assets/accountinfo.jpg
-    - assets/buffalo.jpg
+    - assets/buffalo_.jpg
+  
   
     
     # - web/smartphone.png

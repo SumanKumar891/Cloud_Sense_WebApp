@@ -144,7 +144,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/backgroundd.jpg'),
+                image: AssetImage('assets/background.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -239,6 +239,26 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             _deviceCategories.isNotEmpty
                                 ? _buildDeviceCards()
                                 : _buildNoDevicesCard(),
+                            // SizedBox(height: 20),
+                            // ElevatedButton.icon(
+                            //   onPressed: () {
+                            //     Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             MapPage(), // Navigate to MapPage
+                            //       ),
+                            //     );
+                            //   },
+                            //   icon: Icon(Icons.map),
+                            //   label: Text('View Map'),
+                            //   style: ElevatedButton.styleFrom(
+                            //     padding: EdgeInsets.symmetric(
+                            //         horizontal: 20, vertical: 10),
+                            //     backgroundColor: Colors.black,
+                            //     foregroundColor: Colors.white,
+                            //   ),
+                            // ),
                           ],
                         ),
                 ),

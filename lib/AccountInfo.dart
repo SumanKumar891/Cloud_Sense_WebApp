@@ -351,13 +351,13 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
             decoration: BoxDecoration(
               color: isDarkMode
                   ? Colors.black
-                  : null, // Solid black background for dark mode
-              image: isDarkMode
-                  ? null // No image in dark mode
-                  : DecorationImage(
-                      image: AssetImage('assets/accountinfo.jpg'),
-                      fit: BoxFit.cover,
-                    ),
+                  : Color(0xFFF8F8F8), // Solid black background for dark mode
+              // image: isDarkMode
+              //     ? null // No image in dark mode
+              //     : DecorationImage(
+              //         image: AssetImage('assets/accountinfo.jpg'),
+              //         fit: BoxFit.cover,
+              //       ),
             ),
             child: isDarkMode
                 ? null // No BackdropFilter in dark mode

@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/weatherr.jpg',
+                    'assets/weather.png',
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
                     fit: BoxFit.cover,

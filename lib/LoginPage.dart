@@ -432,7 +432,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/sunn.jpg'),
+                image: AssetImage('assets/sun.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -549,7 +549,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   image: DecorationImage(
-                    image: AssetImage('assets/loginImage.png'),
+                    image: AssetImage('assets/login.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -1014,7 +1014,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   image: DecorationImage(
-                    image: AssetImage('assets/loginImage.png'),
+                    image: AssetImage('assets/login.png'),
                     fit: BoxFit.cover,
                   ),
                 ),

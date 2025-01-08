@@ -308,10 +308,30 @@ class _BuffaloDataState extends State<BuffaloData> {
 
     int total = data.values.reduce((a, b) => a + b);
 
+    // Calculate the percentage for each activity
+    List<double> percentages = [];
+    data.forEach((activityLabel, totalTime) {
+      double percentage = (totalTime / total) * 100;
+      percentages.add(percentage);
+    });
+
+    // Round each percentage to 2 decimal places
+    percentages = percentages
+        .map((percentage) => double.parse(percentage.toStringAsFixed(2)))
+        .toList();
+
+    // Adjust the last percentage to make the total exactly 100
+    double sum = percentages.reduce((a, b) => a + b);
+    double adjustment = 100 - sum;
+    if (percentages.isNotEmpty) {
+      // Add the remaining adjustment to the last item
+      percentages[percentages.length - 1] += adjustment;
+    }
+
+    // Create PieChartSectionData from adjusted percentages
     int index = 0;
     data.forEach((activityLabel, totalTime) {
-      double percentage = (totalTime / total * 100);
-
+      double percentage = percentages[index];
       sections.add(
         PieChartSectionData(
           value: percentage,
@@ -321,7 +341,6 @@ class _BuffaloDataState extends State<BuffaloData> {
           titlePositionPercentageOffset: 0.55,
         ),
       );
-
       index++;
     });
 
@@ -337,16 +356,36 @@ class _BuffaloDataState extends State<BuffaloData> {
 
     int total = data.values.reduce((a, b) => a + b);
 
+    // Calculate the percentage for each activity
+    List<double> percentages = [];
+    data.forEach((activityLabel, totalTime) {
+      double percentage = (totalTime / total) * 100;
+      percentages.add(percentage);
+    });
+
+    // Round each percentage to 2 decimal places
+    percentages = percentages
+        .map((percentage) => double.parse(percentage.toStringAsFixed(2)))
+        .toList();
+
+    // Adjust the last percentage to make the total exactly 100
+    double sum = percentages.reduce((a, b) => a + b);
+    double adjustment = 100 - sum;
+    if (percentages.isNotEmpty) {
+      // Add the remaining adjustment to the last item
+      percentages[percentages.length - 1] += adjustment;
+    }
+
+    // Create LegendItems from adjusted percentages
     int index = 0;
     data.forEach((activityLabel, totalTime) {
-      double percentage = (totalTime / total * 100);
+      double percentage = percentages[index];
       legendData.add(
         LegendItem(
           label: '$activityLabel - ${percentage.toStringAsFixed(2)}%',
           color: getFixedColor(index),
         ),
       );
-
       index++;
     });
 
@@ -368,11 +407,11 @@ class _BuffaloDataState extends State<BuffaloData> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    // if (_isLoading) {
+    //   return Scaffold(
+    //     body: Center(child: CircularProgressIndicator()),
+    //   );
+    // }
 
     // Prepare data for the table with activity time calculation
     final activityTimeData = _totalActivityTimes.entries
@@ -393,7 +432,7 @@ class _BuffaloDataState extends State<BuffaloData> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/buffalo.jpg'),
+                image: AssetImage('assets/buffalo_.jpg'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -405,53 +444,209 @@ class _BuffaloDataState extends State<BuffaloData> {
               ),
             ),
           ),
-          // Body content
-          Column(
-            children: [
-              // Transparent AppBar
-              AppBar(
-                title: Text(
-                  ("Buffalo Data"),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: MediaQuery.of(context).size.width < 800 ? 18 : 28,
-                    fontWeight: FontWeight.bold,
+          // Loading indicator or main content
+          if (_isLoading)
+            Center(
+              child: CircularProgressIndicator(),
+            )
+          else
+            // Body content
+            Column(
+              children: [
+                // Transparent AppBar
+                AppBar(
+                  title: Text(
+                    ("Buffalo Data"),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize:
+                          MediaQuery.of(context).size.width < 800 ? 18 : 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+
+                  backgroundColor: Colors.transparent,
+                  elevation: 0, // Remove shadow of the AppBar
+                  actions: [],
                 ),
 
-                backgroundColor: Colors.transparent,
-                elevation: 0, // Remove shadow of the AppBar
-                actions: [],
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // NodeId, Start Date, and End Date input fields with LayoutBuilder
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              // Check if the screen width is less than 800 pixels
+                              if (constraints.maxWidth < 800) {
+                                // If screen is smaller, display Node ID vertically and Start/End Date in a row
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Node ID field aligned to the left
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Node ID (Buffalo ID)",
+                                              style: TextStyle(fontSize: 16)),
+                                          SizedBox(height: 8),
+                                          Container(
+                                            width: double.infinity,
+                                            child: TextField(
+                                              controller: nodeIdController,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  selectedNodeId = value;
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                hintText: "Enter Node ID",
+                                                hintStyle: TextStyle(
+                                                    color: Color.fromARGB(
+                                                        255, 199, 196, 196),
+                                                    fontSize: 12),
+                                                border: InputBorder
+                                                    .none, // Removes the underline
+                                                labelStyle: TextStyle(
+                                                  color: Theme.of(context)
+                                                              .brightness ==
+                                                          Brightness.dark
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                ),
+                                              ),
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // Row for Start Date and End Date
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          // Start Date & Time
+                                          Column(
+                                            children: [
+                                              Text("Start Date & Time",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                  )),
+                                              SizedBox(height: 8),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  await _pickDateTime(true);
+                                                },
+                                                style: TextButton.styleFrom(
+                                                    backgroundColor: Colors
+                                                        .white
+                                                        .withOpacity(0.6)),
+                                                child: Text(
+                                                  "${selectedStartDate.toLocal()}"
+                                                          .split(' ')[0] +
+                                                      " ${selectedStartDate.hour}:${selectedStartDate.minute}",
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.dark
+                                                        ? const Color.fromARGB(
+                                                            255, 22, 3, 127)
+                                                        : null,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          // End Date & Time
+                                          Column(
+                                            children: [
+                                              Text("End Date & Time",
+                                                  style:
+                                                      TextStyle(fontSize: 16)),
+                                              SizedBox(height: 8),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  await _pickDateTime(false);
+                                                },
+                                                style: TextButton.styleFrom(
+                                                  backgroundColor: Colors.white
+                                                      .withOpacity(0.6),
+                                                ),
+                                                child: Text(
+                                                  "${selectedEndDate.toLocal()}"
+                                                          .split(' ')[0] +
+                                                      " ${selectedEndDate.hour}:${selectedEndDate.minute}",
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.dark
+                                                        ? const Color.fromARGB(
+                                                            255, 22, 3, 127)
+                                                        : null,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
 
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // NodeId, Start Date, and End Date input fields with LayoutBuilder
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            // Check if the screen width is less than 800 pixels
-                            if (constraints.maxWidth < 800) {
-                              // If screen is smaller, display Node ID vertically and Start/End Date in a row
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Node ID field aligned to the left
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                    Center(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 16.0),
+                                        child: ElevatedButton(
+                                          onPressed: _fetchData,
+                                          child: Text(
+                                            "Fetch Data",
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? const Color.fromARGB(
+                                                      255, 22, 3, 127)
+                                                  : null,
+                                            ),
+                                          ),
+                                          style: TextButton.styleFrom(
+                                              backgroundColor: Colors.white
+                                                  .withOpacity(0.6)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                // If screen is larger, display inputs in a row
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    // Node ID field
+                                    Column(
                                       children: [
                                         Text("Node ID (Buffalo ID)",
                                             style: TextStyle(fontSize: 16)),
                                         SizedBox(height: 8),
                                         Container(
-                                          width: double.infinity,
+                                          width: 100,
                                           child: TextField(
                                             controller: nodeIdController,
                                             onChanged: (value) {
@@ -465,103 +660,71 @@ class _BuffaloDataState extends State<BuffaloData> {
                                                   color: Color.fromARGB(
                                                       255, 199, 196, 196),
                                                   fontSize: 12),
-                                              border: InputBorder
-                                                  .none, // Removes the underline
-                                              labelStyle: TextStyle(
-                                                color: Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.dark
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                            ),
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.dark
-                                                  ? Colors.white
-                                                  : Colors.black,
+                                              border: InputBorder.none,
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  // Row for Start Date and End Date
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
+                                    // Start Date & Time
+                                    Column(
                                       children: [
-                                        // Start Date & Time
-                                        Column(
-                                          children: [
-                                            Text("Start Date & Time",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                            SizedBox(height: 8),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                await _pickDateTime(true);
-                                              },
-                                              style: TextButton.styleFrom(
-                                                  backgroundColor: Colors.white
-                                                      .withOpacity(0.6)),
-                                              child: Text(
-                                                "${selectedStartDate.toLocal()}"
-                                                        .split(' ')[0] +
-                                                    " ${selectedStartDate.hour}:${selectedStartDate.minute}",
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                              .brightness ==
-                                                          Brightness.dark
-                                                      ? const Color.fromARGB(
-                                                          255, 22, 3, 127)
-                                                      : null,
-                                                ),
-                                              ),
+                                        Text("Start Date & Time",
+                                            style: TextStyle(fontSize: 16)),
+                                        SizedBox(height: 8),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            await _pickDateTime(true);
+                                          },
+                                          style: TextButton.styleFrom(
+                                              backgroundColor: Colors.white
+                                                  .withOpacity(0.6)),
+                                          child: Text(
+                                            "${selectedStartDate.toLocal()}"
+                                                    .split(' ')[0] +
+                                                " ${selectedStartDate.hour}:${selectedStartDate.minute}",
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? const Color.fromARGB(
+                                                      255, 22, 3, 127)
+                                                  : null,
                                             ),
-                                          ],
-                                        ),
-                                        // End Date & Time
-                                        Column(
-                                          children: [
-                                            Text("End Date & Time",
-                                                style: TextStyle(fontSize: 16)),
-                                            SizedBox(height: 8),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                await _pickDateTime(false);
-                                              },
-                                              style: TextButton.styleFrom(
-                                                backgroundColor: Colors.white
-                                                    .withOpacity(0.6),
-                                              ),
-                                              child: Text(
-                                                "${selectedEndDate.toLocal()}"
-                                                        .split(' ')[0] +
-                                                    " ${selectedEndDate.hour}:${selectedEndDate.minute}",
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                              .brightness ==
-                                                          Brightness.dark
-                                                      ? const Color.fromARGB(
-                                                          255, 22, 3, 127)
-                                                      : null,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                          ),
                                         ),
                                       ],
                                     ),
-                                  ),
-
-                                  Center(
-                                    child: Padding(
+                                    // End Date & Time
+                                    Column(
+                                      children: [
+                                        Text("End Date & Time",
+                                            style: TextStyle(fontSize: 16)),
+                                        SizedBox(height: 8),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            await _pickDateTime(false);
+                                          },
+                                          style: TextButton.styleFrom(
+                                              backgroundColor: Colors.white
+                                                  .withOpacity(0.6)),
+                                          child: Text(
+                                            "${selectedEndDate.toLocal()}"
+                                                    .split(' ')[0] +
+                                                " ${selectedEndDate.hour}:${selectedEndDate.minute}",
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                          .brightness ==
+                                                      Brightness.dark
+                                                  ? const Color.fromARGB(
+                                                      255, 22, 3, 127)
+                                                  : null,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
                                       padding: const EdgeInsets.only(top: 16.0),
                                       child: ElevatedButton(
                                         onPressed: _fetchData,
@@ -581,391 +744,291 @@ class _BuffaloDataState extends State<BuffaloData> {
                                                 Colors.white.withOpacity(0.6)),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              // If screen is larger, display inputs in a row
-                              return Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  // Node ID field
-                                  Column(
-                                    children: [
-                                      Text("Node ID (Buffalo ID)",
-                                          style: TextStyle(fontSize: 16)),
-                                      SizedBox(height: 8),
-                                      Container(
-                                        width: 100,
-                                        child: TextField(
-                                          controller: nodeIdController,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              selectedNodeId = value;
-                                            });
-                                          },
-                                          decoration: InputDecoration(
-                                            hintText: "Enter Node ID",
-                                            hintStyle: TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 199, 196, 196),
-                                                fontSize: 12),
-                                            border: InputBorder.none,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // Start Date & Time
-                                  Column(
-                                    children: [
-                                      Text("Start Date & Time",
-                                          style: TextStyle(fontSize: 16)),
-                                      SizedBox(height: 8),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          await _pickDateTime(true);
-                                        },
-                                        style: TextButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.white.withOpacity(0.6)),
-                                        child: Text(
-                                          "${selectedStartDate.toLocal()}"
-                                                  .split(' ')[0] +
-                                              " ${selectedStartDate.hour}:${selectedStartDate.minute}",
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                        Brightness.dark
-                                                    ? const Color.fromARGB(
-                                                        255, 22, 3, 127)
-                                                    : null,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // End Date & Time
-                                  Column(
-                                    children: [
-                                      Text("End Date & Time",
-                                          style: TextStyle(fontSize: 16)),
-                                      SizedBox(height: 8),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          await _pickDateTime(false);
-                                        },
-                                        style: TextButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.white.withOpacity(0.6)),
-                                        child: Text(
-                                          "${selectedEndDate.toLocal()}"
-                                                  .split(' ')[0] +
-                                              " ${selectedEndDate.hour}:${selectedEndDate.minute}",
-                                          style: TextStyle(
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                        Brightness.dark
-                                                    ? const Color.fromARGB(
-                                                        255, 22, 3, 127)
-                                                    : null,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16.0),
-                                    child: ElevatedButton(
-                                      onPressed: _fetchData,
-                                      child: Text(
-                                        "Fetch Data",
-                                        style: TextStyle(
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? const Color.fromARGB(
-                                                  255, 22, 3, 127)
-                                              : null,
-                                        ),
-                                      ),
-                                      style: TextButton.styleFrom(
-                                          backgroundColor:
-                                              Colors.white.withOpacity(0.6)),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          },
+                                  ],
+                                );
+                              }
+                            },
+                          ),
                         ),
-                      ),
 
-                      Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Center(
-                          // Center the entire column
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                maxWidth: 300), // Limit max width of the table
-                            child: Column(
-                              children: [
-                                // Heading Text centered above the table
-                                Center(
-                                  child: Text(
-                                    'Buffalo Activity Data',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                        Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Center(
+                            // Center the entire column
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  maxWidth:
+                                      300), // Limit max width of the table
+                              child: Column(
+                                children: [
+                                  // Heading Text centered above the table
+                                  Center(
+                                    child: Text(
+                                      'Buffalo Activity Data',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
+                                  ),
+                                  SizedBox(height: 16),
+
+                                  // Using Table widget for better control over header styling
+                                  Table(
+                                    border: TableBorder.all(
+                                      color: Colors.white,
+                                      style: BorderStyle.solid,
+                                      width: 2,
+                                    ),
+                                    children: [
+                                      // Header Row with background color
+                                      TableRow(
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                        ),
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Center(
+                                              // Center the "Activity" header
+                                              child: Text(
+                                                "Activity",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Center(
+                                              // Center the "Total Time (hrs)" header
+                                              child: Text(
+                                                "Total Time (hrs)",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // Data Rows
+                                      ...activityTimeData.map((item) {
+                                        return TableRow(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                item.label,
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                "${(item.totalTime ~/ 3600).toString().padLeft(2, '0')} hr "
+                                                "${((item.totalTime % 3600) ~/ 60).toString().padLeft(2, '0')} min "
+                                                "${(item.totalTime % 60).toString().padLeft(2, '0')} sec",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }).toList(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .center, // Center align the content
+                            crossAxisAlignment: CrossAxisAlignment
+                                .center, // Align children to the center
+                            children: [
+                              // Pie Chart Section
+                              SizedBox(
+                                height: 220,
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? MediaQuery.of(context).size.width * 0.4
+                                    : MediaQuery.of(context).size.width * 0.62,
+                                child: PieChart(
+                                  PieChartData(
+                                    sections: generatePieChartData(
+                                        _totalActivityTimes),
+                                    borderData: FlBorderData(show: false),
+                                    sectionsSpace: 0,
+                                    centerSpaceRadius: 40,
+                                    centerSpaceColor:
+                                        Colors.white.withOpacity(0.4),
                                   ),
                                 ),
-                                SizedBox(height: 16),
+                              ),
+                              // Add horizontal spacing between pie chart and legend
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? 10
+                                    : 16,
+                              ),
+                              // Legend Section
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width > 600
+                                    ? MediaQuery.of(context).size.width * 0.3
+                                    : MediaQuery.of(context).size.width * 0.25,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:
+                                      generateLegendData(_totalActivityTimes)
+                                          .map(
+                                            (legendItem) => Padding(
+                                              padding: EdgeInsets.only(
+                                                bottom: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 4.0
+                                                    : 8.0,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 16,
+                                                    height: 16,
+                                                    color: legendItem.color,
+                                                  ),
+                                                  SizedBox(width: 8),
+                                                  Expanded(
+                                                    // Ensures text wraps to the next line if necessary
+                                                    child: Text(
+                                                      legendItem.label,
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
-                                // Using Table widget for better control over header styling
-                                Table(
+                        SizedBox(height: 10),
+                        groupedActivities.isNotEmpty
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: DataTable(
                                   border: TableBorder.all(
                                     color: Colors.white,
                                     style: BorderStyle.solid,
                                     width: 2,
                                   ),
-                                  children: [
-                                    // Header Row with background color
-                                    TableRow(
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
+                                  headingRowColor:
+                                      WidgetStateProperty.all(Colors.blue),
+                                  columns: const <DataColumn>[
+                                    DataColumn(
+                                      label: Center(
+                                        child: Text('Start Time',
+                                            style:
+                                                TextStyle(color: Colors.white)),
                                       ),
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Activity",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Total Time (hrs)",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
                                     ),
-                                    // Data Rows
-                                    ...activityTimeData.map((item) {
-                                      return TableRow(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              item.label,
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "${(item.totalTime ~/ 3600).toString().padLeft(2, '0')} hr "
-                                              "${((item.totalTime % 3600) ~/ 60).toString().padLeft(2, '0')} min "
-                                              "${(item.totalTime % 60).toString().padLeft(2, '0')} sec",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    }).toList(),
+                                    DataColumn(
+                                      label: Center(
+                                        child: Text('End Time',
+                                            style:
+                                                TextStyle(color: Colors.white)),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Center(
+                                        child: Text('Activity Label',
+                                            style:
+                                                TextStyle(color: Colors.white)),
+                                      ),
+                                    ),
                                   ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                                  rows: groupedActivities.map((group) {
+                                    DateTime startTime =
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            int.parse(group[0]['TimeStamp']
+                                                    .toString()) *
+                                                1000);
+                                    DateTime endTime =
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            int.parse(group.last['TimeStamp']
+                                                    .toString()) *
+                                                1000);
+                                    String activityLabel =
+                                        group[0]['ActivityLabel'];
 
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment
-                              .center, // Center align the content
-                          crossAxisAlignment: CrossAxisAlignment
-                              .center, // Align children to the center
-                          children: [
-                            // Pie Chart Section
-                            SizedBox(
-                              height: 220,
-                              width: MediaQuery.of(context).size.width > 600
-                                  ? MediaQuery.of(context).size.width * 0.4
-                                  : MediaQuery.of(context).size.width * 0.62,
-                              child: PieChart(
-                                PieChartData(
-                                  sections:
-                                      generatePieChartData(_totalActivityTimes),
-                                  borderData: FlBorderData(show: false),
-                                  sectionsSpace: 0,
-                                  centerSpaceRadius: 40,
-                                  centerSpaceColor:
-                                      Colors.white.withOpacity(0.4),
-                                ),
-                              ),
-                            ),
-                            // Add horizontal spacing between pie chart and legend
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width > 600
-                                  ? 10
-                                  : 16,
-                            ),
-                            // Legend Section
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width > 600
-                                  ? MediaQuery.of(context).size.width * 0.3
-                                  : MediaQuery.of(context).size.width * 0.25,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children:
-                                    generateLegendData(_totalActivityTimes)
-                                        .map(
-                                          (legendItem) => Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(context)
-                                                          .size
-                                                          .width >
-                                                      600
-                                                  ? 4.0
-                                                  : 8.0,
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                  width: 16,
-                                                  height: 16,
-                                                  color: legendItem.color,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Expanded(
-                                                  // Ensures text wraps to the next line if necessary
-                                                  child: Text(
-                                                    legendItem.label,
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                    return DataRow(cells: [
+                                      DataCell(
+                                        Container(
+                                          width: 180,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            startTime.toLocal().toString(),
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        )
-                                        .toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-                      groupedActivities.isNotEmpty
-                          ? SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                border: TableBorder.all(
-                                  color: Colors.white,
-                                  style: BorderStyle.solid,
-                                  width: 2,
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Container(
+                                          width: 180,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            endTime.toLocal().toString(),
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Container(
+                                          width: 180,
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            activityLabel,
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                    ]);
+                                  }).toList(),
                                 ),
-                                headingRowColor:
-                                    WidgetStateProperty.all(Colors.blue),
-                                columns: const <DataColumn>[
-                                  DataColumn(
-                                    label: Center(
-                                      child: Text('Start Time',
-                                          style:
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Center(
-                                      child: Text('End Time',
-                                          style:
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                  DataColumn(
-                                    label: Center(
-                                      child: Text('Activity Label',
-                                          style:
-                                              TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                ],
-                                rows: groupedActivities.map((group) {
-                                  DateTime startTime =
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          int.parse(group[0]['TimeStamp']
-                                                  .toString()) *
-                                              1000);
-                                  DateTime endTime =
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          int.parse(group.last['TimeStamp']
-                                                  .toString()) *
-                                              1000);
-                                  String activityLabel =
-                                      group[0]['ActivityLabel'];
-
-                                  return DataRow(cells: [
-                                    DataCell(
-                                      Container(
-                                        width: 180,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          startTime.toLocal().toString(),
-                                          style: TextStyle(color: Colors.white),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        width: 180,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          endTime.toLocal().toString(),
-                                          style: TextStyle(color: Colors.white),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        width: 180,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          activityLabel,
-                                          style: TextStyle(color: Colors.white),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                  ]);
-                                }).toList(),
+                              )
+                            : Center(
+                                child: Text(
+                                  "",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 16),
+                                ),
                               ),
-                            )
-                          : Center(
-                              child: Text(
-                                "",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16),
-                              ),
-                            ),
-                    ],
+                        SizedBox(height: 66),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           Positioned(
             bottom: 16,
             right: 16, // Extreme right position
