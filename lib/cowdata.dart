@@ -467,6 +467,9 @@ class _CowDataState extends State<CowData> {
 
                   backgroundColor: Colors.transparent,
                   elevation: 0, // Remove shadow of the AppBar
+                  iconTheme: IconThemeData(
+                    color: Colors.white, // Set the back arrow color to white
+                  ),
                   actions: [],
                 ),
 
