@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
+import 'themeprovider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
-      title: 'Cloud Sense',
+      title: 'Cloud Sense Viz',
       // theme: ThemeData(
       //   primarySwatch: Colors.blue,
       // ),
@@ -63,24 +64,34 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
+  // Color _mqttdataColor = const Color.fromARGB(255, 235, 232, 232);
+
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
     return LayoutBuilder(builder: (context, constraints) {
       bool isMobile = constraints.maxWidth < 800;
       return Scaffold(
         appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: Colors.grey[900],
+          iconTheme: IconThemeData(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+          backgroundColor: isDarkMode
+              ? const Color.fromARGB(255, 50, 50, 50)
+              : const Color.fromARGB(255, 231, 231, 231),
           title: Row(
             children: [
               isMobile ? SizedBox(width: 10) : SizedBox(width: 80),
-              Icon(Icons.cloud, color: Colors.white, size: isMobile ? 24 : 32),
+              Icon(
+                Icons.cloud,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
               SizedBox(width: isMobile ? 10 : 20),
               Text(
-                'Cloud Sense',
+                'Cloud Sense Viz',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isDarkMode ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: isMobile ? 20 : 32,
                 ),
@@ -92,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                     themeProvider.isDarkMode
                         ? Icons.light_mode
                         : Icons.dark_mode,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                   onPressed: () => themeProvider.toggleTheme(),
                 ),
@@ -102,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                     themeProvider.isDarkMode
                         ? Icons.light_mode
                         : Icons.dark_mode,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                   onPressed: () => themeProvider.toggleTheme(),
                 ),
@@ -118,6 +129,10 @@ class _HomePageState extends State<HomePage> {
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
                   Navigator.pushNamed(context, '/accountinfo');
                 }),
+                // SizedBox(width: 20),
+                // _buildNavButton('MQTT DATA', _mqttdataColor, () {
+                //   Navigator.pushNamed(context, '/mqttdata');
+                // }),
               ],
             ],
           ),
@@ -160,6 +175,13 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
+                    // ListTile(
+                    //   leading: Icon(Icons.login),
+                    //   title: Text('MQTT DATA'),
+                    //   onTap: () {
+                    //     Navigator.pushNamed(context, '/mqttdata');
+                    //   },
+                    // ),
                   ],
                 ),
               )
@@ -192,11 +214,11 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome to Cloud Sense',
+                          'Welcome to Cloud Sense Viz',
                           style: TextStyle(
                             fontFamily: 'OpenSans',
                             fontSize: MediaQuery.of(context).size.width < 800
-                                ? 40
+                                ? 30
                                 : 65,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -206,7 +228,7 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 0.0),
                           child: Text(
-                            "At Cloud Sense, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",
+                            "At Cloud Sense Viz, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",
                             style: TextStyle(
                               fontSize: MediaQuery.of(context).size.width < 800
                                   ? 16
@@ -232,31 +254,44 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         DecoratedBox(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 233, 229, 230),
+                            color: isDarkMode
+                                ? const Color.fromARGB(255, 32, 29, 29)
+                                : const Color.fromARGB(255, 231, 231, 231),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color.fromARGB(255, 194, 196, 194),
-                                spreadRadius: 2,
+                                color: isDarkMode
+                                    ? const Color.fromARGB(255, 196, 194, 194)
+                                    : const Color.fromARGB(255, 32, 29, 29)
+                                        .withOpacity(0.4),
+                                spreadRadius: 1.5,
                                 blurRadius: 5,
                                 offset:
                                     Offset(0, 4), // changes position of shadow
                               ),
                               BoxShadow(
-                                color: const Color.fromARGB(255, 194, 196, 194),
-                                spreadRadius: 2,
+                                color: isDarkMode
+                                    ? const Color.fromARGB(255, 196, 194, 194)
+                                    : const Color.fromARGB(255, 32, 29, 29)
+                                        .withOpacity(0.4),
+                                spreadRadius: 1.5,
                                 blurRadius: 5,
                                 offset: Offset(0, -4), // shadow at the top
                               ),
                               BoxShadow(
-                                color: const Color.fromARGB(255, 194, 196, 194)
-                                    .withOpacity(0.5),
-                                spreadRadius: 2,
+                                color: isDarkMode
+                                    ? const Color.fromARGB(255, 196, 194, 194)
+                                    : const Color.fromARGB(255, 32, 29, 29)
+                                        .withOpacity(0.4),
+                                spreadRadius: 1.5,
                                 blurRadius: 5,
                                 offset: Offset(-4, 0), // shadow at the left
                               ),
                               BoxShadow(
-                                color: const Color.fromARGB(255, 194, 196, 194),
-                                spreadRadius: 2,
+                                color: isDarkMode
+                                    ? const Color.fromARGB(255, 196, 194, 194)
+                                    : const Color.fromARGB(255, 32, 29, 29)
+                                        .withOpacity(0.4),
+                                spreadRadius: 1.5,
                                 blurRadius: 5,
                                 offset: Offset(4, 0), // shadow at the right
                               ),
@@ -272,7 +307,9 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : const Color.fromARGB(255, 0, 0, 0),
                                   ),
                                 ),
                                 SizedBox(height: 16),
@@ -283,7 +320,9 @@ class _HomePageState extends State<HomePage> {
                                         MediaQuery.of(context).size.width < 800
                                             ? 14
                                             : 20,
-                                    color: Colors.black,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                   textAlign: TextAlign.justify,
                                 ),
@@ -332,10 +371,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'At Cloud Sense, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
+                          'At Cloud Sense Viz, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense Viz, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
                           style: TextStyle(
                             fontSize: MediaQuery.of(context).size.width < 800
-                                ? 18
+                                ? 14
                                 : 24,
                             color: Colors.white,
                           ),
@@ -349,7 +388,9 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 0),
 
               Container(
-                color: const Color.fromARGB(255, 10, 10, 10),
+                color: isDarkMode
+                    ? const Color.fromARGB(255, 32, 29, 29)
+                    : const Color.fromARGB(255, 231, 231, 231),
                 width: double.infinity,
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -358,7 +399,7 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'Address : IIT Ropar TIF (AWaDH), 214 / M. Visvesvaraya Block, Indian Institute of Technology Ropar, Rupnagar - 140001, Punjab ',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: isDarkMode ? Colors.white : Colors.black,
                         fontSize: 16,
                       ),
                     ),
@@ -378,7 +419,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: RichText(
                         text: TextSpan(
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                           children: [
                             TextSpan(text: 'Phone : '),
                             TextSpan(
@@ -408,7 +451,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: RichText(
                         text: TextSpan(
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                           children: [
                             TextSpan(text: 'Email : '),
                             TextSpan(
@@ -432,12 +477,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildNavButton(String text, Color color, VoidCallback onPressed) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return MouseRegion(
       onEnter: (_) => setState(() {
         if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
         if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
         if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
-        // if (text == 'CONTACT US') _contactUsColor = Colors.blue;
+        // if (text == 'MQTT DATA') _mqttdataColor = Colors.blue;
       }),
       onExit: (_) => setState(() {
         if (text == 'ABOUT US')
@@ -446,12 +493,19 @@ class _HomePageState extends State<HomePage> {
           _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
         if (text == 'ACCOUNT INFO')
           _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-        // if (text == 'CONTACT US')
-        //   _contactUsColor = const Color.fromARGB(255, 235, 232, 232);
+        // if (text == 'MQTT DATA')
+        //   _mqttdataColor = const Color.fromARGB(255, 235, 232, 232);
       }),
       child: TextButton(
         onPressed: onPressed,
-        child: Text(text, style: TextStyle(color: color)),
+        child: Text(
+          text,
+          style: TextStyle(
+            color:
+                isDarkMode ? Colors.white : Colors.black, // Adjust color here
+            fontWeight: FontWeight.bold, // Optional for better emphasis
+          ),
+        ),
       ),
     );
   }

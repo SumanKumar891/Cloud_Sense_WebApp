@@ -3,6 +3,10 @@ import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
+import 'package:cloud_sense_webapp/cowdata.dart';
+
+import 'package:cloud_sense_webapp/mqttdata.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'HomePage.dart';
@@ -43,9 +47,12 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      title: 'Cloud Sense',
+      title: 'Cloud Sense Viz',
       debugShowCheckedModeBanner: false,
       theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      // themeMode: themeProvider.themeMode,
+      // theme: ThemeData.light(),
+      // darkTheme: ThemeData.dark(),
       initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
@@ -53,12 +60,18 @@ class MyApp extends StatelessWidget {
         '/login': (context) => SignInSignUpScreen(),
         '/accountinfo': (context) => AccountInfoPage(),
         '/devicelist': (context) => DataDisplayPage(),
+        // '/mqttdata': (context) => MQTTDataPage(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',
               sequentialName: null,
               backgroundImagePath: '',
             ),
         '/buffalodata': (context) => BuffaloData(
+              startDateTime: null ?? DateTime.now(),
+              endDateTime: null ?? DateTime.now(),
+              nodeId: '',
+            ),
+        '/cowdata': (context) => CowData(
               startDateTime: null ?? DateTime.now(),
               endDateTime: null ?? DateTime.now(),
               nodeId: '',

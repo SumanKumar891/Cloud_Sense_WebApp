@@ -3,30 +3,30 @@
     "short_name": "Cloud Sense",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#040926",
-    "theme_color": "#040926",
+    "background_color": "#hexcode",
+    "theme_color": "#hexcode",
     "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "web/icons/applogo192.png",
+            "src": "icons/Icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "web/icons/applogo512.png",
+            "src": "icons/Icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "web/icons/maskable-icon192.png",
+            "src": "icons/Icon-maskable-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "web/icons/maskable-icon512.png",
+            "src": "icons/Icon-maskable-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

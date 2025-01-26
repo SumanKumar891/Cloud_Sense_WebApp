@@ -11,7 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html;
-import 'dart:io' as io;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -1790,7 +1789,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       context: context,
       initialDate: _selectedDay,
       firstDate: DateTime(1970),
-      lastDate: DateTime(2025),
+      lastDate: DateTime(2027),
     );
 
     if (picked != null) {

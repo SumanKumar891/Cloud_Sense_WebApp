@@ -1,5 +1,4 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'dart:ui'; // Import for BackdropFilter
@@ -58,6 +57,44 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     super.dispose();
   }
 
+  // Future<void> _signIn() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   try {
+  //     // Sign out the user before trying to sign in again
+  //     try {
+  //       await Amplify.Auth.signOut();
+  //     } catch (e) {
+  //       // Ignore errors from signOut, as the user might not be signed in
+  //     }
+
+  //     SignInResult res = await Amplify.Auth.signIn(
+  //       username: _emailController.text,
+  //       password: _passwordController.text,
+  //     );
+  //     if (res.isSignedIn) {
+  //       SharedPreferences prefs = await SharedPreferences.getInstance();
+  //       await prefs.setString('email', _emailController.text);
+
+  //       Navigator.pushReplacementNamed(context, '/devicelist');
+  //     } else {
+  //       setState(() {
+  //         _errorMessage = 'Sign-in failed';
+  //       });
+  //     }
+  //   } on AuthException catch (e) {
+  //     setState(() {
+  //       _errorMessage = e.message;
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
@@ -81,19 +118,24 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
         Navigator.pushReplacementNamed(context, '/devicelist');
       } else {
-        setState(() {
-          _errorMessage = 'Sign-in failed';
-        });
+        _showSnackbar('Sign-in failed');
       }
     } on AuthException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-      });
+      _showSnackbar(e.message);
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  void _showSnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
 // Method to handle password reset process
@@ -615,7 +657,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              obscureText: _isPasswordVisible,
+              obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle:
@@ -864,7 +906,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              obscureText: _isPasswordVisible,
+              obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle:

@@ -222,6 +222,16 @@ class _CsvDownloaderState extends State<CsvDownloader> {
       try {
         // Use Storage Access Framework for non-web platforms
         await saveCSVFile(csvData, fileName);
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("File downloaded: $fileName")),
+        );
+
+        // Navigate back to the previous screen after a short delay
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error downloading: $e")),

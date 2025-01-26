@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
+import 'package:cloud_sense_webapp/cowdata.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -120,6 +121,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'CPS Lab Sensors'; // All grouped under CPS Lab Sensors
       case 'BF':
         return 'Buffalo Sensors';
+      case 'CS':
+        return 'Cow Sensors';
       default:
         return key;
     }
@@ -353,6 +356,22 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                   ),
                                 ),
                               );
+                            } else if (sensorName.startsWith('CS')) {
+                              // If sensor starts with 'CS', navigate to CowDataPage
+                              String numericNodeId =
+                                  sensorName.replaceAll(RegExp(r'\D'), '');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CowData(
+                                    startDateTime: DateTime.now(),
+                                    endDateTime:
+                                        DateTime.now().add(Duration(days: 1)),
+                                    nodeId:
+                                        numericNodeId, // Pass the sensor ID or name here
+                                  ),
+                                ),
+                              );
                             } else {
                               // Otherwise, navigate to DeviceGraphPage
                               Navigator.push(
@@ -519,6 +538,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'CPS Lab Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Buffalo Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Cow Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);
