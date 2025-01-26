@@ -39,15 +39,25 @@ class _CowDataState extends State<CowData> {
   @override
   void initState() {
     super.initState();
-    selectedStartDate = widget.startDateTime;
-    selectedEndDate = widget.endDateTime;
+    //   selectedStartDate = widget.startDateTime;
+    //   selectedEndDate = widget.endDateTime;
+
+    // Set both start and end date-times to the current date and time
+    final now = DateTime.now();
+    selectedStartDate = now;
+    selectedEndDate = now;
     selectedNodeId = widget.nodeId;
+
+    // Debugging logs
     print("CowData initialized with:");
     print("Start Date: $selectedStartDate");
     print("End Date: $selectedEndDate");
     print("Node ID: $selectedNodeId");
+
     nodeIdController.text =
         selectedNodeId; // Set initial value of Node ID controller
+
+    // Fetch data after initializing the dates
     _fetchData();
   }
 

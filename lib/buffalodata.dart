@@ -39,8 +39,9 @@ class _BuffaloDataState extends State<BuffaloData> {
   @override
   void initState() {
     super.initState();
-    selectedStartDate = widget.startDateTime;
-    selectedEndDate = widget.endDateTime;
+    final now = DateTime.now();
+    selectedStartDate = now;
+    selectedEndDate = now;
     selectedNodeId = widget.nodeId;
     print("BuffaloData initialized with:");
     print("Start Date: $selectedStartDate");
