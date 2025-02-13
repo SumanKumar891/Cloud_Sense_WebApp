@@ -175,13 +175,13 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
-                    // ListTile(
-                    //   leading: Icon(Icons.login),
-                    //   title: Text('MQTT DATA'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/mqttdata');
-                    //   },
-                    // ),
+                    ListTile(
+                      leading: Icon(Icons.login),
+                      title: Text('MQTT DATA'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/mqttdata');
+                      },
+                    ),
                   ],
                 ),
               )

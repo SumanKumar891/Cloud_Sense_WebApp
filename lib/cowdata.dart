@@ -417,12 +417,6 @@ class _CowDataState extends State<CowData> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_isLoading) {
-    //   return Scaffold(
-    //     body: Center(child: CircularProgressIndicator()),
-    //   );
-    // }
-
     // Prepare data for the table with activity time calculation
     final activityTimeData = _totalActivityTimes.entries
         .map((entry) =>

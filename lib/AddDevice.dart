@@ -126,6 +126,9 @@ class _QRScannerPageState extends State<QRScannerPage> {
     } else if (scannedQRCode.startsWith('CS')) {
       sensorType = 'Cow Sensor';
       sensorPrefix = 'CS';
+    } else if (scannedQRCode.startsWith('TH')) {
+      sensorType = 'Temperature Sensor';
+      sensorPrefix = 'TH';
     } else {
       sensorType = 'Unknown Sensor';
       sensorPrefix = ''; // Unknown sensors have no prefix

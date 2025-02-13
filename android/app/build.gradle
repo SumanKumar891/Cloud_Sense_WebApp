@@ -54,6 +54,12 @@ android {
         }
     }
 }
+task deleteLogs {
+    doLast {
+        delete fileTree(dir: project.rootDir, includes: ['**/*.log'])
+    }
+}
+preBuild.dependsOn(deleteLogs)
 
 flutter {
     source = "../.."

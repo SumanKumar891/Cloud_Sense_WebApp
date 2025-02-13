@@ -123,6 +123,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Buffalo Sensors';
       case 'CS':
         return 'Cow Sensors';
+      case 'TH':
+        return 'Temperature Sensors';
       default:
         return key;
     }
@@ -540,6 +542,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'Buffalo Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Cow Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Temperature Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => SignInSignUpScreen(),
         '/accountinfo': (context) => AccountInfoPage(),
         '/devicelist': (context) => DataDisplayPage(),
-        // '/mqttdata': (context) => MQTTDataPage(),
+        // '/mqttdata': (context) => FtpFilesScreen(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',
               sequentialName: null,

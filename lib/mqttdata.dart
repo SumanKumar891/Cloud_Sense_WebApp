@@ -1,156 +1,209 @@
-// import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
-// import 'dart:convert';
-// import 'dart:io';
-// import 'package:path_provider/path_provider.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:universal_html/html.dart'
-//     as html; // For web-specific file downloads
+// // import 'package:flutter/material.dart';
+// // import 'package:http/http.dart' as http;
+// // import 'dart:convert';
 
-// class MQTTDataPage extends StatefulWidget {
-//   @override
-//   _MQTTDataPageState createState() => _MQTTDataPageState();
+// // void main() {
+// //   runApp(MyApp());
+// // }
+
+// // class MyApp extends StatelessWidget {
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     return MaterialApp(
+// //       title: 'FTP File Fetcher',
+// //       theme: ThemeData(
+// //         primarySwatch: Colors.blue,
+// //       ),
+// //       home: FtpFilesScreen(),
+// //     );
+// //   }
+// // }
+
+// // class FtpFilesScreen extends StatefulWidget {
+// //   @override
+// //   _FtpFilesScreenState createState() => _FtpFilesScreenState();
+// // }
+
+// // class _FtpFilesScreenState extends State<FtpFilesScreen> {
+// //   List<String> files = [];
+// //   bool isLoading = false;
+
+// //   @override
+// //   void initState() {
+// //     super.initState();
+// //     fetchFiles();
+// //   }
+
+// //   Future<void> fetchFiles() async {
+// //     setState(() {
+// //       isLoading = true;
+// //     });
+
+// //     try {
+// //       final response =
+// //           await http.get(Uri.parse('http://127.0.0.1:5000/list-files'));
+// //       if (response.statusCode == 200) {
+// //         final data = json.decode(response.body);
+// //         setState(() {
+// //           files = List<String>.from(data['files']);
+// //         });
+// //       } else {
+// //         setState(() {
+// //           files = ['Error fetching files: ${response.statusCode}'];
+// //         });
+// //       }
+// //     } catch (e) {
+// //       print("Error: $e");
+// //       setState(() {
+// //         files = ['Error fetching files'];
+// //       });
+// //     } finally {
+// //       setState(() {
+// //         isLoading = false;
+// //       });
+// //     }
+// //   }
+
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     return Scaffold(
+// //       appBar: AppBar(
+// //         title: Text('FTP File Fetcher'),
+// //       ),
+// //       body: isLoading
+// //           ? Center(child: CircularProgressIndicator())
+// //           : ListView.builder(
+// //               itemCount: files.length,
+// //               itemBuilder: (context, index) {
+// //                 return ListTile(
+// //                   title: Text(files[index]),
+// //                 );
+// //               },
+// //             ),
+// //     );
+// //   }
+// // }
+// import 'package:flutter/material.dart';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
+
+// void main() {
+//   runApp(MyApp());
 // }
 
-// class _MQTTDataPageState extends State<MQTTDataPage> {
-//   String? ipAddress;
-//   List<dynamic> files = [];
-
-//   // Fetch the IP address of the user's PC
-//   Future<void> getIpAddress() async {
-//     try {
-//       final response =
-//           await http.get(Uri.parse('http://localhost:5000/api/ip'));
-
-//       if (response.statusCode == 200) {
-//         var data = json.decode(response.body);
-//         setState(() {
-//           ipAddress = data['ip'];
-//         });
-
-//         if (ipAddress != null) {
-//           fetchFiles(
-//               ipAddress!); // Once the IP is fetched, get the list of files.
-//         }
-//       } else {
-//         throw Exception('Failed to fetch IP');
-//       }
-//     } catch (e) {
-//       print('Error getting IP: $e');
-//     }
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'FTP File Fetcher',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       home: FtpFilesScreen(),
+//     );
 //   }
+// }
 
-//   // Fetch the files/folders from the Flask API dynamically using the fetched IP
-//   Future<void> fetchFiles(String ip) async {
-//     try {
-//       final response = await http.get(Uri.parse('http://$ip:5000/api/files'));
+// class FtpFilesScreen extends StatefulWidget {
+//   @override
+//   _FtpFilesScreenState createState() => _FtpFilesScreenState();
+// }
 
-//       if (response.statusCode == 200) {
-//         var data = json.decode(response.body);
-//         setState(() {
-//           files = data['files'];
-//         });
-
-//         // Print the files and folders to the console
-//         print('Files and Folders at IP $ip:');
-//         for (var file in files) {
-//           print(
-//               'File: ${file['name']} | Type: ${file['is_directory'] ? 'Folder' : 'File'}');
-//         }
-//       } else {
-//         throw Exception('Failed to fetch files');
-//       }
-//     } catch (e) {
-//       print('Error fetching files: $e');
-//     }
-//   }
-
-//   // Function to download a file
-//   Future<void> downloadFile(String filePath, String fileName) async {
-//     final url = 'http://$ipAddress:5000/api/download?path=$filePath';
-
-//     if (kIsWeb) {
-//       // Web-specific logic
-//       try {
-//         html.AnchorElement anchor = html.AnchorElement(href: url)
-//           ..target = 'blank'
-//           ..download = fileName;
-//         anchor.click();
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('Download started for $fileName')),
-//         );
-//       } catch (e) {
-//         print('Error downloading file on web: $e');
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('Error downloading file: $e')),
-//         );
-//       }
-//     } else {
-//       // Android/Desktop-specific logic
-//       try {
-//         final response = await http.get(Uri.parse(url));
-
-//         if (response.statusCode == 200) {
-//           // Get the local directory to save the file
-//           final directory = await getApplicationDocumentsDirectory();
-//           final file = File('${directory.path}/$fileName');
-
-//           // Write the file content to local storage
-//           await file.writeAsBytes(response.bodyBytes);
-
-//           // Notify the user
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(content: Text('Downloaded $fileName')),
-//           );
-//         } else {
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(content: Text('Failed to download $fileName')),
-//           );
-//         }
-//       } catch (e) {
-//         print('Error downloading file: $e');
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('Error downloading file: $e')),
-//         );
-//       }
-//     }
-//   }
+// class _FtpFilesScreenState extends State<FtpFilesScreen> {
+//   Map<String, dynamic>? directoryStructure;
+//   bool isLoading = false;
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     getIpAddress(); // Fetch the IP on initial screen load
+//     fetchDirectoryStructure();
+//   }
+
+//   Future<void> fetchDirectoryStructure() async {
+//     setState(() {
+//       isLoading = true;
+//     });
+
+//     try {
+//       final response =
+//           await http.get(Uri.parse('http://127.0.0.1:5000/list-files'));
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//         setState(() {
+//           directoryStructure = data;
+//         });
+//       } else {
+//         setState(() {
+//           directoryStructure = {
+//             "error":
+//                 "Error fetching directory structure: ${response.statusCode}"
+//           };
+//         });
+//       }
+//     } catch (e) {
+//       print("Error: $e");
+//       setState(() {
+//         directoryStructure = {"error": "Error fetching directory structure"};
+//       });
+//     } finally {
+//       setState(() {
+//         isLoading = false;
+//       });
+//     }
+//   }
+
+//   Widget buildDirectory(dynamic node) {
+//     if (node == null) {
+//       return Center(child: Text("No data available."));
+//     }
+
+//     // Handle error case
+//     if (node is Map<String, dynamic> && node.containsKey("error")) {
+//       return Center(child: Text(node["error"]));
+//     }
+
+//     // Display directories and files
+//     if (node["type"] == "directory") {
+//       return ExpansionTile(
+//         title: Text(node["path"].isEmpty ? "/" : node["path"]),
+//         children: node["children"]
+//             .map<Widget>((child) => buildDirectory(child))
+//             .toList(),
+//       );
+//     } else if (node["type"] == "file") {
+//       return ListTile(
+//         title: Text(node["path"]),
+//         trailing: Icon(Icons.file_download),
+//         onTap: () {
+//           downloadFile(node["path"]);
+//         },
+//       );
+//     } else {
+//       return SizedBox.shrink(); // Fallback for unknown types
+//     }
+//   }
+
+//   Future<void> downloadFile(String filePath) async {
+//     // Implement file download logic here
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Downloading: $filePath')),
+//     );
+//     // Add file download implementation as needed
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //       appBar: AppBar(
-//         title: Text("Files and Folders"),
+//         title: Text('FTP File Fetcher'),
 //       ),
-//       body: ipAddress == null
+//       body: isLoading
 //           ? Center(child: CircularProgressIndicator())
-//           : files.isEmpty
-//               ? Center(child: Text('No files found!'))
-//               : ListView.builder(
-//                   itemCount: files.length,
-//                   itemBuilder: (context, index) {
-//                     var file = files[index];
-//                     return ListTile(
-//                       title: Text(file['name']),
-//                       subtitle: Text(file['is_directory'] ? 'Folder' : 'File'),
-//                       trailing: file['is_directory']
-//                           ? null
-//                           : IconButton(
-//                               icon: Icon(Icons.download),
-//                               onPressed: () {
-//                                 downloadFile(file['path'], file['name']);
-//                               },
-//                             ),
-//                     );
-//                   },
-//                 ),
+//           : SingleChildScrollView(
+//               child: directoryStructure != null
+//                   ? buildDirectory(directoryStructure)
+//                   : Center(child: Text('No directory structure available')),
+//             ),
 //     );
 //   }
 // }

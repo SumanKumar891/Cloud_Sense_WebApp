@@ -57,44 +57,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     super.dispose();
   }
 
-  // Future<void> _signIn() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-
-  //   try {
-  //     // Sign out the user before trying to sign in again
-  //     try {
-  //       await Amplify.Auth.signOut();
-  //     } catch (e) {
-  //       // Ignore errors from signOut, as the user might not be signed in
-  //     }
-
-  //     SignInResult res = await Amplify.Auth.signIn(
-  //       username: _emailController.text,
-  //       password: _passwordController.text,
-  //     );
-  //     if (res.isSignedIn) {
-  //       SharedPreferences prefs = await SharedPreferences.getInstance();
-  //       await prefs.setString('email', _emailController.text);
-
-  //       Navigator.pushReplacementNamed(context, '/devicelist');
-  //     } else {
-  //       setState(() {
-  //         _errorMessage = 'Sign-in failed';
-  //       });
-  //     }
-  //   } on AuthException catch (e) {
-  //     setState(() {
-  //       _errorMessage = e.message;
-  //     });
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
-
   Future<void> _signIn() async {
     setState(() {
       _isLoading = true;
@@ -372,14 +334,45 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       _emailToVerify = _emailController.text;
       _showVerificationDialog();
     } on UsernameExistsException {
-      setState(() {
-        _errorMessage =
-            'An account with this email already exists. Please log in or use a different email to sign up.';
-      });
+      // If the username already exists, attempt to resend the verification code
+      try {
+        await Amplify.Auth.resendSignUpCode(username: _emailController.text);
+        // Inform the user to check their email for the new verification code
+        _emailToVerify = _emailController.text;
+        _showVerificationDialog();
+      } on AuthException catch (e) {
+        // Handle failure to resend the code
+        setState(() {
+          _errorMessage = e.message;
+        });
+      }
     } on AuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
       });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _resendVerificationCode() async {
+    if (_emailToVerify == null) {
+      _showSnackbar(
+          'Please provide your email to resend the verification code.');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Amplify.Auth.resendSignUpCode(username: _emailToVerify!);
+      _showSnackbar('Verification code has been resent to your email.');
+    } on AuthException catch (e) {
+      _showSnackbar(e.message);
     } finally {
       setState(() {
         _isLoading = false;
@@ -440,6 +433,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             ],
           ),
           actions: [
+            TextButton(
+              onPressed: () {
+                _resendVerificationCode();
+              },
+              child: Text('Resend Code'),
+            ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();

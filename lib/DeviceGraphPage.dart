@@ -62,6 +62,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> coddata = [];
   List<ChartData> boddata = [];
   List<ChartData> phdata = [];
+  List<ChartData> temperattureData = [];
+  List<ChartData> humidittyData = [];
 
   List<Map<String, dynamic>> rainHourlyItems = [];
   List<List<dynamic>> _csvRainRows = [];
@@ -188,7 +190,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         break;
       case 'single':
         startDate = _selectedDay; // Use the selected day as startDate
-        endDate = startDate; // Single day means endDate is same as startDate
+        endDate = startDate;
+        print('Selected Day: $_selectedDay');
+        print('Start Date: $startDate, End Date: $endDate');
+
+        // Single day means endDate is same as startDate
         break;
       default:
         startDate = endDate; // Default to today
@@ -230,6 +236,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('DO')) {
       apiUrl =
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('TH')) {
+      apiUrl =
+          'https://h1rxzbk3j3.execute-api.us-east-1.amazonaws.com/default/TH_Data_API?Device_id=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
@@ -402,6 +411,45 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   ttempData[i].value,
                   dovaluedata[i].value,
                   dopercentagedata[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('TH')) {
+          setState(() {
+            temperattureData = _parsethChartData(data, 'Temperature');
+            humidittyData = _parsethChartData(data, 'Humidity');
+
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainLevelData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+            temmppData = [];
+            humidityyData = [];
+            lightIntensityData = [];
+            windSpeeddData = [];
+
+            rows = [
+              [
+                "Timestamp",
+                "Temperature",
+                "Humidity ",
+              ],
+              for (int i = 0; i < ttempData.length; i++)
+                [
+                  formatter.format(temperattureData[i].timestamp),
+                  temperattureData[i].value,
+                  humidittyData[i].value,
                 ]
             ];
           });
@@ -1184,6 +1232,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  List<ChartData> _parsethChartData(List<dynamic> data, String type) {
+    return data.map((item) {
+      if (item == null) {
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
+      }
+      return ChartData(
+        timestamp: _parsethDate(item['HumanTime'] ?? ''),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
   List<ChartData> _parseWaterChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -1738,6 +1800,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parsethDate(String dateString) {
+    if (dateString.isEmpty) {
+      return DateTime.now();
+    }
+
+    final dateFormat = DateFormat('dd-MM-yyyy HH:mm:ss');
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      print('Date parsing error: $e');
+      return DateTime.now();
+    }
+  }
+
   DateTime _parsesensorDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
@@ -1833,6 +1909,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('TE')) {
       backgroundImagePath = 'assets/tree.jpg';
     } else if (widget.deviceName.startsWith('LU')) {
+      backgroundImagePath = 'assets/tree.jpg';
+    } else if (widget.deviceName.startsWith('TH')) {
       backgroundImagePath = 'assets/tree.jpg';
     } else {
       // For water quality sensor
@@ -2509,6 +2587,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         if (hasNonZeroValues(phdata))
                           _buildChartContainer(
                               'pH', luxData, 'pH', ChartType.line),
+                        if (hasNonZeroValues(temperattureData))
+                          _buildChartContainer('Temperature', temperattureData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(humidittyData))
+                          _buildChartContainer('Humidity', humidittyData,
+                              'Humidity (%)', ChartType.line),
                       ],
                     )
                   ],
