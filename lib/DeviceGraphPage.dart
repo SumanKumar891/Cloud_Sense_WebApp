@@ -445,7 +445,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Temperature",
                 "Humidity ",
               ],
-              for (int i = 0; i < ttempData.length; i++)
+              for (int i = 0; i < temperattureData.length; i++)
                 [
                   formatter.format(temperattureData[i].timestamp),
                   temperattureData[i].value,
@@ -1950,12 +1950,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             child: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                "${widget.sequentialName}",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: MediaQuery.of(context).size.width < 800 ? 18 : 32,
-                  fontWeight: FontWeight.bold,
+              title: Text.rich(
+                TextSpan(
+                  text: widget.sequentialName, // Main title
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: " (${widget.deviceName})", // Device ID in brackets
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width < 800
+                            ? 16
+                            : 30, // Smaller font
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white70, // Slightly dim color
+                      ),
+                    ),
+                  ],
                 ),
               ),
               leading: IconButton(

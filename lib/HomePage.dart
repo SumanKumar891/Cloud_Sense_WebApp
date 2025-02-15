@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
-import 'themeprovider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -175,13 +174,13 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
-                    ListTile(
-                      leading: Icon(Icons.login),
-                      title: Text('MQTT DATA'),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/mqttdata');
-                      },
-                    ),
+                    // ListTile(
+                    //   leading: Icon(Icons.login),
+                    //   title: Text('MQTT DATA'),
+                    //   onTap: () {
+                    //     Navigator.pushNamed(context, '/mqttdata');
+                    //   },
+                    // ),
                   ],
                 ),
               )

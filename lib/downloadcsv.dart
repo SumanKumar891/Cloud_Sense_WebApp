@@ -68,6 +68,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('DO')) {
       apiUrl =
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceId=$deviceId&startdate=$startDate&enddate=$endDate';
+    } else if (widget.deviceName.startsWith('TH')) {
+      apiUrl =
+          'https://h1rxzbk3j3.execute-api.us-east-1.amazonaws.com/default/TH_Data_API?Device_id=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
@@ -147,6 +150,17 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['DO Percentage'],
           ]);
         });
+      } else if (widget.deviceName.startsWith('TH')) {
+        _csvRows.add(["Timestamp", "Temperature", "Humidity"]);
+
+        // Assuming 'data' is a list of JSON objects
+        for (var item in data) {
+          _csvRows.add([
+            item['HumanTime'], // Correct key reference
+            item['Temperature'], // Correct key reference
+            item['Humidity'], // Correct key reference
+          ]);
+        }
       } else if (widget.deviceName.startsWith('LU')) {
         _csvRows.add([
           "Timestamp",
