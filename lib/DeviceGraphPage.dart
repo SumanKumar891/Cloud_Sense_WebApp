@@ -2756,19 +2756,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       child: Builder(
                         builder: (BuildContext context) {
                           final screenWidth = MediaQuery.of(context).size.width;
-
-                          // Define common properties
                           double boxSize;
                           double textSize;
                           double spacing;
 
                           if (screenWidth < 800) {
-                            // For smaller screens (e.g., mobile devices)
                             boxSize = 15.0;
                             textSize = 15.0;
                             spacing = 12.0;
-
-                            // Row layout for small screens
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -2792,12 +2787,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               ),
                             );
                           } else {
-                            // For larger screens (e.g., PCs and laptops)
                             boxSize = 20.0;
                             textSize = 16.0;
                             spacing = 45.0;
-
-                            // Row layout for larger screens
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -2838,11 +2830,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         labelStyle: TextStyle(color: Colors.white),
                         labelRotation: 70,
                         edgeLabelPlacement: EdgeLabelPlacement.shift,
-                        intervalType: DateTimeIntervalType
-                            .minutes, // Adjust based on your data frequency
-
+                        intervalType:
+                            DateTimeIntervalType.auto, // Changed to auto
+                        autoScrollingDelta: 100, // Added autoScrollingDelta
+                        autoScrollingMode:
+                            AutoScrollingMode.end, // Added autoScrollingMode
+                        enableAutoIntervalOnZooming:
+                            true, // Added enableAutoIntervalOnZooming
                         majorGridLines: MajorGridLines(width: 1.0),
-                        // interval: 10,
                       ),
                       primaryYAxis: NumericAxis(
                         labelStyle: TextStyle(color: Colors.white),
@@ -2856,8 +2851,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                       tooltipBehavior: TooltipBehavior(
                         enable: true,
-                        duration:
-                            4000, // Tooltip will remain for 4 seconds (4000 milliseconds)
+                        duration: 4000,
                         builder: (dynamic data, dynamic point, dynamic series,
                             int pointIndex, int seriesIndex) {
                           final ChartData chartData = data as ChartData;
@@ -2865,8 +2859,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             padding: EdgeInsets.all(8),
                             color: const Color.fromARGB(127, 0, 0, 0),
                             constraints: BoxConstraints(
-                              maxWidth: 200, // Adjust the max width as needed
-                              maxHeight: 60, // Adjust the max height as needed
+                              maxWidth: 200,
+                              maxHeight: 60,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2888,14 +2882,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           );
                         },
                       ),
-                      // tooltipBehavior: _tooltipBehavior,
                       zoomPanBehavior: ZoomPanBehavior(
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
                         enableMouseWheelZooming: true,
                       ),
-
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
                       ],
@@ -2905,7 +2897,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ),
             ),
           )
-        : Container(); // Return empty container if no data
+        : Container();
   }
 
   Widget _buildColorBox(
