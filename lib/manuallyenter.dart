@@ -1,47 +1,34 @@
-import 'package:cloud_sense_webapp/manuallyenter.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'shareddevice.dart'; // Shared utilities file
 
-class QRScannerPage extends StatefulWidget {
+class ManualEntryPage extends StatefulWidget {
   final Map<String, List<String>> devices;
 
-  QRScannerPage({required this.devices});
+  ManualEntryPage({required this.devices});
 
   @override
-  _QRScannerPageState createState() => _QRScannerPageState();
+  _ManualEntryPageState createState() => _ManualEntryPageState();
 }
 
-class _QRScannerPageState extends State<QRScannerPage> {
-  String? scannedQRCode;
-  String message = "Position the QR code inside the scanner";
-  late MobileScannerController _controller;
+class _ManualEntryPageState extends State<ManualEntryPage> {
+  TextEditingController deviceIdController = TextEditingController();
   String? _email;
+  String message = "";
   Color messageColor = Colors.teal;
 
   @override
   void initState() {
     super.initState();
-    _controller = MobileScannerController();
     _loadEmail();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    deviceIdController.dispose();
     super.dispose();
-  }
-
-  void resetScanner() {
-    setState(() {
-      scannedQRCode = null;
-      message = "Position the QR code inside the scanner";
-      _controller.stop();
-      _controller.start();
-    });
   }
 
   Future<void> _loadEmail() async {
@@ -72,7 +59,6 @@ class _QRScannerPageState extends State<QRScannerPage> {
             TextButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.pop(context);
                 Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
@@ -116,69 +102,61 @@ class _QRScannerPageState extends State<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('QR Scanner'),
+        title: Text('Add Device Manually'),
         backgroundColor: Colors.teal,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ManualEntryPage(devices: widget.devices),
-                ),
-              );
-            },
-          ),
-        ],
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.teal, width: 4),
-              ),
-              child: MobileScanner(
-                controller: _controller,
-                allowDuplicates: false,
-                onDetect: (barcode, args) {
-                  final String? code = barcode.rawValue;
-                  if (code != null && code != scannedQRCode) {
-                    setState(() {
-                      scannedQRCode = code;
-                      message = "Detected QR Code";
-                    });
-                    _controller.stop();
-                    DeviceUtils.showConfirmationDialog(
-                      context: context,
-                      deviceId: code,
-                      devices: widget.devices,
-                      onConfirm: () async {
-                        await _addDevice(code);
-                        await _showSuccessMessage();
-                      },
-                    );
-                  }
-                },
+            SizedBox(height: 40),
+            TextField(
+              controller: deviceIdController,
+              decoration: InputDecoration(
+                labelText: 'Enter Device ID',
+                border: OutlineInputBorder(),
+                helperText: 'Enter the device ID (e.g., WD101, CL102, TH200)',
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: resetScanner,
-              child: Text('Scan Again'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.teal,
+            Center(
+              // Centering the button
+              child: SizedBox(
+                width: 150, // Set width to make it smaller
+                child: ElevatedButton(
+                  onPressed: () {
+                    String deviceId = deviceIdController.text.trim();
+                    if (deviceId.isNotEmpty) {
+                      DeviceUtils.showConfirmationDialog(
+                        context: context,
+                        deviceId: deviceId,
+                        devices: widget.devices,
+                        onConfirm: () async {
+                          await _addDevice(deviceId);
+                          await _showSuccessMessage();
+                        },
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please enter a valid device ID'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Add Device'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.teal,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
               ),
             ),
           ],

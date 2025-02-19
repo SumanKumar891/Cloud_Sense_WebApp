@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
+import 'package:cloud_sense_webapp/manuallyenter.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -126,7 +127,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'TH':
         return 'Temperature Sensors';
       default:
-        return key;
+        return 'Unknown Sensors';
     }
   }
 
@@ -419,14 +420,15 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Icon(
-                  Icons.add,
-                  size: 80,
+              Text(
+                'Add New Device',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
+              SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -443,7 +445,28 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   );
                 },
                 child: Text(
-                  'Add Device',
+                  'Scan QR Code',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManualEntryPage(
+                        devices: _deviceCategories,
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Add Manually',
                   style: TextStyle(fontSize: 16),
                 ),
               ),
