@@ -1245,7 +1245,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
-        timestamp: _parsedoDate(item['HumanTime']),
+        timestamp: _parsethDate(item['HumanTime']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
