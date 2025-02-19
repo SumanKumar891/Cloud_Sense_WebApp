@@ -68,6 +68,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> humidittyData = [];
 
   bool isShiftPressed = false;
+  late final FocusNode _focusNode;
 
   List<Map<String, dynamic>> rainHourlyItems = [];
   List<List<dynamic>> _csvRainRows = [];
@@ -110,6 +111,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     _fetchDataForRange('single');
     _loadLocationFromPrefs();
+    _focusNode = FocusNode();
   }
 
   Future<void> _fetchDeviceDetails() async {
@@ -2830,87 +2832,130 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                     ),
                   Expanded(
-                    child: SfCartesianChart(
-                      plotAreaBackgroundColor:
-                          const Color.fromARGB(100, 0, 0, 0),
-                      primaryXAxis: DateTimeAxis(
-                        dateFormat: DateFormat('MM/dd hh:mm a'),
-                        title: AxisTitle(
-                          text: 'Time',
-                          textStyle: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        labelStyle: TextStyle(color: Colors.white),
-                        labelRotation: 70,
-                        edgeLabelPlacement: EdgeLabelPlacement.shift,
-                        intervalType: DateTimeIntervalType
-                            .minutes, // Adjust based on your data frequency
-
-                        majorGridLines: MajorGridLines(width: 1.0),
-                        // interval: 10,
-                      ),
-                      primaryYAxis: NumericAxis(
-                        labelStyle: TextStyle(color: Colors.white),
-                        title: AxisTitle(
-                          text: yAxisTitle,
-                          textStyle: TextStyle(
-                              fontWeight: FontWeight.w200, color: Colors.white),
-                        ),
-                        axisLine: AxisLine(width: 1),
-                        majorGridLines: MajorGridLines(width: 0),
-                      ),
-                      tooltipBehavior: TooltipBehavior(
-                        enable: true,
-                        duration:
-                            4000, // Tooltip will remain for 4 seconds (4000 milliseconds)
-                        builder: (dynamic data, dynamic point, dynamic series,
-                            int pointIndex, int seriesIndex) {
-                          final ChartData chartData = data as ChartData;
-                          return Container(
-                            padding: EdgeInsets.all(8),
-                            color: const Color.fromARGB(127, 0, 0, 0),
-                            constraints: BoxConstraints(
-                              maxWidth: 200, // Adjust the max width as needed
-                              maxHeight: 60, // Adjust the max height as needed
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${chartData.timestamp}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                    child: Focus(
+                      autofocus: true,
+                      child: RawKeyboardListener(
+                        focusNode: _focusNode,
+                        autofocus: true,
+                        onKey: (RawKeyEvent event) {
+                          if (event is RawKeyDownEvent &&
+                              (event.logicalKey ==
+                                      LogicalKeyboardKey.shiftLeft ||
+                                  event.logicalKey ==
+                                      LogicalKeyboardKey.shiftRight)) {
+                            setState(() {
+                              isShiftPressed = true;
+                            });
+                          } else if (event is RawKeyUpEvent &&
+                              (event.logicalKey ==
+                                      LogicalKeyboardKey.shiftLeft ||
+                                  event.logicalKey ==
+                                      LogicalKeyboardKey.shiftRight)) {
+                            setState(() {
+                              isShiftPressed = false;
+                            });
+                          }
+                        },
+                        child: MouseRegion(
+                          onEnter: (_) => _focusNode.requestFocus(),
+                          child: Listener(
+                            onPointerSignal: (PointerSignalEvent event) {
+                              print(
+                                  "Pointer Signal Event: $event | Shift Pressed: $isShiftPressed");
+                              if (event is PointerScrollEvent &&
+                                  isShiftPressed) {
+                                print("Zooming...");
+                                // No need to return early; let ZoomPanBehavior handle it
+                              }
+                            },
+                            child: SfCartesianChart(
+                              plotAreaBackgroundColor:
+                                  const Color.fromARGB(100, 0, 0, 0),
+                              primaryXAxis: DateTimeAxis(
+                                dateFormat: DateFormat('MM/dd hh:mm a'),
+                                title: AxisTitle(
+                                  text: 'Time',
+                                  textStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
                                 ),
-                                Text(
-                                  'Value: ${chartData.value}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
+                                labelStyle: TextStyle(color: Colors.white),
+                                labelRotation: 70,
+                                edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                intervalType: DateTimeIntervalType.auto,
+                                autoScrollingDelta: 100,
+                                autoScrollingMode: AutoScrollingMode.end,
+                                enableAutoIntervalOnZooming: true,
+                                majorGridLines: MajorGridLines(width: 1.0),
+                              ),
+                              primaryYAxis: NumericAxis(
+                                labelStyle: TextStyle(color: Colors.white),
+                                title: AxisTitle(
+                                  text: yAxisTitle,
+                                  textStyle: TextStyle(
+                                      fontWeight: FontWeight.w200,
+                                      color: Colors.white),
                                 ),
+                                axisLine: AxisLine(width: 1),
+                                majorGridLines: MajorGridLines(width: 0),
+                              ),
+                              tooltipBehavior: TooltipBehavior(
+                                enable: true,
+                                duration: 4000,
+                                builder: (dynamic data,
+                                    dynamic point,
+                                    dynamic series,
+                                    int pointIndex,
+                                    int seriesIndex) {
+                                  final ChartData chartData = data as ChartData;
+                                  return Container(
+                                    padding: EdgeInsets.all(8),
+                                    color: const Color.fromARGB(127, 0, 0, 0),
+                                    constraints: BoxConstraints(
+                                      maxWidth: 200,
+                                      maxHeight: 60,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${chartData.timestamp}',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          'Value: ${chartData.value}',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              zoomPanBehavior: ZoomPanBehavior(
+                                zoomMode: ZoomMode.x,
+                                enablePanning: true,
+                                enablePinching: true,
+                                enableMouseWheelZooming: isShiftPressed,
+                              ),
+                              series: <ChartSeries<ChartData, DateTime>>[
+                                _getChartSeries(chartType, data, title),
                               ],
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                      // tooltipBehavior: _tooltipBehavior,
-                      zoomPanBehavior: ZoomPanBehavior(
-                        zoomMode: ZoomMode.x,
-                        enablePanning: true,
-                        enablePinching: true,
-                        enableMouseWheelZooming: true,
-                      ),
-
-                      series: <ChartSeries<ChartData, DateTime>>[
-                        _getChartSeries(chartType, data, title),
-                      ],
                     ),
                   ),
                 ],
               ),
             ),
           )
-        : Container(); // Return empty container if no data
+        : Container();
   }
 
   Widget _buildColorBox(
