@@ -70,7 +70,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceId=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('TH')) {
       apiUrl =
-          'https://h1rxzbk3j3.execute-api.us-east-1.amazonaws.com/default/TH_Data_API?Device_id=$deviceId&startdate=$startDate&enddate=$endDate';
+          'https://5s3pangtz0.execute-api.us-east-1.amazonaws.com/default/CloudSense_TH_Data_Api_function?deviceid=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
@@ -154,13 +154,13 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _csvRows.add(["Timestamp", "Temperature", "Humidity"]);
 
         // Assuming 'data' is a list of JSON objects
-        for (var item in data) {
+        data['items'].forEach((item) {
           _csvRows.add([
             item['HumanTime'], // Correct key reference
             item['Temperature'], // Correct key reference
             item['Humidity'], // Correct key reference
           ]);
-        }
+        });
       } else if (widget.deviceName.startsWith('LU')) {
         _csvRows.add([
           "Timestamp",
