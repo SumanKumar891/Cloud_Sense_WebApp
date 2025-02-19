@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:cloud_sense_webapp/downloadcsv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -64,6 +66,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> phdata = [];
   List<ChartData> temperattureData = [];
   List<ChartData> humidittyData = [];
+
+  bool isShiftPressed = false;
 
   List<Map<String, dynamic>> rainHourlyItems = [];
   List<List<dynamic>> _csvRainRows = [];
@@ -238,7 +242,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('TH')) {
       apiUrl =
-          'https://h1rxzbk3j3.execute-api.us-east-1.amazonaws.com/default/TH_Data_API?Device_id=$deviceId&startdate=$startdate&enddate=$enddate';
+          'https://5s3pangtz0.execute-api.us-east-1.amazonaws.com/default/CloudSense_TH_Data_Api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
@@ -1232,13 +1236,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
-  List<ChartData> _parsethChartData(List<dynamic> data, String type) {
-    return data.map((item) {
+  List<ChartData> _parsethChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
       if (item == null) {
         return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
       return ChartData(
-        timestamp: _parsethDate(item['HumanTime'] ?? ''),
+        timestamp: _parsedoDate(item['HumanTime']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -2756,14 +2761,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       child: Builder(
                         builder: (BuildContext context) {
                           final screenWidth = MediaQuery.of(context).size.width;
+
+                          // Define common properties
                           double boxSize;
                           double textSize;
                           double spacing;
 
                           if (screenWidth < 800) {
+                            // For smaller screens (e.g., mobile devices)
                             boxSize = 15.0;
                             textSize = 15.0;
                             spacing = 12.0;
+
+                            // Row layout for small screens
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -2787,9 +2797,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               ),
                             );
                           } else {
+                            // For larger screens (e.g., PCs and laptops)
                             boxSize = 20.0;
                             textSize = 16.0;
                             spacing = 45.0;
+
+                            // Row layout for larger screens
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -2830,14 +2843,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         labelStyle: TextStyle(color: Colors.white),
                         labelRotation: 70,
                         edgeLabelPlacement: EdgeLabelPlacement.shift,
-                        intervalType:
-                            DateTimeIntervalType.auto, // Changed to auto
-                        autoScrollingDelta: 100, // Added autoScrollingDelta
-                        autoScrollingMode:
-                            AutoScrollingMode.end, // Added autoScrollingMode
-                        enableAutoIntervalOnZooming:
-                            true, // Added enableAutoIntervalOnZooming
+                        intervalType: DateTimeIntervalType
+                            .minutes, // Adjust based on your data frequency
+
                         majorGridLines: MajorGridLines(width: 1.0),
+                        // interval: 10,
                       ),
                       primaryYAxis: NumericAxis(
                         labelStyle: TextStyle(color: Colors.white),
@@ -2851,7 +2861,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                       tooltipBehavior: TooltipBehavior(
                         enable: true,
-                        duration: 4000,
+                        duration:
+                            4000, // Tooltip will remain for 4 seconds (4000 milliseconds)
                         builder: (dynamic data, dynamic point, dynamic series,
                             int pointIndex, int seriesIndex) {
                           final ChartData chartData = data as ChartData;
@@ -2859,8 +2870,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             padding: EdgeInsets.all(8),
                             color: const Color.fromARGB(127, 0, 0, 0),
                             constraints: BoxConstraints(
-                              maxWidth: 200,
-                              maxHeight: 60,
+                              maxWidth: 200, // Adjust the max width as needed
+                              maxHeight: 60, // Adjust the max height as needed
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2882,12 +2893,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           );
                         },
                       ),
+                      // tooltipBehavior: _tooltipBehavior,
                       zoomPanBehavior: ZoomPanBehavior(
                         zoomMode: ZoomMode.x,
                         enablePanning: true,
                         enablePinching: true,
                         enableMouseWheelZooming: true,
                       ),
+
                       series: <ChartSeries<ChartData, DateTime>>[
                         _getChartSeries(chartType, data, title),
                       ],
@@ -2897,7 +2910,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ),
             ),
           )
-        : Container();
+        : Container(); // Return empty container if no data
   }
 
   Widget _buildColorBox(
