@@ -15,6 +15,7 @@ class DeviceUtils {
     if (deviceId.startsWith('BF')) return 'BF Sensor';
     if (deviceId.startsWith('CS')) return 'Cow Sensor';
     if (deviceId.startsWith('TH')) return 'Temperature Sensor';
+    if (deviceId.startsWith('NH')) return 'Ammonia Sensor';
     return 'Unknown Sensor';
   }
 
@@ -35,7 +36,8 @@ class DeviceUtils {
       'AC',
       'BF',
       'CS',
-      'TH'
+      'TH',
+      'NH'
     ];
     // Return 'UN' for unknown sensors
     return validPrefixes.contains(prefix) ? prefix : 'UN';
@@ -129,6 +131,7 @@ class DeviceUtils {
     'AC',
     'BF',
     'CS',
-    'TH'
+    'TH',
+    'NH',
   ];
 }

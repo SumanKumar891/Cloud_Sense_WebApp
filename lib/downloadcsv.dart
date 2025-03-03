@@ -71,6 +71,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('TH')) {
       apiUrl =
           'https://5s3pangtz0.execute-api.us-east-1.amazonaws.com/default/CloudSense_TH_Data_Api_function?deviceid=$deviceId&startdate=$startDate&enddate=$endDate';
+    } else if (widget.deviceName.startsWith('NH')) {
+      apiUrl =
+          'https://qgbwurafri.execute-api.us-east-1.amazonaws.com/default/CloudSense_NH_Data_Api_function?deviceid=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
@@ -159,6 +162,16 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['HumanTime'], // Correct key reference
             item['Temperature'], // Correct key reference
             item['Humidity'], // Correct key reference
+          ]);
+        });
+      } else if (widget.deviceName.startsWith('NH')) {
+        _csvRows.add(
+            ['Timestamp', 'Ammonia', "Temperature", "Humidity"]); // Add headers
+        data['items'].forEach((item) {
+          _csvRows.add([
+            item['HumanTime'], item['AmmoniaPPM'],
+            item['Temperature'], // Correct key reference
+            item['Humidity'],
           ]);
         });
       } else if (widget.deviceName.startsWith('LU')) {

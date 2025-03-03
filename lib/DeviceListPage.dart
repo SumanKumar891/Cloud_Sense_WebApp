@@ -126,6 +126,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Cow Sensors';
       case 'TH':
         return 'Temperature Sensors';
+      case 'NH':
+        return 'Ammonia Sensors';
       default:
         return 'Unknown Sensors';
     }
@@ -431,7 +433,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                   backgroundColor: Colors.black,
                 ),
                 onPressed: () {
@@ -452,7 +454,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                   backgroundColor: Colors.black,
                 ),
                 onPressed: () {
@@ -565,6 +567,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'Buffalo Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Cow Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Ammonia Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Temperature Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);

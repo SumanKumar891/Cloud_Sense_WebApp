@@ -66,6 +66,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> phdata = [];
   List<ChartData> temperattureData = [];
   List<ChartData> humidittyData = [];
+  List<ChartData> ammoniaData = [];
+  List<ChartData> temperaturedata = [];
+  List<ChartData> humiditydata = [];
 
   bool isShiftPressed = false;
   late final FocusNode _focusNode;
@@ -79,6 +82,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   bool _isHovering = false;
   String? _activeButton;
   String _currentChlorineValue = '0.00';
+  String _currentAmmoniaValue = '0.00';
   bool _isLoading = false;
   String _lastSelectedRange = 'single'; // Default to single
   bool isWindDirectionValid(String? windDirection) {
@@ -176,6 +180,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       temperaturData.clear();
       humData.clear();
       luxData.clear();
+      ammoniaData.clear();
+      temperaturedata.clear;
+      humiditydata.clear;
       _weeklyPrecipitationData.clear();
     });
     DateTime startDate;
@@ -245,6 +252,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('TH')) {
       apiUrl =
           'https://5s3pangtz0.execute-api.us-east-1.amazonaws.com/default/CloudSense_TH_Data_Api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('NH')) {
+      apiUrl =
+          'https://qgbwurafri.execute-api.us-east-1.amazonaws.com/default/CloudSense_NH_Data_Api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('LU') ||
         widget.deviceName.startsWith('TE') ||
         widget.deviceName.startsWith('AC')) {
@@ -456,6 +466,66 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   formatter.format(temperattureData[i].timestamp),
                   temperattureData[i].value,
                   humidittyData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('NH')) {
+          setState(() {
+            ammoniaData = _parseammoniaChartData(data, 'AmmoniaPPM');
+            temperaturedata = _parseammoniaChartData(data, 'Temperature');
+            humiditydata = _parseammoniaChartData(data, 'Humidity');
+
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainLevelData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            electrodeSignalData = [];
+            hypochlorousData = [];
+            temppData = [];
+            residualchlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+            temmppData = [];
+            humidityyData = [];
+            lightIntensityData = [];
+            windSpeeddData = [];
+            ttempData = [];
+            dovaluedata = [];
+            dopercentagedata = [];
+            temperaturData = [];
+            humData = [];
+            luxData = [];
+            coddata = [];
+            boddata = [];
+            phdata = [];
+            temperattureData = [];
+            humidittyData = [];
+
+            // if (ammoniaData.isNotEmpty) {
+            //   _currentAmmoniaValue = ammoniaData.last.value.toStringAsFixed(2);
+            // }
+            rows = [
+              [
+                "Timestamp",
+                "Ammonia",
+                "Temperature",
+                "Humidity ",
+              ],
+              for (int i = 0; i < ammoniaData.length; i++)
+                [
+                  formatter.format(ammoniaData[i].timestamp),
+                  ammoniaData[i].value,
+                  temperaturedata[i].value,
+                  humiditydata[i].value,
                 ]
             ];
           });
@@ -1253,6 +1323,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }).toList();
   }
 
+  List<ChartData> _parseammoniaChartData(
+      Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
+      }
+      return ChartData(
+        timestamp: _parseammoniaDate(item['HumanTime']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
   List<ChartData> _parseWaterChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -1758,6 +1844,132 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+// Calculate average, min, and max values
+  Map<String, List<double?>> _calculateNHStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        // 'average': [null],
+        'current': [null],
+        'min': [null],
+        'max': [null],
+      };
+    }
+    // double sum = 0.0;
+    double? current = data.last.value;
+    double min = double.infinity;
+    double max = double.negativeInfinity;
+
+    for (var entry in data) {
+      if (entry.value < min) min = entry.value;
+      if (entry.value > max) max = entry.value;
+    }
+
+    return {
+      'current': [current],
+      'min': [min],
+      'max': [max],
+    };
+  }
+
+  // Create a table displaying statistics
+  Widget buildNHStatisticsTable() {
+    final ammoniaStats = _calculateNHStatistics(ammoniaData);
+    final temppStats = _calculateNHStatistics(temperaturedata);
+    final humStats = _calculateNHStatistics(humiditydata);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 500,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Min',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Max',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                buildDataRow('AMMONIA', ammoniaStats, fontSize),
+                buildDataRow('TEMP', temppStats, fontSize),
+                buildDataRow('HUMIDITY', humStats, fontSize),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  DataRow buildNHDataRow(
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
+              : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
@@ -1800,6 +2012,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   DateTime _parsedoDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
+  DateTime _parseammoniaDate(String dateString) {
+    final dateFormat = DateFormat(
+        'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
     try {
       return dateFormat.parse(dateString);
     } catch (e) {
@@ -2457,11 +2679,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           if (widget.deviceName.startsWith('CL'))
                             _buildCurrentValue('Chlorine Level',
                                 _currentChlorineValue, 'mg/L'),
+                          // if (widget.deviceName.startsWith('NH'))
+                          //   _buildCurrentValue(
+                          //       'Ammonia Value', _currentAmmoniaValue, 'PPM'),
                         ],
                       ),
                     ),
                     if (widget.deviceName.startsWith('WQ'))
                       buildStatisticsTable(),
+                    if (widget.deviceName.startsWith('NH'))
+                      buildNHStatisticsTable(),
                     if (widget.deviceName.startsWith('DO'))
                       buildDOStatisticsTable(),
                     if (widget.deviceName.startsWith('WD211') ||
@@ -2613,6 +2840,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'Temperature (°C)', ChartType.line),
                         if (hasNonZeroValues(humidittyData))
                           _buildChartContainer('Humidity', humidittyData,
+                              'Humidity (%)', ChartType.line),
+                        if (hasNonZeroValues(ammoniaData))
+                          _buildChartContainer('Ammonia', ammoniaData,
+                              'Ammonia (PPM)', ChartType.line),
+                        if (hasNonZeroValues(temperaturedata))
+                          _buildChartContainer('Temperature', temperaturedata,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(humiditydata))
+                          _buildChartContainer('Humidity', humiditydata,
                               'Humidity (%)', ChartType.line),
                       ],
                     )
