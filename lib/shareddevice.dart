@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DeviceUtils {
+  // Determine the sensor type based on the device ID prefix
   static String getSensorType(String deviceId) {
     if (deviceId.startsWith('WD')) return 'Weather Sensor';
     if (deviceId.startsWith('CL') || deviceId.startsWith('BD'))
@@ -19,30 +20,16 @@ class DeviceUtils {
     return 'Unknown Sensor';
   }
 
+  // Extract the sensor prefix from the device ID
   static String getSensorPrefix(String deviceId) {
     if (deviceId.length < 2) return '';
     String prefix = deviceId.substring(0, 2);
-    // List of valid sensor prefixes
-    List<String> validPrefixes = [
-      'WD',
-      'CL',
-      'BD',
-      'SS',
-      'WQ',
-      'WS',
-      'DO',
-      'LU',
-      'TE',
-      'AC',
-      'BF',
-      'CS',
-      'TH',
-      'NH'
-    ];
-    // Return 'UN' for unknown sensors
-    return validPrefixes.contains(prefix) ? prefix : 'UN';
+    return validPrefixes.contains(prefix)
+        ? prefix
+        : 'UN'; // 'UN' for unknown sensors
   }
 
+  // Display a confirmation dialog for adding a device
   static Future<void> showConfirmationDialog({
     required BuildContext context,
     required String deviceId,
@@ -52,69 +39,73 @@ class DeviceUtils {
     String sensorType = getSensorType(deviceId);
     String sensorPrefix = getSensorPrefix(deviceId);
 
-    // Calculate sensor number
+    // Count existing devices of the same type
     final categoryDevices = devices.values
         .expand((deviceList) => deviceList)
-        .where((device) =>
-            // For known sensors, match prefix
-            // For unknown sensors, exclude all known prefixes
-            sensorPrefix == 'UN'
-                ? !validPrefixes.any((prefix) => device.startsWith(prefix))
-                : device.startsWith(sensorPrefix))
+        .where((device) => sensorPrefix == 'UN'
+            ? !validPrefixes.any(
+                (prefix) => device.startsWith(prefix)) // Unknown sensor check
+            : device.startsWith(sensorPrefix))
         .toList();
     int sensorNumber = categoryDevices.length + 1;
 
-    // Check if device exists
+    // Check if the device already exists
     bool deviceExists =
         devices.values.any((deviceList) => deviceList.contains(deviceId));
 
     if (deviceExists) {
-      showDialog<void>(
+      _showDialog(
         context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Device Already Exists'),
-            content: Text('This $sensorType is already added to your account.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
+        title: 'Device Already Exists',
+        content: 'This $sensorType is already added to your account.',
       );
     } else {
-      showDialog<void>(
+      _showDialog(
         context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Confirm Device Addition'),
-            content: Text(
-                'Do you want to add $sensorType $sensorNumber to your account?'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('No'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              TextButton(
-                child: Text('Yes'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  onConfirm();
-                },
-              ),
-            ],
-          );
-        },
+        title: 'Confirm Device Addition',
+        content:
+            'Do you want to add $sensorType $sensorNumber to your account?',
+        actions: [
+          TextButton(
+            child: Text('No'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text('Yes'),
+            onPressed: () {
+              Navigator.pop(context);
+              onConfirm();
+            },
+          ),
+        ],
       );
     }
+  }
+
+  // Generic function to display dialogs
+  static void _showDialog({
+    required BuildContext context,
+    required String title,
+    required String content,
+    List<Widget>? actions,
+  }) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: actions ??
+              [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+        );
+      },
+    );
   }
 
   // List of valid sensor prefixes

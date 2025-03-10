@@ -31,16 +31,13 @@ class _CowDataState extends State<CowData> {
   late DateTime selectedEndDate;
   bool _isHovering = false;
 
-  String selectedNodeId = ''; // Store selected nodeId
-  Map<String, int> _totalActivityTimes = {}; // Store total activity times
-  TextEditingController nodeIdController =
-      TextEditingController(); // Controller for Node ID
+  String selectedNodeId = '';
+  Map<String, int> _totalActivityTimes = {};
+  TextEditingController nodeIdController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    //   selectedStartDate = widget.startDateTime;
-    //   selectedEndDate = widget.endDateTime;
 
     // Set both start and end date-times to the current date and time
     final now = DateTime.now();

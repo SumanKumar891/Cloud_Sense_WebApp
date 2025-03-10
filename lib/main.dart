@@ -1,5 +1,5 @@
+// Import essential packages
 import 'dart:convert';
-
 import 'package:cloud_sense_webapp/AccountInfo.dart';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
@@ -21,17 +21,17 @@ import 'package:url_strategy/url_strategy.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
-// Initialize local notifications
+// Initialize Flutter local notifications plugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-// Background message handler (MUST be a top-level function)
+// Background message handler for Firebase Messaging (required to be top-level)
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("📩 Handling a background message: ${message.messageId}");
 }
 
-// Function to update SNS endpoint with the new FCM token
+// Update SNS endpoint with the latest FCM token via API Gateway
 Future<void> updateSnsEndpoint(String fcmToken) async {
   print("Updating SNS with new FCM token: $fcmToken");
 
@@ -41,7 +41,6 @@ Future<void> updateSnsEndpoint(String fcmToken) async {
       'https://2u9vg092x5.execute-api.us-east-1.amazonaws.com/default/sns_api_fcm_updation';
 
   try {
-    // ✅ Ensure JSON encoding is correct
     var requestBody = jsonEncode({
       'snsEndpointArn': snsEndpointArn,
       'fcmToken': fcmToken,
@@ -49,10 +48,8 @@ Future<void> updateSnsEndpoint(String fcmToken) async {
 
     var response = await http.post(
       Uri.parse(apiGatewayUrl),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: requestBody, // Correct JSON encoding
+      headers: {'Content-Type': 'application/json'},
+      body: requestBody,
     );
 
     if (response.statusCode == 200) {
@@ -61,14 +58,15 @@ Future<void> updateSnsEndpoint(String fcmToken) async {
       print("❌ Failed to update SNS endpoint: ${response.statusCode}");
     }
   } catch (e) {
-    print("⚠️ Error updating SNS endpoint: $e");
+    print("⚠ Error updating SNS endpoint: $e");
   }
 }
 
+// Setup and configure local notifications
 Future<void> setupNotifications() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel',
-    'High Importance Notifications',
+    'high_importance_channel', // Unique ID
+    'High Importance Notifications', // Channel name
     description: 'This channel is used for important notifications.',
     importance: Importance.max,
     playSound: true,
@@ -79,11 +77,9 @@ Future<void> setupNotifications() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  const AndroidInitializationSettings androidInitSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  const InitializationSettings initSettings =
-      InitializationSettings(android: androidInitSettings);
+  const InitializationSettings initSettings = InitializationSettings(
+    android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+  );
 
   await flutterLocalNotificationsPlugin.initialize(initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {
@@ -93,10 +89,11 @@ Future<void> setupNotifications() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setPathUrlStrategy();
+  setPathUrlStrategy(); // Remove # from web app URLs
 
   await setupNotifications();
 
+  // Firebase initialization based on platform
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -113,33 +110,34 @@ void main() async {
     await PushNotifications().initNotifications();
   }
 
-  // Set background message handler for Firebase Messaging
+  // Set up Firebase background message handler
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // Initialize Firebase Messaging instance
+  // Get FCM token and update SNS
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  // Get the FCM token when the app starts and update SNS
   String? token = await messaging.getToken();
   if (token != null) {
     await updateSnsEndpoint(token);
   }
 
-  // Listen for token refreshes and update SNS
+  // Listen for FCM token refreshes
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     await updateSnsEndpoint(newToken);
   });
 
+  // Initialize Amplify for Cognito authentication
   try {
     await Amplify.addPlugin(AmplifyAuthCognito());
     await Amplify.configure(amplifyconfig);
   } catch (e) {
-    print('⚠️ Could not configure Amplify: $e');
+    print('⚠ Could not configure Amplify: $e');
   }
 
+  // Retrieve user's email from shared preferences
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? email = prefs.getString('email');
 
+  // Launch app with theme provider
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
