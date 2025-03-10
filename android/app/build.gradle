@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
@@ -64,3 +67,24 @@ preBuild.dependsOn(deleteLogs)
 flutter {
     source = "../.."
 }
+dependencies {
+    // Firebase Bill of Materials (BOM) for Firebase SDKs
+    implementation platform('com.google.firebase:firebase-bom:33.3.0')  // Firebase BOM ensures consistent versions
+    implementation "com.google.firebase:firebase-analytics"  // Firebase Analytics
+    implementation "com.google.firebase:firebase-auth"  // Firebase Authentication
+    implementation "com.google.firebase:firebase-messaging"  // Firebase Cloud Messaging
+    implementation "com.google.firebase:firebase-inappmessaging-display"  // Firebase In-App Messaging
+    
+    // Android Support Libraries (if needed)
+    implementation 'com.android.support:multidex:1.0.3'  // Enable Multidex support if necessary
+
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion '2.0.21'  // Use Kotlin version you prefer, ensuring compatibility
+            }
+        }
+    }
+}
+
+apply plugin: 'com.google.gms.google-services'  // Apply the Google Services plugin to enable Firebase

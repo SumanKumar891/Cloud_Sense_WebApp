@@ -31,6 +31,44 @@
   <title>Cloud Connect</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+   <!-- Firebase SDK (modular version) -->
+   <script type="module">
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getMessaging } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC8VgXQxru1bzlbLTUvOc4o490gxDc_MDQ",
+      authDomain: "cloudsense-cba8a.firebaseapp.com",
+      projectId: "cloudsense-cba8a",
+      storageBucket: "cloudsense-cba8a.appspot.com",
+      messagingSenderId: "209940213885",
+      appId: "1:209940213885:web:1b68309df786c4c30fc114",
+      measurementId: "G-HMXS0HV32J"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    
+    // Initialize Firebase Messaging
+    const messaging = getMessaging(app);
+
+    // Register service worker for Firebase Cloud Messaging
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('web/firebase-messaging-sw.js')
+        .then(function (registration) {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(function (error) {
+          console.log('Service Worker registration failed:', error);
+        });
+    }
+
+    // You can further add Firebase Messaging logic here, like requesting permissions or receiving messages
+  </script>
   <style id="splash-screen-style">
     html {
       height: 100%
@@ -105,6 +143,7 @@
       <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
   </picture>
   <script src="flutter_bootstrap.js" async=""></script>
+  
 
 
 </body></html>

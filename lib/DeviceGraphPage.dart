@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_sense_webapp/downloadcsv.dart';
+import 'package:cloud_sense_webapp/push_notifications.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -70,6 +72,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> temperaturedata = [];
   List<ChartData> humiditydata = [];
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  bool _hasShownAmmoniaNotification =
+      false; // To prevent repeated notifications
+  double _ammoniaThreshold = 0.0; // Threshold for ammonia alerts
+
   bool isShiftPressed = false;
   late final FocusNode _focusNode;
 
@@ -105,17 +113,60 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
-  double? _latitude;
-  double? _longitude;
-
   @override
   void initState() {
     super.initState();
+    requestPermissions();
     _fetchDeviceDetails();
 
     _fetchDataForRange('single');
-    _loadLocationFromPrefs();
+
     _focusNode = FocusNode();
+    // Initialize notifications
+    _initializeNotifications();
+  }
+
+  Future<void> requestPermissions() async {
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+  }
+
+// Add this method to initialize notifications
+  Future<void> _initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    final DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings();
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+  }
+
+  // Add this method to show notification
+  Future<void> _showAmmoniaAlertNotification(double value) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'ammonia_alerts',
+      'Ammonia Alerts',
+      channelDescription: 'Alerts for high ammonia values',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'High Ammonia Level Alert',
+      'Ammonia level has reached ${value.toStringAsFixed(2)}, exceeding the safe threshold of $_ammoniaThreshold',
+      platformChannelSpecifics,
+    );
   }
 
   Future<void> _fetchDeviceDetails() async {
@@ -513,6 +564,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             // if (ammoniaData.isNotEmpty) {
             //   _currentAmmoniaValue = ammoniaData.last.value.toStringAsFixed(2);
             // }
+// Update ammonia value and check threshold
+            // Check if ammonia value exceeds 25 ppm and trigger notification
+            if (ammoniaData.isNotEmpty) {
+              double currentAmmoniaValue = ammoniaData.last.value;
+              if (currentAmmoniaValue > 0) {
+                // Trigger the notification when ammonia level exceeds 25 ppm
+                PushNotifications()
+                    .sendAmmoniaAlertNotification(currentAmmoniaValue);
+              }
+            }
+
             rows = [
               [
                 "Timestamp",
@@ -789,365 +851,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } catch (e) {
       print('Error fetching rain forecasting data: $e');
     }
-  }
-
-  Future<void> _showWeeklyPrecipitationProbability(
-      double latitude, double longitude) async {
-    try {
-      final apiUrl =
-          'https://api.tomorrow.io/v4/weather/forecast?location=$latitude,$longitude&apikey=VCusVsCI9zp6B89kZv5lxb8zDFI7mtoi';
-
-      final response = await http.get(Uri.parse(apiUrl));
-
-      if (response.statusCode == 200) {
-        final rainData = json.decode(response.body);
-
-        // Extract weekly precipitation probabilities for 7 days
-        List<Map<String, dynamic>> weeklyPrecipitation = [];
-        for (int i = 0; i < 6; i++) {
-          final dayData = rainData['timelines']['daily'][i];
-          final date = dayData['time'];
-          final precipitationProbability =
-              dayData['values']['precipitationProbabilityAvg'] ?? 0.0;
-          final rainIntensity = dayData['values']['rainIntensityAvg'] ?? 0.0;
-
-          weeklyPrecipitation.add({
-            'date': DateFormat('dd-MM-yyyy').format(DateTime.parse(date)),
-            'precipitationProbabilityAvg': precipitationProbability,
-            'rainIntensityAvg': rainIntensity,
-          });
-        }
-
-        // Show the weekly precipitation data in a dialog
-        showDialog(
-          context: context,
-          builder: (context) {
-            double screenWidth = MediaQuery.of(context).size.width;
-            double dialogWidth = screenWidth < 800 ? 300 : 400;
-            double dialogHeight = screenWidth < 800 ? 350 : 350;
-
-            return AlertDialog(
-              title: Center(
-                child: Text('Weekly Rain Forecasting'),
-              ),
-              content: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  width: dialogWidth,
-                  height: dialogHeight,
-                  child: DataTable(
-                    columnSpacing: 20,
-                    horizontalMargin: 10,
-                    columns: [
-                      DataColumn(label: Text('Date')),
-                      DataColumn(label: Text('Avg Rain\nIntensity')),
-                      DataColumn(label: Text('Avg Rain\nProbability')),
-                    ],
-                    rows: weeklyPrecipitation.map((day) {
-                      return DataRow(cells: [
-                        DataCell(Text(day['date'])),
-                        DataCell(Text('${day['rainIntensityAvg']}')),
-                        DataCell(Text('${day['precipitationProbabilityAvg']}')),
-                      ]);
-                    }).toList(),
-                  ),
-                ),
-              ),
-              actionsAlignment: MainAxisAlignment.spaceBetween,
-              actions: [
-                TextButton(
-                  onPressed: () async {
-                    await _showHourlyPrecipitationForWeek();
-                  },
-                  child: Text('Hourly Insights'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Close'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        print('Failed to load weather data');
-      }
-    } catch (e) {
-      print('Error fetching precipitation data: $e');
-    }
-  }
-
-  Future<void> _showHourlyPrecipitationForWeek() async {
-    try {
-      final apiUrl =
-          'https://api.tomorrow.io/v4/weather/forecast?location=$_latitude,$_longitude&apikey=VCusVsCI9zp6B89kZv5lxb8zDFI7mtoi';
-
-      final response = await http.get(Uri.parse(apiUrl));
-
-      if (response.statusCode == 200) {
-        final rainData = json.decode(response.body);
-
-        // Organize hourly data for each day of the week
-        Map<String, List<Map<String, dynamic>>> weeklyHourlyData = {};
-
-        for (var entry in rainData['timelines']['hourly']) {
-          final dateTime = DateTime.parse(entry['time']);
-          final date = DateFormat('dd-MM-yyyy').format(dateTime);
-          final hour = DateFormat('HH:mm').format(dateTime);
-
-          // Create a new date entry if it doesn't exist
-          if (!weeklyHourlyData.containsKey(date)) {
-            weeklyHourlyData[date] = [];
-          }
-
-          // Add hourly data to the appropriate date
-          weeklyHourlyData[date]?.add({
-            'time': hour,
-            'precipitationProbability':
-                entry['values']['precipitationProbability'] ?? 0.0,
-            'rainIntensity': entry['values']['rainIntensity'] ?? 0.0,
-          });
-        }
-        // Show the hourly data in a new dialog
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Center(
-                child: Text('Hourly Rain Forecasting - Weekly Insights'),
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: weeklyHourlyData.keys.map((date) {
-                    return ExpansionTile(
-                      title: Text(date),
-                      children: [
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            columnSpacing: 20,
-                            horizontalMargin: 10,
-                            columns: [
-                              DataColumn(label: Text('Time')),
-                              DataColumn(label: Text('Rain Intensity\n(mm/h)')),
-                              DataColumn(label: Text('Rain Probability\n(%)')),
-                            ],
-                            rows: weeklyHourlyData[date]!.map((hour) {
-                              return DataRow(cells: [
-                                DataCell(Text(hour['time'])),
-                                DataCell(Text('${hour['rainIntensity']}')),
-                                DataCell(Text(
-                                    '${hour['precipitationProbability']}')),
-                              ]);
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Close'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        print('Failed to load hourly weather data');
-      }
-    } catch (e) {
-      print('Error fetching hourly precipitation data: $e');
-    }
-  }
-
-// Function to get the current location based on platform
-  Future<void> _getUserCurrentLocation() async {
-    setState(() {
-      _isLoading = true; // Start loading
-    });
-
-    // For web
-    if (kIsWeb) {
-      try {
-        html.window.navigator.geolocation.getCurrentPosition().then((position) {
-          final latitude = position.coords?.latitude;
-          final longitude = position.coords?.longitude;
-
-          setState(() {
-            _latitude = latitude as double?;
-            _longitude = longitude as double?;
-            _isLoading = false;
-            _saveLocationToPrefs();
-          });
-        }).catchError((e) {
-          print("Error getting location: $e");
-          setState(() {
-            _isLoading = false;
-          });
-        });
-      } catch (e) {
-        print("Error accessing geolocation: $e");
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } else {
-      // Mobile specific location fetching
-      bool serviceEnabled;
-      geolocator.LocationPermission permission;
-
-      serviceEnabled = await geolocator.Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        print('Location services are disabled.');
-        setState(() {
-          _isLoading = false; // Stop loading if location services are disabled
-        });
-        return;
-      }
-
-      permission = await geolocator.Geolocator.checkPermission();
-      if (permission == geolocator.LocationPermission.denied) {
-        permission = await geolocator.Geolocator.requestPermission();
-        if (permission == geolocator.LocationPermission.denied) {
-          print('Location permissions are denied');
-          setState(() {
-            _isLoading = false;
-          });
-          return;
-        }
-      }
-
-      if (permission == geolocator.LocationPermission.deniedForever) {
-        print('Location permissions are permanently denied');
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      geolocator.Position position =
-          await geolocator.Geolocator.getCurrentPosition(
-        desiredAccuracy: geolocator.LocationAccuracy.high,
-      );
-
-      setState(() {
-        _latitude = position.latitude;
-        _longitude = position.longitude;
-        _isLoading = false;
-        _saveLocationToPrefs();
-      });
-    }
-  }
-
-  // Save latitude and longitude to SharedPreferences
-  Future<void> _saveLocationToPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setDouble('latitude', _latitude ?? 0.0);
-    prefs.setDouble('longitude', _longitude ?? 0.0);
-  }
-
-  // Load latitude and longitude from SharedPreferences
-  Future<void> _loadLocationFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _latitude = prefs.getDouble('latitude');
-      _longitude = prefs.getDouble('longitude');
-    });
-  }
-
-  // Function to show the location input dialog
-  Future<void> _showLocationInputDialog() async {
-    TextEditingController latitudeController =
-        TextEditingController(text: _latitude?.toString() ?? '');
-    TextEditingController longitudeController =
-        TextEditingController(text: _longitude?.toString() ?? '');
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Enter Location'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Show input fields for latitude and longitude
-              TextField(
-                controller: latitudeController,
-                decoration: InputDecoration(
-                  labelText: 'Latitude',
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: longitudeController,
-                decoration: InputDecoration(
-                  labelText: 'Longitude',
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 10),
-              // Show the "Use Current Location" button
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (!_isLoading) {
-                          await _getUserCurrentLocation(); // Fetch current location
-                          latitudeController.text = _latitude?.toString() ?? '';
-                          longitudeController.text =
-                              _longitude?.toString() ?? '';
-                        }
-                      },
-                      child: _isLoading
-                          ? CircularProgressIndicator() // Show loading while fetching
-                          : Text('Use Current Location'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog without action
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final latitude = double.tryParse(latitudeController.text);
-                final longitude = double.tryParse(longitudeController.text);
-
-                if (latitude != null && longitude != null) {
-                  setState(() {
-                    _latitude = latitude;
-                    _longitude = longitude;
-                  });
-
-                  Navigator.of(context).pop();
-                  await _saveLocationToPrefs(); // Save updated location to prefs
-                  await _showWeeklyPrecipitationProbability(
-                      _latitude!, _longitude!);
-                } else {
-                  print("Please enter valid coordinates.");
-                }
-              },
-              child: Text('Confirm'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> _showDownloadOptionsDialog(BuildContext context) async {
@@ -2636,34 +2339,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 20,
                                     color: Colors.white,
-                                  ),
-                                ),
-
-                              if (widget.deviceName == 'WD311')
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 4.0,
-                                  ), // Spacing between elements
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .end, // Aligns the text to the right
-                                    children: [
-                                      SizedBox(
-                                          width:
-                                              10), // Adds some space between text and button
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          // Call a function to show the input dialog for latitude and longitude
-                                          await _showLocationInputDialog();
-                                        },
-                                        child: Text('Weekly Forecast'),
-                                        style: ElevatedButton.styleFrom(
-                                          foregroundColor: Colors.white,
-                                          backgroundColor: const Color.fromARGB(
-                                              255, 40, 41, 41), // Text color
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
                             ],
