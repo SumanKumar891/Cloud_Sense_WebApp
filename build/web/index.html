@@ -58,7 +58,7 @@
 
     // Register service worker for Firebase Cloud Messaging
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('web/firebase-messaging-sw.js')
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then(function (registration) {
           console.log('Service Worker registered with scope:', registration.scope);
         })
