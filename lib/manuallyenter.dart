@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
-import 'shareddevice.dart'; // Shared utilities file
+import 'shareddevice.dart';
 
 class ManualEntryPage extends StatefulWidget {
   final Map<String, List<String>> devices;
@@ -22,7 +22,7 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
   @override
   void initState() {
     super.initState();
-    _loadEmail();
+    _loadEmail(); // Load email when the page initializes
   }
 
   @override
@@ -31,35 +31,41 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
     super.dispose();
   }
 
+  // Load user's email from shared preferences
   Future<void> _loadEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
 
     if (email != null) {
       setState(() {
-        _email = email;
+        _email = email; // Store email for future API calls
       });
     } else {
+      // Redirect to sign-in page if email is not found
       Navigator.pushReplacementNamed(context, '/signin');
     }
   }
 
+  // Show a dialog with success or error message
   Future<void> _showSuccessMessage() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text(message,
-              style: TextStyle(
-                color: messageColor,
-                fontSize: 16,
-              )),
+          content: Text(
+            message,
+            style: TextStyle(
+              color: messageColor,
+              fontSize: 16,
+            ),
+          ),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
               onPressed: () {
                 Navigator.pop(context);
+                // Navigate to the data display page
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => DataDisplayPage()),
@@ -72,6 +78,7 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
     );
   }
 
+  // Add a device by sending a GET request to the API
   Future<void> _addDevice(String deviceID) async {
     final String apiUrl =
         "https://ymfmk699j5.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_add_devices?email_id=$_email&device_id=$deviceID";
@@ -106,7 +113,8 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
         backgroundColor: Colors.teal,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () =>
+              Navigator.pop(context), // Go back to the previous screen
         ),
       ),
       body: Padding(
@@ -115,6 +123,7 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: 40),
+            // Input field for device ID
             TextField(
               controller: deviceIdController,
               decoration: InputDecoration(
@@ -125,13 +134,14 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
             ),
             SizedBox(height: 20),
             Center(
-              // Centering the button
+              // Add device button
               child: SizedBox(
-                width: 150, // Set width to make it smaller
+                width: 150,
                 child: ElevatedButton(
                   onPressed: () {
                     String deviceId = deviceIdController.text.trim();
                     if (deviceId.isNotEmpty) {
+                      // Show confirmation dialog before adding the device
                       DeviceUtils.showConfirmationDialog(
                         context: context,
                         deviceId: deviceId,
@@ -142,6 +152,7 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
                         },
                       );
                     } else {
+                      // Show error if device ID is empty
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Please enter a valid device ID'),

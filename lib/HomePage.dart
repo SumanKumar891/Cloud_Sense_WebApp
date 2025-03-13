@@ -5,10 +5,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensures Flutter bindings are initialized before running the app (needed for async ops like SharedPreferences).
   runApp(
     ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+      create: (_) =>
+          ThemeProvider(), // Provides theme state management across the app.
       child: MyApp(),
     ),
   );
@@ -20,9 +22,6 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Cloud Sense Viz',
-      // theme: ThemeData(
-      //   primarySwatch: Colors.blue,
-      // ),
       theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: HomePage(),
     );
@@ -32,25 +31,26 @@ class MyApp extends StatelessWidget {
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
 
-  bool get isDarkMode => _isDarkMode;
+  bool get isDarkMode =>
+      _isDarkMode; // Getter to access the current theme mode.
 
   ThemeProvider() {
-    _loadTheme();
+    _loadTheme(); // Load saved theme preference on initialization.
   }
 
   void toggleTheme() async {
-    _isDarkMode = !_isDarkMode;
-    notifyListeners();
+    _isDarkMode = !_isDarkMode; // Toggle between dark and light modes.
+    notifyListeners(); // Notify all listeners about the theme change.
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', _isDarkMode); // Save the preference
+    await prefs.setBool('isDarkMode', _isDarkMode); // Save theme preference.
   }
 
   void _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isDarkMode =
-        prefs.getBool('isDarkMode') ?? false; // Default to light theme
-    notifyListeners(); // Notify listeners after loading the theme
+        prefs.getBool('isDarkMode') ?? false; // Default to light theme.
+    notifyListeners(); // Ensure UI updates after loading saved theme.
   }
 }
 
@@ -63,7 +63,6 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-  // Color _mqttdataColor = const Color.fromARGB(255, 235, 232, 232);
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +94,7 @@ class _HomePageState extends State<HomePage> {
                   fontSize: isMobile ? 20 : 32,
                 ),
               ),
-              Spacer(),
+              Spacer(), // Pushes items to the right.
               if (isMobile)
                 IconButton(
                   icon: Icon(
@@ -128,10 +127,6 @@ class _HomePageState extends State<HomePage> {
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
                   Navigator.pushNamed(context, '/accountinfo');
                 }),
-                // SizedBox(width: 20),
-                // _buildNavButton('MQTT DATA', _mqttdataColor, () {
-                //   Navigator.pushNamed(context, '/mqttdata');
-                // }),
               ],
             ],
           ),

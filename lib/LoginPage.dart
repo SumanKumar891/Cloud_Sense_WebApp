@@ -1,7 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'dart:ui'; // Import for BackdropFilter
+import 'dart:ui';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,10 +27,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   @override
   void initState() {
     super.initState();
-    _checkCurrentUser();
+    _checkCurrentUser(); // Check if user is already signed in
     _emailController.addListener(() {
       setState(() {
-        _emailValid = EmailValidator.validate(_emailController.text);
+        _emailValid = EmailValidator.validate(
+            _emailController.text); // Real-time email validation
       });
     });
   }
@@ -39,6 +40,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     try {
       var currentUser = await Amplify.Auth.getCurrentUser();
       if (currentUser != null) {
+        // If user is already signed in, navigate to DeviceListPage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -46,7 +48,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           ),
         );
       }
-    } catch (e) {}
+    } catch (e) {
+      // Ignore errors — means no current user
+    }
   }
 
   @override
@@ -59,34 +63,38 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
   Future<void> _signIn() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Show loading indicator
     });
 
     try {
-      // Sign out the user before trying to sign in again
+      // Ensure any previous session is cleared before signing in
       try {
         await Amplify.Auth.signOut();
       } catch (e) {
-        // Ignore errors from signOut, as the user might not be signed in
+        // Ignoring errors here since user might not be signed in
       }
 
+      // Attempt to sign in with provided credentials
       SignInResult res = await Amplify.Auth.signIn(
         username: _emailController.text,
         password: _passwordController.text,
       );
+
       if (res.isSignedIn) {
+        // Store email in shared preferences for session management
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', _emailController.text);
 
+        // Navigate to device list page on successful sign-in
         Navigator.pushReplacementNamed(context, '/devicelist');
       } else {
         _showSnackbar('Sign-in failed');
       }
     } on AuthException catch (e) {
-      _showSnackbar(e.message);
+      _showSnackbar(e.message); // Show error message if sign-in fails
     } finally {
       setState(() {
-        _isLoading = false;
+        _isLoading = false; // Hide loading indicator
       });
     }
   }
@@ -100,20 +108,19 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-// Method to handle password reset process
   Future<void> _forgotPassword() async {
-    String? email = await _showEmailInputDialog();
+    String? email = await _showEmailInputDialog(); // Get user email
     if (email != null && _emailValid) {
       try {
-        // Send password reset request
+        // Request password reset
         await Amplify.Auth.resetPassword(username: email);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text('A password reset code has been sent to your email.')),
+            content: Text('A password reset code has been sent to your email.'),
+          ),
         );
 
-        // After the email is sent, show the dialog to enter the reset code and new password
+        // Ask for reset code and new password
         _showPasswordResetCodeDialog(email);
       } on AuthException catch (e) {
         setState(() {
@@ -318,9 +325,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
   Future<void> _signUp() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Show loading indicator during sign-up
     });
+
     try {
+      // Sign up with email, password, and name attributes
       await Amplify.Auth.signUp(
         username: _emailController.text,
         password: _passwordController.text,
@@ -331,24 +340,24 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           },
         ),
       );
+
+      // Store email for verification step
       _emailToVerify = _emailController.text;
-      _showVerificationDialog();
+      _showVerificationDialog(); // Prompt user to enter verification code
     } on UsernameExistsException {
-      // If the username already exists, attempt to resend the verification code
+      // Resend code if user already exists but hasn't verified
       try {
         await Amplify.Auth.resendSignUpCode(username: _emailController.text);
-        // Inform the user to check their email for the new verification code
         _emailToVerify = _emailController.text;
         _showVerificationDialog();
       } on AuthException catch (e) {
-        // Handle failure to resend the code
         setState(() {
           _errorMessage = e.message;
         });
       }
     } on AuthException catch (e) {
       setState(() {
-        _errorMessage = e.message;
+        _errorMessage = e.message; // Handle other sign-up errors
       });
     } finally {
       setState(() {
@@ -426,7 +435,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   'A verification code has been sent to your email. Please enter the code below:'),
               TextField(
                 onChanged: (value) {
-                  _verificationCode = value;
+                  _verificationCode = value; // Store verification code
                 },
                 decoration: InputDecoration(labelText: 'Verification Code'),
               ),
@@ -435,14 +444,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                _resendVerificationCode();
+                _resendVerificationCode(); // Resend code if needed
               },
               child: Text('Resend Code'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _confirmSignUp();
+                _confirmSignUp(); // Confirm sign-up using the code
               },
               child: Text('Submit'),
             ),
@@ -523,13 +532,17 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
+// Builds the sign-in widget, adjusting layout based on screen size
   Widget _buildSignIn(bool isDarkMode) {
     return SingleChildScrollView(
-      key: ValueKey('SignIn'),
+      key: ValueKey(
+          'SignIn'), // Used for widget identification (helpful for animations or testing)
       child: LayoutBuilder(
         builder: (context, constraints) {
+          // Check if the screen width is less than 800px (small screen)
           bool isSmallScreen = constraints.maxWidth < 800;
 
+          // Adjust layout: Column for small screens, Row for large screens
           return isSmallScreen
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -546,10 +559,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
+  // Builds a list of widgets for the Sign-In screen layout
   List<Widget> _buildContent(bool isSmallScreen, bool isDarkMode) {
     return [
+      // Welcome section (Left side for large screens, top for small screens)
       Container(
-        width: isSmallScreen ? double.infinity : 400,
+        width: isSmallScreen
+            ? double.infinity
+            : 400, // Full width for small screens
         height: 500,
         color: isDarkMode
             ? Color.fromARGB(155, 255, 255, 255)
@@ -559,29 +576,34 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 55),
+            // Heading text
             Text(
               'Welcome Back!',
               style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode
-                      ? Colors.black
-                      : Color.fromARGB(223, 216, 226, 231)),
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode
+                    ? Colors.black
+                    : Color.fromARGB(223, 216, 226, 231),
+              ),
             ),
             SizedBox(height: 15),
+            // Subheading text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: Text(
                 'To keep connected with us please login with your personal info.',
                 style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode
-                        ? Colors.purple
-                        : Color.fromARGB(223, 205, 108, 230)),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode
+                      ? Colors.purple
+                      : Color.fromARGB(223, 205, 108, 230),
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
+            // Image section
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: Container(
@@ -599,7 +621,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           ],
         ),
       ),
+
+      // Add spacing between sections for small screens
       SizedBox(height: isSmallScreen ? 32 : 0),
+
+      // Sign-in form section
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
@@ -612,6 +638,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 24),
+            // Login title
             Text(
               'Login',
               style: TextStyle(
@@ -623,6 +650,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
             ),
             SizedBox(height: 42),
+
+            // Email text field
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -635,25 +664,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   borderSide: BorderSide(
                       color: isDarkMode ? Colors.redAccent : Colors.red),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.white30 : Colors.black),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
-                ),
-                errorStyle: TextStyle(
-                  color: isDarkMode ? Colors.redAccent : Colors.red,
-                ),
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
+
+            // Password text field with visibility toggle
             TextField(
               controller: _passwordController,
               obscureText: !_isPasswordVisible,
@@ -675,14 +691,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     });
                   },
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 76, 39, 176)),
-                ),
               ),
             ),
+
+            // Show loading indicator or Sign-in button
             if (_isLoading)
               CircularProgressIndicator()
             else
@@ -693,9 +705,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   child: Text(
                     'Sign In',
                     style: TextStyle(
-                        color: isDarkMode
-                            ? Colors.black
-                            : const Color.fromARGB(255, 245, 241, 240)),
+                      color: isDarkMode
+                          ? Colors.black
+                          : const Color.fromARGB(255, 245, 241, 240),
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -706,6 +719,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 ),
               ),
             SizedBox(height: 22),
+
+            // Forgot Password link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -742,7 +757,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           color: isDarkMode
                               ? Colors.blue
                               : Color.fromARGB(243, 32, 39, 230),
-                          decoration: TextDecoration.none,
                         ),
                       ),
                     ],
@@ -751,9 +765,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ],
             ),
             SizedBox(height: 8),
+
+            // Sign-up link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'Don\'t have an Account?',
@@ -769,7 +784,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _isSignIn = false;
+                      _isSignIn = false; // Switch to sign-up form
                     });
                   },
                   child: Stack(
@@ -792,7 +807,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                           color: isDarkMode
                               ? Colors.blue
                               : Color.fromARGB(243, 32, 39, 230),
-                          decoration: TextDecoration.none,
                         ),
                       ),
                     ],
@@ -806,14 +820,19 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     ];
   }
 
+  // Builds the Sign-Up screen with responsive design for both small and large screens
   Widget _buildSignUp() {
+    // Checks if the current theme is in dark mode
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return SingleChildScrollView(
       key: ValueKey('SignUp'),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          // Determines if the screen size is small (typically mobile screens)
           bool isSmallScreen = constraints.maxWidth < 800;
 
+          // Responsive layout: Column for small screens, Row for larger screens
           return isSmallScreen
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -830,15 +849,17 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
+  // Builds the content for the Sign-Up screen, responsive for both small and large screens
   List<Widget> _buildSignUpContent(bool isSmallScreen, bool isDarkMode) {
     return [
+      // Form container
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
         padding: EdgeInsets.all(32.0),
         color: isDarkMode
             ? const Color.fromARGB(255, 38, 37, 37)
-            : Color.fromARGB(155, 255, 255, 255),
+            : const Color.fromARGB(155, 255, 255, 255),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -851,10 +872,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 fontWeight: FontWeight.bold,
                 color: isDarkMode
                     ? Colors.white
-                    : Color.fromARGB(243, 173, 21, 211),
+                    : const Color.fromARGB(243, 173, 21, 211),
               ),
             ),
             SizedBox(height: 24),
+            // Name input field
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -872,6 +894,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
+            // Email input field
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -884,25 +907,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   borderSide: BorderSide(
                       color: isDarkMode ? Colors.redAccent : Colors.red),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.white30 : Colors.black),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
-                ),
-                errorStyle: TextStyle(
-                  color: isDarkMode ? Colors.redAccent : Colors.red,
-                ),
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
+            // Password input field
             TextField(
               controller: _passwordController,
               obscureText: !_isPasswordVisible,
@@ -933,6 +942,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
+            // Sign-Up button
             if (_isLoading)
               CircularProgressIndicator()
             else
@@ -951,14 +961,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     backgroundColor: isDarkMode
                         ? Colors.purple
-                        : Color.fromARGB(223, 205, 108, 230),
+                        : const Color.fromARGB(223, 205, 108, 230),
                   ),
                 ),
               ),
             SizedBox(height: 24),
+            // Navigation to Sign-In
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'Already have an Account?',
@@ -967,7 +977,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     fontWeight: FontWeight.bold,
                     color: isDarkMode
                         ? Colors.white
-                        : Color.fromARGB(181, 113, 5, 214),
+                        : const Color.fromARGB(181, 113, 5, 214),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -977,34 +987,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                       _isSignIn = true;
                     });
                   },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        bottom:
-                            -1, // Adjust this value for spacing between text and underline
-                        child: Container(
-                          height: 1.5, // Thickness of the underline
-                          width:
-                              45, // Width of the underline to match the text length
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(
-                                  243, 32, 39, 230), // Underline color
-                        ),
-                      ),
-                      Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230),
-                          decoration:
-                              TextDecoration.none, // Disable default underline
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode
+                          ? Colors.blue
+                          : const Color.fromARGB(243, 32, 39, 230),
+                    ),
                   ),
                 ),
               ],
@@ -1013,11 +1003,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         ),
       ),
       SizedBox(height: isSmallScreen ? 32 : 0),
+      // Welcome container
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
         color: isDarkMode
-            ? Color.fromARGB(155, 255, 255, 255)
+            ? const Color.fromARGB(155, 255, 255, 255)
             : const Color.fromARGB(155, 0, 0, 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -1031,7 +1022,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   fontWeight: FontWeight.bold,
                   color: isDarkMode
                       ? Colors.black
-                      : Color.fromARGB(223, 216, 226, 231)),
+                      : const Color.fromARGB(223, 216, 226, 231)),
             ),
             SizedBox(height: 15),
             Padding(
@@ -1043,7 +1034,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     fontWeight: FontWeight.bold,
                     color: isDarkMode
                         ? Colors.purple
-                        : Color.fromARGB(223, 205, 108, 230)),
+                        : const Color.fromARGB(223, 205, 108, 230)),
                 textAlign: TextAlign.center,
               ),
             ),
