@@ -566,14 +566,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             // }
 // Update ammonia value and check threshold
             // Check if ammonia value exceeds 25 ppm and trigger notification
-            if (ammoniaData.isNotEmpty) {
-              double currentAmmoniaValue = ammoniaData.last.value;
-              if (currentAmmoniaValue > 0) {
-                // Trigger the notification when ammonia level exceeds 25 ppm
-                PushNotifications()
-                    .sendAmmoniaAlertNotification(currentAmmoniaValue);
-              }
-            }
+            // if (ammoniaData.isNotEmpty) {
+            //   double currentAmmoniaValue = ammoniaData.last.value;
+            //   if (currentAmmoniaValue > 0) {
+            //     // Trigger the notification when ammonia level exceeds 25 ppm
+            //     PushNotifications()
+            //         .sendAmmoniaAlertNotification(currentAmmoniaValue);
+            //   }
+            // }
 
             rows = [
               [
