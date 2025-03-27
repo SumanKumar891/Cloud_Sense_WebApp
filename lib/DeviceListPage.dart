@@ -3,6 +3,7 @@ import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/manuallyenter.dart';
+import 'package:cloud_sense_webapp/map.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -498,46 +499,69 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Message Text
+              // "No devices found." message
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'No devices found.',
+                  'No Device Found',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
                     color: const Color.fromARGB(255, 235, 28, 28),
                   ),
                 ),
               ),
-              // Plus sign above the button
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Icon(
-                  Icons.add,
-                  size: 80,
+              SizedBox(height: 10),
+              // "Add New Device" heading
+              Text(
+                'Add New Device',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              // Add Devices button
+              SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                   backgroundColor: Colors.black,
                 ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          QRScannerPage(devices: _deviceCategories),
+                      builder: (context) => QRScannerPage(
+                        devices: _deviceCategories,
+                      ),
                     ),
                   );
                 },
                 child: Text(
-                  'Add Devices',
-                  style: TextStyle(
-                      color: const Color.fromARGB(255, 245, 241, 240)),
+                  'Scan QR Code',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManualEntryPage(
+                        devices: _deviceCategories,
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Add Manually',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ],
