@@ -71,6 +71,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> ammoniaData = [];
   List<ChartData> temperaturedata = [];
   List<ChartData> humiditydata = [];
+  List<ChartData> rfdData = [];
+  List<ChartData> rfsData = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -90,6 +92,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   bool _isHovering = false;
   String? _activeButton;
   String _currentChlorineValue = '0.00';
+  String _currentrfdValue = '0.00';
   String _currentAmmoniaValue = '0.00';
   bool _isLoading = false;
   String _lastSelectedRange = 'single'; // Default to single
@@ -291,6 +294,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         (widget.deviceName.startsWith('BD'))) {
       apiUrl =
           'https://b0e4z6nczh.execute-api.us-east-1.amazonaws.com/CloudSense_Chloritrone_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+      print(startdate);
     } else if (widget.deviceName.startsWith('WQ')) {
       apiUrl =
           'https://oy7qhc1me7.execute-api.us-west-2.amazonaws.com/default/k_wqm_api?deviceid=${widget.deviceName}&startdate=$startdate&enddate=$enddate';
@@ -311,8 +315,27 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         widget.deviceName.startsWith('AC')) {
       apiUrl =
           'https://2bftil5o0c.execute-api.us-east-1.amazonaws.com/default/CloudSense_sensor_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('20')) {
+      apiUrl =
+          'https://gzdsa7h08k.execute-api.us-east-1.amazonaws.com/default/lat_long_api_func?deviceId=$deviceId';
+      print("Device ID: $deviceId");
+
+      try {
+        final response = await http.get(Uri.parse(apiUrl));
+
+        if (response.statusCode == 200) {
+          print("API Response: ${response.body}");
+          // Optional: Parse JSON if needed
+          // final jsonData = json.decode(response.body);
+          // print("Parsed JSON: $jsonData");
+        } else {
+          print("Failed to fetch data. Status Code: ${response.statusCode}");
+        }
+      } catch (e) {
+        print("Error during API call: $e");
+      }
     } else {
-      setState(() {});
+      setState(() {}); // Not sure if needed here
       setState(() {
         _isLoading = false;
       });
@@ -673,7 +696,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           await _fetchDeviceDetails();
-        } else {
+        } else if (widget.deviceName.startsWith('WD')) {
           setState(() {
             temperatureData = _parseChartData(data, 'Temperature');
             humidityData = _parseChartData(data, 'Humidity');
@@ -718,6 +741,50 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           // Fetch device details specifically for Weather data
+          await _fetchDeviceDetails();
+        } else {
+          setState(() {
+            rfdData = _parserainChartData(data, 'RFD');
+            rfsData = _parserainChartData(data, 'RFS');
+
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainLevelData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+            tempData = [];
+            tdsData = [];
+            codData = [];
+            bodData = [];
+            pHData = [];
+            doData = [];
+            ecData = [];
+            temmppData = [];
+            humidityyData = [];
+            lightIntensityData = [];
+            windSpeeddData = [];
+
+            // Update current chlorine value
+            if (rfdData.isNotEmpty) {
+              _currentrfdValue = rfdData.last.value.toStringAsFixed(2);
+            }
+
+            rows = [
+              [
+                "Timestamp",
+                "RFD ",
+                "RFS ",
+              ],
+              for (int i = 0; i < rfdData.length; i++)
+                [
+                  formatter.format(rfdData[i].timestamp),
+                  rfdData[i].value,
+                  rfsData[i].value,
+                ]
+            ];
+          });
           await _fetchDeviceDetails();
         }
 
@@ -1050,6 +1117,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       }
       return ChartData(
         timestamp: _parseWaterDate(item['time_stamp']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parserainChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
+      }
+      return ChartData(
+        timestamp: _parserainDate(item['human_time']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -1732,6 +1814,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parserainDate(String dateString) {
+    final dateFormat = DateFormat(
+        'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
   DateTime _parsethDate(String dateString) {
     if (dateString.isEmpty) {
       return DateTime.now();
@@ -1844,9 +1936,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       backgroundImagePath = 'assets/tree.jpg';
     } else if (widget.deviceName.startsWith('TH')) {
       backgroundImagePath = 'assets/tree.jpg';
+    } else if (widget.deviceName.startsWith('WQ') ||
+        (widget.deviceName.startsWith('WS'))) {
+      backgroundImagePath = 'assets/water_quality.jpg';
     } else {
       // For water quality sensor
-      backgroundImagePath = 'assets/water_quality.jpg';
+      backgroundImagePath = 'assets/tree.jpg';
     }
     String _selectedRange = 'ee';
     // : 'assets/soil.jpg';
@@ -2357,6 +2452,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           // if (widget.deviceName.startsWith('NH'))
                           //   _buildCurrentValue(
                           //       'Ammonia Value', _currentAmmoniaValue, 'PPM'),
+                          if (widget.deviceName.startsWith('20'))
+                            _buildCurrentValue(
+                                'Rain Level ', _currentrfdValue, 'mm'),
                         ],
                       ),
                     ),
@@ -2525,6 +2623,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         if (hasNonZeroValues(humiditydata))
                           _buildChartContainer('Humidity', humiditydata,
                               'Humidity (%)', ChartType.line),
+                        // if (hasNonZeroValues(rfdData))
+                        // _buildChartContainer(
+                        //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
+                        // if (hasNonZeroValues(rfsData))
+                        _buildChartContainer(
+                            'RFS', rfsData, 'RFS (mm)', ChartType.line),
                       ],
                     )
                   ],
@@ -2602,7 +2706,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           Text(
             '$parameterName: $currentValue $unit',
             style: TextStyle(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ],
       ),

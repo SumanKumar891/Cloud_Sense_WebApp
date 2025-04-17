@@ -130,7 +130,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'NH':
         return 'Ammonia Sensors';
       default:
-        return 'Unknown Sensors';
+        return 'Rain Sensors';
     }
   }
 
@@ -248,7 +248,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             _deviceCategories.isNotEmpty
                                 ? _buildDeviceCards()
                                 : _buildNoDevicesCard(),
-                            // SizedBox(height: 20),
+                            SizedBox(height: 20),
                             // ElevatedButton.icon(
                             //   onPressed: () {
                             //     Navigator.push(
