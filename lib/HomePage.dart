@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
+  Color _deviceinfoColor = const Color.fromARGB(255, 235, 232, 232);
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +128,10 @@ class _HomePageState extends State<HomePage> {
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
                   Navigator.pushNamed(context, '/accountinfo');
                 }),
+                SizedBox(width: 20),
+                _buildNavButton('DEVICE INFO', _deviceinfoColor, () {
+                  Navigator.pushNamed(context, '/deviceinfo');
+                }),
               ],
             ],
           ),
@@ -167,6 +172,13 @@ class _HomePageState extends State<HomePage> {
                       title: Text('ACCOUNT INFO'),
                       onTap: () {
                         Navigator.pushNamed(context, '/accountinfo');
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.login),
+                      title: Text('DEVICE INFO'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/deviceinfo');
                       },
                     ),
                     // ListTile(
@@ -487,6 +499,8 @@ class _HomePageState extends State<HomePage> {
           _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
         if (text == 'ACCOUNT INFO')
           _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
+        if (text == 'DEVICE INFO')
+          _deviceinfoColor = const Color.fromARGB(255, 235, 232, 232);
         // if (text == 'MQTT DATA')
         //   _mqttdataColor = const Color.fromARGB(255, 235, 232, 232);
       }),
