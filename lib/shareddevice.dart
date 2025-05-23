@@ -9,6 +9,7 @@ class DeviceUtils {
     if (deviceId.startsWith('SS')) return 'Soil Sensor';
     if (deviceId.startsWith('WQ')) return 'Water Quality Sensor';
     if (deviceId.startsWith('WS')) return 'Water Sensor';
+    if (deviceId.startsWith('IT')) return 'IIT Sensor';
     if (deviceId.startsWith('DO')) return 'DO Sensor';
     if (deviceId.startsWith('LU')) return 'LU Sensor';
     if (deviceId.startsWith('TE')) return 'TE Sensor';
@@ -123,6 +124,7 @@ class DeviceUtils {
     'BF',
     'CS',
     'TH',
-    'NH',
+    'NH'
+        'IT'
   ];
 }

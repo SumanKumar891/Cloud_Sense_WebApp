@@ -32,7 +32,7 @@ class _MapPageState extends State<MapPage> {
 
   // Track previous positions for each device
   Map<String, LatLng> previousPositions = {};
-  final double displacementThreshold = 2000.0; // 2 kilometers
+  final double displacementThreshold = 200.0; // 2 kilometers
   final Distance distance =
       Distance(); // For calculating distance between coordinates
 
@@ -328,6 +328,115 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  void _showDeviceInfoDialog(
+    BuildContext context,
+    String name,
+    double latitude,
+    double longitude,
+    String place,
+    String state,
+    String country,
+    String lastActive,
+    bool hasMoved,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black.withOpacity(0.6)
+              : Colors.white.withOpacity(0.7),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          contentPadding: EdgeInsets.all(16),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Latitude: ${latitude.toStringAsFixed(6)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+              Text(
+                'Longitude: ${longitude.toStringAsFixed(6)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+              Text(
+                'Place: $place',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+              Text(
+                'State: $state',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+              Text(
+                'Country: $country',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+              Text(
+                'Last Active: $lastActive',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black, // Match web tooltip text color
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Close',
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -359,9 +468,20 @@ class _MapPageState extends State<MapPage> {
                           device['latitude'],
                           device['longitude'],
                         ),
-                        builder: (ctx) => Tooltip(
-                          message:
-                              '${device['name']}\nLatitude: ${device['latitude'].toStringAsFixed(6)}\nLongitude: ${device['longitude'].toStringAsFixed(6)}\nPlace: ${device['place']}\nState: ${device['state']}\nCountry: ${device['country']}\nLast Active: ${device['last_active']}',
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            _showDeviceInfoDialog(
+                              context,
+                              device['name'],
+                              device['latitude'],
+                              device['longitude'],
+                              device['place'],
+                              device['state'],
+                              device['country'],
+                              device['last_active'],
+                              device['has_moved'] == true,
+                            );
+                          },
                           child: Icon(
                             Icons.location_pin,
                             size: 40,

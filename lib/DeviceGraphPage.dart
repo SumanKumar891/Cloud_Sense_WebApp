@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:cloud_sense_webapp/downloadcsv.dart';
 import 'package:cloud_sense_webapp/push_notifications.dart';
 import 'package:file_picker/file_picker.dart';
@@ -17,6 +18,123 @@ import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+
+// Updated CompassNeedlePainter with corrected arrowhead positioning
+class CompassNeedlePainter extends CustomPainter {
+  CompassNeedlePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Define the needle length (60% of radius as per your code)
+    final needleLength = radius * 0.4;
+
+    // Paint for the red tip (pointing to wind direction, initially pointing up/North)
+    final redPaint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke;
+
+    // Paint for the white tail (opposite direction)
+    final whitePaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke;
+
+    // Paint for the red arrowhead (filled triangle)
+    final arrowPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill;
+
+    // Draw the red tip (from center to North, will be rotated by Transform.rotate)
+    final tipX = center.dx;
+    final tipY = center.dy - needleLength; // Pointing up (North)
+    canvas.drawLine(center, Offset(tipX, tipY), redPaint);
+
+    // Draw the white tail (from center to South)
+    final tailX = center.dx;
+    final tailY = center.dy + needleLength; // Pointing down (South)
+    canvas.drawLine(center, Offset(tailX, tailY), whitePaint);
+
+    // Draw the arrowhead at the tip of the red line
+    final arrowSize = 8.0; // Width of the arrowhead base
+    final arrowHeight = 10.0; // Height of the arrowhead (from base to tip)
+    final arrowPath = Path();
+    // The base of the arrowhead is at the end of the red line (tipX, tipY)
+    // Calculate the two base points perpendicular to the needle direction
+    // Since the needle points up (North) initially, the direction is along the negative Y-axis
+    // Perpendicular direction is along the X-axis (left and right)
+    final baseLeft = Offset(tipX - arrowSize / 2, tipY); // Left base point
+    final baseRight = Offset(tipX + arrowSize / 2, tipY); // Right base point
+    // The tip of the arrowhead extends further in the direction of the red line (upward)
+    final arrowTip = Offset(
+        tipX, tipY - arrowHeight); // Tip of the arrowhead (further North)
+    arrowPath.moveTo(arrowTip.dx, arrowTip.dy); // Tip of the arrow
+    arrowPath.lineTo(baseLeft.dx, baseLeft.dy); // Left base
+    arrowPath.lineTo(baseRight.dx, baseRight.dy); // Right base
+    arrowPath.close(); // Close the triangle
+    canvas.drawPath(arrowPath, arrowPaint);
+
+    // Draw a small circle at the center to cover the intersection
+    final centerPaint = Paint()
+      ..color = Colors.grey.shade300
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 5, centerPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class CompassBackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    final gradientPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.black.withOpacity(0.7), Colors.black.withOpacity(0.5)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(center, radius, gradientPaint);
+
+    final innerCirclePaint = Paint()
+      ..color = Colors.grey.withOpacity(0.2)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius * 0.8, innerCirclePaint);
+
+    final tickPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2;
+    final tickLength = 8.0;
+    for (int i = 0; i < 360; i += 30) {
+      final angle = i * math.pi / 180;
+      final startX = center.dx + (radius - tickLength) * math.sin(angle);
+      final startY = center.dy - (radius - tickLength) * math.cos(angle);
+      final endX = center.dx + radius * math.sin(angle);
+      final endY = center.dy - radius * math.cos(angle);
+      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), tickPaint);
+    }
+
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawCircle(center, radius, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
 
 class DeviceGraphPage extends StatefulWidget {
   final String deviceName;
@@ -73,6 +191,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> humiditydata = [];
   List<ChartData> rfdData = [];
   List<ChartData> rfsData = [];
+  List<ChartData> ittempData = [];
+  List<ChartData> itpressureData = [];
+  List<ChartData> ithumidityData = [];
+  List<ChartData> itradiationData = [];
+  List<ChartData> itwindspeedData = [];
+  List<ChartData> itvisibilityData = [];
+  List<ChartData> itrainData = [];
+  List<ChartData> itwinddirectionData = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -98,6 +224,23 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _lastSelectedRange = 'single'; // Default to single
   bool isWindDirectionValid(String? windDirection) {
     return windDirection != null && windDirection != "-";
+  }
+
+  bool iswinddirectionValid(String? direction) {
+    print('Validating wind direction: $direction');
+    if (direction == null || direction.isEmpty) {
+      print('Wind direction invalid: null or empty');
+      return false;
+    }
+    try {
+      double value = double.parse(direction);
+      bool isValid = value >= 0 && value <= 360;
+      print('Wind direction parsed: $value, isValid: $isValid');
+      return isValid;
+    } catch (e) {
+      print('Wind direction invalid: parse error - $e');
+      return false;
+    }
   }
 
   // New variables to store rain forecasting data for WD 211
@@ -197,6 +340,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
+  String _lastwinddirection = "";
   String _lastBatteryPercentage = "";
   String _lastRSSI_Value = "";
 
@@ -298,6 +442,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('WQ')) {
       apiUrl =
           'https://oy7qhc1me7.execute-api.us-west-2.amazonaws.com/default/k_wqm_api?deviceid=${widget.deviceName}&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('IT')) {
+      apiUrl =
+          'https://7a3bcew3y2.execute-api.us-east-1.amazonaws.com/default/IIT_Bombay_API_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -350,6 +497,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
         List<List<dynamic>> rows = [];
         String lastWindDirection = 'Unknown';
+        String lastwinddirection;
         String lastBatteryPercentage = 'Unknown';
         String lastRSSI_Value = 'Unknown';
 
@@ -424,6 +572,66 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   pHData[i].value,
                   doData[i].value,
                   ecData[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('IT')) {
+          setState(() {
+            print('Processing IT device data');
+            print('Items in response: ${data['items']}');
+            ittempData = _parseITChartData(data, 'temperature');
+            itpressureData = _parseITChartData(data, 'pressure');
+            ithumidityData = _parseITChartData(data, 'humidity');
+            itradiationData = _parseITChartData(data, 'radiation');
+            itrainData = _parseITChartData(data, 'rain_level');
+            itvisibilityData = _parseITChartData(data, 'visibility');
+            itwinddirectionData = _parseITChartData(data, 'wind_direction');
+            itwindspeedData = _parseITChartData(data, 'wind_speed');
+            temperatureData = [];
+            humidityData = [];
+            lightIntensityData = [];
+            windSpeedData = [];
+            rainLevelData = [];
+            solarIrradianceData = [];
+            chlorineData = [];
+
+            // Assign _lastWindDirection from the latest item
+            if (data.containsKey('items') &&
+                data['items'] is List &&
+                data['items'].isNotEmpty) {
+              var lastItem = data['items'].last;
+              print('Last item: $lastItem');
+              print(
+                  'wind_direction in last item: ${lastItem['wind_direction']}');
+              _lastwinddirection =
+                  lastItem['wind_direction']?.toString() ?? '0';
+              print('Assigned _lastWindDirection: $_lastwinddirection');
+            } else {
+              _lastwinddirection = '0';
+              print('No valid items in data, setting _lastWindDirection to 0');
+            }
+            rows = [
+              [
+                "Timestamp",
+                "Temperature",
+                "Pressure ",
+                "Humidity",
+                "Radiation",
+                "Visibility",
+                "Wind Direction",
+                "Wind Speed"
+              ],
+              for (int i = 0; i < ittempData.length; i++)
+                [
+                  formatter.format(ittempData[i].timestamp),
+                  ittempData[i].value,
+                  itpressureData[i].value,
+                  ithumidityData[i].value,
+                  itradiationData[i].value,
+                  itvisibilityData[i].value,
+                  itwinddirectionData[i].value,
+                  itwindspeedData[i].value,
                 ]
             ];
           });
@@ -795,6 +1003,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               lastWindDirection; // Store the last wind direction
           _lastBatteryPercentage = lastBatteryPercentage;
           _lastRSSI_Value = lastRSSI_Value;
+          // _lastwinddirection = lastwinddirection;
 
           if (_csvRows.isEmpty) {
           } else {}
@@ -1025,6 +1234,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       }
       return ChartData(
         timestamp: _parsewaterDate(item['HumanTime']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parseITChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
+      }
+      return ChartData(
+        timestamp: _parseITDate(item['human_time']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -1755,6 +1979,140 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     ]);
   }
 
+  // Calculate average, min, and max values
+  Map<String, List<double?>> _calculateITStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        // 'average': [null],
+        'current': [null],
+        'min': [null],
+        'max': [null],
+      };
+    }
+    // double sum = 0.0;
+    double? current = data.last.value;
+    double min = double.infinity;
+    double max = double.negativeInfinity;
+
+    for (var entry in data) {
+      if (entry.value < min) min = entry.value;
+      if (entry.value > max) max = entry.value;
+    }
+
+    return {
+      'current': [current],
+      'min': [min],
+      'max': [max],
+    };
+  }
+
+  // Create a table displaying statistics
+  Widget buildITStatisticsTable() {
+    final ittempStats = _calculateITStatistics(ittempData);
+    final itpressureStats = _calculateITStatistics(itpressureData);
+    final ithumStats = _calculateITStatistics(ithumidityData);
+    final itrainStats = _calculateITStatistics(itrainData);
+    final itradiationStats = _calculateITStatistics(itradiationData);
+    final itvisibilityStats = _calculateITStatistics(itvisibilityData);
+    final itwindspeedStats = _calculateITStatistics(itwindspeedData);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 500,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Min',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Max',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                buildDataRow('TEMP', ittempStats, fontSize),
+                buildDataRow('PRESSURE', itpressureStats, fontSize),
+                buildDataRow('HUMIDITY', ithumStats, fontSize),
+                buildDataRow('RAIN', itrainStats, fontSize),
+                buildDataRow('RADIATION', itradiationStats, fontSize),
+                buildDataRow('VISIBILITY', itvisibilityStats, fontSize),
+                buildDataRow('WIND SPEED', itwindspeedStats, fontSize),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  DataRow buildITDataRow(
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
+              : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
@@ -1787,6 +2145,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   DateTime _parseWaterDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
+  DateTime _parseITDate(String dateString) {
+    final dateFormat = DateFormat(
+        'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
     try {
       return dateFormat.parse(dateString);
     } catch (e) {
@@ -1918,6 +2286,154 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     setState(() {
       _isLoading = false; // Stop loading once data is fetched
     });
+  }
+
+  // Updated _buildWindCompass
+  Widget _buildWindCompass(String? winddirection) {
+    print('Building wind compass with windDirection: "$winddirection"');
+
+    // Convert wind direction to double, default to 0 if invalid
+    double angle = 0;
+    try {
+      angle = double.parse(winddirection ?? '0');
+      print('Parsed wind direction angle: $angle degrees');
+    } catch (e) {
+      print('Error parsing wind direction: $e');
+      angle = 0;
+    }
+
+    // Convert degrees to radians for rotation
+    final angleRad = angle * math.pi / 180;
+    print('Angle in radians: $angleRad');
+
+    return Column(
+      children: [
+        Container(
+          width: 150,
+          height: 150,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Compass background with ticks
+              CustomPaint(
+                painter: CompassBackgroundPainter(),
+                child: Container(width: 150, height: 150),
+              ),
+              // Compass cardinal directions (N, NE, E, SE, S, SW, W, NW)
+              Positioned(
+                top: 10,
+                child: Text(
+                  'N',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 20,
+                right: 20,
+                child: Text(
+                  'NE',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 10,
+                child: Text(
+                  'E',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: Text(
+                  'SE',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                child: Text(
+                  'S',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 20,
+                child: Text(
+                  'SW',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 10,
+                child: Text(
+                  'W',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 20,
+                left: 20,
+                child: Text(
+                  'NW',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Rotated needle for wind direction
+              Transform.rotate(
+                angle: angleRad,
+                child: CustomPaint(
+                  painter: CompassNeedlePainter(), // No angle parameter
+                  child: Container(width: 150, height: 150),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          'Wind Direction: ${winddirection ?? 'N/A'}°',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -2455,6 +2971,33 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           if (widget.deviceName.startsWith('20'))
                             _buildCurrentValue(
                                 'Rain Level ', _currentrfdValue, 'mm'),
+
+                          // Add compass for IT devices with debugging
+                          () {
+                            print(
+                                'Checking compass display conditions for device: ${widget.deviceName}');
+                            print(
+                                'Device starts with IT: ${widget.deviceName.startsWith('IT')}');
+                            print(
+                                'Wind direction valid: ${isWindDirectionValid(_lastwinddirection)}');
+                            print(
+                                'Wind direction not null: ${_lastwinddirection != null}');
+                            print(
+                                'Wind direction not empty: ${_lastwinddirection?.isNotEmpty ?? false}');
+
+                            if (widget.deviceName.startsWith('IT') &&
+                                iswinddirectionValid(_lastwinddirection) &&
+                                _lastwinddirection != null &&
+                                _lastwinddirection.isNotEmpty) {
+                              print('All conditions met, displaying compass');
+                              return _buildWindCompass(_lastwinddirection);
+                            } else {
+                              print(
+                                  'Compass not displayed due to failed conditions');
+                              return SizedBox
+                                  .shrink(); // Return empty widget if conditions fail
+                            }
+                          }(),
                         ],
                       ),
                     ),
@@ -2464,6 +3007,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildNHStatisticsTable(),
                     if (widget.deviceName.startsWith('DO'))
                       buildDOStatisticsTable(),
+                    if (widget.deviceName.startsWith('IT'))
+                      buildITStatisticsTable(),
                     if (widget.deviceName.startsWith('WD211') ||
                         (widget.deviceName.startsWith('WD511')))
                       SingleChildScrollView(
@@ -2629,6 +3174,27 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         // if (hasNonZeroValues(rfsData))
                         _buildChartContainer(
                             'RFS', rfsData, 'RFS (mm)', ChartType.line),
+                        if (hasNonZeroValues(ittempData))
+                          _buildChartContainer('Temperature', ittempData,
+                              'Temperature (°C)', ChartType.line),
+                        if (hasNonZeroValues(itpressureData))
+                          _buildChartContainer('Pressure', itpressureData,
+                              'Pressure ()', ChartType.line),
+                        if (hasNonZeroValues(ithumidityData))
+                          _buildChartContainer('Humidity', ithumidityData,
+                              'Humidity (%)', ChartType.line),
+                        // if (hasNonZeroValues(itrainData))
+                        _buildChartContainer('Rain Level', itrainData,
+                            'Rain Level (mm)', ChartType.line),
+                        if (hasNonZeroValues(itvisibilityData))
+                          _buildChartContainer('Wind Speed', itwindspeedData,
+                              'Wind Speed (m/s)', ChartType.line),
+                        if (hasNonZeroValues(itradiationData))
+                          _buildChartContainer('Radiation', itradiationData,
+                              'Radiation ()', ChartType.line),
+                        if (hasNonZeroValues(itvisibilityData))
+                          _buildChartContainer('Visibilty', itvisibilityData,
+                              'Visibility ()', ChartType.line),
                       ],
                     )
                   ],
