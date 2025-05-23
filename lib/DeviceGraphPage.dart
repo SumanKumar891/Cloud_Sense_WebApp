@@ -3179,7 +3179,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'Temperature (°C)', ChartType.line),
                         if (hasNonZeroValues(itpressureData))
                           _buildChartContainer('Pressure', itpressureData,
-                              'Pressure ()', ChartType.line),
+                              'Pressure (hPa)', ChartType.line),
                         if (hasNonZeroValues(ithumidityData))
                           _buildChartContainer('Humidity', ithumidityData,
                               'Humidity (%)', ChartType.line),
@@ -3191,10 +3191,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'Wind Speed (m/s)', ChartType.line),
                         if (hasNonZeroValues(itradiationData))
                           _buildChartContainer('Radiation', itradiationData,
-                              'Radiation ()', ChartType.line),
+                              'Radiation (W/m²)', ChartType.line),
                         if (hasNonZeroValues(itvisibilityData))
                           _buildChartContainer('Visibilty', itvisibilityData,
-                              'Visibility ()', ChartType.line),
+                              'Visibility (m)', ChartType.line),
                       ],
                     )
                   ],
