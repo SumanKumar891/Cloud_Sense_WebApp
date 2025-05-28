@@ -68,6 +68,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startDate&enddate=$endDate';
+    } else if (widget.deviceName.startsWith('FS')) {
+      apiUrl =
+          'https://w7w21t8s23.execute-api.us-east-1.amazonaws.com/default/SSMet_Forest_API_func?deviceid=$deviceId&startdate=$startDate&enddate=$endDate';
     } else if (widget.deviceName.startsWith('DO')) {
       apiUrl =
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceId=$deviceId&startdate=$startDate&enddate=$endDate';
@@ -145,6 +148,23 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['visibility'],
             item['wind_direction'],
             item['wind_speed'],
+          ]);
+        });
+      } else if (widget.deviceName.startsWith('FS')) {
+        _csvRows.add([
+          "Timestamp",
+          "Temperature",
+          "Humidity ",
+          "RFD",
+          "RFS",
+        ]);
+        data['items'].forEach((item) {
+          _csvRows.add([
+            item['timestamp'],
+            item['temperature'],
+            item['humidity'],
+            item['RFD'],
+            item['RFS'],
           ]);
         });
       } else if (widget.deviceName.startsWith('WS')) {

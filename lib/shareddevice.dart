@@ -18,6 +18,7 @@ class DeviceUtils {
     if (deviceId.startsWith('CS')) return 'Cow Sensor';
     if (deviceId.startsWith('TH')) return 'Temperature Sensor';
     if (deviceId.startsWith('NH')) return 'Ammonia Sensor';
+    if (deviceId.startsWith('FS')) return 'Forest Sensor';
     return 'Rain Sensor';
   }
 
@@ -124,7 +125,8 @@ class DeviceUtils {
     'BF',
     'CS',
     'TH',
-    'NH'
-        'IT'
+    'NH',
+    'IT',
+    'FS',
   ];
 }

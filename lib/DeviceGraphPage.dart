@@ -199,6 +199,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> itvisibilityData = [];
   List<ChartData> itrainData = [];
   List<ChartData> itwinddirectionData = [];
+  List<ChartData> fstemperatureData = [];
+  List<ChartData> fshumidityData = [];
+  List<ChartData> fsrfdData = [];
+  List<ChartData> fsrfsData = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -448,6 +452,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('FS')) {
+      apiUrl =
+          'https://w7w21t8s23.execute-api.us-east-1.amazonaws.com/default/SSMet_Forest_API_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('DO')) {
       apiUrl =
           'https://br2s08as9f.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_2_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -904,6 +911,41 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('FS')) {
+          setState(() {
+            fstemperatureData = _parsefsChartData(data, 'temperature');
+            fshumidityData = _parsefsChartData(data, 'humidity');
+            fsrfdData = _parsefsChartData(data, 'RFD');
+            fsrfsData = _parsefsChartData(data, 'RFS');
+
+            // //Extract the last wind direction from the data
+            // if (data['weather_items'].isNotEmpty) {
+            //   lastWindDirection = data['weather_items'].last['WindDirection'];
+            //   lastBatteryPercentage =
+            //       data['weather_items'].last['BatteryPercentage'];
+            // }
+
+            // Prepare data for CSV
+            rows = [
+              [
+                "Timestamp",
+                "Temperature",
+                "Humidity",
+                "RFD",
+                "RFS",
+              ],
+              for (int i = 0; i < fstemperatureData.length; i++)
+                [
+                  formatter.format(fstemperatureData[i].timestamp),
+                  fstemperatureData[i].value,
+                  fshumidityData[i].value,
+                  fsrfdData[i].value,
+                  fsrfsData[i].value,
+                ]
+            ];
+          });
+          // Fetch device details specifically for Weather data
+          await _fetchDeviceDetails();
         } else if (widget.deviceName.startsWith('WD')) {
           setState(() {
             temperatureData = _parseChartData(data, 'Temperature');
@@ -1249,6 +1291,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       }
       return ChartData(
         timestamp: _parseITDate(item['human_time']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
+  List<ChartData> _parsefsChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
+      }
+      return ChartData(
+        timestamp: _parsefsDate(item['timestamp']),
         value: item[type] != null
             ? double.tryParse(item[type].toString()) ?? 0.0
             : 0.0,
@@ -2113,6 +2170,152 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     ]);
   }
 
+  // Calculate average, min, and max values
+  Map<String, List<double?>> _calculatefsStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        'average': [null],
+        'current': [null],
+        'min': [null],
+        'max': [null],
+      };
+    }
+    double sum = 0.0;
+    double? current = data.last.value;
+    double min = double.infinity;
+    double max = double.negativeInfinity;
+
+    for (var entry in data) {
+      sum += entry.value;
+      if (entry.value < min) min = entry.value;
+      if (entry.value > max) max = entry.value;
+    }
+    double avg = sum / data.length;
+    return {
+      'average': [avg],
+      'current': [current],
+      'min': [min],
+      'max': [max],
+    };
+  }
+
+  // Create a table displaying statistics
+  Widget buildfsStatisticsTable() {
+    final fstempStats = _calculatefsStatistics(fstemperatureData);
+    final fshumStats = _calculatefsStatistics(fshumidityData);
+    final fsrfdStats = _calculatefsStatistics(fsrfdData);
+    final fsrfsStats = _calculatefsStatistics(fsrfsData);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 500,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Min',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Max',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Avg',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                buildfsDataRow('TEMP', fstempStats, fontSize),
+                buildfsDataRow('HUMIDITY', fshumStats, fontSize),
+                buildfsDataRow('RFD', fsrfdStats, fontSize),
+                buildfsDataRow('RFS', fsrfsStats, fontSize),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  DataRow buildfsDataRow(
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
+              : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          (parameter == 'RFD' || parameter == 'RFS')
+              ? '-'
+              : (stats['average']?[0] != null
+                  ? stats['average']![0]!.toStringAsFixed(2)
+                  : '-'),
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
@@ -2153,6 +2356,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   DateTime _parseITDate(String dateString) {
+    final dateFormat = DateFormat(
+        'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
+  DateTime _parsefsDate(String dateString) {
     final dateFormat = DateFormat(
         'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
     try {
@@ -3009,6 +3222,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildDOStatisticsTable(),
                     if (widget.deviceName.startsWith('IT'))
                       buildITStatisticsTable(),
+                    if (widget.deviceName.startsWith('FS'))
+                      buildfsStatisticsTable(),
                     if (widget.deviceName.startsWith('WD211') ||
                         (widget.deviceName.startsWith('WD511')))
                       SingleChildScrollView(
@@ -3195,6 +3410,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         if (hasNonZeroValues(itvisibilityData))
                           _buildChartContainer('Visibilty', itvisibilityData,
                               'Visibility (m)', ChartType.line),
+                        if (hasNonZeroValues(fstemperatureData))
+                          _buildChartContainer('Temperature', fstemperatureData,
+                              'Temperature (°C)', ChartType.line),
+
+                        if (hasNonZeroValues(fshumidityData))
+                          _buildChartContainer('Humidity', fshumidityData,
+                              'Humidity (%)', ChartType.line),
+                        // // if (hasNonZeroValues(fsrfdData))
+                        // _buildChartContainer(
+                        //     'RFD', fsrfdData, 'RFD (mm)', ChartType.line),
+                        // if (hasNonZeroValues(rfsData))
+                        _buildChartContainer('Rainfall Per Minute', fsrfsData,
+                            'Rainfall Per Minute (mm)', ChartType.line),
                       ],
                     )
                   ],

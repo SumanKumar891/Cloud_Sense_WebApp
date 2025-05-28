@@ -131,6 +131,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Temperature Sensors';
       case 'NH':
         return 'Ammonia Sensors';
+      case 'FS':
+        return 'Forest Sensors';
+
       default:
         return 'Rain Sensors';
     }

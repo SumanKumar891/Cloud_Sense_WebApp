@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http; // For API requests
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:shared_preferences/shared_preferences.dart'; // For persistent storage
 
 class MapPage extends StatefulWidget {
   @override
@@ -30,27 +31,77 @@ class _MapPageState extends State<MapPage> {
   DateTime? endDate;
   final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
 
-  // Track previous positions for each device
-  Map<String, LatLng> previousPositions = {};
-  final double displacementThreshold = 200.0; // 2 kilometers
+  // Track previous positions for each device (now persistent)
+  Map<String, Map<String, dynamic>> previousPositions = {};
+  final double displacementThreshold = 200.0; // 200 meters
   final Distance distance =
       Distance(); // For calculating distance between coordinates
+  final int stationaryTimeThreshold = 5 * 60 * 1000; // 5 minutes
+
+  // SharedPreferences key for storing positions
+  static const String POSITIONS_KEY = 'device_previous_positions';
 
   @override
   void initState() {
     super.initState();
     mapController = MapController(); // Initialize MapController
-    _fetchDeviceLocations(); // Fetch all devices on initialization
+    _loadPreviousPositions(); // Load stored positions first
+  }
+
+  // Load previous positions from SharedPreferences
+  Future<void> _loadPreviousPositions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? storedData = prefs.getString(POSITIONS_KEY);
+
+      if (storedData != null) {
+        final Map<String, dynamic> decodedData = json.decode(storedData);
+        previousPositions = decodedData.map((key, value) => MapEntry(
+              key,
+              Map<String, dynamic>.from(value),
+            ));
+        print(
+            'Loaded ${previousPositions.length} previous positions from storage');
+      }
+    } catch (e) {
+      print('Error loading previous positions: $e');
+      previousPositions = {};
+    }
+
+    // Now fetch device locations after loading previous positions
+    _fetchDeviceLocations();
+  }
+
+  // Save previous positions to SharedPreferences
+  Future<void> _savePreviousPositions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String encodedData = json.encode(previousPositions);
+      await prefs.setString(POSITIONS_KEY, encodedData);
+      print('Saved ${previousPositions.length} positions to storage');
+    } catch (e) {
+      print('Error saving previous positions: $e');
+    }
+  }
+
+  // Helper method to truncate a number to 3 decimal places
+  double _truncateToThreeDecimals(double value) {
+    String valueStr = value.toString();
+    List<String> parts = valueStr.split('.');
+    if (parts.length < 2) return value; // No decimal part
+    String integerPart = parts[0];
+    String decimalPart =
+        parts[1].length > 3 ? parts[1].substring(0, 3) : parts[1];
+    return double.parse('$integerPart.$decimalPart');
   }
 
   Future<void> _fetchDeviceLocations(
       {String? deviceId, DateTime? start, DateTime? end}) async {
     setState(() {
-      isLoading = true; // Show loading indicator
+      isLoading = true;
     });
 
     try {
-      // Construct API URL
       String url =
           'https://nv9spsjdpe.execute-api.us-east-1.amazonaws.com/default/GPS_API_Data_func';
       if (deviceId != null && start != null && end != null) {
@@ -63,7 +114,14 @@ class _MapPageState extends State<MapPage> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        // Group by Device_id and take the most recent record
+        if (data.isEmpty) {
+          print('No new data returned from API');
+          setState(() {
+            isLoading = false;
+          });
+          return; // Exit early if no data
+        }
+
         Map<String, Map<String, dynamic>> latestDevices = {};
 
         for (var device in data) {
@@ -77,41 +135,120 @@ class _MapPageState extends State<MapPage> {
           }
         }
 
-        // Update deviceIds for dropdown if fetching all devices
         if (deviceId == null) {
           deviceIds = latestDevices.keys.toList();
-          deviceIds.sort(); // Sort for better UX
+          deviceIds.sort();
         }
 
         List<Map<String, dynamic>> fetchedDevices = [];
+        bool positionsUpdated = false;
+
         for (var device in latestDevices.values) {
           String deviceId = device['Device_id'].toString();
+          // Truncate latitude and longitude to 3 decimal places
           double lat = device['Latitude'] is String
-              ? double.parse(device['Latitude'])
-              : device['Latitude'];
+              ? _truncateToThreeDecimals(double.parse(device['Latitude']))
+              : _truncateToThreeDecimals(device['Latitude']);
           double lon = device['Longitude'] is String
-              ? double.parse(device['Longitude'])
-              : device['Longitude'];
+              ? _truncateToThreeDecimals(double.parse(device['Longitude']))
+              : _truncateToThreeDecimals(device['Longitude']);
           LatLng currentPosition = LatLng(lat, lon);
+          String currentTimestamp = device['Timestamp'].toString();
 
-          // Check if position has changed
           bool hasMoved = false;
+          bool shouldUpdatePosition = false;
+
           if (previousPositions.containsKey(deviceId)) {
+            final prevData = previousPositions[deviceId]!;
+            final LatLng prevPosition = LatLng(
+              prevData['latitude'],
+              prevData['longitude'],
+            );
+            final String prevTimestamp = prevData['timestamp'];
+            final String? lastMovedTimestamp = prevData['last_moved_timestamp'];
+
+            // Skip stationary check if timestamp hasn't changed
+            if (currentTimestamp == prevTimestamp) {
+              print('No new timestamp for device $deviceId, skipping update');
+              fetchedDevices.add({
+                'name': 'Device: $deviceId',
+                'latitude': lat,
+                'longitude': lon,
+                'place': prevData['place'] ?? 'Unknown',
+                'state': prevData['state'] ?? 'Unknown',
+                'country': prevData['country'] ?? 'Unknown',
+                'last_active': currentTimestamp,
+                'has_moved': prevData['has_moved'] ?? false,
+              });
+              continue;
+            }
+
             double dist = distance.as(
               LengthUnit.Meter,
-              previousPositions[deviceId]!,
+              prevPosition,
               currentPosition,
             );
+
             if (dist >= displacementThreshold) {
               hasMoved = true;
+              shouldUpdatePosition = true;
+              print(
+                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>${displacementThreshold}m threshold)');
+            } else if (DateTime.parse(currentTimestamp)
+                .isAfter(DateTime.parse(prevTimestamp))) {
+              shouldUpdatePosition = true;
+              if (lastMovedTimestamp != null) {
+                try {
+                  final currentTime = DateTime.parse(currentTimestamp);
+                  final lastMovedTime = DateTime.parse(lastMovedTimestamp);
+                  final timeDiff =
+                      currentTime.difference(lastMovedTime).inMilliseconds;
+                  if (timeDiff >= stationaryTimeThreshold) {
+                    hasMoved = false;
+                    print(
+                        'Device $deviceId stationary for ${timeDiff / 1000 / 60} minutes, setting to green');
+                  } else {
+                    hasMoved =
+                        prevData['has_moved'] ?? false; // Retain previous state
+                    print(
+                        'Device $deviceId stationary for ${timeDiff / 1000 / 60} minutes, not yet 5 minutes');
+                  }
+                } catch (e) {
+                  print('Error parsing timestamps for device $deviceId: $e');
+                }
+              }
             }
+          } else {
+            shouldUpdatePosition = true;
+            print('First time tracking device $deviceId');
           }
 
-          // Update previous position
-          previousPositions[deviceId] = currentPosition;
+          if (shouldUpdatePosition) {
+            final geoData = await _reverseGeocode(lat, lon);
+            previousPositions[deviceId] = {
+              'latitude': lat,
+              'longitude': lon,
+              'timestamp': currentTimestamp,
+              'last_moved_timestamp': hasMoved
+                  ? currentTimestamp
+                  : previousPositions[deviceId]?['last_moved_timestamp'] ??
+                      currentTimestamp,
+              'has_moved': hasMoved,
+              'place': geoData['place'],
+              'state': geoData['state'],
+              'country': geoData['country'],
+            };
+            positionsUpdated = true;
+          }
 
-          // Perform reverse geocoding to get place, state, and country
-          final geoData = await _reverseGeocode(lat, lon);
+          final geoData = previousPositions[deviceId] != null
+              ? {
+                  'place': previousPositions[deviceId]!['place'] ?? 'Unknown',
+                  'state': previousPositions[deviceId]!['state'] ?? 'Unknown',
+                  'country':
+                      previousPositions[deviceId]!['country'] ?? 'Unknown',
+                }
+              : await _reverseGeocode(lat, lon);
 
           fetchedDevices.add({
             'name': 'Device: $deviceId',
@@ -120,9 +257,13 @@ class _MapPageState extends State<MapPage> {
             'place': geoData['place'] ?? 'Unknown',
             'state': geoData['state'] ?? 'Unknown',
             'country': geoData['country'] ?? 'Unknown',
-            'last_active': device['Timestamp'].toString(),
-            'has_moved': hasMoved, // Track if device has moved
+            'last_active': currentTimestamp,
+            'has_moved': hasMoved,
           });
+        }
+
+        if (positionsUpdated) {
+          await _savePreviousPositions();
         }
 
         setState(() {
@@ -133,10 +274,9 @@ class _MapPageState extends State<MapPage> {
               fetchedDevices[0]['latitude'],
               fetchedDevices[0]['longitude'],
             );
-            zoomLevel = 12.0; // Adjusted for better initial view
+            zoomLevel = 12.0;
             mapController.move(centerCoordinates, zoomLevel);
           } else {
-            // Reset to default if no devices
             centerCoordinates = LatLng(0, 0);
             zoomLevel = 5.0;
             mapController.move(centerCoordinates, zoomLevel);
@@ -149,8 +289,26 @@ class _MapPageState extends State<MapPage> {
       _showError('Error fetching devices: $e');
     } finally {
       setState(() {
-        isLoading = false; // Hide loading indicator
+        isLoading = false;
       });
+    }
+  }
+
+  // Method to manually clear stored positions (for testing/debugging)
+  Future<void> _clearStoredPositions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(POSITIONS_KEY);
+      previousPositions.clear();
+      print('Cleared all stored positions');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cleared stored device positions')),
+      );
+
+      _fetchDeviceLocations();
+    } catch (e) {
+      print('Error clearing positions: $e');
     }
   }
 
@@ -158,16 +316,14 @@ class _MapPageState extends State<MapPage> {
     try {
       final url =
           'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=18&addressdetails=1';
-      final response = await http.get(Uri.parse(url), headers: {
-        'User-Agent': 'YourAppName/1.0', // Required by Nominatim
-      });
+      final response =
+          await http.get(Uri.parse(url)); // Removed User-Agent header
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final address = data['address'];
 
-        // Prioritize specific place names for better accuracy
-        String place = address['amenity'] ?? // e.g., IIT Ropar
+        String place = address['amenity'] ??
             address['building'] ??
             address['shop'] ??
             address['office'] ??
@@ -180,8 +336,7 @@ class _MapPageState extends State<MapPage> {
             address['town'] ??
             address['village'] ??
             address['county'] ??
-            data['display_name']
-                ?.split(',')[0] ?? // Fallback to first part of display_name
+            data['display_name']?.split(',')[0] ??
             'Unknown';
 
         return {
@@ -201,9 +356,8 @@ class _MapPageState extends State<MapPage> {
     try {
       final url =
           'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json';
-      final response = await http.get(Uri.parse(url), headers: {
-        'User-Agent': 'YourAppName/1.0', // Required by Nominatim
-      });
+      final response =
+          await http.get(Uri.parse(url)); // Removed User-Agent header
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -304,7 +458,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  // Date picker for start and end dates
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -319,7 +472,6 @@ class _MapPageState extends State<MapPage> {
         } else {
           endDate = picked;
         }
-        // Trigger API call if all fields are selected
         if (selectedDeviceId != null && startDate != null && endDate != null) {
           _fetchDeviceLocations(
               deviceId: selectedDeviceId, start: startDate, end: endDate);
@@ -361,26 +513,26 @@ class _MapPageState extends State<MapPage> {
                   fontSize: 16,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
                 ),
               ),
               SizedBox(height: 8),
               Text(
-                'Latitude: ${latitude.toStringAsFixed(6)}',
+                'Latitude: ${latitude.toStringAsFixed(3)}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
                 ),
               ),
               Text(
-                'Longitude: ${longitude.toStringAsFixed(6)}',
+                'Longitude: ${longitude.toStringAsFixed(3)}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
                 ),
               ),
               Text(
@@ -389,7 +541,7 @@ class _MapPageState extends State<MapPage> {
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
                 ),
               ),
               Text(
@@ -398,7 +550,7 @@ class _MapPageState extends State<MapPage> {
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
                 ),
               ),
               Text(
@@ -407,7 +559,7 @@ class _MapPageState extends State<MapPage> {
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
                 ),
               ),
               Text(
@@ -416,7 +568,15 @@ class _MapPageState extends State<MapPage> {
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : Colors.black, // Match web tooltip text color
+                      : Colors.black,
+                ),
+              ),
+              Text(
+                'Status: ${hasMoved ? "Moved (>200m)" : "Stationary (<200m or >5min)"}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: hasMoved ? Colors.blue : Colors.green,
                 ),
               ),
             ],
@@ -486,8 +646,8 @@ class _MapPageState extends State<MapPage> {
                             Icons.location_pin,
                             size: 40,
                             color: device['has_moved'] == true
-                                ? Colors.blue // Displaced devices (≥ 2 km)
-                                : Colors.red, // Stationary devices (< 2 km)
+                                ? Colors.blue
+                                : Colors.green,
                           ),
                         ),
                       );
@@ -520,6 +680,11 @@ class _MapPageState extends State<MapPage> {
                           ),
                         ),
                         Spacer(),
+                        // IconButton(
+                        //   icon: Icon(Icons.clear_all, color: Colors.orange),
+                        //   onPressed: _clearStoredPositions,
+                        //   tooltip: 'Clear Stored Positions',
+                        // ),
                         IconButton(
                           icon: isLoading
                               ? CircularProgressIndicator(
@@ -528,10 +693,8 @@ class _MapPageState extends State<MapPage> {
                                       Colors.black),
                                 )
                               : Icon(Icons.refresh, color: Colors.black),
-                          onPressed: isLoading
-                              ? null
-                              : () =>
-                                  _fetchDeviceLocations(), // Reload all devices
+                          onPressed:
+                              isLoading ? null : () => _fetchDeviceLocations(),
                           tooltip: 'Reload Map',
                         ),
                       ],
@@ -559,7 +722,6 @@ class _MapPageState extends State<MapPage> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        // Device ID Dropdown
                         DropdownButtonFormField<String>(
                           value: selectedDeviceId,
                           hint: Text('Select Device ID'),
@@ -572,7 +734,6 @@ class _MapPageState extends State<MapPage> {
                           onChanged: (String? newValue) {
                             setState(() {
                               selectedDeviceId = newValue;
-                              // Trigger API call if all fields are selected
                               if (selectedDeviceId != null &&
                                   startDate != null &&
                                   endDate != null) {
@@ -595,7 +756,6 @@ class _MapPageState extends State<MapPage> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        // Date Pickers
                         Row(
                           children: [
                             Expanded(
