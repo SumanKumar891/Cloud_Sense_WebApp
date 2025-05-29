@@ -18,6 +18,7 @@ import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -199,10 +200,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> itvisibilityData = [];
   List<ChartData> itrainData = [];
   List<ChartData> itwinddirectionData = [];
-  List<ChartData> fstemperatureData = [];
+  List<ChartData> fstempData = [];
+  List<ChartData> fspressureData = [];
   List<ChartData> fshumidityData = [];
-  List<ChartData> fsrfdData = [];
-  List<ChartData> fsrfsData = [];
+  List<ChartData> fsradiationData = [];
+  List<ChartData> fswindspeedData = [];
+
+  List<ChartData> fsrainData = [];
+  List<ChartData> fswinddirectionData = [];
+  Timer? _reloadTimer;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -268,12 +274,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     super.initState();
     requestPermissions();
     _fetchDeviceDetails();
-
     _fetchDataForRange('single');
-
     _focusNode = FocusNode();
-    // Initialize notifications
     _initializeNotifications();
+
+    // Set up the periodic timer to reload data every 30 seconds
+    _reloadTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      _reloadData();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer to prevent memory leaks
+    _reloadTimer?.cancel();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   Future<void> requestPermissions() async {
@@ -345,7 +361,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
   String _lastwinddirection = "";
+  String _lastfswinddirection = "";
   String _lastBatteryPercentage = "";
+  double _lastfsBattery = 0.0;
+
   String _lastRSSI_Value = "";
 
   Future<void> _fetchDataForRange(String range,
@@ -913,10 +932,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           await _fetchDeviceDetails();
         } else if (widget.deviceName.startsWith('FS')) {
           setState(() {
-            fstemperatureData = _parsefsChartData(data, 'temperature');
+            fstempData = _parsefsChartData(data, 'temperature');
+            fspressureData = _parsefsChartData(data, 'pressure');
             fshumidityData = _parsefsChartData(data, 'humidity');
-            fsrfdData = _parsefsChartData(data, 'RFD');
-            fsrfsData = _parsefsChartData(data, 'RFS');
+            fsradiationData = _parsefsChartData(data, 'radiation');
+            fsrainData = _parsefsChartData(data, 'rain_level');
+            fswinddirectionData = _parsefsChartData(data, 'wind_direction');
+            fswindspeedData = _parsefsChartData(data, 'wind_speed');
 
             // //Extract the last wind direction from the data
             // if (data['weather_items'].isNotEmpty) {
@@ -924,23 +946,49 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             //   lastBatteryPercentage =
             //       data['weather_items'].last['BatteryPercentage'];
             // }
+            // Assign _lastWindDirection from the latest item
+            if (data.containsKey('items') &&
+                data['items'] is List &&
+                data['items'].isNotEmpty) {
+              var lastItem = data['items'].last;
+
+              print('Last item: $lastItem');
+              print('Last item keys: ${lastItem.keys}');
+
+              _lastfswinddirection =
+                  lastItem['wind_direction']?.toString() ?? '0';
+
+              var batteryVoltage = lastItem['battery_voltage'];
+              if (batteryVoltage != null) {
+                _lastfsBattery =
+                    double.tryParse(batteryVoltage.toString()) ?? 0.0;
+                print('Battery Voltage: $_lastfsBattery V');
+              } else {
+                _lastfsBattery = 0;
+                print('No battery_voltage found, defaulting to 0.0');
+              }
+            }
 
             // Prepare data for CSV
             rows = [
               [
                 "Timestamp",
                 "Temperature",
+                "Pressure ",
                 "Humidity",
-                "RFD",
-                "RFS",
+                "Radiation",
+                "Wind Direction",
+                "Wind Speed"
               ],
-              for (int i = 0; i < fstemperatureData.length; i++)
+              for (int i = 0; i < fstempData.length; i++)
                 [
-                  formatter.format(fstemperatureData[i].timestamp),
-                  fstemperatureData[i].value,
+                  formatter.format(ittempData[i].timestamp),
                   fshumidityData[i].value,
-                  fsrfdData[i].value,
-                  fsrfsData[i].value,
+                  fspressureData[i].value,
+                  fshumidityData[i].value,
+                  fsradiationData[i].value,
+                  fswinddirectionData[i].value,
+                  fswindspeedData[i].value,
                 ]
             ];
           });
@@ -2201,10 +2249,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   // Create a table displaying statistics
   Widget buildfsStatisticsTable() {
-    final fstempStats = _calculatefsStatistics(fstemperatureData);
+    final fstempStats = _calculatefsStatistics(fstempData);
+    final fspressureStats = _calculatefsStatistics(fspressureData);
     final fshumStats = _calculatefsStatistics(fshumidityData);
-    final fsrfdStats = _calculatefsStatistics(fsrfdData);
-    final fsrfsStats = _calculatefsStatistics(fsrfsData);
+    final fsrainStats = _calculatefsStatistics(fsrainData);
+    final fsradiationStats = _calculatefsStatistics(fsradiationData);
+
+    final fswindspeedStats = _calculatefsStatistics(fswindspeedData);
 
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 16;
@@ -2279,9 +2330,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ],
               rows: [
                 buildfsDataRow('TEMP', fstempStats, fontSize),
+                buildfsDataRow('PRESSURE', fspressureStats, fontSize),
                 buildfsDataRow('HUMIDITY', fshumStats, fontSize),
-                buildfsDataRow('RFD', fsrfdStats, fontSize),
-                buildfsDataRow('RFS', fsrfsStats, fontSize),
+                buildfsDataRow('RAIN', fsrainStats, fontSize),
+                buildfsDataRow('RADIATION', fsradiationStats, fontSize),
+                buildfsDataRow('WIND SPEED', fswindspeedStats, fontSize),
               ],
             ),
           ),
@@ -2307,11 +2360,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          (parameter == 'RFD' || parameter == 'RFS')
-              ? '-'
-              : (stats['average']?[0] != null
-                  ? stats['average']![0]!.toStringAsFixed(2)
-                  : '-'),
+          stats['average']?[0] != null
+              ? stats['average']![0]!.toStringAsFixed(2)
+              : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
@@ -2737,22 +2788,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               actions: [
                 if (widget.deviceName.startsWith('WD'))
                   Padding(
-                    padding: const EdgeInsets.only(
-                        right: 0.0), // Adjust padding as needed
+                    padding: const EdgeInsets.only(right: 8.0),
                     child: Row(
-                      mainAxisSize: MainAxisSize
-                          .min, // Ensure Row uses only required space
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          _getBatteryIcon(_parseBatteryPercentage(
-                              _lastBatteryPercentage)), // Convert to int before passing
+                          _getBatteryIcon(
+                            _parseBatteryPercentage(_lastBatteryPercentage),
+                          ),
                           size: 26,
                           color: Colors.white,
-                          // color: _getBatteryIconColor(_parseBatteryPercentage(
-                          //     _lastBatteryPercentage)), // Change color based on percentage
                         ),
+                        SizedBox(width: 4),
                         Text(
-                          ': $_lastBatteryPercentage', // Battery percentage
+                          ': $_lastBatteryPercentage',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -2762,13 +2811,40 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ],
                     ),
                   ),
+                if (widget.deviceName.startsWith('FS'))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getfsBatteryIcon(_lastfsBattery),
+                              color: _getBatteryColor(_lastfsBattery),
+                              size: 26,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${_lastfsBattery.toStringAsFixed(2)} V',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 Padding(
-                  padding: const EdgeInsets.only(
-                      right: 0.0), // Adjust padding as needed
+                  padding: const EdgeInsets.only(right: 12.0),
                   child: IconButton(
                     icon: Icon(Icons.refresh, color: Colors.white, size: 26),
                     onPressed: () {
-                      _reloadData(); // Function to reload data
+                      _reloadData();
                     },
                   ),
                 ),
@@ -3211,6 +3287,33 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   .shrink(); // Return empty widget if conditions fail
                             }
                           }(),
+
+                          // Add compass for IT devices with debugging
+                          () {
+                            print(
+                                'Checking compass display conditions for device: ${widget.deviceName}');
+                            print(
+                                'Device starts with IT: ${widget.deviceName.startsWith('FS')}');
+                            print(
+                                'Wind direction valid: ${isWindDirectionValid(_lastfswinddirection)}');
+                            print(
+                                'Wind direction not null: ${_lastfswinddirection != null}');
+                            print(
+                                'Wind direction not empty: ${_lastfswinddirection?.isNotEmpty ?? false}');
+
+                            if (widget.deviceName.startsWith('FS') &&
+                                iswinddirectionValid(_lastfswinddirection) &&
+                                _lastfswinddirection != null &&
+                                _lastfswinddirection.isNotEmpty) {
+                              print('All conditions met, displaying compass');
+                              return _buildWindCompass(_lastfswinddirection);
+                            } else {
+                              print(
+                                  'Compass not displayed due to failed conditions');
+                              return SizedBox
+                                  .shrink(); // Return empty widget if conditions fail
+                            }
+                          }(),
                         ],
                       ),
                     ),
@@ -3410,19 +3513,29 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         if (hasNonZeroValues(itvisibilityData))
                           _buildChartContainer('Visibilty', itvisibilityData,
                               'Visibility (m)', ChartType.line),
-                        if (hasNonZeroValues(fstemperatureData))
-                          _buildChartContainer('Temperature', fstemperatureData,
+                        if (hasNonZeroValues(fstempData))
+                          _buildChartContainer('Temperature', fstempData,
                               'Temperature (°C)', ChartType.line),
-
+                        if (hasNonZeroValues(fspressureData))
+                          _buildChartContainer('Pressure', fspressureData,
+                              'Pressure (hPa)', ChartType.line),
                         if (hasNonZeroValues(fshumidityData))
                           _buildChartContainer('Humidity', fshumidityData,
                               'Humidity (%)', ChartType.line),
+                        // if (hasNonZeroValues(itrainData))
+                        _buildChartContainer('Rain Level', fsrainData,
+                            'Rain Level (mm)', ChartType.line),
+                        if (hasNonZeroValues(fswindspeedData))
+                          _buildChartContainer('Wind Speed', fswindspeedData,
+                              'Wind Speed (m/s)', ChartType.line),
+                        if (hasNonZeroValues(fsradiationData))
+                          _buildChartContainer('Radiation', fsradiationData,
+                              'Radiation (W/m²)', ChartType.line),
+
                         // // if (hasNonZeroValues(fsrfdData))
                         // _buildChartContainer(
                         //     'RFD', fsrfdData, 'RFD (mm)', ChartType.line),
                         // if (hasNonZeroValues(rfsData))
-                        _buildChartContainer('Rainfall Per Minute', fsrfsData,
-                            'Rainfall Per Minute (mm)', ChartType.line),
                       ],
                     )
                   ],
@@ -3531,6 +3644,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       return Icons.battery_4_bar; // 80% battery
     } else if (batteryPercentage > 80 && batteryPercentage < 100) {
       return Icons.battery_5_bar; // 90% battery
+    } else {
+      return Icons.battery_full; // Full battery
+    }
+  }
+
+  Color _getBatteryColor(double voltage) {
+    if (voltage < 3.3) {
+      return Colors.red;
+    } else if (voltage < 4.0) {
+      return Colors.orange;
+    } else {
+      return Colors.green;
+    }
+  }
+
+  IconData _getfsBatteryIcon(double voltage) {
+    if (voltage < 3.3) {
+      return Icons.battery_2_bar; // Low battery
+    } else if (voltage < 4.0) {
+      return Icons.battery_5_bar; // Medium battery
     } else {
       return Icons.battery_full; // Full battery
     }
