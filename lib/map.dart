@@ -5,6 +5,13 @@ import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http; // For API requests
 import 'package:intl/intl.dart'; // For date formatting
 import 'package:shared_preferences/shared_preferences.dart'; // For persistent storage
+import 'package:latlong2/latlong.dart' show Distance;
+
+void main() {
+  runApp(MaterialApp(
+    home: MapPage(),
+  ));
+}
 
 class MapPage extends StatefulWidget {
   @override
@@ -99,6 +106,7 @@ class _MapPageState extends State<MapPage> {
       {String? deviceId, DateTime? start, DateTime? end}) async {
     setState(() {
       isLoading = true;
+      searchPin = null; // Clear search pin on reload
     });
 
     try {
@@ -138,6 +146,10 @@ class _MapPageState extends State<MapPage> {
         if (deviceId == null) {
           deviceIds = latestDevices.keys.toList();
           deviceIds.sort();
+          // Add "None" option to deviceIds if not already present
+          if (!deviceIds.contains('None')) {
+            deviceIds.insert(0, 'None');
+          }
         }
 
         List<Map<String, dynamic>> fetchedDevices = [];
@@ -145,7 +157,6 @@ class _MapPageState extends State<MapPage> {
 
         for (var device in latestDevices.values) {
           String deviceId = device['Device_id'].toString();
-          // Truncate latitude and longitude to 3 decimal places
           double lat = device['Latitude'] is String
               ? _truncateToThreeDecimals(double.parse(device['Latitude']))
               : _truncateToThreeDecimals(device['Latitude']);
@@ -167,7 +178,6 @@ class _MapPageState extends State<MapPage> {
             final String prevTimestamp = prevData['timestamp'];
             final String? lastMovedTimestamp = prevData['last_moved_timestamp'];
 
-            // Skip stationary check if timestamp hasn't changed
             if (currentTimestamp == prevTimestamp) {
               print('No new timestamp for device $deviceId, skipping update');
               fetchedDevices.add({
@@ -193,7 +203,7 @@ class _MapPageState extends State<MapPage> {
               hasMoved = true;
               shouldUpdatePosition = true;
               print(
-                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>${displacementThreshold}m threshold)');
+                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>200m threshold)');
             } else if (DateTime.parse(currentTimestamp)
                 .isAfter(DateTime.parse(prevTimestamp))) {
               shouldUpdatePosition = true;
@@ -208,8 +218,7 @@ class _MapPageState extends State<MapPage> {
                     print(
                         'Device $deviceId stationary for ${timeDiff / 1000 / 60} minutes, setting to green');
                   } else {
-                    hasMoved =
-                        prevData['has_moved'] ?? false; // Retain previous state
+                    hasMoved = prevData['has_moved'] ?? false;
                     print(
                         'Device $deviceId stationary for ${timeDiff / 1000 / 60} minutes, not yet 5 minutes');
                   }
@@ -316,8 +325,12 @@ class _MapPageState extends State<MapPage> {
     try {
       final url =
           'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=18&addressdetails=1';
-      final response =
-          await http.get(Uri.parse(url)); // Removed User-Agent header
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (contact@example.com)'
+        }, // Required by Nominatim
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -345,9 +358,11 @@ class _MapPageState extends State<MapPage> {
           'country': address['country'] ?? 'Unknown',
         };
       } else {
+        print('Reverse geocoding failed: ${response.statusCode}');
         return {'place': 'Unknown', 'state': 'Unknown', 'country': 'Unknown'};
       }
     } catch (e) {
+      print('Error during reverse geocoding: $e');
       return {'place': 'Unknown', 'state': 'Unknown', 'country': 'Unknown'};
     }
   }
@@ -356,8 +371,12 @@ class _MapPageState extends State<MapPage> {
     try {
       final url =
           'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json';
-      final response =
-          await http.get(Uri.parse(url)); // Removed User-Agent header
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (contact@example.com)'
+        }, // Required by Nominatim
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -381,7 +400,7 @@ class _MapPageState extends State<MapPage> {
                 builder: (ctx) => Icon(
                   Icons.location_pin,
                   size: 40,
-                  color: Colors.blue,
+                  color: Colors.red,
                 ),
               );
             });
@@ -410,6 +429,9 @@ class _MapPageState extends State<MapPage> {
             device['country']?.toLowerCase().contains(searchQuery) == true ||
             device['name']?.toLowerCase().contains(searchQuery) == true;
       }).toList();
+      if (query.isEmpty) {
+        searchPin = null; // Clear search pin when search query is empty
+      }
     });
 
     if (filteredDevices.isEmpty && query.isNotEmpty) {
@@ -429,6 +451,7 @@ class _MapPageState extends State<MapPage> {
     if (query.isEmpty) {
       setState(() {
         suggestions = [];
+        searchPin = null; // Clear search pin when suggestions are cleared
       });
       return;
     }
@@ -609,6 +632,12 @@ class _MapPageState extends State<MapPage> {
               options: MapOptions(
                 center: centerCoordinates,
                 zoom: zoomLevel,
+                minZoom: 2.0, // Prevent zooming out too far
+                maxZoom: 19.0, // Prevent zooming in too far (OSM max is 19)
+                interactiveFlags: InteractiveFlag.all &
+                    ~InteractiveFlag
+                        .rotate, // Enable all gestures except rotation
+                keepAlive: true, // Keep map alive to prevent reloading
               ),
               children: [
                 TileLayer(
@@ -616,6 +645,11 @@ class _MapPageState extends State<MapPage> {
                       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   subdomains: ['a', 'b', 'c'],
                   backgroundColor: const Color.fromARGB(255, 173, 216, 230),
+                  maxZoom: 19.0,
+                  minZoom: 2.0,
+                  errorTileCallback: (tile, error, stackTrace) {
+                    print('Tile failed to load: $error');
+                  },
                 ),
                 MarkerLayer(
                   markers: [
@@ -831,10 +865,4 @@ class _MapPageState extends State<MapPage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: MapPage(),
-  ));
 }
