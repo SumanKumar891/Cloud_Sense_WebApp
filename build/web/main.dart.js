@@ -79481,7 +79481,7 @@ auD(){var s,r,q,p,o,n=this.c
 n.toString
 s=A.acd(n,t.eC).a
 n=this.dy
-switch(n.a){case 0:r=s?"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png":"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+switch(n.a){case 0:r=s?"https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png":"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 q=s?B.ji:B.mU
 break
 case 1:q=s?B.ji:B.mU
@@ -79491,8 +79491,9 @@ case 2:q=s?B.ji:B.mU
 r="https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png"
 break
 default:r=null
-q=null}p=t.s
-n=n===B.ou?A.b(["a","b","c","d"],p):A.b([],p)
+q=null}n=n===B.ou&&!s
+p=t.s
+n=n?A.b(["a","b","c"],p):A.b([],p)
 p=t.N
 p=A.a7(["User-Agent","flutter_map (unknown)"],p,p)
 o=new A.aRL(B.W)

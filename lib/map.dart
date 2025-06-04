@@ -580,7 +580,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-// Helper method to get the appropriate TileLayer based on map type and theme
+  // Helper method to get the appropriate TileLayer based on map type and theme
   TileLayer _getTileLayer() {
     final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     String urlTemplate;
@@ -589,7 +589,7 @@ class _MapPageState extends State<MapPage> {
     switch (currentMapType) {
       case MapType.defaultMap:
         urlTemplate = isDarkMode
-            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
             : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         backgroundColor = isDarkMode
             ? const Color(0xFF1A2A44) // Dark blue for dark mode
@@ -613,8 +613,9 @@ class _MapPageState extends State<MapPage> {
 
     return TileLayer(
       urlTemplate: urlTemplate,
-      subdomains:
-          currentMapType == MapType.defaultMap ? ['a', 'b', 'c', 'd'] : [],
+      subdomains: currentMapType == MapType.defaultMap && !isDarkMode
+          ? ['a', 'b', 'c']
+          : [],
       backgroundColor: backgroundColor,
       maxZoom: 19.0,
       minZoom: 2.0,
