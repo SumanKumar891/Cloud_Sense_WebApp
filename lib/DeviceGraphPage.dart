@@ -279,7 +279,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     _initializeNotifications();
 
     // Set up the periodic timer to reload data every 30 seconds
-    _reloadTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+    _reloadTimer = Timer.periodic(Duration(seconds: 50), (timer) {
       _reloadData();
     });
   }
@@ -2256,10 +2256,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     final fsradiationStats = _calculatefsStatistics(fsradiationData);
 
     final fswindspeedStats = _calculatefsStatistics(fswindspeedData);
+    final fswinddirectionStats = _calculatefsStatistics(fswinddirectionData);
 
     double screenWidth = MediaQuery.of(context).size.width;
-    double fontSize = screenWidth < 800 ? 13 : 16;
-    double headerFontSize = screenWidth < 800 ? 16 : 22;
+    double fontSize = screenWidth < 800 ? 13 : 27;
+    double headerFontSize = screenWidth < 800 ? 16 : 33;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -2269,18 +2270,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           borderRadius: BorderRadius.circular(16),
           color: Colors.black.withOpacity(0.6),
         ),
-        margin: EdgeInsets.all(10),
+        margin: EdgeInsets.all(16),
         padding: EdgeInsets.all(8),
-        width: screenWidth < 800 ? double.infinity : 500,
+        width: screenWidth < 800 ? double.infinity : 900,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 900,
             ),
             child: DataTable(
-              horizontalMargin: 16,
-              columnSpacing: 16,
+              horizontalMargin: 20,
+              columnSpacing: 25,
               columns: [
                 DataColumn(
                   label: Text(
@@ -2318,23 +2319,25 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         color: Colors.blue),
                   ),
                 ),
-                DataColumn(
-                  label: Text(
-                    'Avg',
-                    style: TextStyle(
-                        fontSize: headerFontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue),
-                  ),
-                ),
+                // DataColumn(
+                //   label: Text(
+                //     'Avg',
+                //     style: TextStyle(
+                //         fontSize: headerFontSize,
+                //         fontWeight: FontWeight.bold,
+                //         color: Colors.blue),
+                //   ),
+                // ),
               ],
               rows: [
-                buildfsDataRow('TEMP', fstempStats, fontSize),
+                buildfsDataRow('TEMPERATURE', fstempStats, fontSize),
                 buildfsDataRow('PRESSURE', fspressureStats, fontSize),
                 buildfsDataRow('HUMIDITY', fshumStats, fontSize),
                 buildfsDataRow('RAIN', fsrainStats, fontSize),
                 buildfsDataRow('RADIATION', fsradiationStats, fontSize),
                 buildfsDataRow('WIND SPEED', fswindspeedStats, fontSize),
+                buildfsDataRow(
+                    'WIND DIRECTION', fswinddirectionStats, fontSize),
               ],
             ),
           ),
@@ -2359,11 +2362,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       DataCell(Text(
           stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
-      DataCell(Text(
-          stats['average']?[0] != null
-              ? stats['average']![0]!.toStringAsFixed(2)
-              : '-',
-          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      // DataCell(Text(
+      //     stats['average']?[0] != null
+      //         ? stats['average']![0]!.toStringAsFixed(2)
+      //         : '-',
+      //     style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
 
@@ -3288,32 +3291,32 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             }
                           }(),
 
-                          // Add compass for IT devices with debugging
-                          () {
-                            print(
-                                'Checking compass display conditions for device: ${widget.deviceName}');
-                            print(
-                                'Device starts with IT: ${widget.deviceName.startsWith('FS')}');
-                            print(
-                                'Wind direction valid: ${isWindDirectionValid(_lastfswinddirection)}');
-                            print(
-                                'Wind direction not null: ${_lastfswinddirection != null}');
-                            print(
-                                'Wind direction not empty: ${_lastfswinddirection?.isNotEmpty ?? false}');
+                          // // Add compass for FS devices with debugging
+                          // () {
+                          //   print(
+                          //       'Checking compass display conditions for device: ${widget.deviceName}');
+                          //   print(
+                          //       'Device starts with FS: ${widget.deviceName.startsWith('FS')}');
+                          //   print(
+                          //       'Wind direction valid: ${isWindDirectionValid(_lastfswinddirection)}');
+                          //   print(
+                          //       'Wind direction not null: ${_lastfswinddirection != null}');
+                          //   print(
+                          //       'Wind direction not empty: ${_lastfswinddirection?.isNotEmpty ?? false}');
 
-                            if (widget.deviceName.startsWith('FS') &&
-                                iswinddirectionValid(_lastfswinddirection) &&
-                                _lastfswinddirection != null &&
-                                _lastfswinddirection.isNotEmpty) {
-                              print('All conditions met, displaying compass');
-                              return _buildWindCompass(_lastfswinddirection);
-                            } else {
-                              print(
-                                  'Compass not displayed due to failed conditions');
-                              return SizedBox
-                                  .shrink(); // Return empty widget if conditions fail
-                            }
-                          }(),
+                          //   if (widget.deviceName.startsWith('FS') &&
+                          //       iswinddirectionValid(_lastfswinddirection) &&
+                          //       _lastfswinddirection != null &&
+                          //       _lastfswinddirection.isNotEmpty) {
+                          //     print('All conditions met, displaying compass');
+                          //     return _buildWindCompass(_lastfswinddirection);
+                          //   } else {
+                          //     print(
+                          //         'Compass not displayed due to failed conditions');
+                          //     return SizedBox
+                          //         .shrink(); // Return empty widget if conditions fail
+                          //   }
+                          // }(),
                         ],
                       ),
                     ),
