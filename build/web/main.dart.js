@@ -75838,7 +75838,7 @@ d=A.ij(16)
 c=A.J(153,0,0,0)
 b=s?1/0:900
 s=s?g-32:900
-f0.push(new A.aP(B.bP,A.bm(c1,A.eu(new A.fu(new A.aE(s,1/0,0,1/0),A.xP(c1,25,A.b([A.hc(A.Q(c3,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)),A.hc(A.Q(c4,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)),A.hc(A.Q(c5,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)),A.hc(A.Q(c6,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1))],t.UR),c1,20,A.b([c0.u1("TEMPERATURE (\xb0C)",b3,f),c0.u1("PRESSURE (hPa)",b4,f),c0.u1("HUMIDITY (%)",b5,f),c0.u1("RAIN LEVEL (mm)",b6,f),c0.u1("RADIATION (W/m\xb2)",b7,f),c0.u1("WIND SPEED (m/s)",b8,f),c0.u1("WIND DIRECTION (\xb0)",b9,f)],t.yy)),c1),c1,c1,c1,c1,B.a8),B.l,c1,c1,new A.cS(c,c1,o,d,c1,c1,B.S),c1,c1,c1,new A.aq(16,16,16,16),new A.aq(8,8,8,8),c1,c1,b),c1))}s=c0.a.c
+f0.push(new A.aP(B.bP,A.bm(c1,A.eu(new A.fu(new A.aE(s,1/0,0,1/0),A.xP(c1,25,A.b([A.hc(A.Q(c3,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)),A.hc(A.Q(c4,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)),A.hc(A.Q(c5,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)),A.hc(A.Q(c6,c1,c1,c1,c1,A.a1(c1,c1,B.D,c1,c1,c1,c1,c1,c1,c1,c1,e,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1))],t.UR),c1,20,A.b([c0.u1("TEMPERATURE (\xb0C)",b3,f),c0.u1("PRESSURE (hPa)",b4,f),c0.u1("RELATIVE HUMIDITY (%)",b5,f),c0.u1("RAIN LEVEL (mm)",b6,f),c0.u1("RADIATION (W/m\xb2)",b7,f),c0.u1("WIND SPEED (m/s)",b8,f),c0.u1("WIND DIRECTION (\xb0)",b9,f)],t.yy)),c1),c1,c1,c1,c1,B.a8),B.l,c1,c1,new A.cS(c,c1,o,d,c1,c1,B.S),c1,c1,c1,new A.aq(16,16,16,16),new A.aq(8,8,8,8),c1,c1,b),c1))}s=c0.a.c
 if(B.c.am(s,"WD211")||B.c.am(s,"WD511"))f0.push(A.eu(A.dm(new A.iV(new A.be9(c0),c1),c1,c1),c1,c1,c1,c1,B.ad))
 s=A.b([],p)
 if(c0.cN(c0.as))s.push(c0.cE(d2,c0.as,d3,B.O))
@@ -75887,7 +75887,7 @@ if(c0.cN(c0.aH))s.push(c0.cE(e8,c0.aH,e9,B.O))
 if(c0.cN(c0.a0))s.push(c0.cE("Visibilty",c0.a0,"Visibility (m)",B.O))
 if(c0.cN(c0.an))s.push(c0.cE(c9,c0.an,d4,B.O))
 if(c0.cN(c0.D))s.push(c0.cE(e4,c0.D,e5,B.O))
-if(c0.cN(c0.a_))s.push(c0.cE(d5,c0.a_,d6,B.O))
+if(c0.cN(c0.a_))s.push(c0.cE("Relative Humidity",c0.a_,d6,B.O))
 s.push(c0.cE(e6,c0.aE,e7,B.O))
 if(c0.cN(c0.a3))s.push(c0.cE(e8,c0.a3,e9,B.O))
 if(c0.cN(c0.ap))s.push(c0.cE(d9,c0.ap,e0,B.O))
@@ -76292,7 +76292,7 @@ if(r!=null){j=A.kG(J.aI(r))
 if(j==null)j=0
 k.B=j
 A.c0("Battery Voltage: "+A.n(j)+" V")}else{k.B=0
-A.c0("No battery_voltage found, defaulting to 0.0")}}q=A.b([["Timestamp","Temperature","Pressure ","Humidity","Radiation","Wind Speed","Wind Direction"]],t.X6)
+A.c0("No battery_voltage found, defaulting to 0.0")}}q=A.b([["Timestamp","Temperature","Pressure ","relative Humidity","Radiation","Wind Speed","Wind Direction"]],t.X6)
 for(p=0,j=m.d;o=p,n=k.an,o<n.length;++p)J.e0(q,[j.dm(n[p].a),k.an[p].b,k.D[p].b,k.a_[p].b,k.a3[p].b,k.ap[p].b,k.au[p].b])
 m.a.a=q},
 $S:0}
@@ -78529,7 +78529,7 @@ n=p.a.c
 if(B.c.am(n,"CL")||B.c.am(n,"BD")){o.push(["Timestamp","Chlorine"])
 J.e7(J.L(f,"items"),new A.bb7(p))}else if(B.c.am(n,"WQ")){o.push(["Timestamp","Temperature","TDS","COD","BOD","pH","DO","EC"])
 J.e7(f,new A.bb8(p))}else if(B.c.am(n,"IT")){o.push(["Timestamp","Temperature","Pressure ","Humidity","Radiation","Visibility","Wind Direction","Wind Speed"])
-J.e7(J.L(f,"items"),new A.bba(p))}else if(B.c.am(n,"FS")){o.push(["Timestamp","Temperature","Pressure ","Humidity","Radiation","Wind Speed","Wind Direction"])
+J.e7(J.L(f,"items"),new A.bba(p))}else if(B.c.am(n,"FS")){o.push(["Timestamp","Temperature","Pressure ","Relative Humidity","Radiation","Wind Speed","Wind Direction"])
 J.e7(J.L(f,"items"),new A.bbb(p))}else if(B.c.am(n,"WS")){o.push(["Timestamp","Temperature","Electrode_signal","Chlorine_value","Hypochlorous_value"])
 J.e7(J.L(f,"items"),new A.bbc(p))}else if(B.c.am(n,"DO")){o.push(["Timestamp","Temperature","DO Value ","DO Percentage"])
 J.e7(J.L(f,"items"),new A.bbd(p))}else if(B.c.am(n,"TH")){o.push(["Timestamp","Temperature","Humidity"])

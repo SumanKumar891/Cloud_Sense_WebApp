@@ -975,7 +975,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Timestamp",
                 "Temperature",
                 "Pressure ",
-                "Humidity",
+                "relative Humidity",
                 "Radiation",
                 "Wind Speed",
                 "Wind Direction",
@@ -2332,7 +2332,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               rows: [
                 buildfsDataRow('TEMPERATURE (°C)', fstempStats, fontSize),
                 buildfsDataRow('PRESSURE (hPa)', fspressureStats, fontSize),
-                buildfsDataRow('HUMIDITY (%)', fshumStats, fontSize),
+                buildfsDataRow('RELATIVE HUMIDITY (%)', fshumStats, fontSize),
                 buildfsDataRow('RAIN LEVEL (mm)', fsrainStats, fontSize),
                 buildfsDataRow('RADIATION (W/m²)', fsradiationStats, fontSize),
                 buildfsDataRow('WIND SPEED (m/s)', fswindspeedStats, fontSize),
@@ -3523,8 +3523,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           _buildChartContainer('Pressure', fspressureData,
                               'Pressure (hPa)', ChartType.line),
                         if (hasNonZeroValues(fshumidityData))
-                          _buildChartContainer('Humidity', fshumidityData,
-                              'Humidity (%)', ChartType.line),
+                          _buildChartContainer('Relative Humidity',
+                              fshumidityData, 'Humidity (%)', ChartType.line),
                         // if (hasNonZeroValues(itrainData))
                         _buildChartContainer('Rain Level', fsrainData,
                             'Rain Level (mm)', ChartType.line),
