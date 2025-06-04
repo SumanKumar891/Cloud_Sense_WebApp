@@ -1,20 +1,19 @@
-import 'dart:convert';
-import 'package:cloud_sense_webapp/HomePage.dart';
+import 'dart:convert'; // For JSON decoding
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http; // For API requests
+import 'package:intl/intl.dart'; // For date formatting
+import 'package:shared_preferences/shared_preferences.dart'; // For persistent storage
 import 'package:latlong2/latlong.dart' show Distance;
-import 'package:provider/provider.dart';
-import 'package:cloud_sense_webapp/main.dart'; // Import main.dart for ThemeProvider
 
-enum MapType { defaultMap, satellite, terrain }
+void main() {
+  runApp(MaterialApp(
+    home: MapPage(),
+  ));
+}
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
-
   @override
   _MapPageState createState() => _MapPageState();
 }
@@ -39,7 +38,7 @@ class _MapPageState extends State<MapPage> {
   DateTime? endDate;
   final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
 
-  // Track previous positions for each device (persistent)
+  // Track previous positions for each device (now persistent)
   Map<String, Map<String, dynamic>> previousPositions = {};
   final double displacementThreshold = 200.0; // 200 meters
   final Distance distance =
@@ -48,9 +47,6 @@ class _MapPageState extends State<MapPage> {
 
   // SharedPreferences key for storing positions
   static const String POSITIONS_KEY = 'device_previous_positions';
-
-  // State for map type
-  MapType currentMapType = MapType.defaultMap; // Default map type
 
   @override
   void initState() {
@@ -79,7 +75,7 @@ class _MapPageState extends State<MapPage> {
       previousPositions = {};
     }
 
-    // Fetch device locations after loading previous positions
+    // Now fetch device locations after loading previous positions
     _fetchDeviceLocations();
   }
 
@@ -150,6 +146,7 @@ class _MapPageState extends State<MapPage> {
         if (deviceId == null) {
           deviceIds = latestDevices.keys.toList();
           deviceIds.sort();
+          // Add "None" option to deviceIds if not already present
           if (!deviceIds.contains('None')) {
             deviceIds.insert(0, 'None');
           }
@@ -283,7 +280,9 @@ class _MapPageState extends State<MapPage> {
           filteredDevices = fetchedDevices;
           if (fetchedDevices.isNotEmpty) {
             centerCoordinates = LatLng(
-                fetchedDevices[0]['latitude'], fetchedDevices[0]['longitude']);
+              fetchedDevices[0]['latitude'],
+              fetchedDevices[0]['longitude'],
+            );
             zoomLevel = 12.0;
             mapController.move(centerCoordinates, zoomLevel);
           } else {
@@ -328,7 +327,9 @@ class _MapPageState extends State<MapPage> {
           'https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=18&addressdetails=1';
       final response = await http.get(
         Uri.parse(url),
-        headers: {'User-Agent': 'CloudSenseApp/1.0 (contact@example.com)'},
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (contact@example.com)'
+        }, // Required by Nominatim
       );
 
       if (response.statusCode == 200) {
@@ -372,7 +373,9 @@ class _MapPageState extends State<MapPage> {
           'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json';
       final response = await http.get(
         Uri.parse(url),
-        headers: {'User-Agent': 'CloudSenseApp/1.0 (contact@example.com)'},
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (contact@example.com)'
+        }, // Required by Nominatim
       );
 
       if (response.statusCode == 200) {
@@ -514,9 +517,10 @@ class _MapPageState extends State<MapPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
         return AlertDialog(
-          backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+          backgroundColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black.withOpacity(0.6)
+              : Colors.white.withOpacity(0.7),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -530,32 +534,65 @@ class _MapPageState extends State<MapPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                 ),
               ),
               SizedBox(height: 8),
               Text(
                 'Latitude: ${latitude.toStringAsFixed(3)}',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
               Text(
                 'Longitude: ${longitude.toStringAsFixed(3)}',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
               Text(
                 'Place: $place',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
               Text(
                 'State: $state',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
               Text(
                 'Country: $country',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
               Text(
                 'Last Active: $lastActive',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
               ),
               Text(
                 'Status: ${hasMoved ? "Moved (>200m)" : "Stationary (<200m or >5min)"}',
@@ -572,7 +609,10 @@ class _MapPageState extends State<MapPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: Text(
+                'Close',
+                style: TextStyle(color: Colors.blue),
+              ),
             ),
           ],
         );
@@ -580,72 +620,11 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  // Helper method to get the appropriate TileLayer based on map type and theme
-  TileLayer _getTileLayer() {
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
-    String urlTemplate;
-    Color backgroundColor;
-
-    switch (currentMapType) {
-      case MapType.defaultMap:
-        urlTemplate = isDarkMode
-            ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        backgroundColor = isDarkMode
-            ? const Color(0xFF1A2A44) // Dark blue for dark mode
-            : const Color.fromARGB(255, 173, 216, 230); // Light mode background
-        break;
-      case MapType.satellite:
-        urlTemplate =
-            'https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png';
-        backgroundColor = isDarkMode
-            ? const Color(0xFF1A2A44)
-            : const Color.fromARGB(255, 173, 216, 230);
-        break;
-      case MapType.terrain:
-        urlTemplate =
-            'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png';
-        backgroundColor = isDarkMode
-            ? const Color(0xFF1A2A44)
-            : const Color.fromARGB(255, 173, 216, 230);
-        break;
-    }
-
-    return TileLayer(
-      urlTemplate: urlTemplate,
-      subdomains: currentMapType == MapType.defaultMap && !isDarkMode
-          ? ['a', 'b', 'c']
-          : [],
-      backgroundColor: backgroundColor,
-      maxZoom: 19.0,
-      minZoom: 2.0,
-      errorTileCallback: (tile, error, stackTrace) {
-        print('Tile failed to load: $error');
-      },
-    );
-  }
-
-  // Method to handle map type selection
-  void _toggleMapType(MapType type) {
-    setState(() {
-      currentMapType = type;
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //       content:
-      //           Text('Switched to ${type.toString().split('.').last} Map')),
-      // );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return Scaffold(
       body: Container(
-        color: themeProvider.isDarkMode
-            ? const Color(0xFF1A2A44)
-            : Colors.lightBlue[100],
+        color: Colors.lightBlue[100],
         child: Stack(
           children: [
             FlutterMap(
@@ -653,13 +632,25 @@ class _MapPageState extends State<MapPage> {
               options: MapOptions(
                 center: centerCoordinates,
                 zoom: zoomLevel,
-                minZoom: 2.0,
-                maxZoom: 19.0,
-                interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-                keepAlive: true,
+                minZoom: 2.0, // Prevent zooming out too far
+                maxZoom: 19.0, // Prevent zooming in too far (OSM max is 19)
+                interactiveFlags: InteractiveFlag.all &
+                    ~InteractiveFlag
+                        .rotate, // Enable all gestures except rotation
+                keepAlive: true, // Keep map alive to prevent reloading
               ),
               children: [
-                _getTileLayer(),
+                TileLayer(
+                  urlTemplate:
+                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  subdomains: ['a', 'b', 'c'],
+                  backgroundColor: const Color.fromARGB(255, 173, 216, 230),
+                  maxZoom: 19.0,
+                  minZoom: 2.0,
+                  errorTileCallback: (tile, error, stackTrace) {
+                    print('Tile failed to load: $error');
+                  },
+                ),
                 MarkerLayer(
                   markers: [
                     if (searchPin != null) searchPin!,
@@ -711,67 +702,34 @@ class _MapPageState extends State<MapPage> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.arrow_back),
+                          icon: Icon(Icons.arrow_back, color: Colors.black),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         Text(
                           'Device Map',
                           style: TextStyle(
+                            color: Colors.black,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Spacer(),
-                        // Map Type Selection Menu with white circular background
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: PopupMenuButton<MapType>(
-                            icon: Icon(Icons.map, color: Colors.black),
-                            tooltip: 'Select Map Type',
-                            onSelected: (MapType type) {
-                              _toggleMapType(type);
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<MapType>>[
-                              PopupMenuItem<MapType>(
-                                value: MapType.defaultMap,
-                                child: Text('Default Map'),
-                              ),
-                              PopupMenuItem<MapType>(
-                                value: MapType.satellite,
-                                child: Text('Satellite Map'),
-                              ),
-                              PopupMenuItem<MapType>(
-                                value: MapType.terrain,
-                                child: Text('Terrain Map'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 10), // Space between icons
-                        // Reload Icon with white circular background
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: isLoading
+                        // IconButton(
+                        //   icon: Icon(Icons.clear_all, color: Colors.orange),
+                        //   onPressed: _clearStoredPositions,
+                        //   tooltip: 'Clear Stored Positions',
+                        // ),
+                        IconButton(
+                          icon: isLoading
                               ? CircularProgressIndicator(
                                   strokeWidth: 2,
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.black),
                                 )
-                              : IconButton(
-                                  icon:
-                                      Icon(Icons.refresh, color: Colors.black),
-                                  onPressed: isLoading
-                                      ? null
-                                      : () => _fetchDeviceLocations(),
-                                  tooltip: 'Reload Map',
-                                ),
+                              : Icon(Icons.refresh, color: Colors.black),
+                          onPressed:
+                              isLoading ? null : () => _fetchDeviceLocations(),
+                          tooltip: 'Reload Map',
                         ),
                       ],
                     ),
@@ -780,74 +738,56 @@ class _MapPageState extends State<MapPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Column(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: searchController,
-                                onChanged: _updateSuggestions,
-                                onSubmitted: _searchDevices,
-                                decoration: InputDecoration(
-                                  hintText: 'Search Location',
-                                  hintStyle: TextStyle(
-                                    color: themeProvider.isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  prefixIcon: Icon(Icons.search),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  filled: true,
-                                  fillColor: themeProvider.isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
-                                ),
-                              ),
+                        TextField(
+                          controller: searchController,
+                          onChanged: _updateSuggestions,
+                          onSubmitted: _searchDevices,
+                          decoration: InputDecoration(
+                            hintText: 'Search here',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: selectedDeviceId,
-                                hint: Text(
-                                  'Select Device ID',
-                                  style: TextStyle(
-                                    color: themeProvider.isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                                items: deviceIds.map((String id) {
-                                  return DropdownMenuItem<String>(
-                                    value: id,
-                                    child: Text(id),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedDeviceId = newValue;
-                                    if (selectedDeviceId != null &&
-                                        startDate != null &&
-                                        endDate != null) {
-                                      _fetchDeviceLocations(
-                                          deviceId: selectedDeviceId,
-                                          start: startDate,
-                                          end: endDate);
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  filled: true,
-                                  fillColor: themeProvider.isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
-                                ),
-                              ),
+                            filled: true,
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.black.withOpacity(0.7)
+                                    : Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          value: selectedDeviceId,
+                          hint: Text('Select Device ID'),
+                          items: deviceIds.map((String id) {
+                            return DropdownMenuItem<String>(
+                              value: id,
+                              child: Text(id),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedDeviceId = newValue;
+                              if (selectedDeviceId != null &&
+                                  startDate != null &&
+                                  endDate != null) {
+                                _fetchDeviceLocations(
+                                    deviceId: selectedDeviceId,
+                                    start: startDate,
+                                    end: endDate);
+                              }
+                            });
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ],
+                            filled: true,
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.black.withOpacity(0.7)
+                                    : Colors.white,
+                          ),
                         ),
                         SizedBox(height: 10),
                         Row(
@@ -856,27 +796,18 @@ class _MapPageState extends State<MapPage> {
                               child: TextField(
                                 readOnly: true,
                                 onTap: () => _selectDate(context, true),
-                                style: TextStyle(
-                                  color: themeProvider.isDarkMode
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   filled: true,
-                                  fillColor: themeProvider.isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
+                                  fillColor: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.black.withOpacity(0.7)
+                                      : Colors.white,
                                   hintText: startDate == null
                                       ? 'Select Start Date'
                                       : dateFormatter.format(startDate!),
-                                  hintStyle: TextStyle(
-                                    color: themeProvider.isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
                                 ),
                               ),
                             ),
@@ -885,27 +816,18 @@ class _MapPageState extends State<MapPage> {
                               child: TextField(
                                 readOnly: true,
                                 onTap: () => _selectDate(context, false),
-                                style: TextStyle(
-                                  color: themeProvider.isDarkMode
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   filled: true,
-                                  fillColor: themeProvider.isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
+                                  fillColor: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.black.withOpacity(0.7)
+                                      : Colors.white,
                                   hintText: endDate == null
                                       ? 'Select End Date'
                                       : dateFormatter.format(endDate!),
-                                  hintStyle: TextStyle(
-                                    color: themeProvider.isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
                                 ),
                               ),
                             ),
@@ -914,9 +836,10 @@ class _MapPageState extends State<MapPage> {
                         SizedBox(height: 10),
                         if (suggestions.isNotEmpty)
                           Container(
-                            color: themeProvider.isDarkMode
-                                ? Colors.grey[850]
-                                : Colors.white,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.black.withOpacity(0.5)
+                                    : Colors.white.withOpacity(0.5),
                             child: ListView.builder(
                               shrinkWrap: true,
                               itemCount: suggestions.length,

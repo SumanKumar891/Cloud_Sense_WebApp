@@ -154,17 +154,21 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _csvRows.add([
           "Timestamp",
           "Temperature",
-          "Humidity ",
-          "RFD",
-          "RFS",
+          "Pressure ",
+          "Humidity",
+          "Radiation",
+          "Wind Speed",
+          "Wind Direction",
         ]);
         data['items'].forEach((item) {
           _csvRows.add([
             item['timestamp'],
             item['temperature'],
+            item['pressure'],
             item['humidity'],
-            item['RFD'],
-            item['RFS'],
+            item['radiation'],
+            item['wind_speed'],
+            item['wind_direction'],
           ]);
         });
       } else if (widget.deviceName.startsWith('WS')) {

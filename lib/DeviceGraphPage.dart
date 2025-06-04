@@ -361,7 +361,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
   String _lastwinddirection = "";
-  String _lastfswinddirection = "";
+  // String _lastfswinddirection = "";
   String _lastBatteryPercentage = "";
   double _lastfsBattery = 0.0;
 
@@ -955,8 +955,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               print('Last item: $lastItem');
               print('Last item keys: ${lastItem.keys}');
 
-              _lastfswinddirection =
-                  lastItem['wind_direction']?.toString() ?? '0';
+              // _lastfswinddirection =
+              //     lastItem['wind_direction']?.toString() ?? '0';
 
               var batteryVoltage = lastItem['battery_voltage'];
               if (batteryVoltage != null) {
@@ -977,18 +977,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 "Pressure ",
                 "Humidity",
                 "Radiation",
+                "Wind Speed",
                 "Wind Direction",
-                "Wind Speed"
               ],
               for (int i = 0; i < fstempData.length; i++)
                 [
-                  formatter.format(ittempData[i].timestamp),
-                  fshumidityData[i].value,
+                  formatter.format(fstempData[i].timestamp),
+                  fstempData[i].value,
                   fspressureData[i].value,
                   fshumidityData[i].value,
                   fsradiationData[i].value,
-                  fswinddirectionData[i].value,
                   fswindspeedData[i].value,
+                  fswinddirectionData[i].value,
                 ]
             ];
           });
@@ -2330,14 +2330,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 // ),
               ],
               rows: [
-                buildfsDataRow('TEMPERATURE', fstempStats, fontSize),
-                buildfsDataRow('PRESSURE', fspressureStats, fontSize),
-                buildfsDataRow('HUMIDITY', fshumStats, fontSize),
-                buildfsDataRow('RAIN', fsrainStats, fontSize),
-                buildfsDataRow('RADIATION', fsradiationStats, fontSize),
-                buildfsDataRow('WIND SPEED', fswindspeedStats, fontSize),
+                buildfsDataRow('TEMPERATURE (°C)', fstempStats, fontSize),
+                buildfsDataRow('PRESSURE (hPa)', fspressureStats, fontSize),
+                buildfsDataRow('HUMIDITY (%)', fshumStats, fontSize),
+                buildfsDataRow('RAIN LEVEL (mm)', fsrainStats, fontSize),
+                buildfsDataRow('RADIATION (W/m²)', fsradiationStats, fontSize),
+                buildfsDataRow('WIND SPEED (m/s)', fswindspeedStats, fontSize),
                 buildfsDataRow(
-                    'WIND DIRECTION', fswinddirectionStats, fontSize),
+                    'WIND DIRECTION (°)', fswinddirectionStats, fontSize),
               ],
             ),
           ),
@@ -3528,12 +3528,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         // if (hasNonZeroValues(itrainData))
                         _buildChartContainer('Rain Level', fsrainData,
                             'Rain Level (mm)', ChartType.line),
-                        if (hasNonZeroValues(fswindspeedData))
-                          _buildChartContainer('Wind Speed', fswindspeedData,
-                              'Wind Speed (m/s)', ChartType.line),
                         if (hasNonZeroValues(fsradiationData))
                           _buildChartContainer('Radiation', fsradiationData,
                               'Radiation (W/m²)', ChartType.line),
+
+                        if (hasNonZeroValues(fswindspeedData))
+                          _buildChartContainer('Wind Speed', fswindspeedData,
+                              'Wind Speed (m/s)', ChartType.line),
 
                         // // if (hasNonZeroValues(fsrfdData))
                         // _buildChartContainer(
