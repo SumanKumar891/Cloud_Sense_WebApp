@@ -75142,7 +75142,7 @@ s=A.p5(!0,null,!0,!0,null,null,!1)
 r.b5!==$&&A.c2()
 r.b5=s
 r.Gp()
-r.aR=A.b0n(A.cd(0,0,0,0,0,50),new A.bee(r))},
+r.aR=A.b0n(A.cd(0,0,0,0,0,30),new A.bee(r))},
 m(){var s=this.aR
 if(s!=null)s.aF(0)
 s=this.b5
@@ -75740,14 +75740,14 @@ s=t.l
 r=A.ah(f3,c1,s).w.a.a<800?400:500
 r=A.bsU(0,A.bm(c1,c1,B.l,c1,c1,new A.cS(c1,f1,c1,c1,c1,c1,B.S),c1,r,c1,c1,c1,c1,c1,1/0))
 f1=c0.a.d
-q=A.a1(c1,c1,B.i,c1,c1,c1,c1,c1,c1,c1,c1,A.ah(f3,c1,s).w.a.a<800?16:32,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1)
+q=A.a1(c1,c1,B.i,c1,c1,c1,c1,c1,c1,c1,c1,A.ah(f3,c1,s).w.a.a<800?14:32,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1)
 p=c0.a.c
-f1=A.bBc(A.dU(A.b([A.dU(c1,A.a1(c1,c1,B.a9,c1,c1,c1,c1,c1,c1,c1,c1,A.ah(f3,c1,s).w.a.a<800?16:30,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1)," ("+p+")")],t.VO),q,f1),c1,c1)
+f1=A.bBc(A.dU(A.b([A.dU(c1,A.a1(c1,c1,B.a9,c1,c1,c1,c1,c1,c1,c1,c1,A.ah(f3,c1,s).w.a.a<800?14:30,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1)," ("+p+")")],t.VO),q,f1),c1,c1)
 q=A.ir(c1,A.ec(B.ep,B.i,c1,c1),c1,new A.be5(f3),c1,c1)
 p=t.p
 o=A.b([],p)
 if(B.c.am(c0.a.c,"WD"))o.push(new A.aP(B.us,A.cV(A.b([A.ec(c0.atE(c0.aC3(c0.eJ)),B.i,c1,26),A.aG(c1,c1,4),A.Q(": "+c0.eJ,c1,c1,c1,c1,A.a1(c1,c1,B.i,c1,c1,c1,c1,c1,c1,c1,c1,16,c1,c1,B.v,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)],p),B.r,B.o,B.aH,c1),c1))
-if(B.c.am(c0.a.c,"FS"))o.push(new A.aP(B.us,A.cV(A.b([A.bs(A.b([A.ec(c0.auy(c0.B),c0.atD(c0.B),c1,26),A.aG(c1,2,c1),A.Q(B.d.aC(c0.B,2)+" V",c1,c1,c1,c1,A.a1(c1,c1,B.i,c1,c1,c1,c1,c1,c1,c1,c1,16,c1,c1,B.ai,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)],p),B.r,B.o,B.aH)],p),B.r,B.o,B.n,c1),c1))
+if(B.c.am(c0.a.c,"FS"))o.push(new A.aP(B.us,A.cV(A.b([A.bs(A.b([A.ec(c0.auy(c0.B),c0.atD(c0.B),c1,28),A.aG(c1,2,c1),A.Q(B.d.aC(c0.B,2)+" V",c1,c1,c1,c1,A.a1(c1,c1,B.i,c1,c1,c1,c1,c1,c1,c1,c1,14,c1,c1,B.ai,c1,c1,!0,c1,c1,c1,c1,c1,c1,c1,c1),c1,c1,c1,c1)],p),B.r,B.o,B.aH)],p),B.r,B.o,B.n,c1),c1))
 o.push(new A.aP(B.VQ,A.ir(c1,A.ec(B.vD,B.i,c1,26),c1,new A.be6(c0),c1,c1),c1))
 f1=A.i2(c1,A.uj(o,B.q,0,c1,q,f1),c1,c1,0,0,0,c1)
 q=A.uj(c1,c1,c1,c1,c1,c1)

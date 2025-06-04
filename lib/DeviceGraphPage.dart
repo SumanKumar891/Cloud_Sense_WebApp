@@ -279,7 +279,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     _initializeNotifications();
 
     // Set up the periodic timer to reload data every 30 seconds
-    _reloadTimer = Timer.periodic(Duration(seconds: 50), (timer) {
+    _reloadTimer = Timer.periodic(Duration(seconds: 30), (timer) {
       _reloadData();
     });
   }
@@ -2765,7 +2765,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   text: widget.sequentialName, // Main title
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+                    fontSize: MediaQuery.of(context).size.width < 800 ? 14 : 32,
                     fontWeight: FontWeight.bold,
                   ),
                   children: [
@@ -2773,7 +2773,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       text: " (${widget.deviceName})", // Device ID in brackets
                       style: TextStyle(
                         fontSize: MediaQuery.of(context).size.width < 800
-                            ? 16
+                            ? 14
                             : 30, // Smaller font
                         fontWeight: FontWeight.bold,
                         color: Colors.white70, // Slightly dim color
@@ -2826,13 +2826,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             Icon(
                               _getfsBatteryIcon(_lastfsBattery),
                               color: _getBatteryColor(_lastfsBattery),
-                              size: 26,
+                              size: 28,
                             ),
                             SizedBox(height: 2),
                             Text(
                               '${_lastfsBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
                               ),
