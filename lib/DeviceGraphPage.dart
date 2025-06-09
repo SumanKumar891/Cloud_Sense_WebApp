@@ -419,6 +419,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       fstempData.clear();
       fswinddirectionData.clear();
       fswindspeedData.clear();
+      _lastfsBattery = 0.0;
       _weeklyPrecipitationData.clear();
     });
     DateTime startDate;
