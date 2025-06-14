@@ -205,6 +205,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> fshumidityData = [];
   List<ChartData> fsradiationData = [];
   List<ChartData> fswindspeedData = [];
+  List<ChartData> smwindspeedData = [];
+  List<ChartData> smWindDirectionData = [];
+  List<ChartData> smAtmPressureData = [];
+  List<ChartData> smLightIntensityData = [];
+  List<ChartData> smRainfallWeeklyData = [];
+  List<ChartData> smMaximumTemperatureData = [];
+  List<ChartData> smRainfallDailyData = [];
+  List<ChartData> smAverageHumidityData = [];
+  List<ChartData> smBatteryVoltageData = [];
+  List<ChartData> smAverageTemperatureData = [];
+  List<ChartData> smMaximumHumidityData = [];
+  List<ChartData> smMinimumTemperatureData = [];
+  List<ChartData> smMinimumHumidityData = [];
+  List<ChartData> smCurrentHumidityData = [];
+  List<ChartData> smRainfallHourlyData = [];
+  List<ChartData> smIMEINumberData = [];
+  List<ChartData> smRainfallMinutlyData = [];
+  List<ChartData> smCurrentTemperatureData = [];
+  List<ChartData> smSignalStrength = [];
+  Map<String, List<ChartData>> smParametersData = {};
 
   List<ChartData> fsrainData = [];
   List<ChartData> fswinddirectionData = [];
@@ -364,7 +384,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   // String _lastfswinddirection = "";
   String _lastBatteryPercentage = "";
   double _lastfsBattery = 0.0;
-
+  double _lastsmBattery = 0.0;
   String _lastRSSI_Value = "";
 
   Future<void> _fetchDataForRange(String range,
@@ -418,8 +438,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       fsrainData.clear();
       fstempData.clear();
       fswinddirectionData.clear();
-      fswindspeedData.clear();
       _lastfsBattery = 0.0;
+      _lastsmBattery = 0.0;
+      fswindspeedData.clear();
+
+      smParametersData.clear();
+
       _weeklyPrecipitationData.clear();
     });
     DateTime startDate;
@@ -452,8 +476,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     _lastSelectedRange = range; // Store the currently selected range
 
-    final startdate = _formatDate(startDate);
-    final enddate = _formatDate(endDate);
+    // Format dates for most APIs (DD-MM-YYYY)
+    final dateFormatter = DateFormat('dd-MM-yyyy');
+    final startdate = dateFormatter.format(startDate);
+    final enddate = dateFormatter.format(endDate);
+
+    // Format dates for SM sensor API (YYYYMMDD)
+    final smDateFormatter = DateFormat('yyyyMMdd');
+    final smStartDate = smDateFormatter.format(startDate);
+    final smEndDate = smDateFormatter.format(endDate);
+
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
     int deviceId =
         int.parse(widget.deviceName.replaceAll(RegExp(r'[^0-9]'), ''));
@@ -470,7 +502,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
 
     String apiUrl;
-    if (widget.deviceName.startsWith('WD')) {
+    if (widget.deviceName.startsWith('SM')) {
+      apiUrl =
+          'https://n42fiw7l89.execute-api.us-east-1.amazonaws.com/default/SSMet_API_Func?device_id=$deviceId&start_date=$smStartDate&end_date=$smEndDate';
+    } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CL') ||
@@ -542,6 +577,61 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         String lastwinddirection;
         String lastBatteryPercentage = 'Unknown';
         String lastRSSI_Value = 'Unknown';
+
+        if (widget.deviceName.startsWith('SM')) {
+          print('SM API Response: ${response.body}');
+          setState(() {
+            smParametersData = _parseSMParametersData(data);
+            print('Parsed SM Parameters: $smParametersData');
+
+            if (smParametersData.isEmpty) {
+              print('No valid SM parameters found');
+              _csvRows = [
+                ['Timestamp', 'Message'],
+                ['', 'No data available']
+              ];
+            } else {
+              List<String> headers = ['Timestamp'];
+              headers.addAll(smParametersData.keys);
+
+              List<List<dynamic>> dataRows = [];
+              int maxLength = smParametersData.values
+                  .map((list) => list.length)
+                  .reduce((a, b) => a > b ? a : b);
+
+              for (int i = 0; i < maxLength; i++) {
+                List<dynamic> row = [
+                  smParametersData.values.isNotEmpty &&
+                          smParametersData.values.first.length > i
+                      ? formatter
+                          .format(smParametersData.values.first[i].timestamp)
+                      : ''
+                ];
+                for (var key in smParametersData.keys) {
+                  var value = smParametersData[key]!.length > i
+                      ? smParametersData[key]![i].value
+                      : null;
+                  // ✅ Preserve 0, replace null with empty string
+                  row.add(value ?? '');
+                }
+                dataRows.add(row);
+              }
+
+              _csvRows = [headers, ...dataRows];
+              print('✅ CSV Rows Prepared: ${_csvRows.length} rows');
+              print('✅ Sample Row: ${_csvRows[1]}');
+            }
+
+            // Clear unrelated data
+            temperatureData = [];
+            humidityData = [];
+            // etc...
+          });
+
+          // ✅ Now trigger download
+          downloadCSV(context);
+          await _fetchDeviceDetails();
+        }
 
         if (widget.deviceName.startsWith('CL') ||
             widget.deviceName.startsWith('BD')) {
@@ -1375,6 +1465,65 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             : 0.0,
       );
     }).toList();
+  }
+
+  Map<String, List<ChartData>> _parseSMParametersData(
+      Map<String, dynamic> data) {
+    final List<dynamic> items = data['items'] ?? [];
+    Map<String, List<ChartData>> parametersData = {};
+    print('SM API Items Count: ${items.length}'); // Debug
+
+    if (items.isEmpty) {
+      print('No items in SM API response');
+      return parametersData;
+    }
+
+    // Collect all possible parameter keys from the first item, excluding non-numeric fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      // Exclude non-numeric fields like TimeStamp, TimeStampFormatted, Topic, IMEINumber, DeviceId
+      return ![
+        'TimeStamp',
+        'TimeStampFormatted',
+        'Topic',
+        'IMEINumber',
+        'DeviceId'
+      ].contains(key);
+    }).toList();
+
+    // Initialize ChartData lists for each parameter
+    for (var key in parameterKeys) {
+      parametersData[key] = [];
+    }
+
+    // Parse data for each item
+    for (var item in items) {
+      if (item == null) continue;
+      DateTime timestamp = _parseSMDate(item['TimeStamp']);
+      for (var key in parameterKeys) {
+        if (item[key] != null) {
+          // Only include non-null values
+          double value = double.tryParse(item[key].toString()) ?? 0.0;
+          parametersData[key]!
+              .add(ChartData(timestamp: timestamp, value: value));
+        }
+      }
+    }
+    // Update _lastsmBattery with the latest BatteryVoltage (from the last item)
+    for (var item in items.reversed) {
+      if (item != null && item['BatteryVoltage'] != null) {
+        _lastsmBattery =
+            double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
+        print('Updated _lastsmBattery: $_lastsmBattery V'); // Debug
+        break; // Exit after finding the latest non-null value
+      }
+    }
+
+    // Remove parameters with empty lists (i.e., all values were null)
+    parametersData.removeWhere((key, value) => value.isEmpty);
+    print('Parsed SM Parameters: ${parametersData.keys.join(', ')}'); // Debug
+
+    return parametersData;
   }
 
   List<ChartData> _parsesensorChartData(
@@ -2445,6 +2594,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parseSMDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return DateTime.now();
+    }
+    try {
+      // Parse the timestamp format: YYYYMMDDTHHMMSS (e.g., 20250614T162130)
+      return DateTime.parse(
+          dateStr.replaceFirst('T', ' ')); // Convert to YYYYMMDD HHMMSS
+    } catch (e) {
+      print('Error parsing SM date: $e');
+      return DateTime.now();
+    }
+  }
+
   DateTime _parsedoDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
@@ -2719,6 +2882,54 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+// Helper function to map parameter keys to display names and units
+  Map<String, dynamic> _getParameterDisplayInfo(String paramName) {
+    String displayName = paramName
+        .replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match[1]}')
+        .trim();
+    String unit = '';
+
+    if (paramName.contains('Rainfall'))
+      unit = 'mm';
+    else if (paramName.contains('Voltage'))
+      unit = 'V';
+    else if (paramName.contains('SignalStrength'))
+      unit = 'dBm';
+    else if (paramName.contains('Latitude') || paramName.contains('Longitude'))
+      unit = 'deg';
+    else if (paramName.contains('Temperature'))
+      unit = '°C';
+    else if (paramName.contains('Humidity'))
+      unit = '%';
+    else if (paramName.contains('Pressure'))
+      unit = 'hPa';
+    else if (paramName.contains('LightIntensity'))
+      unit = 'Lux';
+    else if (paramName.contains('WindSpeed'))
+      unit = 'm/s';
+    else if (paramName.contains('Irradiance') ||
+        paramName.contains('Radiation'))
+      unit = 'W/m²';
+    else if (paramName.contains('Chlorine') ||
+        paramName.contains('COD') ||
+        paramName.contains('BOD') ||
+        paramName.contains('DO'))
+      unit = 'mg/L';
+    else if (paramName.contains('TDS'))
+      unit = 'ppm';
+    else if (paramName.contains('EC'))
+      unit = 'mS/cm';
+    else if (paramName.contains('pH'))
+      unit = '';
+    else if (paramName.contains('Ammonia'))
+      unit = 'PPM';
+    else if (paramName.contains('Visibility'))
+      unit = 'm';
+    else if (paramName.contains('ElectrodeSignal')) unit = 'mV';
+
+    return {'displayName': displayName, 'unit': unit};
+  }
+
   @override
   Widget build(BuildContext context) {
     // Determine the background image based on the device type
@@ -2847,6 +3058,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             SizedBox(height: 2),
                             Text(
                               '${_lastfsBattery.toStringAsFixed(2)} V',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                if (widget.deviceName.startsWith('SM'))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getfsBatteryIcon(_lastsmBattery),
+                              color: _getBatteryColor(_lastsmBattery),
+                              size: 28,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${_lastsmBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -3385,177 +3624,220 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ),
                     Column(
                       children: [
-                        if (hasNonZeroValues(chlorineData))
-                          _buildChartContainer('Chlorine', chlorineData,
-                              'Chlorine (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(temperatureData))
-                          _buildChartContainer('Temperature', temperatureData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(humidityData))
-                          _buildChartContainer('Humidity', humidityData,
-                              'Humidity (%)', ChartType.line),
-                        if (hasNonZeroValues(lightIntensityData))
-                          _buildChartContainer(
-                              'Light Intensity',
-                              lightIntensityData,
-                              'Light Intensity (Lux)',
-                              ChartType.line),
-                        if (hasNonZeroValues(windSpeedData))
-                          _buildChartContainer('Wind Speed', windSpeedData,
-                              'Wind Speed (m/s)', ChartType.line),
-                        if (hasNonZeroValues(solarIrradianceData))
-                          _buildChartContainer(
-                              'Solar Irradiance',
-                              solarIrradianceData,
-                              'Solar Irradiance (W/M^2)',
-                              ChartType.line),
-                        if (hasNonZeroValues(tempData))
-                          _buildChartContainer('Temperature', tempData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(tdsData))
-                          _buildChartContainer(
-                              'TDS', tdsData, 'TDS (ppm)', ChartType.line),
-                        if (hasNonZeroValues(codData))
-                          _buildChartContainer(
-                              'COD', codData, 'COD (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(bodData))
-                          _buildChartContainer(
-                              'BOD', bodData, 'BOD (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(pHData))
-                          _buildChartContainer(
-                              'pH', pHData, 'pH', ChartType.line),
-                        if (hasNonZeroValues(doData))
-                          _buildChartContainer(
-                              'DO', doData, 'DO (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(ecData))
-                          _buildChartContainer(
-                              'EC', ecData, 'EC (mS/cm)', ChartType.line),
-                        if (hasNonZeroValues(temppData))
-                          _buildChartContainer('Temperature', temppData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(electrodeSignalData))
-                          _buildChartContainer(
-                              'Electrode Signal',
-                              electrodeSignalData,
-                              'Electrode Signal (mV)',
-                              ChartType.line),
-                        if (hasNonZeroValues(residualchlorineData))
-                          _buildChartContainer('Chlorine', residualchlorineData,
-                              'Chlorine (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(hypochlorousData))
-                          _buildChartContainer('Hypochlorous', hypochlorousData,
-                              'Hypochlorous (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(temmppData))
-                          _buildChartContainer('Temperature', temmppData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(humidityyData))
-                          _buildChartContainer('Humidity', humidityyData,
-                              'Humidity (%)', ChartType.line),
-                        if (hasNonZeroValues(lightIntensityyData))
-                          _buildChartContainer(
-                              'Light Intensity',
-                              lightIntensityyData,
-                              'Light Intensity (Lux)',
-                              ChartType.line),
-                        if (hasNonZeroValues(windSpeeddData))
-                          _buildChartContainer('Wind Speed', windSpeeddData,
-                              'Wind Speed (m/s)', ChartType.line),
-                        if (hasNonZeroValues(ttempData))
-                          _buildChartContainer('Temperature', ttempData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(dovaluedata))
-                          _buildChartContainer('DO Value', dovaluedata,
-                              'DO (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(dopercentagedata))
-                          _buildChartContainer(
-                              'DO Percentage',
-                              dopercentagedata,
-                              'DO Percentage (%)',
-                              ChartType.line),
-                        if (hasNonZeroValues(temperaturData))
-                          _buildChartContainer('Temperature', temperaturData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(humData))
-                          _buildChartContainer('Humidity', humData,
-                              'Humidity (%)', ChartType.line),
-                        if (hasNonZeroValues(luxData))
-                          _buildChartContainer('Light Intensity', luxData,
-                              'Lux (Lux)', ChartType.line),
-                        if (hasNonZeroValues(coddata))
-                          _buildChartContainer(
-                              'COD', coddata, 'COD (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(boddata))
-                          _buildChartContainer(
-                              'BOD', boddata, 'BOD (mg/L)', ChartType.line),
-                        if (hasNonZeroValues(phdata))
-                          _buildChartContainer(
-                              'pH', luxData, 'pH', ChartType.line),
-                        if (hasNonZeroValues(temperattureData))
-                          _buildChartContainer('Temperature', temperattureData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(humidittyData))
-                          _buildChartContainer('Humidity', humidittyData,
-                              'Humidity (%)', ChartType.line),
-                        if (hasNonZeroValues(ammoniaData))
-                          _buildChartContainer('Ammonia', ammoniaData,
-                              'Ammonia (PPM)', ChartType.line),
-                        if (hasNonZeroValues(temperaturedata))
-                          _buildChartContainer('Temperature', temperaturedata,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(humiditydata))
-                          _buildChartContainer('Humidity', humiditydata,
-                              'Humidity (%)', ChartType.line),
-                        // if (hasNonZeroValues(rfdData))
-                        // _buildChartContainer(
-                        //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
-                        // if (hasNonZeroValues(rfsData))
-                        _buildChartContainer(
-                            'RFS', rfsData, 'RFS (mm)', ChartType.line),
-                        if (hasNonZeroValues(ittempData))
-                          _buildChartContainer('Temperature', ittempData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(itpressureData))
-                          _buildChartContainer('Pressure', itpressureData,
-                              'Pressure (hPa)', ChartType.line),
-                        if (hasNonZeroValues(ithumidityData))
-                          _buildChartContainer('Humidity', ithumidityData,
-                              'Humidity (%)', ChartType.line),
-                        // if (hasNonZeroValues(itrainData))
-                        _buildChartContainer('Rain Level', itrainData,
-                            'Rain Level (mm)', ChartType.line),
-                        if (hasNonZeroValues(itvisibilityData))
-                          _buildChartContainer('Wind Speed', itwindspeedData,
-                              'Wind Speed (m/s)', ChartType.line),
-                        if (hasNonZeroValues(itradiationData))
-                          _buildChartContainer('Radiation', itradiationData,
-                              'Radiation (W/m²)', ChartType.line),
-                        if (hasNonZeroValues(itvisibilityData))
-                          _buildChartContainer('Visibilty', itvisibilityData,
-                              'Visibility (m)', ChartType.line),
-                        if (hasNonZeroValues(fstempData))
-                          _buildChartContainer('Temperature', fstempData,
-                              'Temperature (°C)', ChartType.line),
-                        if (hasNonZeroValues(fspressureData))
-                          _buildChartContainer('Pressure', fspressureData,
-                              'Pressure (hPa)', ChartType.line),
-                        if (hasNonZeroValues(fshumidityData))
-                          _buildChartContainer('Relative Humidity',
-                              fshumidityData, 'Humidity (%)', ChartType.line),
-                        // if (hasNonZeroValues(itrainData))
-                        _buildChartContainer('Rain Level', fsrainData,
-                            'Rain Level (mm)', ChartType.line),
-                        if (hasNonZeroValues(fsradiationData))
-                          _buildChartContainer('Radiation', fsradiationData,
-                              'Radiation (W/m²)', ChartType.line),
+                        // SM sensor parameters (dynamic)
+                        if (widget.deviceName.startsWith('SM'))
+                          ...smParametersData.entries.map((entry) {
+                            String paramName = entry.key;
+                            List<ChartData> data = entry.value;
 
-                        if (hasNonZeroValues(fswindspeedData))
-                          _buildChartContainer('Wind Speed', fswindspeedData,
-                              'Wind Speed (m/s)', ChartType.line),
+                            // Exclude specified Parameters
+                            List<String> excludedParams = [
+                              'Longitude',
+                              'Latitude',
+                              'SignalStrength',
+                              'BatteryVoltage',
+                            ];
 
-                        // // if (hasNonZeroValues(fsrfdData))
-                        // _buildChartContainer(
-                        //     'RFD', fsrfdData, 'RFD (mm)', ChartType.line),
-                        // if (hasNonZeroValues(rfsData))
+                            if (!excludedParams.contains(paramName) &&
+                                data.isNotEmpty) {
+                              final displayInfo =
+                                  _getParameterDisplayInfo(paramName);
+                              String displayName = displayInfo['displayName'];
+                              String unit = displayInfo['unit'];
+                              return _buildChartContainer(
+                                displayName,
+                                data,
+                                unit.isNotEmpty
+                                    ? '$displayName ($unit)'
+                                    : displayName,
+                                ChartType.line,
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          }).toList(),
+                        // Non-SM sensor parameters
+                        if (!widget.deviceName.startsWith('SM')) ...[
+                          if (hasNonZeroValues(chlorineData))
+                            _buildChartContainer('Chlorine', chlorineData,
+                                'Chlorine (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(temperatureData))
+                            _buildChartContainer('Temperature', temperatureData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(humidityData))
+                            _buildChartContainer('Humidity', humidityData,
+                                'Humidity (%)', ChartType.line),
+                          if (hasNonZeroValues(lightIntensityData))
+                            _buildChartContainer(
+                                'Light Intensity',
+                                lightIntensityData,
+                                'Light Intensity (Lux)',
+                                ChartType.line),
+                          if (hasNonZeroValues(windSpeedData))
+                            _buildChartContainer('Wind Speed', windSpeedData,
+                                'Wind Speed (m/s)', ChartType.line),
+                          if (hasNonZeroValues(solarIrradianceData))
+                            _buildChartContainer(
+                                'Solar Irradiance',
+                                solarIrradianceData,
+                                'Solar Irradiance (W/M^2)',
+                                ChartType.line),
+                          if (hasNonZeroValues(tempData))
+                            _buildChartContainer('Temperature', tempData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(tdsData))
+                            _buildChartContainer(
+                                'TDS', tdsData, 'TDS (ppm)', ChartType.line),
+                          if (hasNonZeroValues(codData))
+                            _buildChartContainer(
+                                'COD', codData, 'COD (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(bodData))
+                            _buildChartContainer(
+                                'BOD', bodData, 'BOD (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(pHData))
+                            _buildChartContainer(
+                                'pH', pHData, 'pH', ChartType.line),
+                          if (hasNonZeroValues(doData))
+                            _buildChartContainer(
+                                'DO', doData, 'DO (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(ecData))
+                            _buildChartContainer(
+                                'EC', ecData, 'EC (mS/cm)', ChartType.line),
+                          if (hasNonZeroValues(temppData))
+                            _buildChartContainer('Temperature', temppData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(electrodeSignalData))
+                            _buildChartContainer(
+                                'Electrode Signal',
+                                electrodeSignalData,
+                                'Electrode Signal (mV)',
+                                ChartType.line),
+                          if (hasNonZeroValues(residualchlorineData))
+                            _buildChartContainer(
+                                'Chlorine',
+                                residualchlorineData,
+                                'Chlorine (mg/L)',
+                                ChartType.line),
+                          if (hasNonZeroValues(hypochlorousData))
+                            _buildChartContainer(
+                                'Hypochlorous',
+                                hypochlorousData,
+                                'Hypochlorous (mg/L)',
+                                ChartType.line),
+                          if (hasNonZeroValues(temmppData))
+                            _buildChartContainer('Temperature', temmppData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(humidityyData))
+                            _buildChartContainer('Humidity', humidityyData,
+                                'Humidity (%)', ChartType.line),
+                          if (hasNonZeroValues(lightIntensityyData))
+                            _buildChartContainer(
+                                'Light Intensity',
+                                lightIntensityyData,
+                                'Light Intensity (Lux)',
+                                ChartType.line),
+                          if (hasNonZeroValues(windSpeeddData))
+                            _buildChartContainer('Wind Speed', windSpeeddData,
+                                'Wind Speed (m/s)', ChartType.line),
+                          if (hasNonZeroValues(ttempData))
+                            _buildChartContainer('Temperature', ttempData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(dovaluedata))
+                            _buildChartContainer('DO Value', dovaluedata,
+                                'DO (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(dopercentagedata))
+                            _buildChartContainer(
+                                'DO Percentage',
+                                dopercentagedata,
+                                'DO Percentage (%)',
+                                ChartType.line),
+                          if (hasNonZeroValues(temperaturData))
+                            _buildChartContainer('Temperature', temperaturData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(humData))
+                            _buildChartContainer('Humidity', humData,
+                                'Humidity (%)', ChartType.line),
+                          if (hasNonZeroValues(luxData))
+                            _buildChartContainer('Light Intensity', luxData,
+                                'Lux (Lux)', ChartType.line),
+                          if (hasNonZeroValues(coddata))
+                            _buildChartContainer(
+                                'COD', coddata, 'COD (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(boddata))
+                            _buildChartContainer(
+                                'BOD', boddata, 'BOD (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(phdata))
+                            _buildChartContainer(
+                                'pH', luxData, 'pH', ChartType.line),
+                          if (hasNonZeroValues(temperattureData))
+                            _buildChartContainer(
+                                'Temperature',
+                                temperattureData,
+                                'Temperature (°C)',
+                                ChartType.line),
+                          if (hasNonZeroValues(humidittyData))
+                            _buildChartContainer('Humidity', humidittyData,
+                                'Humidity (%)', ChartType.line),
+                          if (hasNonZeroValues(ammoniaData))
+                            _buildChartContainer('Ammonia', ammoniaData,
+                                'Ammonia (PPM)', ChartType.line),
+                          if (hasNonZeroValues(temperaturedata))
+                            _buildChartContainer('Temperature', temperaturedata,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(humiditydata))
+                            _buildChartContainer('Humidity', humiditydata,
+                                'Humidity (%)', ChartType.line),
+                          // if (hasNonZeroValues(rfdData))
+                          // _buildChartContainer(
+                          //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
+                          // if (hasNonZeroValues(rfsData))
+                          _buildChartContainer(
+                              'RFS', rfsData, 'RFS (mm)', ChartType.line),
+                          if (hasNonZeroValues(ittempData))
+                            _buildChartContainer('Temperature', ittempData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(itpressureData))
+                            _buildChartContainer('Pressure', itpressureData,
+                                'Pressure (hPa)', ChartType.line),
+                          if (hasNonZeroValues(ithumidityData))
+                            _buildChartContainer('Humidity', ithumidityData,
+                                'Humidity (%)', ChartType.line),
+                          // if (hasNonZeroValues(itrainData))
+                          _buildChartContainer('Rain Level', itrainData,
+                              'Rain Level (mm)', ChartType.line),
+                          if (hasNonZeroValues(itvisibilityData))
+                            _buildChartContainer('Wind Speed', itwindspeedData,
+                                'Wind Speed (m/s)', ChartType.line),
+                          if (hasNonZeroValues(itradiationData))
+                            _buildChartContainer('Radiation', itradiationData,
+                                'Radiation (W/m²)', ChartType.line),
+                          if (hasNonZeroValues(itvisibilityData))
+                            _buildChartContainer('Visibilty', itvisibilityData,
+                                'Visibility (m)', ChartType.line),
+                          if (hasNonZeroValues(fstempData))
+                            _buildChartContainer('Temperature', fstempData,
+                                'Temperature (°C)', ChartType.line),
+                          if (hasNonZeroValues(fspressureData))
+                            _buildChartContainer('Pressure', fspressureData,
+                                'Pressure (hPa)', ChartType.line),
+                          if (hasNonZeroValues(fshumidityData))
+                            _buildChartContainer('Relative Humidity',
+                                fshumidityData, 'Humidity (%)', ChartType.line),
+                          // if (hasNonZeroValues(itrainData))
+                          _buildChartContainer('Rain Level', fsrainData,
+                              'Rain Level (mm)', ChartType.line),
+                          if (hasNonZeroValues(fsradiationData))
+                            _buildChartContainer('Radiation', fsradiationData,
+                                'Radiation (W/m²)', ChartType.line),
+
+                          if (hasNonZeroValues(fswindspeedData))
+                            _buildChartContainer('Wind Speed', fswindspeedData,
+                                'Wind Speed (m/s)', ChartType.line),
+
+                          // // if (hasNonZeroValues(fsrfdData))
+                          // _buildChartContainer(
+                          //     'RFD', fsrfdData, 'RFD (mm)', ChartType.line),
+                          // if (hasNonZeroValues(rfsData))
+                        ],
                       ],
                     )
                   ],
