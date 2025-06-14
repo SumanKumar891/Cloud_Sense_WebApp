@@ -19,6 +19,7 @@ class DeviceUtils {
     if (deviceId.startsWith('TH')) return 'Temperature Sensor';
     if (deviceId.startsWith('NH')) return 'Ammonia Sensor';
     if (deviceId.startsWith('FS')) return 'Forest Sensor';
+    if (deviceId.startsWith('SM')) return 'SSMET Sensor';
     return 'Rain Sensor';
   }
 
@@ -128,5 +129,6 @@ class DeviceUtils {
     'NH',
     'IT',
     'FS',
+    'SM',
   ];
 }
