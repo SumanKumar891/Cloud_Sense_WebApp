@@ -97,7 +97,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "d50e05bec47a1ca531ede214c9f03ffd
 "flutter_assets/packages/flutter_map/lib/assets/flutter_map_logo.png": "208d63cc917af9713fc9572bd5c09362",
 "flutter_assets/packages/wakelock_plus/assets/no_sleep.js": "9c3aa3cd0b217305aa860decab3d9f42",
 "flutter_assets/shaders/ink_sparkle.frag": "9bb2aaa0f9a9213b623947fa682efa76",
-"flutter_bootstrap.js": "29245d376ef19bcd0bb451fb5632a241",
+"flutter_bootstrap.js": "9949972e7dd2881ca62844d21a934f4f",
 "icons/Icon-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
 "icons/Icon-512.png": "76feaf63bcbf28ae35c368fa70d14ce7",
 "icons/Icon-maskable-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
