@@ -628,8 +628,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             // etc...
           });
 
-          // ✅ Now trigger download
-          downloadCSV(context);
+          // // ✅ Now trigger download
+          // downloadCSV(context);
           await _fetchDeviceDetails();
         }
 
