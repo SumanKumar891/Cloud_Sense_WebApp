@@ -20,6 +20,7 @@ class DeviceUtils {
     if (deviceId.startsWith('NH')) return 'Ammonia Sensor';
     if (deviceId.startsWith('FS')) return 'Forest Sensor';
     if (deviceId.startsWith('SM')) return 'SSMET Sensor';
+    if (deviceId.startsWith('CF')) return 'Colonel Farm Sensor';
     return 'Rain Sensor';
   }
 
@@ -130,5 +131,6 @@ class DeviceUtils {
     'IT',
     'FS',
     'SM',
+    'CF'
   ];
 }

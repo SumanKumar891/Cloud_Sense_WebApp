@@ -225,6 +225,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> smCurrentTemperatureData = [];
   List<ChartData> smSignalStrength = [];
   Map<String, List<ChartData>> smParametersData = {};
+  Map<String, List<ChartData>> cfParametersData = {};
 
   List<ChartData> fsrainData = [];
   List<ChartData> fswinddirectionData = [];
@@ -299,7 +300,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     _initializeNotifications();
 
     // Set up the periodic timer to reload data every 30 seconds
-    _reloadTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+    _reloadTimer = Timer.periodic(Duration(seconds: 120), (timer) {
       _reloadData();
     });
   }
@@ -385,6 +386,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   String _lastBatteryPercentage = "";
   double _lastfsBattery = 0.0;
   double _lastsmBattery = 0.0;
+  double _lastcfBattery = 0.0;
   String _lastRSSI_Value = "";
 
   Future<void> _fetchDataForRange(String range,
@@ -440,9 +442,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       fswinddirectionData.clear();
       _lastfsBattery = 0.0;
       _lastsmBattery = 0.0;
+      _lastcfBattery = 0.0;
+
       fswindspeedData.clear();
 
       smParametersData.clear();
+      cfParametersData.clear();
 
       _weeklyPrecipitationData.clear();
     });
@@ -505,6 +510,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     if (widget.deviceName.startsWith('SM')) {
       apiUrl =
           'https://n42fiw7l89.execute-api.us-east-1.amazonaws.com/default/SSMet_API_Func?device_id=$deviceId&start_date=$smStartDate&end_date=$smEndDate';
+    } else if (widget.deviceName.startsWith('CF')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -610,6 +618,59 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 for (var key in smParametersData.keys) {
                   var value = smParametersData[key]!.length > i
                       ? smParametersData[key]![i].value
+                      : null;
+                  // ✅ Preserve 0, replace null with empty string
+                  row.add(value ?? '');
+                }
+                dataRows.add(row);
+              }
+
+              _csvRows = [headers, ...dataRows];
+              print('✅ CSV Rows Prepared: ${_csvRows.length} rows');
+              print('✅ Sample Row: ${_csvRows[1]}');
+            }
+
+            // Clear unrelated data
+            temperatureData = [];
+            humidityData = [];
+            // etc...
+          });
+
+          // // ✅ Now trigger download
+          // downloadCSV(context);
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('CF')) {
+          print('CF API Response: ${response.body}');
+          setState(() {
+            cfParametersData = _parseCFParametersData(data);
+            print('Parsed CF Parameters: $cfParametersData');
+
+            if (cfParametersData.isEmpty) {
+              print('No valid CF parameters found');
+              _csvRows = [
+                ['Timestamp', 'Message'],
+                ['', 'No data available']
+              ];
+            } else {
+              List<String> headers = ['Timestamp'];
+              headers.addAll(cfParametersData.keys);
+
+              List<List<dynamic>> dataRows = [];
+              int maxLength = cfParametersData.values
+                  .map((list) => list.length)
+                  .reduce((a, b) => a > b ? a : b);
+
+              for (int i = 0; i < maxLength; i++) {
+                List<dynamic> row = [
+                  cfParametersData.values.isNotEmpty &&
+                          cfParametersData.values.first.length > i
+                      ? formatter
+                          .format(cfParametersData.values.first[i].timestamp)
+                      : ''
+                ];
+                for (var key in cfParametersData.keys) {
+                  var value = cfParametersData[key]!.length > i
+                      ? cfParametersData[key]![i].value
                       : null;
                   // ✅ Preserve 0, replace null with empty string
                   row.add(value ?? '');
@@ -1522,6 +1583,67 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     // Remove parameters with empty lists (i.e., all values were null)
     parametersData.removeWhere((key, value) => value.isEmpty);
     print('Parsed SM Parameters: ${parametersData.keys.join(', ')}'); // Debug
+
+    return parametersData;
+  }
+
+  Map<String, List<ChartData>> _parseCFParametersData(
+      Map<String, dynamic> data) {
+    final List<dynamic> items = data['items'] ?? [];
+    Map<String, List<ChartData>> parametersData = {};
+    print('CF API Items Count: ${items.length}'); // Debug
+
+    if (items.isEmpty) {
+      print('No items in CF API response');
+      return parametersData;
+    }
+
+    // Collect all possible parameter keys from the first item, excluding non-numeric fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      // Exclude non-numeric fields like TimeStamp, Topic, IMEINumber, DeviceId, Latitude, Longitude
+      return ![
+        'TimeStamp',
+        'Topic',
+        'IMEINumber',
+        'DeviceId',
+        'Latitude',
+        'Longitude'
+      ].contains(key);
+    }).toList();
+
+    // Initialize ChartData lists for each parameter
+    for (var key in parameterKeys) {
+      parametersData[key] = [];
+    }
+
+    // Parse data for each item
+    for (var item in items) {
+      if (item == null) continue;
+      DateTime timestamp = _parseCFDate(item['TimeStamp']);
+      for (var key in parameterKeys) {
+        if (item[key] != null) {
+          // Only include non-null values
+          double value = double.tryParse(item[key].toString()) ?? 0.0;
+          parametersData[key]!
+              .add(ChartData(timestamp: timestamp, value: value));
+        }
+      }
+    }
+
+    // Update _lastcfBattery with the latest BatteryVoltage (from the last item)
+    for (var item in items.reversed) {
+      if (item != null && item['BatteryVoltage'] != null) {
+        _lastcfBattery =
+            double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
+        print('Updated _lastcfBattery: $_lastcfBattery V'); // Debug
+        break; // Exit after finding the latest non-null value
+      }
+    }
+
+    // Remove parameters with empty lists (i.e., all values were null)
+    parametersData.removeWhere((key, value) => value.isEmpty);
+    print('Parsed CF Parameters: ${parametersData.keys.join(', ')}'); // Debug
 
     return parametersData;
   }
@@ -2608,6 +2730,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parseCFDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return DateTime.now();
+    }
+    try {
+      // Parse the timestamp format: YYYY-MM-DD HH:MM:SS (e.g., 2025-06-15 01:01:02)
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      print('Error parsing CF date: $e');
+      return DateTime.now();
+    }
+  }
+
   DateTime _parsedoDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
@@ -2907,6 +3042,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       unit = 'Lux';
     else if (paramName.contains('WindSpeed'))
       unit = 'm/s';
+    else if (paramName.contains('WindDirection'))
+      unit = 'degrees'; // Added for CF WindDirection
     else if (paramName.contains('Irradiance') ||
         paramName.contains('Radiation'))
       unit = 'W/m²';
@@ -3086,6 +3223,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             SizedBox(height: 2),
                             Text(
                               '${_lastsmBattery.toStringAsFixed(2)} V',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                if (widget.deviceName.startsWith('CF'))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getfsBatteryIcon(_lastcfBattery),
+                              color: _getBatteryColor(_lastcfBattery),
+                              size: 28,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${_lastcfBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -3655,8 +3820,47 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             }
                             return const SizedBox.shrink();
                           }).toList(),
+                        if (widget.deviceName.startsWith('CF'))
+                          ...cfParametersData.entries.map((entry) {
+                            String paramName = entry.key;
+                            List<ChartData> data = entry.value;
+
+                            // Exclude specified parameters
+                            List<String> excludedParams = [
+                              'Longitude',
+                              'Latitude',
+                              'SignalStrength',
+                              'BatteryVoltage',
+                              'MaximumTemperature',
+                              'MinimumTemperature',
+                              'AverageTemperature',
+                              'RainfallDaily',
+                              'RainfallWeekly',
+                              'AverageHumidity',
+                              'MinimumHumidity',
+                              'MaximumHumidity',
+                            ];
+
+                            if (!excludedParams.contains(paramName) &&
+                                data.isNotEmpty) {
+                              final displayInfo =
+                                  _getParameterDisplayInfo(paramName);
+                              String displayName = displayInfo['displayName'];
+                              String unit = displayInfo['unit'];
+                              return _buildChartContainer(
+                                displayName,
+                                data,
+                                unit.isNotEmpty
+                                    ? '$displayName ($unit)'
+                                    : displayName,
+                                ChartType.line,
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          }).toList(),
                         // Non-SM sensor parameters
-                        if (!widget.deviceName.startsWith('SM')) ...[
+                        if (!widget.deviceName.startsWith('SM') &&
+                            !widget.deviceName.startsWith('CM')) ...[
                           if (hasNonZeroValues(chlorineData))
                             _buildChartContainer('Chlorine', chlorineData,
                                 'Chlorine (mg/L)', ChartType.line),
