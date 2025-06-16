@@ -226,6 +226,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> smSignalStrength = [];
   Map<String, List<ChartData>> smParametersData = {};
   Map<String, List<ChartData>> cfParametersData = {};
+  final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
 
   List<ChartData> fsrainData = [];
   List<ChartData> fswinddirectionData = [];
@@ -589,6 +590,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         if (widget.deviceName.startsWith('SM')) {
           print('SM API Response: ${response.body}');
           setState(() {
+            smParametersData.clear(); // Clear old data
             smParametersData = _parseSMParametersData(data);
             print('Parsed SM Parameters: $smParametersData');
 
@@ -642,6 +644,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         } else if (widget.deviceName.startsWith('CF')) {
           print('CF API Response: ${response.body}');
           setState(() {
+            cfParametersData.clear(); // Clear old data
             cfParametersData = _parseCFParametersData(data);
             print('Parsed CF Parameters: $cfParametersData');
 
@@ -1255,7 +1258,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
         // Store CSV rows for download later
         setState(() {
-          _csvRows = rows;
+          // Only set _csvRows for sensors other than SM and CF
+          if (!widget.deviceName.startsWith('SM') &&
+              !widget.deviceName.startsWith('CF')) {
+            _csvRows = rows;
+          }
           _lastWindDirection =
               lastWindDirection; // Store the last wind direction
           _lastBatteryPercentage = lastBatteryPercentage;
@@ -1276,21 +1283,118 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   void downloadCSV(BuildContext context, {DateTimeRange? range}) async {
-    if (_csvRows.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No data available for download.")),
-      );
-      return;
+    List<List<dynamic>> csvRows;
+
+    if (widget.deviceName.startsWith('SM')) {
+      if (smParametersData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        List<String> headers = ['Timestamp'];
+        headers.addAll(smParametersData.keys);
+
+        List<List<dynamic>> dataRows = [];
+        Set<DateTime> timestamps = {};
+        smParametersData.values.forEach((dataList) {
+          dataList.forEach((data) => timestamps.add(data.timestamp));
+        });
+        List<DateTime> sortedTimestamps = timestamps.toList()..sort();
+        print('Sorted Timestamps for SM CSV Download: $sortedTimestamps');
+
+        for (var timestamp in sortedTimestamps) {
+          List<dynamic> row = [formatter.format(timestamp)];
+          for (var key in smParametersData.keys) {
+            var dataList = smParametersData[key]!;
+            var matchingData = dataList.firstWhere(
+              (data) => data.timestamp == timestamp,
+              orElse: () => ChartData(timestamp: timestamp, value: 0.0),
+            );
+            row.add(matchingData.value ?? '');
+          }
+          dataRows.add(row);
+        }
+
+        csvRows = [headers, ...dataRows];
+        print('✅ CSV Rows for SM Download: ${csvRows.length} rows');
+        print('✅ Sample Row for SM Download: ${csvRows[1]}');
+      }
+    } else if (widget.deviceName.startsWith('CF')) {
+      if (cfParametersData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        List<String> headers = ['Timestamp'];
+        headers.addAll(cfParametersData.keys);
+
+        List<List<dynamic>> dataRows = [];
+        Set<DateTime> timestamps = {};
+        cfParametersData.values.forEach((dataList) {
+          dataList.forEach((data) => timestamps.add(data.timestamp));
+        });
+        List<DateTime> sortedTimestamps = timestamps.toList()..sort();
+        print('Sorted Timestamps for CF CSV Download: $sortedTimestamps');
+
+        for (var timestamp in sortedTimestamps) {
+          List<dynamic> row = [formatter.format(timestamp)];
+          for (var key in cfParametersData.keys) {
+            var dataList = cfParametersData[key]!;
+            var matchingData = dataList.firstWhere(
+              (data) => data.timestamp == timestamp,
+              orElse: () => ChartData(timestamp: timestamp, value: 0.0),
+            );
+            row.add(matchingData.value ?? '');
+          }
+          dataRows.add(row);
+        }
+
+        csvRows = [headers, ...dataRows];
+        print('✅ CSV Rows for CF Download: ${csvRows.length} rows');
+        print('✅ Sample Row for CF Download: ${csvRows[1]}');
+      }
+    } else if (widget.deviceName.startsWith('WD211') ||
+        widget.deviceName.startsWith('WD511')) {
+      if (rfdData.isEmpty || rfsData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        csvRows = [
+          ["Timestamp", "RFD ", "RFS "],
+          for (int i = 0; i < rfdData.length; i++)
+            [
+              formatter.format(rfdData[i].timestamp),
+              rfdData[i].value,
+              rfsData[i].value,
+            ]
+        ];
+        print('✅ CSV Rows for Rain Forecast Download: ${csvRows.length} rows');
+        print('✅ Sample Row for Rain Forecast Download: ${csvRows[1]}');
+      }
+    } else {
+      // Use _csvRows for other sensors (CL, BD, WQ, IT, WS, DO, TH, NH, TE, LU, FS, WD, etc.)
+      if (_csvRows.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No data available for download.")),
+        );
+        return;
+      }
+      csvRows = _csvRows;
+      print('Using _csvRows for Download: ${csvRows.length} rows');
     }
 
-    String csvData = const ListToCsvConverter().convert(_csvRows);
-    String fileName = _generateFileName(); // Generate a dynamic filename
+    String csvData = const ListToCsvConverter().convert(csvRows);
+    String fileName = _generateFileName();
 
     if (kIsWeb) {
       final blob = html.Blob([csvData], 'text/csv');
       final url = html.Url.createObjectUrlFromBlob(blob);
       final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", fileName) // Use the generated filename
+        ..setAttribute("download", fileName)
         ..click();
       html.Url.revokeObjectUrl(url);
 
@@ -1302,8 +1406,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       );
     } else {
       try {
-        // Use Storage Access Framework for non-web platforms
-        await saveCSVFile(csvData, fileName); // Pass filename to saveCSVFile
+        await saveCSVFile(csvData, fileName);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error downloading: $e")),
