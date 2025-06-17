@@ -4097,8 +4097,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           // _buildChartContainer(
                           //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
                           // if (hasNonZeroValues(rfsData))
-                          _buildChartContainer(
-                              'RFS', rfsData, 'RFS (mm)', ChartType.line),
+                          // _buildChartContainer(
+                          //     'RFS', rfsData, 'RFS (mm)', ChartType.line),
                           if (hasNonZeroValues(ittempData))
                             _buildChartContainer('Temperature', ittempData,
                                 'Temperature (°C)', ChartType.line),
