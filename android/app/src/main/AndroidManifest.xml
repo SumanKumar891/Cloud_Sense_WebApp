@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
    
     <application
-        android:label="Cloud Sense Viz"
+        android:label="Cloud Sense Vis"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:roundIcon="@mipmap/launcher_icon"

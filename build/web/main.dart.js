@@ -77430,7 +77430,7 @@ r.toString
 return A.kG(A.eJ(!1,A.O(a,s,s,s,s,A.a1(s,s,A.aa(r).ax.a===B.Y?B.i:B.m,s,s,s,s,s,s,s,s,s,s,s,B.v,s,s,!0,s,s,s,s,s,s,s,s),s,s,s,s),s,s,B.ak,s,s,s,s,c,s,s),B.br,s,new A.bgc(this,a),new A.bgd(this,a),s)}}
 A.bgp.prototype={
 $2(a4,a5){var s,r,q,p,o,n,m,l,k=this,j=null,i="ABOUT US",h="LOGIN/SIGNUP",g="ACCOUNT INFO",f="DEVICE INFO",e=a5.b<800,d=k.b,c=d?B.i:B.m,b=d?B.St:B.tK,a=e?A.aG(j,j,10):A.aG(j,j,80),a0=A.e2(B.Y9,d?B.i:B.m,j,j),a1=A.aG(j,j,e?10:20),a2=d?B.i:B.m,a3=t.p
-a2=A.b([a,a0,a1,A.O("Cloud Sense Viz",j,j,j,j,A.a1(j,j,a2,j,j,j,j,j,j,j,j,e?20:32,j,j,B.v,j,j,!0,j,j,j,j,j,j,j,j),j,j,j,j),new A.DJ(j)],a3)
+a2=A.b([a,a0,a1,A.O("Cloud Sense Vis",j,j,j,j,A.a1(j,j,a2,j,j,j,j,j,j,j,j,e?20:32,j,j,B.v,j,j,!0,j,j,j,j,j,j,j,j),j,j,j,j),new A.DJ(j)],a3)
 if(e){a=k.c
 a0=a.a?B.vB:B.vA
 a2.push(A.iw(j,A.e2(a0,d?B.i:B.m,j,j),j,new A.bge(a),j,j))}if(!e){a=k.c
@@ -77446,9 +77446,9 @@ s=A.K(a2,0,0,0)
 r=A.ah(a4,j,a).w.a.a<800?20:100
 q=A.ah(a4,j,a).w.a.a<800?60:120
 p=A.ah(a4,j,a).w.a.a<1000?60:400
-o=A.O("Welcome to Cloud Sense Viz",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,"OpenSans",j,j,A.ah(a4,j,a).w.a.a<800?30:65,j,j,B.v,j,j,!0,j,j,j,j,j,j,j,j),j,j,j,j)
+o=A.O("Welcome to Cloud Sense Vis",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,"OpenSans",j,j,A.ah(a4,j,a).w.a.a<800?30:65,j,j,B.v,j,j,!0,j,j,j,j,j,j,j,j),j,j,j,j)
 n=A.aG(j,20,j)
-a0=A.eH(B.aG,A.b([a0,A.bn(B.e8,A.bp(A.b([o,n,new A.aO(B.b3,A.O("At Cloud Sense Viz, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,j,j,j,A.ah(a4,j,a).w.a.a<800?16:22,j,j,j,j,j,!0,j,j,j,j,j,j,j,j),B.eL,j,j,j),j)],a3),B.ae,B.n,B.o),B.l,s,j,j,j,a1,j,j,new A.aq(r,q,p,20),j,j,1/0)],a3),B.t,B.at,j)
+a0=A.eH(B.aG,A.b([a0,A.bn(B.e8,A.bp(A.b([o,n,new A.aO(B.b3,A.O("At Cloud Sense Vis, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,j,j,j,A.ah(a4,j,a).w.a.a<800?16:22,j,j,j,j,j,!0,j,j,j,j,j,j,j,j),B.eL,j,j,j),j)],a3),B.ae,B.n,B.o),B.l,s,j,j,j,a1,j,j,new A.aq(r,q,p,20),j,j,1/0)],a3),B.t,B.at,j)
 a1=A.aG(j,50,j)
 s=A.aG(j,50,j)
 r=A.bz7("assets/weather.png",B.cX,A.ah(a4,j,a).w.a.a<800?400:500,1/0)
@@ -77459,7 +77459,7 @@ o=A.ah(a4,j,a).w.a.a<800?40:85
 n=A.ah(a4,j,a).w.a.a<800?20:90
 m=A.O("Our Mission",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,j,j,j,A.ah(a4,j,a).w.a.a<800?30:50,j,j,B.v,j,j,!0,j,j,j,j,j,j,j,j),j,j,j,j)
 l=A.aG(j,16,j)
-return A.tx(c,j,A.en(A.bp(A.b([a0,a1,new A.aO(new A.aq(16,10,16,10),new A.iY(new A.bgo(d),j),j),s,A.eH(B.aG,A.b([r,A.bn(j,A.bp(A.b([m,l,A.O("At Cloud Sense Viz, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense Viz, you can trust that you\u2019re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,j,j,j,A.ah(a4,j,a).w.a.a<800?14:24,j,j,j,j,j,!0,j,j,j,j,j,j,j,j),B.eL,j,j,j)],a3),B.q,B.n,B.o),B.l,a2,j,j,j,q,j,j,new A.aq(p,o,n,50),j,j,1/0)],a3),B.t,B.at,j),A.aG(j,0,j)],a3),B.ae,B.n,B.o),j,j,j,j,B.ac),b,!1)},
+return A.tx(c,j,A.en(A.bp(A.b([a0,a1,new A.aO(new A.aq(16,10,16,10),new A.iY(new A.bgo(d),j),j),s,A.eH(B.aG,A.b([r,A.bn(j,A.bp(A.b([m,l,A.O("At Cloud Sense Vis, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense Vis, you can trust that you\u2019re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.",j,j,j,j,A.a1(j,j,B.i,j,j,j,j,j,j,j,j,A.ah(a4,j,a).w.a.a<800?14:24,j,j,j,j,j,!0,j,j,j,j,j,j,j,j),B.eL,j,j,j)],a3),B.q,B.n,B.o),B.l,a2,j,j,j,q,j,j,new A.aq(p,o,n,50),j,j,1/0)],a3),B.t,B.at,j),A.aG(j,0,j)],a3),B.ae,B.n,B.o),j,j,j,j,B.ac),b,!1)},
 $S:476}
 A.bge.prototype={
 $0(){return this.a.z0()},
@@ -79168,7 +79168,7 @@ return s},
 $S:488}
 A.aaA.prototype={
 R(a){var s=null,r=A.ac2(a,t.eC).a?A.DR(B.Y,s,s):A.DR(B.ad,s,s)
-return new A.SJ(A.a7(["/",new A.aRc(),"/about-us",new A.aRd(),"/login",new A.aRe(),"/accountinfo",new A.aRf(),"/deviceinfo",new A.aRg(),"/devicelist",new A.aRh(),"/devicegraph",new A.aRi(),"/buffalodata",new A.aRj(),"/cowdata",new A.aRk()],t.N,t.Ab),"/","Cloud Sense Viz",r,!1,s)}}
+return new A.SJ(A.a7(["/",new A.aRc(),"/about-us",new A.aRd(),"/login",new A.aRe(),"/accountinfo",new A.aRf(),"/deviceinfo",new A.aRg(),"/devicelist",new A.aRh(),"/devicegraph",new A.aRi(),"/buffalodata",new A.aRj(),"/cowdata",new A.aRk()],t.N,t.Ab),"/","Cloud Sense Vis",r,!1,s)}}
 A.aRc.prototype={
 $1(a){return new A.vb(null)},
 $S:131}

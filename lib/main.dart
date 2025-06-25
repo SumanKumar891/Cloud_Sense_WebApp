@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      title: 'Cloud Sense Viz',
+      title: 'Cloud Sense Vis',
       debugShowCheckedModeBanner: false,
       theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
       // themeMode: themeProvider.themeMode,

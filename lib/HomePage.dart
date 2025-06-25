@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
-      title: 'Cloud Sense Viz',
+      title: 'Cloud Sense Vis',
       theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: HomePage(),
     );
@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(width: isMobile ? 10 : 20),
               Text(
-                'Cloud Sense Viz',
+                'Cloud Sense Vis',
                 style: TextStyle(
                   color: isDarkMode ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,
@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome to Cloud Sense Viz',
+                          'Welcome to Cloud Sense Vis',
                           style: TextStyle(
                             fontFamily: 'OpenSans',
                             fontSize: MediaQuery.of(context).size.width < 800
@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 0.0),
                           child: Text(
-                            "At Cloud Sense Viz, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",
+                            "At Cloud Sense Vis, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",
                             style: TextStyle(
                               fontSize: MediaQuery.of(context).size.width < 800
                                   ? 16
@@ -377,7 +377,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'At Cloud Sense Viz, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense Viz, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
+                          'At Cloud Sense Vis, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense Vis, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
                           style: TextStyle(
                             fontSize: MediaQuery.of(context).size.width < 800
                                 ? 14
