@@ -83,10 +83,17 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       if (res.isSignedIn) {
         // Store email in shared preferences for session management
         SharedPreferences prefs = await SharedPreferences.getInstance();
+        String email = _emailController.text.trim().toLowerCase();
         await prefs.setString('email', _emailController.text);
 
-        // Navigate to device list page on successful sign-in
-        Navigator.pushReplacementNamed(context, '/devicelist');
+        // ✅ Navigate based on specific user
+        if (email == "05agriculture.05@gmail.com") {
+          print("Navigating to /deviceinfo for $email");
+          Navigator.pushReplacementNamed(context, '/deviceinfo');
+        } else {
+          print("Navigating to /devicelist for $email");
+          Navigator.pushReplacementNamed(context, '/devicelist');
+        }
       } else {
         _showSnackbar('Sign-in failed');
       }

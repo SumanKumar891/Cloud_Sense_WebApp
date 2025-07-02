@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cloud_sense_webapp/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -74,6 +75,43 @@ class _MapPageState extends State<MapPage> {
     searchController.dispose();
     mapController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      // First, unsubscribe from all notification topics before logout
+
+      // Then proceed with logout
+      await Amplify.Auth.signOut();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs
+          .clear(); // Clear all stored preferences including subscription flags
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+      // Even if there's an error, proceed with logout
+      try {
+        await Amplify.Auth.signOut();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+          (Route<dynamic> route) => false,
+        );
+      } catch (logoutError) {
+        print('Error during fallback logout: $logoutError');
+      }
+    }
   }
 
   Future<void> _loadPreviousPositions() async {
@@ -766,6 +804,18 @@ class _MapPageState extends State<MapPage> {
                                       : () => _fetchDeviceLocations(),
                                   tooltip: 'Reload Map',
                                 ),
+                        ),
+                        SizedBox(width: 10),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.logout, color: Colors.black),
+                            onPressed: _handleLogout,
+                            tooltip: 'Logout',
+                          ),
                         ),
                       ],
                     ),

@@ -32,29 +32,29 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   Future<void> _loadEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? email = prefs.getString('email');
+    String? savedEmail = prefs.getString('email');
 
-    if (email != null) {
+    try {
+      var currentUser = await Amplify.Auth.getCurrentUser();
+      if (currentUser.username.trim().toLowerCase() ==
+          "05agriculture.05@gmail.com") {
+        // Redirect to DeviceInfoPage if this is the special user
+        Navigator.pushReplacementNamed(context, '/deviceinfo');
+        return; // Exit further execution
+      }
+      // Else continue on DeviceListPage normally
       setState(() {
-        _email = email;
+        _email = savedEmail ?? currentUser.username;
       });
       _fetchData();
-    } else {
-      // Email not found, clear any authentication and redirect to login/signup page
-      try {
-        await Amplify.Auth
-            .signOut(); // Optional: Sign out from Amplify if authenticated
-      } catch (e) {
-        print("Error signing out from Amplify: $e");
-      }
-
-      // Clear saved data in SharedPreferences
+    } catch (e) {
+      // No signed-in user — clear prefs & navigate to login screen
+      await Amplify.Auth.signOut();
       await prefs.clear();
-
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => SignInSignUpScreen()),
-        (Route<dynamic> route) => false,
+        (route) => false,
       );
     }
   }
@@ -143,14 +143,38 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     }
   }
 
-  Future<void> _logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('email'); // Clear the saved email
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-          builder: (context) => HomePage()), // Navigate to HomePage
-    );
+  Future<void> _handleLogout() async {
+    try {
+      print("[Logout] Starting logout process.");
+
+      await Amplify.Auth.signOut();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      print("[Logout] User signed out and preferences cleared.");
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      print("[Logout] Primary logout failed: $e");
+      // Fallback logout
+      try {
+        await Amplify.Auth.signOut();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        print("[Logout] Fallback logout success.");
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+          (Route<dynamic> route) => false,
+        );
+      } catch (logoutError) {
+        print("[Logout] Fallback logout failed: $logoutError");
+      }
+    }
   }
 
   @override
@@ -192,24 +216,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                   elevation: 0,
                   actions: [
                     TextButton.icon(
-                      onPressed: () async {
-                        try {
-                          await Amplify.Auth.signOut();
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          await prefs.remove('email');
-
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(),
-                            ),
-                            (Route<dynamic> route) => false,
-                          );
-                        } catch (e) {
-                          // Handle error during logout if necessary
-                        }
-                      }, // Logout function
+                      onPressed: _handleLogout,
                       icon: Icon(
                         Icons.logout,
                         color: Colors.white,
