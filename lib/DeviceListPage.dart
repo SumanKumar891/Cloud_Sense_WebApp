@@ -137,8 +137,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'SSMET Sensors';
       case 'CF':
         return 'Colonel Farm Sensors';
-
-      default:
+         case 'SV':
+        return 'SVPU Sensors';
+        default:
         return 'Rain Sensors';
     }
   }
@@ -615,6 +616,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'SSMET Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Colonel Farm Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+         case 'SVPU Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

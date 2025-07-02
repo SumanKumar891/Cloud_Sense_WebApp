@@ -226,6 +226,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   List<ChartData> smSignalStrength = [];
   Map<String, List<ChartData>> smParametersData = {};
   Map<String, List<ChartData>> cfParametersData = {};
+  Map<String, List<ChartData>> svParametersData = {};
   final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
 
   List<ChartData> fsrainData = [];
@@ -388,6 +389,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   double _lastfsBattery = 0.0;
   double _lastsmBattery = 0.0;
   double _lastcfBattery = 0.0;
+  double _lastsvBattery = 0.0;
   String _lastRSSI_Value = "";
 
   Future<void> _fetchDataForRange(String range,
@@ -444,11 +446,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       _lastfsBattery = 0.0;
       _lastsmBattery = 0.0;
       _lastcfBattery = 0.0;
+       _lastsvBattery = 0.0;
 
       fswindspeedData.clear();
 
       smParametersData.clear();
       cfParametersData.clear();
+      svParametersData.clear();
 
       _weeklyPrecipitationData.clear();
     });
@@ -514,6 +518,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('CF')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('SV')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/svpudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -674,6 +681,62 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 for (var key in cfParametersData.keys) {
                   var value = cfParametersData[key]!.length > i
                       ? cfParametersData[key]![i].value
+                      : null;
+                  // ✅ Preserve 0, replace null with empty string
+                  row.add(value ?? '');
+                }
+                dataRows.add(row);
+              }
+
+              _csvRows = [headers, ...dataRows];
+              print('✅ CSV Rows Prepared: ${_csvRows.length} rows');
+              print('✅ Sample Row: ${_csvRows[1]}');
+            }
+
+            // Clear unrelated data
+            temperatureData = [];
+            humidityData = [];
+            // etc...
+          });
+
+          // // ✅ Now trigger download
+          // downloadCSV(context);
+          await _fetchDeviceDetails();
+        }
+
+        else if (widget.deviceName.startsWith('SV')) {
+          print('SV API Response: ${response.body}');
+          setState(() {
+            svParametersData.clear();
+           svParametersData = _parseSVParametersData(data);
+            print('Parsed SV Parameters: $svParametersData');
+
+            if (svParametersData.isEmpty) {
+              print('No valid SV parameters found');
+              _csvRows = [
+                ['Timestamp', 'Message'],
+                ['', 'No data available']
+              ];
+            } else {
+              List<String> headers = ['Timestamp'];
+              headers.addAll(svParametersData.keys);
+
+              List<List<dynamic>> dataRows = [];
+              int maxLength = svParametersData.values
+                  .map((list) => list.length)
+                  .reduce((a, b) => a > b ? a : b);
+
+              for (int i = 0; i < maxLength; i++) {
+                List<dynamic> row = [
+                  svParametersData.values.isNotEmpty &&
+                          svParametersData.values.first.length > i
+                      ? formatter
+                          .format(svParametersData.values.first[i].timestamp)
+                      : ''
+                ];
+                for (var key in svParametersData.keys) {
+                  var value = svParametersData[key]!.length > i
+                      ? svParametersData[key]![i].value
                       : null;
                   // ✅ Preserve 0, replace null with empty string
                   row.add(value ?? '');
@@ -1260,7 +1323,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         setState(() {
           // Only set _csvRows for sensors other than SM and CF
           if (!widget.deviceName.startsWith('SM') &&
-              !widget.deviceName.startsWith('CF')) {
+              !widget.deviceName.startsWith('CF') &&
+              !widget.deviceName.startsWith('SV')) {
             _csvRows = rows;
           }
           _lastWindDirection =
@@ -1355,7 +1419,42 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         print('✅ CSV Rows for CF Download: ${csvRows.length} rows');
         print('✅ Sample Row for CF Download: ${csvRows[1]}');
       }
-    } else if (widget.deviceName.startsWith('WD211') ||
+    } else if (widget.deviceName.startsWith('SV')) {
+      if (svParametersData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        List<String> headers = ['Timestamp'];
+        headers.addAll(svParametersData.keys);
+
+        List<List<dynamic>> dataRows = [];
+        Set<DateTime> timestamps = {};
+        svParametersData.values.forEach((dataList) {
+          dataList.forEach((data) => timestamps.add(data.timestamp));
+        });
+        List<DateTime> sortedTimestamps = timestamps.toList()..sort();
+        print('Sorted Timestamps for SV CSV Download: $sortedTimestamps');
+
+        for (var timestamp in sortedTimestamps) {
+          List<dynamic> row = [formatter.format(timestamp)];
+          for (var key in svParametersData.keys) {
+            var dataList = svParametersData[key]!;
+            var matchingData = dataList.firstWhere(
+              (data) => data.timestamp == timestamp,
+              orElse: () => ChartData(timestamp: timestamp, value: 0.0),
+            );
+            row.add(matchingData.value ?? '');
+          }
+          dataRows.add(row);
+        }
+
+        csvRows = [headers, ...dataRows];
+        print('✅ CSV Rows for SV Download: ${csvRows.length} rows');
+        print('✅ Sample Row for SV Download: ${csvRows[1]}');
+      }
+    }else if (widget.deviceName.startsWith('WD211') ||
         widget.deviceName.startsWith('WD511')) {
       if (rfdData.isEmpty || rfsData.isEmpty) {
         csvRows = [
@@ -1747,6 +1846,66 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     // Remove parameters with empty lists (i.e., all values were null)
     parametersData.removeWhere((key, value) => value.isEmpty);
     print('Parsed CF Parameters: ${parametersData.keys.join(', ')}'); // Debug
+
+    return parametersData;
+  }
+Map<String, List<ChartData>> _parseSVParametersData(
+      Map<String, dynamic> data) {
+    final List<dynamic> items = data['items'] ?? [];
+    Map<String, List<ChartData>> parametersData = {};
+    print('SV API Items Count: ${items.length}'); // Debug
+
+    if (items.isEmpty) {
+      print('No items in SV API response');
+      return parametersData;
+    }
+
+    // Collect all possible parameter keys from the first item, excluding non-numeric fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      // Exclude non-numeric fields like TimeStamp, Topic, IMEINumber, DeviceId, Latitude, Longitude
+      return ![
+        'TimeStamp',
+        'Topic',
+        'IMEINumber',
+        'DeviceId',
+        'Latitude',
+        'Longitude'
+      ].contains(key);
+    }).toList();
+
+    // Initialize ChartData lists for each parameter
+    for (var key in parameterKeys) {
+      parametersData[key] = [];
+    }
+
+    // Parse data for each item
+    for (var item in items) {
+      if (item == null) continue;
+      DateTime timestamp = _parseSVDate(item['TimeStamp']);
+      for (var key in parameterKeys) {
+        if (item[key] != null) {
+          // Only include non-null values
+          double value = double.tryParse(item[key].toString()) ?? 0.0;
+          parametersData[key]!
+              .add(ChartData(timestamp: timestamp, value: value));
+        }
+      }
+    }
+
+    // Update _lastsvBattery with the latest BatteryVoltage (from the last item)
+    for (var item in items.reversed) {
+      if (item != null && item['BatteryVoltage'] != null) {
+        _lastsvBattery =
+            double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
+        print('Updated _lastsvBattery: $_lastsvBattery V'); // Debug
+        break; // Exit after finding the latest non-null value
+      }
+    }
+
+    // Remove parameters with empty lists (i.e., all values were null)
+    parametersData.removeWhere((key, value) => value.isEmpty);
+    print('Parsed SV Parameters: ${parametersData.keys.join(', ')}'); // Debug
 
     return parametersData;
   }
@@ -2846,6 +3005,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parseSVDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return DateTime.now();
+    }
+    try {
+      // Parse the timestamp format: YYYY-MM-DD HH:MM:SS (e.g., 2025-06-15 01:01:02)
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      print('Error parsing SV date: $e');
+      return DateTime.now();
+    }
+  }
+
   DateTime _parsedoDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd HH:mm:ss'); // Ensure this matches your date format
@@ -3354,6 +3526,35 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             SizedBox(height: 2),
                             Text(
                               '${_lastcfBattery.toStringAsFixed(2)} V',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                    if (widget.deviceName.startsWith('SV'))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getfsBatteryIcon(_lastsvBattery),
+                              color: _getBatteryColor(_lastsvBattery),
+                              size: 28,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${_lastsvBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -3946,18 +4147,101 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
                             if (!excludedParams.contains(paramName) &&
                                 data.isNotEmpty) {
+                              print(
+                                  'Processing CF Parameter: $paramName, Data Length: ${data.length}');
+
                               final displayInfo =
                                   _getParameterDisplayInfo(paramName);
                               String displayName = displayInfo['displayName'];
                               String unit = displayInfo['unit'];
+                              print(
+                                  'Display Info for $paramName: displayName=$displayName, unit=$unit');
+
+                              // Customize chart title for specific parameters
+                              String chartTitle;
+                              if (paramName.toLowerCase() ==
+                                  'currenthumidity') {
+                                chartTitle = 'Humidity Graph ($unit)';
+                              } else if (paramName.toLowerCase() ==
+                                  'currenttemperature') {
+                                chartTitle = 'Temperature Graph ($unit)';
+                              } else {
+                                chartTitle = unit.isNotEmpty
+                                    ? '$displayName ($unit)'
+                                    : displayName;
+                              }
+                              print('Chart Title for $paramName: $chartTitle');
+
                               return _buildChartContainer(
                                 displayName,
                                 data,
-                                unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName,
+                                chartTitle,
                                 ChartType.line,
                               );
+                            } else {
+                              print(
+                                  'Skipping CF Parameter: $paramName, Excluded: ${excludedParams.contains(paramName)}, Data Empty: ${data.isEmpty}');
+                            }
+                            return const SizedBox.shrink();
+                          }).toList(),
+
+                           if (widget.deviceName.startsWith('SV'))
+                          ...svParametersData.entries.map((entry) {
+                            String paramName = entry.key;
+                            List<ChartData> data = entry.value;
+
+                            // Exclude specified parameters
+                            List<String> excludedParams = [
+                              'Longitude',
+                              'Latitude',
+                              'SignalStrength',
+                              'BatteryVoltage',
+                              'MaximumTemperature',
+                              'MinimumTemperature',
+                              'AverageTemperature',
+                              'RainfallDaily',
+                              'RainfallWeekly',
+                              'AverageHumidity',
+                              'MinimumHumidity',
+                              'MaximumHumidity',
+                            ];
+
+                            if (!excludedParams.contains(paramName) &&
+                                data.isNotEmpty) {
+                              print(
+                                  'Processing SV Parameter: $paramName, Data Length: ${data.length}');
+
+                              final displayInfo =
+                                  _getParameterDisplayInfo(paramName);
+                              String displayName = displayInfo['displayName'];
+                              String unit = displayInfo['unit'];
+                              print(
+                                  'Display Info for $paramName: displayName=$displayName, unit=$unit');
+
+                              // Customize chart title for specific parameters
+                              String chartTitle;
+                              if (paramName.toLowerCase() ==
+                                  'currenthumidity') {
+                                chartTitle = 'Humidity Graph ($unit)';
+                              } else if (paramName.toLowerCase() ==
+                                  'currenttemperature') {
+                                chartTitle = 'Temperature Graph ($unit)';
+                              } else {
+                                chartTitle = unit.isNotEmpty
+                                    ? '$displayName ($unit)'
+                                    : displayName;
+                              }
+                              print('Chart Title for $paramName: $chartTitle');
+
+                              return _buildChartContainer(
+                                displayName,
+                                data,
+                                chartTitle,
+                                ChartType.line,
+                              );
+                            } else {
+                              print(
+                                  'Skipping SV Parameter: $paramName, Excluded: ${excludedParams.contains(paramName)}, Data Empty: ${data.isEmpty}');
                             }
                             return const SizedBox.shrink();
                           }).toList(),
@@ -4097,8 +4381,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           // _buildChartContainer(
                           //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
                           // if (hasNonZeroValues(rfsData))
-                          // _buildChartContainer(
-                          //     'RFS', rfsData, 'RFS (mm)', ChartType.line),
+                          _buildChartContainer(
+                              'RFS', rfsData, 'RFS (mm)', ChartType.line),
                           if (hasNonZeroValues(ittempData))
                             _buildChartContainer('Temperature', ittempData,
                                 'Temperature (°C)', ChartType.line),

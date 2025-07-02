@@ -60,6 +60,10 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('CF')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } 
+    else if (widget.deviceName.startsWith('SV')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/svpudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -111,6 +115,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _parseSMData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CF')) {
         _parseCFData(data['items'] ?? []);
+      } 
+      else if (widget.deviceName.startsWith('SV')) {
+        _parseSVData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CL') ||
           widget.deviceName.startsWith('BD')) {
         _csvRows.add(['Timestamp', 'Chlorine']);
@@ -351,6 +358,50 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         ['', 'No data available']
       ];
       print('No valid CF parameters found');
+      return;
+    }
+
+    // Build headers
+    List<String> headers = ['TimeStamp'];
+    headers.addAll(parameterKeys);
+    _csvRows.add(headers);
+
+    // Build data rows
+    for (var item in items) {
+      if (item == null) continue;
+      List<dynamic> row = [item['TimeStamp'] ?? ''];
+      for (var key in parameterKeys) {
+        var value = item[key] != null ? item[key].toString() : '';
+        row.add(value);
+      }
+      _csvRows.add(row);
+    }
+  }
+
+ void _parseSVData(List<dynamic> items) {
+    print('SV API Items Count: ${items.length}'); // Debug
+    if (items.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No items in SV API response');
+      return;
+    }
+
+    // Collect non-null parameter keys, excluding non-data fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      return !['TimeStamp', 'Topic', 'IMEINumber', 'DeviceId'].contains(key) &&
+          sampleItem[key] != null;
+    }).toList();
+
+    if (parameterKeys.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No valid SV parameters found');
       return;
     }
 

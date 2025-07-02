@@ -21,6 +21,7 @@ class DeviceUtils {
     if (deviceId.startsWith('FS')) return 'Forest Sensor';
     if (deviceId.startsWith('SM')) return 'SSMET Sensor';
     if (deviceId.startsWith('CF')) return 'Colonel Farm Sensor';
+    if (deviceId.startsWith('SV')) return 'SVPU Sensor';
     return 'Rain Sensor';
   }
 
@@ -131,6 +132,7 @@ class DeviceUtils {
     'IT',
     'FS',
     'SM',
-    'CF'
+    'CF',
+    'SV'
   ];
 }
