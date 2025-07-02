@@ -4247,7 +4247,7 @@ Map<String, List<ChartData>> _parseSVParametersData(
                           }).toList(),
                         // Non-SM sensor parameters
                         if (!widget.deviceName.startsWith('SM') &&
-                            !widget.deviceName.startsWith('CM')) ...[
+                            !widget.deviceName.startsWith('CM') && !widget.deviceName.startsWith('SV')) ...[
                           if (hasNonZeroValues(chlorineData))
                             _buildChartContainer('Chlorine', chlorineData,
                                 'Chlorine (mg/L)', ChartType.line),
