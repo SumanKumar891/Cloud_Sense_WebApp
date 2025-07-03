@@ -115,6 +115,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Soil Sensors';
       case 'WQ':
         return 'Water Quality Sensors';
+        case 'DO':
+        return 'DO Sensors';
       case 'IT':
         return 'IIT Weather Sensors';
       case 'WS':
