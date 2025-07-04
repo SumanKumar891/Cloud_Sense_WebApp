@@ -150,24 +150,27 @@ class _QRScannerPageState extends State<QRScannerPage> {
               ),
               child: MobileScanner(
                 controller: _controller,
-                allowDuplicates: false,
-                onDetect: (barcode, args) {
-                  final String? code = barcode.rawValue;
-                  if (code != null && code != scannedQRCode) {
-                    setState(() {
-                      scannedQRCode = code;
-                      message = "Detected QR Code";
-                    });
-                    _controller.stop();
-                    DeviceUtils.showConfirmationDialog(
-                      context: context,
-                      deviceId: code,
-                      devices: widget.devices,
-                      onConfirm: () async {
-                        await _addDevice(code);
-                        await _showSuccessMessage();
-                      },
-                    );
+                onDetect: (BarcodeCapture capture) {
+                  final List<Barcode> barcodes = capture.barcodes;
+                  for (final barcode in barcodes) {
+                    final String? code = barcode.rawValue;
+                    if (code != null && code != scannedQRCode) {
+                      setState(() {
+                        scannedQRCode = code;
+                        message = "Detected QR Code";
+                      });
+                      _controller.stop();
+                      DeviceUtils.showConfirmationDialog(
+                        context: context,
+                        deviceId: code,
+                        devices: widget.devices,
+                        onConfirm: () async {
+                          await _addDevice(code);
+                          await _showSuccessMessage();
+                        },
+                      );
+                      break; // Exit after processing the first valid barcode
+                    }
                   }
                 },
               ),

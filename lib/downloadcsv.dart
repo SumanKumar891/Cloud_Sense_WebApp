@@ -60,8 +60,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('CF')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
-    } 
-    else if (widget.deviceName.startsWith('SV')) {
+    } else if (widget.deviceName.startsWith('SV')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/svpudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
@@ -80,6 +79,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('CB')) {
+      apiUrl =
+          'https://a9z5vrfpkd.execute-api.us-east-1.amazonaws.com/default/CloudSense_BOD_COD_Api_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('FS')) {
       apiUrl =
           'https://w7w21t8s23.execute-api.us-east-1.amazonaws.com/default/SSMet_Forest_API_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -115,8 +117,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _parseSMData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CF')) {
         _parseCFData(data['items'] ?? []);
-      } 
-      else if (widget.deviceName.startsWith('SV')) {
+      } else if (widget.deviceName.startsWith('SV')) {
         _parseSVData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CL') ||
           widget.deviceName.startsWith('BD')) {
@@ -145,6 +146,21 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['pH'],
             item['DO'],
             item['EC'],
+          ]);
+        });
+      } else if (widget.deviceName.startsWith('CB')) {
+        _csvRows.add([
+          'Timestamp',
+          'temperature',
+          'COD',
+          'BOD',
+        ]);
+        data.forEach((item) {
+          _csvRows.add([
+            item['human_time'],
+            item['temperature'],
+            item['COD'],
+            item['BOD'],
           ]);
         });
       } else if (widget.deviceName.startsWith('IT')) {
@@ -378,7 +394,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     }
   }
 
- void _parseSVData(List<dynamic> items) {
+  void _parseSVData(List<dynamic> items) {
     print('SV API Items Count: ${items.length}'); // Debug
     if (items.isEmpty) {
       _csvRows = [

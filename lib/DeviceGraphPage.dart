@@ -227,6 +227,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Map<String, List<ChartData>> smParametersData = {};
   Map<String, List<ChartData>> cfParametersData = {};
   Map<String, List<ChartData>> svParametersData = {};
+  List<ChartData> cod2Data = [];
+  List<ChartData> bod2Data = [];
+  List<ChartData> temp2Data = [];
   final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
 
   List<ChartData> fsrainData = [];
@@ -446,7 +449,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       _lastfsBattery = 0.0;
       _lastsmBattery = 0.0;
       _lastcfBattery = 0.0;
-       _lastsvBattery = 0.0;
+      _lastsvBattery = 0.0;
 
       fswindspeedData.clear();
 
@@ -538,6 +541,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('CB')) {
+      apiUrl =
+          'https://a9z5vrfpkd.execute-api.us-east-1.amazonaws.com/default/CloudSense_BOD_COD_Api_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('FS')) {
       apiUrl =
           'https://w7w21t8s23.execute-api.us-east-1.amazonaws.com/default/SSMet_Forest_API_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -702,13 +708,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           // // ✅ Now trigger download
           // downloadCSV(context);
           await _fetchDeviceDetails();
-        }
-
-        else if (widget.deviceName.startsWith('SV')) {
+        } else if (widget.deviceName.startsWith('SV')) {
           print('SV API Response: ${response.body}');
           setState(() {
             svParametersData.clear();
-           svParametersData = _parseSVParametersData(data);
+            svParametersData = _parseSVParametersData(data);
             print('Parsed SV Parameters: $svParametersData');
 
             if (svParametersData.isEmpty) {
@@ -835,6 +839,31 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ];
           });
           await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('CB')) {
+          setState(() {
+            print('Items in response: ${data['items']}');
+            temp2Data = _parseCBChartData(data, 'temperature');
+
+            cod2Data = _parseCBChartData(data, 'COD');
+            bod2Data = _parseCBChartData(data, 'BOD');
+
+            rows = [
+              [
+                "Timestamp",
+                "temperature",
+                "COD",
+                "BOD",
+              ],
+              for (int i = 0; i < temp2Data.length; i++)
+                [
+                  formatter.format(temp2Data[i].timestamp),
+                  temp2Data[i].value,
+                  cod2Data[i].value,
+                  bod2Data[i].value,
+                ]
+            ];
+          });
+          await _fetchDeviceDetails();
         } else if (widget.deviceName.startsWith('IT')) {
           setState(() {
             print('Processing IT device data');
@@ -897,19 +926,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           await _fetchDeviceDetails();
         } else if (widget.deviceName.startsWith('WS')) {
           setState(() {
+            print('Items in response: ${data['items']}');
             temppData = _parsewaterChartData(data, 'Temperature');
             electrodeSignalData =
                 _parsewaterChartData(data, 'Electrode_signal');
             residualchlorineData = _parsewaterChartData(data, 'Chlorine_value');
             hypochlorousData = _parsewaterChartData(data, 'Hypochlorous_value');
 
-            temperatureData = [];
-            humidityData = [];
-            lightIntensityData = [];
-            windSpeedData = [];
-            rainLevelData = [];
-            solarIrradianceData = [];
-            chlorineData = [];
+            // temperatureData = [];
+            // humidityData = [];
+            // lightIntensityData = [];
+            // windSpeedData = [];
+            // rainLevelData = [];
+            // solarIrradianceData = [];
+            // chlorineData = [];
 
             rows = [
               [
@@ -1454,7 +1484,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         print('✅ CSV Rows for SV Download: ${csvRows.length} rows');
         print('✅ Sample Row for SV Download: ${csvRows[1]}');
       }
-    }else if (widget.deviceName.startsWith('WD211') ||
+    } else if (widget.deviceName.startsWith('WD211') ||
         widget.deviceName.startsWith('WD511')) {
       if (rfdData.isEmpty || rfsData.isEmpty) {
         csvRows = [
@@ -1687,17 +1717,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   List<ChartData> _parsewaterChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
-    return items.map((item) {
+    final result = items.map((item) {
       if (item == null) {
         return ChartData(timestamp: DateTime.now(), value: 0.0);
       }
+      String valueStr = item[type]?.toString().split(' ')[0] ?? '0.0';
+      double value = double.tryParse(valueStr) ?? 0.0;
+      DateTime timestamp = _parsewaterDate(item['HumanTime']);
+      print('Parsed $type: timestamp=$timestamp, value=$value');
       return ChartData(
-        timestamp: _parsewaterDate(item['HumanTime']),
-        value: item[type] != null
-            ? double.tryParse(item[type].toString()) ?? 0.0
-            : 0.0,
+        timestamp: timestamp,
+        value: value,
       );
     }).toList();
+    print('Parsed $type data: $result');
+    return result;
   }
 
   List<ChartData> _parseITChartData(Map<String, dynamic> data, String type) {
@@ -1849,7 +1883,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     return parametersData;
   }
-Map<String, List<ChartData>> _parseSVParametersData(
+
+  Map<String, List<ChartData>> _parseSVParametersData(
       Map<String, dynamic> data) {
     final List<dynamic> items = data['items'] ?? [];
     Map<String, List<ChartData>> parametersData = {};
@@ -2002,6 +2037,21 @@ Map<String, List<ChartData>> _parseSVParametersData(
     }).toList();
   }
 
+  List<ChartData> _parseCBChartData(Map<String, dynamic> data, String type) {
+    final List<dynamic> items = data['items'] ?? [];
+    return items.map((item) {
+      if (item == null) {
+        return ChartData(timestamp: DateTime.now(), value: 0.0);
+      }
+      return ChartData(
+        timestamp: _parseCBDate(item['human_time']),
+        value: item[type] != null
+            ? double.tryParse(item[type].toString()) ?? 0.0
+            : 0.0,
+      );
+    }).toList();
+  }
+
   List<ChartData> _parserainChartData(Map<String, dynamic> data, String type) {
     final List<dynamic> items = data['items'] ?? [];
     return items.map((item) {
@@ -2133,6 +2183,133 @@ Map<String, List<ChartData>> _parseSVParametersData(
   }
 
   DataRow buildDataRow(
+      String parameter, Map<String, List<double?>> stats, double fontSize) {
+    return DataRow(cells: [
+      DataCell(Text(parameter,
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['current']?[0] != null
+              ? stats['current']![0]!.toStringAsFixed(2)
+              : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+      DataCell(Text(
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          style: TextStyle(fontSize: fontSize, color: Colors.white))),
+    ]);
+  }
+
+// Calculate average, min, and max values
+  Map<String, List<double?>> _calculateCBStatistics(List<ChartData> data) {
+    if (data.isEmpty) {
+      return {
+        // 'average': [null],
+        'current': [null],
+        'min': [null],
+        'max': [null],
+      };
+    }
+    // double sum = 0.0;
+    double? current = data.last.value;
+    double min = double.infinity;
+    double max = double.negativeInfinity;
+
+    for (var entry in data) {
+      if (entry.value < min) min = entry.value;
+      if (entry.value > max) max = entry.value;
+    }
+
+    return {
+      'current': [current],
+      'min': [min],
+      'max': [max],
+    };
+  }
+
+  // Create a table displaying statistics
+  Widget buildCBStatisticsTable() {
+    final temp2Stats = _calculateCBStatistics(temp2Data);
+
+    final cod2Stats = _calculateCBStatistics(cod2Data);
+    final bod2Stats = _calculateCBStatistics(bod2Data);
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 500,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 500,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Min',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Max',
+                    style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ),
+              ],
+              rows: [
+                buildCBDataRow('Temp', temp2Stats, fontSize),
+                buildCBDataRow('COD', cod2Stats, fontSize),
+                buildCBDataRow('BOD', bod2Stats, fontSize),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  DataRow buildCBDataRow(
       String parameter, Map<String, List<double?>> stats, double fontSize) {
     return DataRow(cells: [
       DataCell(Text(parameter,
@@ -2958,6 +3135,16 @@ Map<String, List<ChartData>> _parseSVParametersData(
     }
   }
 
+  DateTime _parseCBDate(String dateString) {
+    final dateFormat = DateFormat(
+        'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
+    try {
+      return dateFormat.parse(dateString);
+    } catch (e) {
+      return DateTime.now(); // Provide a default date-time if parsing fails
+    }
+  }
+
   DateTime _parseITDate(String dateString) {
     final dateFormat = DateFormat(
         'dd-MM-yyyy HH:mm:ss'); // Ensure this matches your date format
@@ -3073,12 +3260,12 @@ Map<String, List<ChartData>> _parseSVParametersData(
   }
 
   DateTime _parsewaterDate(String dateString) {
-    final dateFormat = DateFormat(
-        'yyyy-MM-dd hh:MM:ss'); // Ensure this matches your date format
+    final dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
     try {
       return dateFormat.parse(dateString);
     } catch (e) {
-      return DateTime.now(); // Provide a default date-time if parsing fails
+      print('Error parsing date $dateString: $e');
+      return DateTime.now();
     }
   }
 
@@ -3537,8 +3724,7 @@ Map<String, List<ChartData>> _parseSVParametersData(
                       ],
                     ),
                   ),
-
-                    if (widget.deviceName.startsWith('SV'))
+                if (widget.deviceName.startsWith('SV'))
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: Row(
@@ -4046,6 +4232,8 @@ Map<String, List<ChartData>> _parseSVParametersData(
                     ),
                     if (widget.deviceName.startsWith('WQ'))
                       buildStatisticsTable(),
+                    if (widget.deviceName.startsWith('CB'))
+                      buildCBStatisticsTable(),
                     if (widget.deviceName.startsWith('NH'))
                       buildNHStatisticsTable(),
                     if (widget.deviceName.startsWith('DO'))
@@ -4185,7 +4373,7 @@ Map<String, List<ChartData>> _parseSVParametersData(
                             return const SizedBox.shrink();
                           }).toList(),
 
-                           if (widget.deviceName.startsWith('SV'))
+                        if (widget.deviceName.startsWith('SV'))
                           ...svParametersData.entries.map((entry) {
                             String paramName = entry.key;
                             List<ChartData> data = entry.value;
@@ -4247,7 +4435,8 @@ Map<String, List<ChartData>> _parseSVParametersData(
                           }).toList(),
                         // Non-SM sensor parameters
                         if (!widget.deviceName.startsWith('SM') &&
-                            !widget.deviceName.startsWith('CM') && !widget.deviceName.startsWith('SV')) ...[
+                            !widget.deviceName.startsWith('CM') &&
+                            !widget.deviceName.startsWith('SV')) ...[
                           if (hasNonZeroValues(chlorineData))
                             _buildChartContainer('Chlorine', chlorineData,
                                 'Chlorine (mg/L)', ChartType.line),
@@ -4381,8 +4570,8 @@ Map<String, List<ChartData>> _parseSVParametersData(
                           // _buildChartContainer(
                           //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
                           // if (hasNonZeroValues(rfsData))
-                          // _buildChartContainer(
-                          //     'RFS', rfsData, 'RFS (mm)', ChartType.line),
+                          _buildChartContainer(
+                              'RFS', rfsData, 'RFS (mm)', ChartType.line),
                           if (hasNonZeroValues(ittempData))
                             _buildChartContainer('Temperature', ittempData,
                                 'Temperature (°C)', ChartType.line),
@@ -4423,6 +4612,17 @@ Map<String, List<ChartData>> _parseSVParametersData(
                           if (hasNonZeroValues(fswindspeedData))
                             _buildChartContainer('Wind Speed', fswindspeedData,
                                 'Wind Speed (m/s)', ChartType.line),
+
+                          if (hasNonZeroValues(temp2Data))
+                            _buildChartContainer('Temperature', temp2Data,
+                                'Temperature (°C)', ChartType.line),
+
+                          if (hasNonZeroValues(cod2Data))
+                            _buildChartContainer(
+                                'COD', cod2Data, 'COD (mg/L)', ChartType.line),
+                          if (hasNonZeroValues(bod2Data))
+                            _buildChartContainer(
+                                'BOD', bod2Data, 'BOD (mg/L)', ChartType.line),
 
                           // // if (hasNonZeroValues(fsrfdData))
                           // _buildChartContainer(
@@ -4777,7 +4977,7 @@ Map<String, List<ChartData>> _parseSVParametersData(
                                 enablePinching: true,
                                 enableMouseWheelZooming: isShiftPressed,
                               ),
-                              series: <ChartSeries<ChartData, DateTime>>[
+                              series: <CartesianSeries<ChartData, DateTime>>[
                                 _getChartSeries(chartType, data, title),
                               ],
                             ),
@@ -4814,7 +5014,7 @@ Map<String, List<ChartData>> _parseSVParametersData(
     );
   }
 
-  ChartSeries<ChartData, DateTime> _getChartSeries(
+  CartesianSeries<ChartData, DateTime> _getChartSeries(
       ChartType chartType, List<ChartData> data, String title) {
     switch (chartType) {
       case ChartType.line:

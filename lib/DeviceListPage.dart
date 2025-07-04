@@ -115,7 +115,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Soil Sensors';
       case 'WQ':
         return 'Water Quality Sensors';
-        case 'DO':
+      case 'DO':
         return 'DO Sensors';
       case 'IT':
         return 'IIT Weather Sensors';
@@ -139,9 +139,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'SSMET Sensors';
       case 'CF':
         return 'Colonel Farm Sensors';
-         case 'SV':
+      case 'SV':
         return 'SVPU Sensors';
-        default:
+      case 'CB':
+        return 'COD/BOD Sensors';
+      default:
         return 'Rain Sensors';
     }
   }
@@ -619,7 +621,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Colonel Farm Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
-         case 'SVPU Sensors': // Color for CPS Lab Sensors
+      case 'SVPU Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'COD/BOD Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);
