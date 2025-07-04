@@ -150,7 +150,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         });
       } else if (widget.deviceName.startsWith('CB')) {
         _csvRows.add([
-          'human_time',
+          'Timestamp',
           'temperature',
           'COD',
           'BOD',
