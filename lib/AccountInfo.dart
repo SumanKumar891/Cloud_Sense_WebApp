@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'LoginPage.dart'; // Make sure to import your login page file
+import 'LoginPage.dart';
 
 class AccountInfoPage extends StatefulWidget {
   @override
@@ -352,12 +352,6 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
               color: isDarkMode
                   ? Colors.black
                   : Color(0xFFF8F8F8), // Solid black background for dark mode
-              // image: isDarkMode
-              //     ? null // No image in dark mode
-              //     : DecorationImage(
-              //         image: AssetImage('assets/accountinfo.jpg'),
-              //         fit: BoxFit.cover,
-              //       ),
             ),
             child: isDarkMode
                 ? null // No BackdropFilter in dark mode

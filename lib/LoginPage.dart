@@ -23,6 +23,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   String? _emailToVerify;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _isPasswordValid(String password) {
+    // Password must contain at least 8 characters, one letter, one number, one special character
+    final passwordRegex =
+        RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$');
+    return passwordRegex.hasMatch(password);
+  }
 
   @override
   void initState() {
@@ -334,6 +340,20 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     setState(() {
       _isLoading = true; // Show loading indicator during sign-up
     });
+
+    // Manual password check BEFORE sign-up attempt
+    final password = _passwordController.text;
+    if (!_isPasswordValid(password)) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Show snackbar directly without setting _errorMessage
+      _showSnackbar(
+        'Password must be at least 8 characters long and include:a number,a special character, a letter',
+      );
+      return;
+    }
 
     try {
       // Sign up with email, password, and name attributes

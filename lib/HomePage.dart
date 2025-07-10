@@ -63,7 +63,6 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-  // Color _deviceinfoColor = const Color.fromARGB(255, 235, 232, 232);
 
   @override
   Widget build(BuildContext context) {
@@ -128,10 +127,6 @@ class _HomePageState extends State<HomePage> {
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
                   Navigator.pushNamed(context, '/accountinfo');
                 }),
-                // SizedBox(width: 20),
-                // _buildNavButton('DEVICE INFO', _deviceinfoColor, () {
-                //   Navigator.pushNamed(context, '/deviceinfo');
-                // }),
               ],
             ],
           ),
@@ -174,20 +169,6 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
-                    // ListTile(
-                    //   leading: Icon(Icons.login),
-                    //   title: Text('DEVICE INFO'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/deviceinfo');
-                    //   },
-                    // ),
-                    // ListTile(
-                    //   leading: Icon(Icons.login),
-                    //   title: Text('MQTT DATA'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/mqttdata');
-                    //   },
-                    // ),
                   ],
                 ),
               )
@@ -392,89 +373,6 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               SizedBox(height: 0),
-
-              // Container(
-              //   color: isDarkMode
-              //       ? const Color.fromARGB(255, 32, 29, 29)
-              //       : const Color.fromARGB(255, 231, 231, 231),
-              //   width: double.infinity,
-              //   padding: EdgeInsets.all(20),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.center,
-              //     children: [
-              //       Text(
-              //         'Address : IIT Ropar TIF (AWaDH), 214 / M. Visvesvaraya Block, Indian Institute of Technology Ropar, Rupnagar - 140001, Punjab ',
-              //         style: TextStyle(
-              //           color: isDarkMode ? Colors.white : Colors.black,
-              //           fontSize: 16,
-              //         ),
-              //       ),
-              //       SizedBox(height: 18),
-              //       GestureDetector(
-              //         onTap: () async {
-              //           final Uri launchUri = Uri(
-              //             scheme: 'tel',
-              //             path: '01881-232601',
-              //           );
-
-              //           if (await canLaunchUrl(launchUri)) {
-              //             await launchUrl(launchUri);
-              //           } else {
-              //             throw 'Could not launch $launchUri';
-              //           }
-              //         },
-              //         child: RichText(
-              //           text: TextSpan(
-              //             style: TextStyle(
-              //               color: isDarkMode ? Colors.white : Colors.black,
-              //             ),
-              //             children: [
-              //               TextSpan(text: 'Phone : '),
-              //               TextSpan(
-              //                 text: '01881 - 232601',
-              //                 style: TextStyle(
-              //                   decoration: TextDecoration.underline,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //       SizedBox(height: 18),
-              //       GestureDetector(
-              //         onTap: () async {
-              //           final Uri params = Uri(
-              //             scheme: 'mailto',
-              //             path: 'contact.awadh@iitrpr.ac.in',
-              //           );
-
-              //           // Check if the email URL can be launched
-              //           if (await canLaunchUrl(params)) {
-              //             await launchUrl(params);
-              //           } else {
-              //             throw ('Could not launch $params');
-              //           }
-              //         },
-              //         child: RichText(
-              //           text: TextSpan(
-              //             style: TextStyle(
-              //               color: isDarkMode ? Colors.white : Colors.black,
-              //             ),
-              //             children: [
-              //               TextSpan(text: 'Email : '),
-              //               TextSpan(
-              //                 text: 'contact.awadh@iitrpr.ac.in',
-              //                 style: TextStyle(
-              //                   decoration: TextDecoration.underline,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -499,10 +397,6 @@ class _HomePageState extends State<HomePage> {
           _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
         if (text == 'ACCOUNT INFO')
           _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-        // if (text == 'DEVICE INFO')
-        //   _deviceinfoColor = const Color.fromARGB(255, 235, 232, 232);
-        // if (text == 'MQTT DATA')
-        //   _mqttdataColor = const Color.fromARGB(255, 235, 232, 232);
       }),
       child: TextButton(
         onPressed: onPressed,

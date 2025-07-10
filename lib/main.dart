@@ -12,7 +12,6 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:cloud_sense_webapp/amplifyconfiguration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cloud_sense_webapp/push_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +48,6 @@ class MyApp extends StatelessWidget {
       title: 'Cloud Sense Vis',
       debugShowCheckedModeBanner: false,
       theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      // themeMode: themeProvider.themeMode,
-      // theme: ThemeData.light(),
-      // darkTheme: ThemeData.dark(),
       initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
@@ -60,7 +56,6 @@ class MyApp extends StatelessWidget {
         '/accountinfo': (context) => AccountInfoPage(),
         '/deviceinfo': (context) => MapPage(),
         '/devicelist': (context) => DataDisplayPage(),
-        // '/mqttdata': (context) => FtpFilesScreen(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',
               sequentialName: null,

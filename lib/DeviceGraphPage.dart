@@ -2,14 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:cloud_sense_webapp/downloadcsv.dart';
-import 'package:cloud_sense_webapp/push_notifications.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,7 +17,6 @@ import 'package:universal_html/html.dart' as html;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -571,9 +568,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
         if (response.statusCode == 200) {
           print("API Response: ${response.body}");
-          // Optional: Parse JSON if needed
-          // final jsonData = json.decode(response.body);
-          // print("Parsed JSON: $jsonData");
         } else {
           print("Failed to fetch data. Status Code: ${response.statusCode}");
         }
@@ -702,7 +696,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             // Clear unrelated data
             temperatureData = [];
             humidityData = [];
-            // etc...
           });
 
           // // ✅ Now trigger download
@@ -933,14 +926,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             residualchlorineData = _parsewaterChartData(data, 'Chlorine_value');
             hypochlorousData = _parsewaterChartData(data, 'Hypochlorous_value');
 
-            // temperatureData = [];
-            // humidityData = [];
-            // lightIntensityData = [];
-            // windSpeedData = [];
-            // rainLevelData = [];
-            // solarIrradianceData = [];
-            // chlorineData = [];
-
             rows = [
               [
                 "Timestamp",
@@ -1081,20 +1066,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             temperattureData = [];
             humidittyData = [];
 
-            // if (ammoniaData.isNotEmpty) {
-            //   _currentAmmoniaValue = ammoniaData.last.value.toStringAsFixed(2);
-            // }
-// Update ammonia value and check threshold
-            // Check if ammonia value exceeds 25 ppm and trigger notification
-            // if (ammoniaData.isNotEmpty) {
-            //   double currentAmmoniaValue = ammoniaData.last.value;
-            //   if (currentAmmoniaValue > 0) {
-            //     // Trigger the notification when ammonia level exceeds 25 ppm
-            //     PushNotifications()
-            //         .sendAmmoniaAlertNotification(currentAmmoniaValue);
-            //   }
-            // }
-
             rows = [
               [
                 "Timestamp",
@@ -1203,13 +1174,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             fswinddirectionData = _parsefsChartData(data, 'wind_direction');
             fswindspeedData = _parsefsChartData(data, 'wind_speed');
 
-            // //Extract the last wind direction from the data
-            // if (data['weather_items'].isNotEmpty) {
-            //   lastWindDirection = data['weather_items'].last['WindDirection'];
-            //   lastBatteryPercentage =
-            //       data['weather_items'].last['BatteryPercentage'];
-            // }
-            // Assign _lastWindDirection from the latest item
             if (data.containsKey('items') &&
                 data['items'] is List &&
                 data['items'].isNotEmpty) {
@@ -1217,9 +1181,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
               print('Last item: $lastItem');
               print('Last item keys: ${lastItem.keys}');
-
-              // _lastfswinddirection =
-              //     lastItem['wind_direction']?.toString() ?? '0';
 
               var batteryVoltage = lastItem['battery_voltage'];
               if (batteryVoltage != null) {
@@ -1331,20 +1292,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             if (rfdData.isNotEmpty) {
               _currentrfdValue = rfdData.last.value.toStringAsFixed(2);
             }
-
-            // rows = [
-            //   [
-            //     "Timestamp",
-            //     "RFD ",
-            //     "RFS ",
-            //   ],
-            //   for (int i = 0; i < rfdData.length; i++)
-            //     [
-            //       formatter.format(rfdData[i].timestamp),
-            //       rfdData[i].value,
-            //       rfsData[i].value,
-            //     ]
-            // ];
           });
           await _fetchDeviceDetails();
         }
@@ -3045,15 +2992,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         color: Colors.blue),
                   ),
                 ),
-                // DataColumn(
-                //   label: Text(
-                //     'Avg',
-                //     style: TextStyle(
-                //         fontSize: headerFontSize,
-                //         fontWeight: FontWeight.bold,
-                //         color: Colors.blue),
-                //   ),
-                // ),
               ],
               rows: [
                 buildfsDataRow('TEMPERATURE (°C)', fstempStats, fontSize),
@@ -3088,11 +3026,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       DataCell(Text(
           stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
-      // DataCell(Text(
-      //     stats['average']?[0] != null
-      //         ? stats['average']![0]!.toStringAsFixed(2)
-      //         : '-',
-      //     style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
 
@@ -3853,24 +3786,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         builder: (context, constraints) {
                           return Column(
                             children: [
-                              // Display Device ID, Status, and Received time
-                              // Row(
-                              //   mainAxisAlignment:
-                              //       MainAxisAlignment.spaceBetween,
-                              //   children: [
-                              //     Text(
-                              //       'Status: $_currentStatus',
-                              //       style: TextStyle(
-                              //         fontWeight: FontWeight.bold,
-                              //         fontSize:
-                              //             MediaQuery.of(context).size.width *
-                              //                 0.011,
-                              //         color: Colors.white,
-                              //       ),
-                              //     ),
-                              //   ],
-                              // ),
-
                               // Space between status and buttons
                               SizedBox(height: 20),
                               Align(
@@ -3999,8 +3914,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                   onPressed: () {
                                                     _selectDate(); // Your date picker function
                                                     setState(() {
-                                                      // _selectedRange =
-                                                      //     'date'; // Mark this button as selected
                                                       _activeButton =
                                                           'date'; // Set the active button
                                                     });
@@ -4189,8 +4102,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   height:
                                       20), // Space between buttons and the next section
 // Wind Direction widget in the center
-                              // if (widget.deviceName.startsWith('WD') &&
-                              //     isWindDirectionValid(_lastWindDirection))
+
                               if (widget.deviceName.startsWith('WD') &&
                                   isWindDirectionValid(_lastWindDirection) &&
                                   _lastWindDirection != null &&
@@ -4237,9 +4149,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           if (widget.deviceName.startsWith('CL'))
                             _buildCurrentValue('Chlorine Level',
                                 _currentChlorineValue, 'mg/L'),
-                          // if (widget.deviceName.startsWith('NH'))
-                          //   _buildCurrentValue(
-                          //       'Ammonia Value', _currentAmmoniaValue, 'PPM'),
+
                           if (widget.deviceName.startsWith('20'))
                             _buildCurrentValue(
                                 'Rain Level ', _currentrfdValue, 'mm'),
@@ -4270,33 +4180,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   .shrink(); // Return empty widget if conditions fail
                             }
                           }(),
-
-                          // // Add compass for FS devices with debugging
-                          // () {
-                          //   print(
-                          //       'Checking compass display conditions for device: ${widget.deviceName}');
-                          //   print(
-                          //       'Device starts with FS: ${widget.deviceName.startsWith('FS')}');
-                          //   print(
-                          //       'Wind direction valid: ${isWindDirectionValid(_lastfswinddirection)}');
-                          //   print(
-                          //       'Wind direction not null: ${_lastfswinddirection != null}');
-                          //   print(
-                          //       'Wind direction not empty: ${_lastfswinddirection?.isNotEmpty ?? false}');
-
-                          //   if (widget.deviceName.startsWith('FS') &&
-                          //       iswinddirectionValid(_lastfswinddirection) &&
-                          //       _lastfswinddirection != null &&
-                          //       _lastfswinddirection.isNotEmpty) {
-                          //     print('All conditions met, displaying compass');
-                          //     return _buildWindCompass(_lastfswinddirection);
-                          //   } else {
-                          //     print(
-                          //         'Compass not displayed due to failed conditions');
-                          //     return SizedBox
-                          //         .shrink(); // Return empty widget if conditions fail
-                          //   }
-                          // }(),
                         ],
                       ),
                     ),
@@ -4695,11 +4578,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           if (hasNonZeroValues(bod2Data))
                             _buildChartContainer(
                                 'BOD', bod2Data, 'BOD (mg/L)', ChartType.line),
-
-                          // // if (hasNonZeroValues(fsrfdData))
-                          // _buildChartContainer(
-                          //     'RFD', fsrfdData, 'RFD (mm)', ChartType.line),
-                          // if (hasNonZeroValues(rfsData))
                         ],
                       ],
                     )
@@ -4732,8 +4610,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               onExit: (_) => setState(() => _isHovering = false),
               child: ElevatedButton(
                 onPressed: () {
-                  //downloadCSV(context);
-                  // downloadRainCSV(context);
                   _showDownloadOptionsDialog(context); // Show popup
                 },
                 style: ElevatedButton.styleFrom(

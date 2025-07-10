@@ -4,7 +4,6 @@ import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/manuallyenter.dart';
 import 'package:cloud_sense_webapp/map.dart';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -269,26 +268,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             _deviceCategories.isNotEmpty
                                 ? _buildDeviceCards()
                                 : _buildNoDevicesCard(),
-                            // SizedBox(height: 20),
-                            // ElevatedButton.icon(
-                            //   onPressed: () {
-                            //     Navigator.push(
-                            //       context,
-                            //       MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             MapPage(), // Navigate to MapPage
-                            //       ),
-                            //     );
-                            //   },
-                            //   icon: Icon(Icons.map),
-                            //   label: Text('View Map'),
-                            //   style: ElevatedButton.styleFrom(
-                            //     padding: EdgeInsets.symmetric(
-                            //         horizontal: 20, vertical: 10),
-                            //     backgroundColor: Colors.black,
-                            //     foregroundColor: Colors.white,
-                            //   ),
-                            // ),
                           ],
                         ),
                 ),
