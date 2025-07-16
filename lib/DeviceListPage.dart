@@ -22,11 +22,19 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   bool _isLoading = true;
   Map<String, List<String>> _deviceCategories = {};
   String? _email;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _loadEmail();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadEmail() async {
@@ -142,6 +150,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'SVPU Sensors';
       case 'CB':
         return 'COD/BOD Sensors';
+      case 'WF':
+        return 'WF Sensors';
+      case 'KD':
+        return 'Kargil Sensors';
       default:
         return 'Rain Sensors';
     }
@@ -287,129 +299,120 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
     List<Widget> cardList = _deviceCategories.keys.map((category) {
       return Container(
-        width: 300,
-        height: 300,
-        margin: EdgeInsets.all(10),
-        child: Card(
-          color: _getCardColor(category),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 30),
-                Text(
-                  category,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+          width: 300,
+          height: 300,
+          margin: EdgeInsets.all(10),
+          child: Card(
+            color: _getCardColor(category),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 30),
+                  Text(
+                    category,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _deviceCategories[category]?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      String sensorName = _deviceCategories[category]![index];
-                      String sequentialName = '';
+                  SizedBox(height: 10),
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _deviceCategories[category]?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        String sensorName = _deviceCategories[category]![index];
+                        String sequentialName = '';
 
-                      // Determine the proper sensor name based on the category
-                      if (category == 'CPS Lab Sensors') {
-                        if (sensorName.contains('LU')) {
-                          luxSensorCount++; // Increment Lux sensor count
-                          sequentialName = 'Lux Sensor $luxSensorCount';
-                        } else if (sensorName.contains('TE')) {
-                          tempSensorCount++; // Increment Temperature sensor count
+                        if (category == 'CPS Lab Sensors') {
+                          if (sensorName.contains('LU')) {
+                            luxSensorCount++;
+                            sequentialName = 'Lux Sensor $luxSensorCount';
+                          } else if (sensorName.contains('TE')) {
+                            tempSensorCount++;
+                            sequentialName =
+                                'Temperature Sensor $tempSensorCount';
+                          } else if (sensorName.contains('AC')) {
+                            accelerometerSensorCount++;
+                            sequentialName =
+                                'Accelerometer Sensor $accelerometerSensorCount';
+                          }
+                        } else {
                           sequentialName =
-                              'Temperature Sensor $tempSensorCount';
-                        } else if (sensorName.contains('AC')) {
-                          accelerometerSensorCount++; // Increment Accelerometer sensor count
-                          sequentialName =
-                              'Accelerometer Sensor $accelerometerSensorCount';
+                              '${category.split(" ").first} Sensor ${index + 1}';
                         }
-                      } else {
-                        sequentialName =
-                            '${category.split(" ").first} Sensor ${index + 1}';
-                      }
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.black, // Text color
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                          ),
-                          onPressed: () {
-                            if (sensorName.startsWith('BF')) {
-                              // If sensor starts with 'BF', navigate to BuffaloDataPage
-                              String numericNodeId =
-                                  sensorName.replaceAll(RegExp(r'\D'), '');
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => BuffaloData(
-                                    startDateTime: DateTime.now(),
-                                    endDateTime:
-                                        DateTime.now().add(Duration(days: 1)),
-                                    nodeId:
-                                        numericNodeId, // Pass the sensor ID or name here
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.black,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                            ),
+                            onPressed: () {
+                              if (sensorName.startsWith('BF')) {
+                                String numericNodeId =
+                                    sensorName.replaceAll(RegExp(r'\D'), '');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BuffaloData(
+                                      startDateTime: DateTime.now(),
+                                      endDateTime:
+                                          DateTime.now().add(Duration(days: 1)),
+                                      nodeId: numericNodeId,
+                                    ),
                                   ),
-                                ),
-                              );
-                            } else if (sensorName.startsWith('CS')) {
-                              // If sensor starts with 'CS', navigate to CowDataPage
-                              String numericNodeId =
-                                  sensorName.replaceAll(RegExp(r'\D'), '');
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CowData(
-                                    startDateTime: DateTime.now(),
-                                    endDateTime:
-                                        DateTime.now().add(Duration(days: 1)),
-                                    nodeId:
-                                        numericNodeId, // Pass the sensor ID or name here
+                                );
+                              } else if (sensorName.startsWith('CS')) {
+                                String numericNodeId =
+                                    sensorName.replaceAll(RegExp(r'\D'), '');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CowData(
+                                      startDateTime: DateTime.now(),
+                                      endDateTime:
+                                          DateTime.now().add(Duration(days: 1)),
+                                      nodeId: numericNodeId,
+                                    ),
                                   ),
-                                ),
-                              );
-                            } else {
-                              // Otherwise, navigate to DeviceGraphPage
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DeviceGraphPage(
-                                    deviceName:
-                                        _deviceCategories[category]![index],
-                                    sequentialName: sequentialName,
-                                    backgroundImagePath:
-                                        'assets/backgroundd.jpg',
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DeviceGraphPage(
+                                      deviceName:
+                                          _deviceCategories[category]![index],
+                                      sequentialName: sequentialName,
+                                      backgroundImagePath:
+                                          'assets/backgroundd.jpg',
+                                    ),
                                   ),
-                                ),
-                              );
-                            }
-                          },
-                          child: Text(
-                            sequentialName,
-                            style: TextStyle(
-                              fontSize: 14,
+                                );
+                              }
+                            },
+                            child: Text(
+                              sequentialName,
+                              style: TextStyle(fontSize: 14),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ),
-      );
+          ));
     }).toList();
 
     // Add the "Add Devices" button as a card
@@ -479,11 +482,22 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       ),
     );
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: cardList,
+    return ScrollConfiguration(
+      behavior: ScrollBehavior().copyWith(scrollbars: false), // Hide scrollbar
+      child: GestureDetector(
+        onHorizontalDragStart: (details) {}, // Required to enable drag
+        onHorizontalDragUpdate: (details) {
+          // Scroll based on drag distance
+          _scrollController.jumpTo(_scrollController.offset - details.delta.dx);
+        },
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: _scrollController,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: cardList,
+          ),
+        ),
       ),
     );
   }
@@ -603,6 +617,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'SVPU Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'COD/BOD Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'WF Sensors': // Color for CPS Lab Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'Kargil Sensors': // Color for WF Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);

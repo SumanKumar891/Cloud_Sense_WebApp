@@ -63,6 +63,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('SV')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/svpudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('KD')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/kargildata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -79,9 +82,6 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('WS')) {
       apiUrl =
           'https://xjbnnqcup4.execute-api.us-east-1.amazonaws.com/default/CloudSense_Water_quality_api_function?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
-    } else if (widget.deviceName.startsWith('CB')) {
-      apiUrl =
-          'https://a9z5vrfpkd.execute-api.us-east-1.amazonaws.com/default/CloudSense_BOD_COD_Api_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('FS')) {
       apiUrl =
           'https://w7w21t8s23.execute-api.us-east-1.amazonaws.com/default/SSMet_Forest_API_func?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -119,6 +119,8 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _parseCFData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('SV')) {
         _parseSVData(data['items'] ?? []);
+      } else if (widget.deviceName.startsWith('KD')) {
+        _parseKDData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CL') ||
           widget.deviceName.startsWith('BD')) {
         _csvRows.add(['Timestamp', 'Chlorine']);
@@ -151,13 +153,13 @@ class _CsvDownloaderState extends State<CsvDownloader> {
       } else if (widget.deviceName.startsWith('CB')) {
         _csvRows.add([
           'Timestamp',
-          'temperature',
+          'Temperature',
           'COD',
           'BOD',
         ]);
         data.forEach((item) {
           _csvRows.add([
-            item['human_time'],
+            item['time_stamp'],
             item['temperature'],
             item['COD'],
             item['BOD'],
@@ -172,7 +174,8 @@ class _CsvDownloaderState extends State<CsvDownloader> {
           'Radiation',
           'Visibility',
           'Wind Direction',
-          'Wind Speed'
+          'Wind Speed',
+          'Rain Level'
         ]);
         data['items'].forEach((item) {
           _csvRows.add([
@@ -184,6 +187,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['visibility'],
             item['wind_direction'],
             item['wind_speed'],
+            item['rain_level'],
           ]);
         });
       } else if (widget.deviceName.startsWith('FS')) {
@@ -195,8 +199,29 @@ class _CsvDownloaderState extends State<CsvDownloader> {
           'Radiation',
           'Wind Speed',
           'Wind Direction',
+          'Rain Level (Daily Difference)'
         ]);
+
+        String? lastRainDate;
+        double? dailyRainBaseline;
+
         data['items'].forEach((item) {
+          DateTime ts = formatter.parse(item['timestamp']);
+          String currentDay = DateFormat('yyyy-MM-dd').format(ts);
+
+          double rain = double.tryParse(item['rain_level'].toString()) ?? 0.0;
+
+          if (lastRainDate != currentDay) {
+            // New day detected, reset baseline
+            lastRainDate = currentDay;
+            dailyRainBaseline = rain;
+          }
+
+          double rainDifference = rain - (dailyRainBaseline ?? rain);
+
+          // Round to 2 decimals
+          rainDifference = double.parse(rainDifference.toStringAsFixed(2));
+
           _csvRows.add([
             item['timestamp'],
             item['temperature'],
@@ -205,6 +230,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
             item['radiation'],
             item['wind_speed'],
             item['wind_direction'],
+            rainDifference,
           ]);
         });
       } else if (widget.deviceName.startsWith('WS')) {
@@ -351,6 +377,50 @@ class _CsvDownloaderState extends State<CsvDownloader> {
   }
 
   void _parseCFData(List<dynamic> items) {
+    print('CF API Items Count: ${items.length}'); // Debug
+    if (items.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No items in CF API response');
+      return;
+    }
+
+    // Collect non-null parameter keys, excluding non-data fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      return !['TimeStamp', 'Topic', 'IMEINumber', 'DeviceId'].contains(key) &&
+          sampleItem[key] != null;
+    }).toList();
+
+    if (parameterKeys.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No valid CF parameters found');
+      return;
+    }
+
+    // Build headers
+    List<String> headers = ['TimeStamp'];
+    headers.addAll(parameterKeys);
+    _csvRows.add(headers);
+
+    // Build data rows
+    for (var item in items) {
+      if (item == null) continue;
+      List<dynamic> row = [item['TimeStamp'] ?? ''];
+      for (var key in parameterKeys) {
+        var value = item[key] != null ? item[key].toString() : '';
+        row.add(value);
+      }
+      _csvRows.add(row);
+    }
+  }
+
+  void _parseKDData(List<dynamic> items) {
     print('CF API Items Count: ${items.length}'); // Debug
     if (items.isEmpty) {
       _csvRows = [

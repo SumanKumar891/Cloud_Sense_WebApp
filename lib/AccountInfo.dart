@@ -334,9 +334,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
         title: Text(
           'Account Info',
           style: TextStyle(
-            color: isDarkMode
-                ? Colors.white
-                : Colors.black, // Change text color for dark mode
+            color: isDarkMode ? Colors.white : Colors.black,
             fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
             fontWeight: FontWeight.bold,
           ),
@@ -346,15 +344,12 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
       ),
       body: Stack(
         children: [
-          // Set background based on theme (dark or light)
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode
-                  ? Colors.black
-                  : Color(0xFFF8F8F8), // Solid black background for dark mode
+              color: isDarkMode ? Colors.black : Color(0xFFF8F8F8),
             ),
             child: isDarkMode
-                ? null // No BackdropFilter in dark mode
+                ? null
                 : BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
@@ -373,9 +368,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                   decoration: InputDecoration(
                     labelText: 'Enter Email ID',
                     labelStyle: TextStyle(
-                      color: isDarkMode
-                          ? Colors.white
-                          : Colors.black, // Change label color
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                     border: OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
@@ -385,17 +378,13 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isDarkMode
-                            ? Colors.white
-                            : Colors.black, // Border color
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white
-                        : Colors.black, // Input text color
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 SizedBox(height: 15),
@@ -412,131 +401,124 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                     ? Center(child: CircularProgressIndicator())
                     : deviceCategories.isNotEmpty
                         ? Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: Table(
-                                border: TableBorder.all(
-                                  color: isDarkMode
-                                      ? Colors.white
-                                      : Colors
-                                          .black, // Change table border color
-                                  width: 1.5,
-                                ),
-                                children: [
-                                  // Table header row for sensors
-                                  TableRow(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Center(
+                                  child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.blue,
+                                      border: Border.all(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                        width: 2.0,
+                                      ),
                                     ),
-                                    children:
-                                        deviceCategories.keys.map((sensorKey) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text(
-                                          sensorKey.trim(),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width <
-                                                    400
-                                                ? 10
-                                                : MediaQuery.of(context)
-                                                            .size
-                                                            .width <
-                                                        800
-                                                    ? 13
-                                                    : 22,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  // Table rows for devices associated with each sensor
-                                  TableRow(
-                                    children: deviceCategories.values
-                                        .map((deviceList) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(36.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: deviceList.map((device) {
-                                            return Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                // Bullet
-                                                Text(
-                                                  '• ',
-                                                  style: TextStyle(
-                                                    color: isDarkMode
-                                                        ? Colors.white
-                                                        : Colors
-                                                            .black, // Bullet color
-                                                    fontSize: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width <
-                                                            400
-                                                        ? 7
-                                                        : MediaQuery.of(context)
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight: constraints.maxHeight,
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: DataTable(
+                                            headingRowColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.blue),
+                                            dataRowColor:
+                                                MaterialStateProperty.all(
+                                                    isDarkMode
+                                                        ? Colors.grey[800]
+                                                        : Colors.white),
+                                            columnSpacing: 20.0,
+                                            columns: deviceCategories.keys
+                                                .map((sensorKey) => DataColumn(
+                                                      label: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Text(
+                                                          sensorKey.trim(),
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width <
+                                                                    400
+                                                                ? 10
+                                                                : MediaQuery.of(context)
+                                                                            .size
+                                                                            .width <
+                                                                        800
+                                                                    ? 13
+                                                                    : 22,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ))
+                                                .toList(),
+                                            rows: List.generate(
+                                              deviceCategories.values
+                                                  .map((list) => list.length)
+                                                  .reduce((a, b) => a > b
+                                                      ? a
+                                                      : b), // Max length of device lists
+                                              (index) => DataRow(
+                                                cells: deviceCategories.keys
+                                                    .map((sensorKey) {
+                                                  final devices =
+                                                      deviceCategories[
+                                                          sensorKey]!;
+                                                  final device =
+                                                      index < devices.length
+                                                          ? devices[index]
+                                                          : '';
+                                                  return DataCell(
+                                                    Text(
+                                                      device.isNotEmpty
+                                                          ? '• $device'
+                                                          : '',
+                                                      style: TextStyle(
+                                                        color: isDarkMode
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                        fontSize: MediaQuery.of(
+                                                                        context)
                                                                     .size
                                                                     .width <
-                                                                800
-                                                            ? 10
-                                                            : 20,
-                                                    height: 1.5,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                // Device ID
-                                                Expanded(
-                                                  child: Text(
-                                                    'Device ID - $device',
-                                                    style: TextStyle(
-                                                      color: isDarkMode
-                                                          ? Colors.white
-                                                          : Colors
-                                                              .black, // Text color for devices
-                                                      fontSize: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width <
-                                                              400
-                                                          ? 7
-                                                          : MediaQuery.of(context)
-                                                                      .size
-                                                                      .width <
-                                                                  800
-                                                              ? 10
-                                                              : 20,
+                                                                400
+                                                            ? 7
+                                                            : MediaQuery.of(context)
+                                                                        .size
+                                                                        .width <
+                                                                    800
+                                                                ? 10
+                                                                : 20,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }).toList(),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      );
-                                    }).toList(),
+                                      ),
+                                    ),
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           )
                         : Text(
                             'No devices found',
                             style: TextStyle(
                               fontSize: 18,
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : Colors.black, // Change text color
+                              color: isDarkMode ? Colors.white : Colors.black,
                             ),
                           ),
-                Spacer(), // Pushes the buttons to the bottom
+                Spacer(),
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
