@@ -1,3 +1,4 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,6 +64,32 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
+  // Color _deviceinfoColor = const Color.fromARGB(255, 235, 232, 232);
+
+  Future<void> _handleLoginNavigation() async {
+    try {
+      var currentUser = await Amplify.Auth.getCurrentUser();
+      var userAttributes = await Amplify.Auth.fetchUserAttributes();
+      String? email;
+      for (var attr in userAttributes) {
+        if (attr.userAttributeKey == AuthUserAttributeKey.email) {
+          email = attr.value;
+          break;
+        }
+      }
+      print('Current user ID: ${currentUser.username}, Email: $email');
+      if (email?.trim().toLowerCase() == '05agriculture.05@gmail.com') {
+        print('Navigating to MapPage (/deviceinfo)');
+        Navigator.pushNamed(context, '/deviceinfo');
+      } else {
+        print('Navigating to DeviceListPage (/devicelist)');
+        Navigator.pushNamed(context, '/devicelist');
+      }
+    } catch (e) {
+      print('No user logged in or error: $e');
+      Navigator.pushNamed(context, '/login');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +148,7 @@ class _HomePageState extends State<HomePage> {
                 }),
                 SizedBox(width: 20),
                 _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-                  Navigator.pushNamed(context, '/login');
+                  _handleLoginNavigation();
                 }),
                 SizedBox(width: 20),
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
@@ -159,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(Icons.login),
                       title: Text('LOGIN/SIGNUP'),
                       onTap: () {
-                        Navigator.pushNamed(context, '/login');
+                        _handleLoginNavigation();
                       },
                     ),
                     ListTile(
@@ -169,6 +196,13 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
+                    // ListTile(
+                    //   leading: Icon(Icons.login),
+                    //   title: Text('DEVICE INFO'),
+                    //   onTap: () {
+                    //     Navigator.pushNamed(context, '/deviceinfo');
+                    //   },
+                    // ),
                   ],
                 ),
               )
@@ -388,7 +422,6 @@ class _HomePageState extends State<HomePage> {
         if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
         if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
         if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
-        // if (text == 'MQTT DATA') _mqttdataColor = Colors.blue;
       }),
       onExit: (_) => setState(() {
         if (text == 'ABOUT US')
