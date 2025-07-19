@@ -41,7 +41,7 @@ class _MapPageState extends State<MapPage> {
   final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
 
   Map<String, Map<String, dynamic>> previousPositions = {};
-  final double displacementThreshold = 100.0;
+  final double displacementThreshold = 30.0;
   final Distance distance = Distance();
   final int stationaryTimeThreshold = 10 * 60 * 1000;
 
@@ -270,10 +270,10 @@ class _MapPageState extends State<MapPage> {
               hasMoved = true;
               initialMovedTimestamp = currentTimestamp;
               print(
-                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>100m), setting to red');
+                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>30m), setting to red');
             } else {
               hasMoved = prevData['has_moved'] ?? false;
-              print('Device $deviceId stationary (<100m), retaining color');
+              print('Device $deviceId stationary (<30m), retaining color');
             }
           } else {
             hasMoved = false;
@@ -342,9 +342,10 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _updateDeviceStatusesForInactivity() {
-    final currentTime = DateTime.now();
-    final istOffset = Duration(hours: 5, minutes: 30);
-    final currentTimeUtc = currentTime.subtract(istOffset);
+    // final currentTime = DateTime.now();
+    // final istOffset = Duration(hours: 5, minutes: 30);
+    final currentTimeUtc = DateTime.now().toUtc();
+    print('Checking device inactivity statuses at UTC time: $currentTimeUtc');
 
     setState(() {
       for (var device in deviceLocations) {
@@ -367,12 +368,20 @@ class _MapPageState extends State<MapPage> {
           DateTime initialMovedTime = DateTime.parse(initialMovedTimestamp);
           final timeSinceInitialMove =
               currentTimeUtc.difference(initialMovedTime).inMilliseconds;
+
+          print(
+              'Device $deviceId: Time since last significant movement = ${timeSinceInitialMove / 1000} seconds, Initial Moved Timestamp: $initialMovedTimestamp');
+
           if (timeSinceInitialMove >= stationaryTimeThreshold &&
               device['has_moved'] == true) {
             print(
-                'Device $deviceId initial movement over 10 min ago, changing to green');
+                'Device $deviceId: Stationary for >= 10 minutes (${timeSinceInitialMove / 1000} seconds), changing color to green');
             device['has_moved'] = false;
             prevData['has_moved'] = false;
+            prevData['initial_moved_timestamp'] = currentTimeUtc.toString();
+          } else {
+            print(
+                'Device $deviceId: Retaining color (has_moved: ${device['has_moved']}) ${device['has_moved'] == false ? 'as device is already stationary' : 'as time since last movement (${timeSinceInitialMove / 1000} seconds) is less than 10 minutes'}');
           }
         } catch (e) {
           print(
@@ -614,7 +623,7 @@ class _MapPageState extends State<MapPage> {
                   Text('Country: $country'),
                   Text('Last Active: $lastActive'),
                   Text(
-                    'Status: ${hasMoved ? "Moved (>100m)" : "Stationary (<100m or >10 min)"}',
+                    'Status: ${hasMoved ? "Moved (>30m)" : "Stationary (<30m or >10 min)"}',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
