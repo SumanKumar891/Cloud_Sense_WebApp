@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:cloud_sense_webapp/map.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'dart:ui';
@@ -46,16 +47,26 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     try {
       var currentUser = await Amplify.Auth.getCurrentUser();
       if (currentUser != null) {
-        // If user is already signed in, navigate to DeviceListPage
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DataDisplayPage(),
-          ),
-        );
+        // Check if this is the special user
+        if (currentUser.username.trim().toLowerCase() ==
+            "05agriculture.05@gmail.com") {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MapPage(),
+            ),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DataDisplayPage(),
+            ),
+          );
+        }
       }
-    } catch (e) {
-      // Ignore errors — means no current user
+    } catch (_) {
+      // Not signed in — stay on HomePage
     }
   }
 
