@@ -43,7 +43,7 @@ class _MapPageState extends State<MapPage> {
   Map<String, Map<String, dynamic>> previousPositions = {};
   final double displacementThreshold = 100.0;
   final Distance distance = Distance();
-  final int stationaryTimeThreshold = 24 * 60 * 60 * 1000;
+  final int stationaryTimeThreshold = 10 * 60 * 1000;
 
   static const String POSITIONS_KEY = 'device_previous_positions';
 
@@ -370,7 +370,7 @@ class _MapPageState extends State<MapPage> {
           if (timeSinceInitialMove >= stationaryTimeThreshold &&
               device['has_moved'] == true) {
             print(
-                'Device $deviceId initial movement over 24hrs ago, changing to green');
+                'Device $deviceId initial movement over 10 min ago, changing to green');
             device['has_moved'] = false;
             prevData['has_moved'] = false;
           }
@@ -468,7 +468,7 @@ class _MapPageState extends State<MapPage> {
               child: Icon(
                 Icons.location_pin,
                 size: 40,
-                color: Colors.red,
+                color: Colors.blue,
               ),
             );
           });
@@ -614,7 +614,7 @@ class _MapPageState extends State<MapPage> {
                   Text('Country: $country'),
                   Text('Last Active: $lastActive'),
                   Text(
-                    'Status: ${hasMoved ? "Moved (>100m)" : "Stationary (<100m or >24 hrs)"}',
+                    'Status: ${hasMoved ? "Moved (>100m)" : "Stationary (<100m or >10 min)"}',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -652,43 +652,35 @@ class _MapPageState extends State<MapPage> {
   TileLayer _getTileLayer() {
     final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     String urlTemplate;
-    Color backgroundColor;
-
     switch (currentMapType) {
       case MapType.defaultMap:
         urlTemplate = isDarkMode
             ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        backgroundColor = isDarkMode
-            ? const Color(0xFF1A2A44)
-            : const Color.fromARGB(255, 173, 216, 230);
+            : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; // Single domain
         break;
       case MapType.satellite:
         urlTemplate =
             'https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.png';
-        backgroundColor = isDarkMode
-            ? const Color(0xFF1A2A44)
-            : const Color.fromARGB(255, 173, 216, 230);
         break;
       case MapType.terrain:
         urlTemplate =
             'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png';
-        backgroundColor = isDarkMode
-            ? const Color(0xFF1A2A44)
-            : const Color.fromARGB(255, 173, 216, 230);
         break;
     }
 
     return TileLayer(
       urlTemplate: urlTemplate,
-      subdomains: currentMapType == MapType.defaultMap && !isDarkMode
-          ? ['a', 'b', 'c']
-          : [],
-      // backgroundColor: backgroundColor,
+      subdomains: [], // Remove subdomains
       maxZoom: 19.0,
       minZoom: 2.0,
+      userAgentPackageName: 'com.CloudSenseVis', // Your app's package name
+      tileProvider: NetworkTileProvider(
+        headers: {
+          'User-Agent': 'CloudSenseVis/1.0 (ihubawadh@gmail.com)'
+        }, // Custom User-Agent
+      ),
       errorTileCallback: (tile, error, stackTrace) {
-        print('Tile failed to load: $error');
+        print('Stack trace: $stackTrace');
       },
     );
   }
