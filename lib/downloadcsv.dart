@@ -60,6 +60,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('CF')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('VD')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/vanixdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('SV')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/svpudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -117,6 +120,8 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _parseSMData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CF')) {
         _parseCFData(data['items'] ?? []);
+      } else if (widget.deviceName.startsWith('VD')) {
+        _parseVDData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('SV')) {
         _parseSVData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('KD')) {
@@ -420,8 +425,52 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     }
   }
 
+  void _parseVDData(List<dynamic> items) {
+    print('VD API Items Count: ${items.length}'); // Debug
+    if (items.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No items in VD API response');
+      return;
+    }
+
+    // Collect non-null parameter keys, excluding non-data fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      return !['TimeStamp', 'Topic', 'IMEINumber', 'DeviceId'].contains(key) &&
+          sampleItem[key] != null;
+    }).toList();
+
+    if (parameterKeys.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No valid CF parameters found');
+      return;
+    }
+
+    // Build headers
+    List<String> headers = ['TimeStamp'];
+    headers.addAll(parameterKeys);
+    _csvRows.add(headers);
+
+    // Build data rows
+    for (var item in items) {
+      if (item == null) continue;
+      List<dynamic> row = [item['TimeStamp'] ?? ''];
+      for (var key in parameterKeys) {
+        var value = item[key] != null ? item[key].toString() : '';
+        row.add(value);
+      }
+      _csvRows.add(row);
+    }
+  }
+
   void _parseKDData(List<dynamic> items) {
-    print('CF API Items Count: ${items.length}'); // Debug
+    print('KD API Items Count: ${items.length}'); // Debug
     if (items.isEmpty) {
       _csvRows = [
         ['Timestamp', 'Message'],

@@ -226,6 +226,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Map<String, List<ChartData>> cfParametersData = {};
   Map<String, List<ChartData>> svParametersData = {};
   Map<String, List<ChartData>> kdParametersData = {};
+  Map<String, List<ChartData>> vdParametersData = {};
   List<ChartData> cod2Data = [];
   List<ChartData> bod2Data = [];
   List<ChartData> temp2Data = [];
@@ -391,6 +392,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   double _lastfsBattery = 0.0;
   double _lastsmBattery = 0.0;
   double _lastcfBattery = 0.0;
+  double _lastvdBattery = 0.0;
   double _lastkdBattery = 0.0;
   double _lastsvBattery = 0.0;
   String _lastRSSI_Value = "";
@@ -449,6 +451,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       _lastfsBattery = 0.0;
       _lastsmBattery = 0.0;
       _lastcfBattery = 0.0;
+      _lastvdBattery = 0.0;
       _lastkdBattery = 0.0;
       _lastsvBattery = 0.0;
 
@@ -457,6 +460,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       smParametersData.clear();
       cfParametersData.clear();
       svParametersData.clear();
+      vdParametersData.clear();
       wfAverageTemperatureData.clear();
       wfrainfallData.clear();
       kdParametersData.clear();
@@ -523,6 +527,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('CF')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('VD')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/vanixdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('SV')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/svpudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -681,6 +688,54 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 for (var key in cfParametersData.keys) {
                   var value = cfParametersData[key]!.length > i
                       ? cfParametersData[key]![i].value
+                      : null;
+                  // ✅ Preserve 0, replace null with empty string
+                  row.add(value ?? '');
+                }
+                dataRows.add(row);
+              }
+
+              _csvRows = [headers, ...dataRows];
+            }
+
+            // Clear unrelated data
+            temperatureData = [];
+            humidityData = [];
+          });
+
+          // // ✅ Now trigger download
+          // downloadCSV(context);
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('VD')) {
+          setState(() {
+            vdParametersData.clear();
+            vdParametersData = _parseVDParametersData(data);
+
+            if (vdParametersData.isEmpty) {
+              _csvRows = [
+                ['Timestamp', 'Message'],
+                ['', 'No data available']
+              ];
+            } else {
+              List<String> headers = ['Timestamp'];
+              headers.addAll(vdParametersData.keys);
+
+              List<List<dynamic>> dataRows = [];
+              int maxLength = vdParametersData.values
+                  .map((list) => list.length)
+                  .reduce((a, b) => a > b ? a : b);
+
+              for (int i = 0; i < maxLength; i++) {
+                List<dynamic> row = [
+                  vdParametersData.values.isNotEmpty &&
+                          vdParametersData.values.first.length > i
+                      ? formatter
+                          .format(vdParametersData.values.first[i].timestamp)
+                      : ''
+                ];
+                for (var key in vdParametersData.keys) {
+                  var value = vdParametersData[key]!.length > i
+                      ? vdParametersData[key]![i].value
                       : null;
                   // ✅ Preserve 0, replace null with empty string
                   row.add(value ?? '');
@@ -1376,6 +1431,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           // Only set _csvRows for sensors other than SM and CF
           if (!widget.deviceName.startsWith('SM') &&
               !widget.deviceName.startsWith('CF') &&
+              !widget.deviceName.startsWith('VD') &&
               !widget.deviceName.startsWith('SV')) {
             _csvRows = rows;
           }
@@ -1876,6 +1932,64 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     for (var item in items.reversed) {
       if (item != null && item['BatteryVoltage'] != null) {
         _lastcfBattery =
+            double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
+
+        break; // Exit after finding the latest non-null value
+      }
+    }
+
+    // Remove parameters with empty lists (i.e., all values were null)
+    parametersData.removeWhere((key, value) => value.isEmpty);
+
+    return parametersData;
+  }
+
+  Map<String, List<ChartData>> _parseVDParametersData(
+      Map<String, dynamic> data) {
+    final List<dynamic> items = data['items'] ?? [];
+    Map<String, List<ChartData>> parametersData = {};
+
+    if (items.isEmpty) {
+      return parametersData;
+    }
+
+    // Collect all possible parameter keys from the first item, excluding non-numeric fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      // Exclude non-numeric fields like TimeStamp, Topic, IMEINumber, DeviceId, Latitude, Longitude
+      return ![
+        'TimeStamp',
+        'Topic',
+        'IMEINumber',
+        'DeviceId',
+        'Latitude',
+        'Longitude'
+      ].contains(key);
+    }).toList();
+
+    // Initialize ChartData lists for each parameter
+    for (var key in parameterKeys) {
+      parametersData[key] = [];
+    }
+
+    // Parse data for each item
+    for (var item in items) {
+      if (item == null) continue;
+      DateTime timestamp = _parseVDDate(item['TimeStamp']);
+      for (var key in parameterKeys) {
+        if (item[key] != null) {
+          // Only include non-null values
+          double value = double.tryParse(item[key].toString()) ?? 0.0;
+          parametersData[key]!
+              .add(ChartData(timestamp: timestamp, value: value));
+        }
+      }
+    }
+
+    // Update _lastcfBattery with the latest BatteryVoltage (from the last item)
+    for (var item in items.reversed) {
+      if (item != null && item['BatteryVoltage'] != null) {
+        _lastvdBattery =
             double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
 
         break; // Exit after finding the latest non-null value
@@ -3239,6 +3353,89 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+  Widget buildVDStatisticsTable() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    // Map internal keys to readable labels with units
+    Map<String, String> parameterLabels = {
+      'CurrentTemperature': 'Temperature (°C)',
+      'CurrentHumidity': 'Humidity (%)',
+      'LightIntensity': 'Light Intensity (lux)',
+      'RainfallHourly': 'Rainfall (mm)',
+    };
+
+    List<String> includedParameters = parameterLabels.keys.toList();
+
+    List<DataRow> rows = vdParametersData.entries
+        .where((entry) => includedParameters.contains(entry.key))
+        .map((entry) {
+      final current = entry.value.isNotEmpty
+          ? entry.value.last.value.toStringAsFixed(2)
+          : '-';
+      return DataRow(cells: [
+        DataCell(Text(
+          parameterLabels[entry.key] ?? entry.key,
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        )),
+        DataCell(Text(
+          '$current',
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        )),
+      ]);
+    }).toList();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 400,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 400,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                      fontSize: headerFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                      fontSize: headerFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+              rows: rows,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
@@ -3322,6 +3519,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   DateTime _parseCFDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return DateTime.now();
+    }
+    try {
+      // Parse the timestamp format: YYYY-MM-DD HH:MM:SS (e.g., 2025-06-15 01:01:02)
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      return DateTime.now();
+    }
+  }
+
+  DateTime _parseVDDate(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) {
       return DateTime.now();
     }
@@ -3878,6 +4087,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       ],
                     ),
                   ),
+                if (widget.deviceName.startsWith('VD'))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getfsBatteryIcon(_lastvdBattery),
+                              color: _getBatteryColor(_lastvdBattery),
+                              size: 28,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${_lastvdBattery.toStringAsFixed(2)} V',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 if (widget.deviceName.startsWith('KD'))
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
@@ -4401,6 +4638,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildfsStatisticsTable(),
                     if (widget.deviceName.startsWith('SM'))
                       buildSMStatisticsTable(),
+                    if (widget.deviceName.startsWith('VD'))
+                      buildVDStatisticsTable(),
                     if (widget.deviceName.startsWith('WD211') ||
                         (widget.deviceName.startsWith('WD511')))
                       SingleChildScrollView(
@@ -4473,6 +4712,57 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           }).toList(),
                         if (widget.deviceName.startsWith('CF'))
                           ...cfParametersData.entries.map((entry) {
+                            String paramName = entry.key;
+                            List<ChartData> data = entry.value;
+
+                            // Exclude specified parameters
+                            List<String> excludedParams = [
+                              'Longitude',
+                              'Latitude',
+                              'SignalStrength',
+                              'BatteryVoltage',
+                              'MaximumTemperature',
+                              'MinimumTemperature',
+                              'AverageTemperature',
+                              'RainfallDaily',
+                              'RainfallWeekly',
+                              'AverageHumidity',
+                              'MinimumHumidity',
+                              'MaximumHumidity',
+                            ];
+
+                            if (!excludedParams.contains(paramName) &&
+                                data.isNotEmpty) {
+                              final displayInfo =
+                                  _getParameterDisplayInfo(paramName);
+                              String displayName = displayInfo['displayName'];
+                              String unit = displayInfo['unit'];
+
+                              // Customize chart title for specific parameters
+                              String chartTitle;
+                              if (paramName.toLowerCase() ==
+                                  'currenthumidity') {
+                                chartTitle = 'Humidity Graph ($unit)';
+                              } else if (paramName.toLowerCase() ==
+                                  'currenttemperature') {
+                                chartTitle = 'Temperature Graph ($unit)';
+                              } else {
+                                chartTitle = unit.isNotEmpty
+                                    ? '$displayName ($unit)'
+                                    : displayName;
+                              }
+
+                              return _buildChartContainer(
+                                displayName,
+                                data,
+                                chartTitle,
+                                ChartType.line,
+                              );
+                            } else {}
+                            return const SizedBox.shrink();
+                          }).toList(),
+                        if (widget.deviceName.startsWith('VD'))
+                          ...vdParametersData.entries.map((entry) {
                             String paramName = entry.key;
                             List<ChartData> data = entry.value;
 

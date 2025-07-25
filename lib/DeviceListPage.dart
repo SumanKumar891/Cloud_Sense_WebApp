@@ -154,6 +154,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'WF Sensors';
       case 'KD':
         return 'Kargil Sensors';
+      case 'VD':
+        return 'Vanix Sensors';
       default:
         return 'Rain Sensors';
     }
@@ -621,6 +623,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'WF Sensors': // Color for CPS Lab Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       case 'Kargil Sensors': // Color for WF Sensors
+        return const Color.fromARGB(255, 167, 158, 172);
+      case 'VD Sensors': // Color for VD Sensors
         return const Color.fromARGB(255, 167, 158, 172);
       default:
         return const Color.fromARGB(255, 167, 158, 172);
