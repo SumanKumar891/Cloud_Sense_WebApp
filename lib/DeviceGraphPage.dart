@@ -4691,6 +4691,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'Latitude',
                               'SignalStrength',
                               'BatteryVoltage',
+                              'TemperatureHourlyComulative',
+                              'LuxHourlyComulative',
+                              'PressureHourlyComulative',
+                              'HumidityHourlyComulative'
                             ];
 
                             if (!excludedParams.contains(paramName) &&
