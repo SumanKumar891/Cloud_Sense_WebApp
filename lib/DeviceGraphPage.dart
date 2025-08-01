@@ -3115,6 +3115,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   DataRow buildITDataRow(
       String parameter, Map<String, List<double?>> stats, double fontSize) {
+    // Parameters that should only show current values
+    final onlyCurrentParams = [
+      'RAIN',
+    ];
+
+    final isOnlyCurrent = onlyCurrentParams.contains(parameter);
+
     return DataRow(cells: [
       DataCell(Text(parameter,
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
@@ -3124,10 +3131,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          isOnlyCurrent
+              ? '-' // Show '-' for min if parameter is in onlyCurrentParams
+              : (stats['min']?[0] != null
+                  ? stats['min']![0]!.toStringAsFixed(2)
+                  : '-'),
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          isOnlyCurrent
+              ? '-' // Show '-' for max if parameter is in onlyCurrentParams
+              : (stats['max']?[0] != null
+                  ? stats['max']![0]!.toStringAsFixed(2)
+                  : '-'),
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
@@ -3253,6 +3268,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   DataRow buildfsDataRow(
       String parameter, Map<String, List<double?>> stats, double fontSize) {
+    // Parameters that should only show current values
+    final onlyCurrentParams = [
+      'WIND DIRECTION (°)',
+      'RAIN LEVEL (mm)',
+    ];
+
+    final isOnlyCurrent = onlyCurrentParams.contains(parameter);
+
     return DataRow(cells: [
       DataCell(Text(parameter,
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
@@ -3262,10 +3285,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
+          isOnlyCurrent
+              ? '-' // Show '-' for min if parameter is in onlyCurrentParams
+              : (stats['min']?[0] != null
+                  ? stats['min']![0]!.toStringAsFixed(2)
+                  : '-'),
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
+          isOnlyCurrent
+              ? '-' // Show '-' for max if parameter is in onlyCurrentParams
+              : (stats['max']?[0] != null
+                  ? stats['max']![0]!.toStringAsFixed(2)
+                  : '-'),
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
