@@ -3115,8 +3115,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   DataRow buildITDataRow(
       String parameter, Map<String, List<double?>> stats, double fontSize) {
-    bool showMinMax = parameter == 'TEMP' || parameter == 'HUMIDITY';
-
     return DataRow(cells: [
       DataCell(Text(parameter,
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
@@ -3126,14 +3124,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          showMinMax && stats['min']?[0] != null
-              ? stats['min']![0]!.toStringAsFixed(2)
-              : '-',
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          showMinMax && stats['max']?[0] != null
-              ? stats['max']![0]!.toStringAsFixed(2)
-              : '-',
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
@@ -3259,9 +3253,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   DataRow buildfsDataRow(
       String parameter, Map<String, List<double?>> stats, double fontSize) {
-    bool showMinMax =
-        parameter == 'TEMPERATURE (°C)' || parameter == 'RELATIVE HUMIDITY (%)';
-
     return DataRow(cells: [
       DataCell(Text(parameter,
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
@@ -3271,14 +3262,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          showMinMax && stats['min']?[0] != null
-              ? stats['min']![0]!.toStringAsFixed(2)
-              : '-',
+          stats['min']?[0] != null ? stats['min']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
       DataCell(Text(
-          showMinMax && stats['max']?[0] != null
-              ? stats['max']![0]!.toStringAsFixed(2)
-              : '-',
+          stats['max']?[0] != null ? stats['max']![0]!.toStringAsFixed(2) : '-',
           style: TextStyle(fontSize: fontSize, color: Colors.white))),
     ]);
   }
