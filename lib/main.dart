@@ -4,7 +4,7 @@ import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
-import 'package:cloud_sense_webapp/map.dart';
+import 'package:cloud_sense_webapp/GPS.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'HomePage.dart';

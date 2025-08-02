@@ -4906,6 +4906,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'AverageHumidity',
                               'MinimumHumidity',
                               'MaximumHumidity',
+                              'HumidityHourlyComulative',
+                              'PressureHourlyComulative',
+                              'LuxHourlyComulative',
+                              'TemperatureHourlyComulative',
                             ];
 
                             if (!excludedParams.contains(paramName) &&
