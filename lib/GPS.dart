@@ -593,7 +593,7 @@ class _MapPageState extends State<MapPage> {
       builder: (BuildContext context) {
         final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
         return AlertDialog(
-          backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -705,7 +705,7 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       body: Container(
-        color: isDarkMode ? const Color(0xFF1A2A44) : Colors.lightBlue[100],
+        color: Colors.lightBlue[100],
         child: Stack(
           children: [
             FlutterMap(
@@ -775,7 +775,7 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.arrow_back),
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          color: Colors.black,
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         Text(
@@ -783,7 +783,7 @@ class _MapPageState extends State<MapPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: Colors.black,
                           ),
                         ),
                         Spacer(),
@@ -836,18 +836,14 @@ class _MapPageState extends State<MapPage> {
                                 decoration: InputDecoration(
                                   hintText: 'Search Location',
                                   hintStyle: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: Colors.black,
                                   ),
                                   prefixIcon: Icon(Icons.search),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   filled: true,
-                                  fillColor: isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
+                                  fillColor: Colors.white.withOpacity(0.2),
                                 ),
                               ),
                             ),
@@ -858,9 +854,7 @@ class _MapPageState extends State<MapPage> {
                                 hint: Text(
                                   'Select Device ID',
                                   style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: Colors.black,
                                   ),
                                 ),
                                 items: deviceIds.map((String id) {
@@ -887,9 +881,7 @@ class _MapPageState extends State<MapPage> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   filled: true,
-                                  fillColor: isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
+                                  fillColor: Colors.white.withOpacity(0.2),
                                 ),
                               ),
                             ),
@@ -903,24 +895,19 @@ class _MapPageState extends State<MapPage> {
                                 readOnly: true,
                                 onTap: () => _selectDate(context, true),
                                 style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: Colors.black,
                                 ),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   filled: true,
-                                  fillColor: isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
+                                  fillColor: Colors.white.withOpacity(0.2),
                                   hintText: startDate == null
                                       ? 'Select Start Date'
                                       : dateFormatter.format(startDate!),
                                   hintStyle: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
@@ -931,24 +918,19 @@ class _MapPageState extends State<MapPage> {
                                 readOnly: true,
                                 onTap: () => _selectDate(context, false),
                                 style: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: Colors.black,
                                 ),
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   filled: true,
-                                  fillColor: isDarkMode
-                                      ? Colors.black.withOpacity(0.2)
-                                      : Colors.white.withOpacity(0.2),
+                                  fillColor: Colors.white.withOpacity(0.2),
                                   hintText: endDate == null
                                       ? 'Select End Date'
                                       : dateFormatter.format(endDate!),
                                   hintStyle: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
@@ -958,7 +940,7 @@ class _MapPageState extends State<MapPage> {
                         SizedBox(height: 10),
                         if (suggestions.isNotEmpty)
                           Container(
-                            color: isDarkMode ? Colors.grey[850] : Colors.white,
+                            color: Colors.white,
                             child: ListView.builder(
                               shrinkWrap: true,
                               itemCount: suggestions.length,
