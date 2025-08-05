@@ -659,13 +659,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   TileLayer _getTileLayer() {
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     String urlTemplate;
     switch (currentMapType) {
       case MapType.defaultMap:
-        urlTemplate = isDarkMode
-            ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-            : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; // Single domain
+        urlTemplate =
+            'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; // Same for both themes
         break;
       case MapType.satellite:
         urlTemplate =
@@ -679,14 +677,14 @@ class _MapPageState extends State<MapPage> {
 
     return TileLayer(
       urlTemplate: urlTemplate,
-      subdomains: [], // Remove subdomains
+      subdomains: [], // No subdomains
       maxZoom: 19.0,
       minZoom: 2.0,
       userAgentPackageName: 'com.CloudSenseVis', // Your app's package name
       tileProvider: NetworkTileProvider(
         headers: {
-          'User-Agent': 'CloudSenseVis/1.0 (ihubawadh@gmail.com)'
-        }, // Custom User-Agent
+          'User-Agent': 'CloudSenseVis/1.0 (ihubawadh@gmail.com)',
+        },
       ),
       errorTileCallback: (tile, error, stackTrace) {
         print('Stack trace: $stackTrace');
