@@ -331,31 +331,19 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(
-          'Account Info',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.blueGrey[900],
+        title:
+            const Text('Device Status', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.black : Color(0xFFF8F8F8),
+              color: isDarkMode
+                  ? const Color.fromARGB(255, 38, 37, 37)
+                  : Colors.grey[200],
             ),
-            child: isDarkMode
-                ? null
-                : BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.3),
-                    ),
-                  ),
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),
