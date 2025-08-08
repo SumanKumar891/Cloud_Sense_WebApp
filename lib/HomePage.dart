@@ -64,8 +64,8 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-  Color _devicelocationinfoColor = const Color.fromARGB(255, 235, 232, 232);
-  Color _weatherinfoColor = const Color.fromARGB(255, 235, 232, 232);
+
+  Color _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
 
   Future<void> _handleLoginNavigation() async {
     try {
@@ -155,14 +155,10 @@ class _HomePageState extends State<HomePage> {
                 _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
                   Navigator.pushNamed(context, '/accountinfo');
                 }),
-                // SizedBox(width: 20),
-                // _buildNavButton('DEVICE INFO', _devicelocationinfoColor, () {
-                //   Navigator.pushNamed(context, '/devicelocationinfo');
-                // }),
-                // SizedBox(width: 20),
-                // _buildNavButton('WEATHER FORECAST', _weatherinfoColor, () {
-                //   Navigator.pushNamed(context, '/weatherinfo');
-                // }),
+                SizedBox(width: 20),
+                _buildNavButton('DEVICE STATUS', _devicemapinfoColor, () {
+                  Navigator.pushNamed(context, '/devicemapinfo');
+                }),
               ],
             ],
           ),
@@ -205,20 +201,13 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
-                    // ListTile(
-                    //   leading: Icon(Icons.login),
-                    //   title: Text('DEVICE INFO'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/devicelocationinfo');
-                    //   },
-                    // ),
-                    // ListTile(
-                    //   leading: Icon(Icons.login),
-                    //   title: Text('WEATHER FORECAST'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/weatherinfo');
-                    //   },
-                    // ),
+                    ListTile(
+                      leading: Icon(Icons.login),
+                      title: Text('DEVICE STATUS'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/devicemapinfo');
+                      },
+                    ),
                   ],
                 ),
               )
@@ -438,8 +427,8 @@ class _HomePageState extends State<HomePage> {
         if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
         if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
         if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
-        // if (text == 'DEVICE INFO') _devicelocationinfoColor = Colors.blue;
-        // if (text == 'WEATHER FORECAST') _weatherinfoColor = Colors.blue;
+
+        if (text == 'DEVICE STATUS') _devicemapinfoColor = Colors.blue;
       }),
       onExit: (_) => setState(() {
         if (text == 'ABOUT US')
@@ -448,10 +437,9 @@ class _HomePageState extends State<HomePage> {
           _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
         if (text == 'ACCOUNT INFO')
           _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-        // if (text == 'DEVICE INFO')
-        //   _devicelocationinfoColor = const Color.fromARGB(255, 235, 232, 232);
-        // if (text == 'WEATHER FORECAST')
-        //   _weatherinfoColor = const Color.fromARGB(255, 235, 232, 232);
+
+        if (text == 'DEVICE STATUS')
+          _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
       }),
       child: TextButton(
         onPressed: onPressed,

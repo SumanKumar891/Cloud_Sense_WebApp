@@ -5,6 +5,8 @@ import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/GPS.dart';
+import 'package:cloud_sense_webapp/devicelocationinfo.dart';
+import 'package:cloud_sense_webapp/devicemap.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'HomePage.dart';
@@ -56,6 +58,8 @@ class MyApp extends StatelessWidget {
         '/accountinfo': (context) => AccountInfoPage(),
         '/deviceinfo': (context) => MapPage(),
         '/devicelist': (context) => DataDisplayPage(),
+        '/devicelocationinfo': (context) => DeviceActivityPage(),
+        '/devicemapinfo': (context) => DeviceMapScreen(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',
               sequentialName: null,
