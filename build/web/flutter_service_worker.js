@@ -3,9 +3,12 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.bin": "de065ac22627898fc3b0d1382d5deca2",
-"assets/AssetManifest.bin.json": "e723c3ae1747c30ce4a8b05c270346bd",
-"assets/AssetManifest.json": "dc2a6ff49ad709fd88cf58007815243e",
+const RESOURCES = {"assets/AssetManifest.bin": "2241244e6bc6553f5d7881dfb73ff65a",
+"assets/AssetManifest.bin.json": "805dd94bda701de0d369e85a1784bedb",
+"assets/AssetManifest.json": "38302105bb829c222662702c23526087",
+"assets/assets/25.jpg": "7f119e2878ef8082a8e8af9dff75f923",
+"assets/assets/28.jpg": "356de2ea3d48c337f8ac7dd6044684d4",
+"assets/assets/5.jpg": "dee1f699247cd948348474acfd8368cc",
 "assets/assets/applogo.jpg": "2e94775337b76c86ce1e0f9be0f894ae",
 "assets/assets/background.jpg": "de4a32535578e611355ce4785f9657cf",
 "assets/assets/buffalo_.jpg": "0f21746395163610782b4c3f7a63471a",
@@ -51,7 +54,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "de065ac22627898fc3b0d1382d5deca2
 "favicon.png": "352a05256273593e3e2b5d173d54cf60",
 "firebase-messaging-sw.js": "17c44fff535ffea2671fce491d6dd458",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"flutter_bootstrap.js": "fe69692d217dd6c4349d609a509aba60",
+"flutter_bootstrap.js": "12cb104845787ac53eb6ff8f7411988d",
 "icons/Icon-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
 "icons/Icon-512.png": "76feaf63bcbf28ae35c368fa70d14ce7",
 "icons/Icon-maskable-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
