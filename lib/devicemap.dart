@@ -435,6 +435,23 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
               MarkerLayer(
                 markers: [
                   ...deviceLocations.map((device) {
+                    // Parse last_active date
+                    bool isToday = false;
+                    try {
+                      if (device['last_active'] != null) {
+                        final lastActive =
+                            DateTime.tryParse(device['last_active'].toString());
+                        if (lastActive != null) {
+                          final now = DateTime.now();
+                          isToday = lastActive.year == now.year &&
+                              lastActive.month == now.month &&
+                              lastActive.day == now.day;
+                        }
+                      }
+                    } catch (_) {
+                      isToday = false;
+                    }
+
                     return Marker(
                       point: LatLng(
                         (device['latitude'] as num).toDouble(),
@@ -447,14 +464,14 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
                         child: Icon(
                           Icons.location_on,
                           size: 40,
-                          color: Colors.red,
+                          color: isToday ? Colors.green : Colors.red,
                         ),
                       ),
                     );
                   }).toList(),
                   if (searchPin != null) searchPin!,
                 ],
-              ),
+              )
             ],
           ),
           Positioned(
