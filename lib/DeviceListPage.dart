@@ -204,8 +204,10 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           : Colors.grey[200], // Light mode → grey[200] background
       appBar: AppBar(
         iconTheme: IconThemeData(
-            color:
-                isDarkMode ? Colors.black : Colors.white), // back arrow color
+            color: isDarkMode ? Colors.black : Colors.white,
+            size: MediaQuery.of(context).size.width < 800
+                ? 16
+                : 32), // back arrow color
         title: Text(
           'Your Chosen Devices',
           style: TextStyle(

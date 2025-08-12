@@ -122,12 +122,15 @@ class _QRScannerPageState extends State<QRScannerPage> {
           'QR Scanner',
           style: TextStyle(
             color: isDarkMode ? Colors.black : Colors.white,
+            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+            fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.black : Colors.white),
+              color: isDarkMode ? Colors.black : Colors.white,
+              size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [

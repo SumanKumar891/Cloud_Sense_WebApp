@@ -333,9 +333,14 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
       appBar: AppBar(
         backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
         title: Text('Device Status',
-            style: TextStyle(color: isDarkMode ? Colors.black : Colors.white)),
-        iconTheme:
-            IconThemeData(color: isDarkMode ? Colors.black : Colors.white),
+            style: TextStyle(
+              color: isDarkMode ? Colors.black : Colors.white,
+              fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+              fontWeight: FontWeight.bold,
+            )),
+        iconTheme: IconThemeData(
+            color: isDarkMode ? Colors.black : Colors.white,
+            size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
       ),
       body: Stack(
         children: [

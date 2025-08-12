@@ -507,7 +507,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.white : Colors.black),
+              color: isDarkMode ? Colors.white : Colors.black,
+              size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
           onPressed: () {
             Navigator.of(context).pop();
           },

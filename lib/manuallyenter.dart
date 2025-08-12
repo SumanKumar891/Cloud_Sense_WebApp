@@ -115,13 +115,17 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
           'Add Device Manually',
           style: TextStyle(
             color: isDarkMode ? Colors.black : Colors.white,
+            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+            fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
-              color:
-                  isDarkMode ? Colors.black : Colors.white), // white back arrow
+              color: isDarkMode ? Colors.black : Colors.white,
+              size: MediaQuery.of(context).size.width < 800
+                  ? 16
+                  : 32), // white back arrow
           onPressed: () => Navigator.pop(context),
         ),
       ),
