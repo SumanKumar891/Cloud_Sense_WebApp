@@ -279,7 +279,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               color: themeProvider.isDarkMode
                   ? Colors.black.withOpacity(0.8)
-                  : Colors.white.withOpacity(0.3),
+                  : const Color.fromARGB(255, 114, 112, 112).withOpacity(0.6),
             ),
 
             // Content
