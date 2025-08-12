@@ -107,17 +107,21 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
       appBar: AppBar(
         title: Text(
           'Add Device Manually',
           style: TextStyle(
-            color: Colors.white,
+            color: isDarkMode ? Colors.black : Colors.white,
           ),
         ),
-        backgroundColor: Colors.blueGrey[900],
+        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white), // white back arrow
+          icon: Icon(Icons.arrow_back,
+              color:
+                  isDarkMode ? Colors.black : Colors.white), // white back arrow
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -167,8 +171,9 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
                   },
                   child: Text('Add Device'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueGrey[900],
+                    foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),

@@ -223,13 +223,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
             onPressed: _handleLogout,
             icon: Icon(
               Icons.logout,
-              color: Colors.white,
+              color: isDarkMode ? Colors.black : Colors.white,
               size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
             ),
             label: Text(
               'Log out',
               style: TextStyle(
-                color: Colors.white,
+                color: isDarkMode ? Colors.black : Colors.white,
                 fontSize: MediaQuery.of(context).size.width < 800 ? 12 : 24,
               ),
             ),
@@ -265,7 +265,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 50),
                         _deviceCategories.isNotEmpty
                             ? _buildDeviceCards()
                             : _buildNoDevicesCard(),

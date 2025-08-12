@@ -123,7 +123,7 @@ flutter:
   assets:
    
     - assets/weather.png
-    - assets/login.png
+    - assets/signin.png
     - assets/signup3.png
     - assets/background.jpg
     - assets/sun.jpg
