@@ -153,10 +153,10 @@ class _HomePageState extends State<HomePage> {
                           ),
                           onPressed: () => themeProvider.toggleTheme(),
                         ),
-                        SizedBox(width: 20),
-                        _buildNavButton('ABOUT US', _aboutUsColor, () {
-                          Navigator.pushNamed(context, '/about-us');
-                        }),
+                        // SizedBox(width: 20),
+                        // _buildNavButton('ABOUT US', _aboutUsColor, () {
+                        //   Navigator.pushNamed(context, '/about-us');
+                        // }),
                         SizedBox(width: 20),
                         _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
                           _handleLoginNavigation();
@@ -194,13 +194,13 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text('ABOUT US'),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/about-us');
-                      },
-                    ),
+                    // ListTile(
+                    //   leading: Icon(Icons.info),
+                    //   title: Text('ABOUT US'),
+                    //   onTap: () {
+                    //     Navigator.pushNamed(context, '/about-us');
+                    //   },
+                    // ),
                     ListTile(
                       leading: Icon(Icons.login),
                       title: Text('LOGIN/SIGNUP'),

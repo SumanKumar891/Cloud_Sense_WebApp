@@ -483,7 +483,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       controller: _scrollController,
       thumbVisibility: true, // Always show scrollbar
       trackVisibility: true,
-      thickness: 8,
+      thickness: 6,
       radius: Radius.circular(8),
       child: GestureDetector(
         onHorizontalDragUpdate: (details) {
@@ -494,6 +494,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           controller: _scrollController,
+          // <-- add bottom padding here to create a gap between cards and scrollbar
+          padding: const EdgeInsets.only(bottom: 15.0, left: 12.0, right: 12.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: cardList,
