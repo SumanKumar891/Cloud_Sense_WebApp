@@ -467,6 +467,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       wfAverageTemperatureData.clear();
       wfrainfallData.clear();
       kdParametersData.clear();
+      NARLParametersData.clear();
 
       _weeklyPrecipitationData.clear();
     });
@@ -1487,6 +1488,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           if (!widget.deviceName.startsWith('SM') &&
               !widget.deviceName.startsWith('CF') &&
               !widget.deviceName.startsWith('VD') &&
+              !widget.deviceName.startsWith('NA') &&
               !widget.deviceName.startsWith('SV')) {
             _csvRows = rows;
           }
