@@ -332,7 +332,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
-        title: Text('Device Status',
+        title: Text('Account Info',
             style: TextStyle(
               color: isDarkMode ? Colors.black : Colors.white,
               fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
