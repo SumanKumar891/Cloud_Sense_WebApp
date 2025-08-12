@@ -383,10 +383,14 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                 ElevatedButton(
                   onPressed: _fetchData,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
                     foregroundColor: Colors.white,
                   ),
-                  child: Text("Fetch Devices"),
+                  child: Text("Fetch Devices",
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.black : Colors.white,
+                      )),
                 ),
                 SizedBox(height: 20),
                 _isLoading
@@ -415,12 +419,14 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                           child: DataTable(
                                             headingRowColor:
                                                 MaterialStateProperty.all(
-                                                    Colors.blue),
+                                                    isDarkMode
+                                                        ? Colors.grey[200]
+                                                        : Colors.blueGrey[900]),
                                             dataRowColor:
                                                 MaterialStateProperty.all(
                                                     isDarkMode
-                                                        ? Colors.grey[800]
-                                                        : Colors.white),
+                                                        ? Colors.blueGrey[900]
+                                                        : Colors.grey[200]),
                                             columnSpacing: 20.0,
                                             columns: deviceCategories.keys
                                                 .map((sensorKey) => DataColumn(
@@ -431,7 +437,9 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                         child: Text(
                                                           sensorKey.trim(),
                                                           style: TextStyle(
-                                                            color: Colors.white,
+                                                            color: isDarkMode
+                                                                ? Colors.black
+                                                                : Colors.white,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             fontSize: MediaQuery.of(
