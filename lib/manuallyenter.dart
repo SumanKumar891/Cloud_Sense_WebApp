@@ -109,12 +109,16 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Device Manually'),
-        backgroundColor: Colors.teal,
+        title: Text(
+          'Add Device Manually',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.blueGrey[900],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () =>
-              Navigator.pop(context), // Go back to the previous screen
+          icon: Icon(Icons.arrow_back, color: Colors.white), // white back arrow
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -164,7 +168,7 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
                   child: Text('Add Device'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Colors.blueGrey[900],
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),

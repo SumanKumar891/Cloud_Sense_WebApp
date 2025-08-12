@@ -197,103 +197,90 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background image
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/background.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                color: Colors.black
-                    .withOpacity(0.4), // Optional overlay for readability
-              ),
-            ),
+      backgroundColor: isDarkMode
+          ? Colors.blueGrey[900] // Dark mode → blueGrey background
+          : Colors.grey[200], // Light mode → grey[200] background
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+            color:
+                isDarkMode ? Colors.black : Colors.white), // back arrow color
+        title: Text(
+          'Your Chosen Devices',
+          style: TextStyle(
+            color: isDarkMode ? Colors.black : Colors.white,
+            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+            fontWeight: FontWeight.bold,
           ),
-          // Main content
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                AppBar(
-                  title: Text(
-                    'Your Chosen Devices',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize:
-                          MediaQuery.of(context).size.width < 800 ? 16 : 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  actions: [
-                    TextButton.icon(
-                      onPressed: _handleLogout,
-                      icon: Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                        size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
-                      ),
-                      label: Text(
-                        'Log out',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize:
-                              MediaQuery.of(context).size.width < 800 ? 12 : 24,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20), // Add some space below the AppBar
-                Center(
-                  child: _isLoading
-                      ? CircularProgressIndicator()
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Quote Text
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 70.0, left: 16.0, right: 16.0),
-                              child: Text(
-                                "Select a device to unlock insights into data.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'OpenSans',
-                                  fontSize:
-                                      MediaQuery.of(context).size.width < 800
-                                          ? 30
-                                          : 45,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                                height:
-                                    5), // Space between quote and device cards
-                            _deviceCategories.isNotEmpty
-                                ? _buildDeviceCards()
-                                : _buildNoDevicesCard(),
-                          ],
-                        ),
-                ),
-              ],
+        ),
+        backgroundColor: isDarkMode
+            ? Colors.grey[200]
+            : Colors.blueGrey[900], // Blue background for AppBar
+        elevation: 0,
+        actions: [
+          TextButton.icon(
+            onPressed: _handleLogout,
+            icon: Icon(
+              Icons.logout,
+              color: Colors.white,
+              size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
+            ),
+            label: Text(
+              'Log out',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: MediaQuery.of(context).size.width < 800 ? 12 : 24,
+              ),
             ),
           ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Center(
+              child: _isLoading
+                  ? CircularProgressIndicator()
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 90.0, left: 16.0, right: 16.0),
+                          child: Text(
+                            "Select a device to unlock insights into data.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'OpenSans',
+                              fontSize: MediaQuery.of(context).size.width < 800
+                                  ? 30
+                                  : 45,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Colors
+                                      .black, // Black text on white background
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        _deviceCategories.isNotEmpty
+                            ? _buildDeviceCards()
+                            : _buildNoDevicesCard(),
+                      ],
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDeviceCards() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     // Separate counters for each sensor type
     int luxSensorCount = 0;
     int tempSensorCount = 0;
@@ -307,7 +294,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           child: Card(
             color: _getCardColor(category),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -319,7 +306,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: _getCardTextColor(),
                     ),
                   ),
                   SizedBox(height: 10),
@@ -353,8 +340,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.black,
+                              foregroundColor: isDarkMode
+                                  ? Colors.white
+                                  : Colors.black, // text color
+                              backgroundColor: isDarkMode
+                                  ? Colors.black
+                                  : Colors.white, // background
                               padding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 10),
                             ),
@@ -424,7 +415,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         height: 300,
         margin: EdgeInsets.all(10),
         child: Card(
-          color: const Color.fromARGB(255, 167, 158, 172),
+          color: _getCardColor('AddDevice'),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -433,14 +424,16 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: isDarkMode ? Colors.black : Colors.white,
                 ),
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: Colors.black,
+
+                  backgroundColor:
+                      isDarkMode ? Colors.black : Colors.white, // background,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -461,7 +454,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.black : Colors.white,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -475,7 +468,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 },
                 child: Text(
                   'Add Manually',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -484,13 +479,17 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       ),
     );
 
-    return ScrollConfiguration(
-      behavior: ScrollBehavior().copyWith(scrollbars: false), // Hide scrollbar
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true, // Always show scrollbar
+      trackVisibility: true,
+      thickness: 8,
+      radius: Radius.circular(8),
       child: GestureDetector(
-        onHorizontalDragStart: (details) {}, // Required to enable drag
         onHorizontalDragUpdate: (details) {
-          // Scroll based on drag distance
-          _scrollController.jumpTo(_scrollController.offset - details.delta.dx);
+          _scrollController.jumpTo(
+            _scrollController.offset - details.delta.dx,
+          );
         },
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -511,7 +510,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         height: 300,
         margin: EdgeInsets.all(10),
         child: Card(
-          color: const Color.fromARGB(255, 167, 158, 172),
+          color: Colors.grey[200],
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -588,46 +587,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   }
 
   Color _getCardColor(String category) {
-    switch (category) {
-      case 'Chlorine Sensors':
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Weather Sensors':
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Soil Sensors': // Add color for Soil Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Water Quality Sensors': // Add color for Water Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Water Sensors': // Add color for Water Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'DO Sensors': // Add color for Water Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return isDarkMode ? Colors.grey[200]! : Colors.blueGrey[900]!;
+  }
 
-      case 'CPS Lab Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Buffalo Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Cow Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Ammonia Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Temperature Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'SSMET Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Colonel Farm Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'SVPU Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'COD/BOD Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'WF Sensors': // Color for CPS Lab Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'Kargil Sensors': // Color for WF Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      case 'VD Sensors': // Color for VD Sensors
-        return const Color.fromARGB(255, 167, 158, 172);
-      default:
-        return const Color.fromARGB(255, 167, 158, 172);
-    }
+  Color _getCardTextColor() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return isDarkMode ? Colors.black : Colors.white;
   }
 }
