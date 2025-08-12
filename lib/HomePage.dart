@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +69,43 @@ class _HomePageState extends State<HomePage> {
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
   Color _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
 
+  int _totalDevices = 0; // Stores total devices from API
+
   bool isHovered = false;
+  @override
+  void initState() {
+    super.initState();
+    _fetchDeviceData();
+  }
+
+  Future<void> _fetchDeviceData() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        final wsDevices = data['WS_Device_Activity'] ?? [];
+        final awadhDevices = data['Awadh_Jio_Device_Activity'] ?? [];
+        final weatherDevices = data['weather_Device_Activity'] ?? [];
+
+        final totalCount =
+            wsDevices.length + awadhDevices.length + weatherDevices.length;
+
+        setState(() {
+          _totalDevices = totalCount;
+        });
+      } else {
+        print('Failed to load device data. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching device data: $e');
+    }
+  }
 
   Future<void> _handleLoginNavigation() async {
     try {
@@ -103,13 +142,14 @@ class _HomePageState extends State<HomePage> {
           MediaQuery.of(context).size.width < 800 ? 0.0 : 280.0;
 
       return Scaffold(
+        backgroundColor: isDarkMode
+            ? Colors.grey[200] // Dark mode → blueGrey background
+            : Colors.blueGrey[900], // Light mode → grey[200] background
         appBar: AppBar(
           iconTheme: IconThemeData(
             color: isDarkMode ? Colors.white : Colors.black,
           ),
-          backgroundColor: isDarkMode
-              ? const Color.fromARGB(255, 50, 50, 50)
-              : const Color.fromARGB(255, 231, 231, 231),
+          backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
           title: Padding(
             padding: EdgeInsets.only(left: horizontalPadding),
             child: Row(
@@ -153,10 +193,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           onPressed: () => themeProvider.toggleTheme(),
                         ),
-                        // SizedBox(width: 20),
-                        // _buildNavButton('ABOUT US', _aboutUsColor, () {
-                        //   Navigator.pushNamed(context, '/about-us');
-                        // }),
                         SizedBox(width: 20),
                         _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
                           _handleLoginNavigation();
@@ -165,11 +201,11 @@ class _HomePageState extends State<HomePage> {
                         _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
                           Navigator.pushNamed(context, '/accountinfo');
                         }),
-                        SizedBox(width: 20),
-                        _buildNavButton('DEVICE STATUS', _devicemapinfoColor,
-                            () {
-                          Navigator.pushNamed(context, '/devicemapinfo');
-                        }),
+                        // SizedBox(width: 20),
+                        // _buildNavButton('DEVICE STATUS', _devicemapinfoColor,
+                        //     () {
+                        //   Navigator.pushNamed(context, '/devicemapinfo');
+                        // }),
                       ],
                     ),
                   ),
@@ -194,13 +230,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    // ListTile(
-                    //   leading: Icon(Icons.info),
-                    //   title: Text('ABOUT US'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/about-us');
-                    //   },
-                    // ),
                     ListTile(
                       leading: Icon(Icons.login),
                       title: Text('LOGIN/SIGNUP'),
@@ -215,255 +244,155 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
-                    ListTile(
-                      leading: Icon(Icons.login),
-                      title: Text('DEVICE STATUS'),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/devicemapinfo');
-                      },
-                    ),
+                    // ListTile(
+                    //   leading: Icon(Icons.login),
+                    //   title: Text('DEVICE STATUS'),
+                    //   onTap: () {
+                    //     Navigator.pushNamed(context, '/devicemapinfo');
+                    //   },
+                    // ),
                   ],
                 ),
               )
             : null,
         body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    // height: MediaQuery.of(context).size.width < 800 ? 450 : 650,
-                    color: Colors.transparent,
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width < 800 ? 40 : 280,
-                      top: MediaQuery.of(context).size.width < 800 ? 60 : 80,
-                      right:
-                          MediaQuery.of(context).size.width < 1000 ? 30 : 400,
-                      bottom: 20,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'WEATHER FORECASTS\nTAILORED FOR YOUR\nLOCATION',
-                          style: TextStyle(
-                            fontFamily: 'OpenSans',
-                            fontSize: MediaQuery.of(context).size.width < 800
-                                ? 26
-                                : 50,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode
-                                ? const Color.fromARGB(255, 255, 255, 255)
-                                : Colors.black,
-                            height: 1.3,
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        Text(
-                          'Get hyper-local forecasts powered by your weather station.\nAccurate, hourly insights for temperature, humidity,\nprecipitation, and much more.',
-                          style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width < 800
-                                ? 16
-                                : 22,
-                            color: isDarkMode ? Colors.white : Colors.black,
-                            height: 1.5,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        MouseRegion(
-                          onEnter: (_) => setState(() => isHovered = true),
-                          onExit: (_) => setState(() => isHovered = false),
-                          child: Transform.scale(
-                            scale: isHovered ? 1.05 : 1.0,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/weatherinfo');
+          child: Padding(
+            padding: const EdgeInsets.all(40.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                isMobile
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 250,
+                              height: 160,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/devicelocationinfo');
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 49, 145, 241),
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isMobile ? 10 : 24,
-                                    vertical: isMobile ? 8 : 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  elevation: isHovered ? 8 : 4,
-                                ),
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 300),
-                                  transitionBuilder: (child, animation) =>
-                                      SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(0.3, 0),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: FadeTransition(
-                                        opacity: animation, child: child),
-                                  ),
-                                  child: isHovered
-                                      ? Row(
-                                          key: const ValueKey('hover'),
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: const [
-                                            Text(
-                                              'GET STARTED NOW',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(width: 8),
-                                            Icon(Icons.arrow_forward, size: 20),
-                                          ],
-                                        )
-                                      : const Text(
-                                          'GET STARTED NOW',
-                                          key: ValueKey('normal'),
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                child: _buildStatCard(
+                                  title: "Total Devices",
+                                  value: _totalDevices.toString(),
+                                  icon: Icons.devices,
                                 ),
                               ),
                             ),
+                            SizedBox(height: 16),
+                            SizedBox(
+                              width: 250,
+                              height: 160,
+                              child: _buildStatCard(
+                                title: "Total Data Points",
+                                value:
+                                    "-", // Replace with actual data point count
+                                icon: Icons.data_usage,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 250,
+                            height: 160,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/devicelocationinfo');
+                              },
+                              child: _buildStatCard(
+                                title: "Total Devices",
+                                value: _totalDevices.toString(),
+                                icon: Icons.devices,
+                                showArrow: true,
+                              ),
+                            ),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal:
-                      MediaQuery.of(context).size.width < 800 ? 40 : 280,
-                  vertical: 20,
-                ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    bool isMobile = constraints.maxWidth < 800;
-                    return isMobile
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildTextContent(isDarkMode),
-                              SizedBox(height: 30),
-                              _buildImageContent(),
-                            ],
-                          )
-                        : Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: _buildTextContent(isDarkMode),
-                              ),
-                              SizedBox(width: 40),
-                              Expanded(
-                                flex: 3,
-                                child: isMobile
-                                    ? _buildImageContent()
-                                    : Transform.translate(
-                                        offset: Offset(110, -200),
-                                        child: _buildImageContent(),
-                                      ),
-                              ),
-                            ],
-                          );
-                  },
-                ),
-              ),
-              SizedBox(height: 0),
-            ],
+                          SizedBox(width: 16),
+                          SizedBox(
+                            width: 250,
+                            height: 160,
+                            child: _buildStatCard(
+                              title: "Total Data Points",
+                              value: "-",
+                              icon: Icons.data_usage,
+                            ),
+                          ),
+                        ],
+                      ),
+              ],
+            ),
           ),
         ),
       );
     });
   }
 
-  Widget _buildTextContent(bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Forecasting Applications',
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'Benefits include:',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        SizedBox(height: 10),
-        _buildBulletPoint(
-            '10-day Hourly Forecasts: Temperature; Relative Humidity; Precipitation.'),
-        _buildBulletPoint(
-            'Instant IoT Sync: Connect to your weather station in minutes and get real-time, AI-powered forecasts.'),
-        _buildBulletPoint(
-            'Up to 85% More Accurate Than National Weather Services.'),
-      ],
-    );
-  }
-
-  Widget _buildImageContent() {
-    return Center(
-      child: SizedBox(
-        width: 750, // You can adjust this to smaller like 300 or 250 if needed
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.asset(
-            'assets/weatherforecasting.png',
-            fit: BoxFit.cover,
-          ),
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    bool showArrow = false,
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return Card(
+      color: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isDarkMode ? Colors.grey[200]! : Colors.blueGrey[900]!,
+          width: 2,
         ),
       ),
-    );
-  }
-
-  Widget _buildBulletPoint(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '• ',
-            style: TextStyle(
-              fontSize: 18,
-              color: const Color.fromARGB(255, 49, 145, 241),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row: icon + arrow
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(
+                  icon,
+                  size: 40,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                if (showArrow)
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 20,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+              ],
             ),
-          ),
-          Expanded(
-            child: Text(
-              text,
+            SizedBox(height: 12),
+            Text(
+              title,
               style: TextStyle(
-                fontSize: 16,
-                height: 1.5,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
