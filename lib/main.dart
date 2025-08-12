@@ -49,7 +49,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cloud Sense Vis',
       debugShowCheckedModeBanner: false,
-      theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      theme: themeProvider.isDarkMode
+          ? ThemeData.dark().copyWith(
+              textTheme: ThemeData.dark().textTheme.apply(
+                    fontFamily: 'OpenSans',
+                  ),
+            )
+          : ThemeData.light().copyWith(
+              textTheme: ThemeData.light().textTheme.apply(
+                    fontFamily: 'OpenSans',
+                  ),
+            ),
       initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
