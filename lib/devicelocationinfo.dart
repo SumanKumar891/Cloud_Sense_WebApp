@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_sense_webapp/devicemap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -39,7 +40,8 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
         // Merge selected groups
         final keysToInclude = [
           'WS_Device_Activity',
-          'Awadh_Jio_Device_Activity'
+          'Awadh_Jio_Device_Activity',
+          'weather_Device_Activity',
         ];
 
         for (var key in keysToInclude) {
@@ -177,6 +179,17 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: fetchDevices, // reload data
+          ),
+          IconButton(
+            icon: Icon(Icons.map, color: Colors.white),
+            tooltip: 'Open Map',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DeviceMapScreen()), // map.dart widget
+              );
+            },
           ),
         ],
       ),
