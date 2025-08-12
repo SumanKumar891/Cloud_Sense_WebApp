@@ -114,12 +114,20 @@ class _QRScannerPageState extends State<QRScannerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
       appBar: AppBar(
-        title: Text('QR Scanner'),
-        backgroundColor: Colors.teal,
+        title: Text(
+          'QR Scanner',
+          style: TextStyle(
+            color: isDarkMode ? Colors.black : Colors.white,
+          ),
+        ),
+        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back,
+              color: isDarkMode ? Colors.black : Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -146,7 +154,10 @@ class _QRScannerPageState extends State<QRScannerPage> {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.teal, width: 4),
+                border: Border.all(
+                  color: isDarkMode ? Colors.grey[200]! : Colors.blueGrey[900]!,
+                  width: 4,
+                ),
               ),
               child: MobileScanner(
                 controller: _controller,
@@ -180,8 +191,9 @@ class _QRScannerPageState extends State<QRScannerPage> {
               onPressed: resetScanner,
               child: Text('Scan Again'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.teal,
+                foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                backgroundColor:
+                    isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
               ),
             ),
           ],
