@@ -507,7 +507,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.black : Colors.white),
+              color: isDarkMode ? Colors.white : Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -518,22 +518,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/sun.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-              child: Container(
-                color: isDarkMode
-                    ? Colors.black
-                        .withOpacity(0.7) // Darker overlay for dark mode
-                    : Colors.black
-                        .withOpacity(0.5), // Lighter overlay for light mode
-              ),
-            ),
+            color: isDarkMode
+                ? const Color(0xFF121212) // Dark background
+                : Colors.transparent, // Light theme background
           ),
           Center(
             child: AnimatedSwitcher(
@@ -607,8 +594,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             : 400, // Full width for small screens
         height: 500,
         color: isDarkMode
-            ? Color.fromARGB(155, 255, 255, 255)
-            : Color.fromARGB(155, 0, 0, 0),
+            ? const Color.fromARGB(255, 231, 231, 231)
+            : const Color.fromARGB(255, 38, 37, 37),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -620,9 +607,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode
-                    ? Colors.black
-                    : Color.fromARGB(223, 216, 226, 231),
+                color: isDarkMode ? Colors.black : Colors.white,
               ),
             ),
             SizedBox(height: 15),
@@ -635,22 +620,22 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: isDarkMode
-                      ? Colors.purple
-                      : Color.fromARGB(223, 205, 108, 230),
+                      ? const Color.fromARGB(255, 13, 123, 233)
+                      : const Color.fromARGB(255, 49, 145, 241),
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
             // Image section
             Padding(
-              padding: const EdgeInsets.only(top: 20.0),
+              padding: const EdgeInsets.only(top: 5.0),
               child: Container(
-                width: 290,
-                height: 190,
+                width: 250,
+                height: 220,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   image: DecorationImage(
-                    image: AssetImage('assets/login.png'),
+                    image: AssetImage('assets/signin.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -661,7 +646,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       ),
 
       // Add spacing between sections for small screens
-      SizedBox(height: isSmallScreen ? 32 : 0),
+      // SizedBox(height: isSmallScreen ? 0 : 0),
 
       // Sign-in form section
       Container(
@@ -670,7 +655,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         padding: EdgeInsets.all(32.0),
         color: isDarkMode
             ? const Color.fromARGB(255, 38, 37, 37)
-            : const Color.fromARGB(155, 255, 255, 255),
+            : const Color.fromARGB(255, 231, 231, 231),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -682,9 +667,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode
-                    ? Colors.white
-                    : Color.fromARGB(243, 173, 21, 211),
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
             SizedBox(height: 42),
@@ -729,7 +712,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     });
                   },
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? Colors.blue
+                          : const Color.fromARGB(255, 76, 39, 176)),
+                ),
               ),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
 
             // Show loading indicator or Sign-in button
@@ -749,10 +739,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                     backgroundColor: isDarkMode
-                        ? Colors.purple
-                        : Color.fromARGB(223, 205, 108, 230),
+                        ? const Color.fromARGB(255, 13, 123, 233)
+                        : const Color.fromARGB(255, 49, 145, 241),
                   ),
                 ),
               ),
@@ -767,9 +757,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode
-                        ? Colors.white
-                        : Color.fromARGB(181, 113, 5, 214),
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 SizedBox(width: 8),
@@ -792,9 +780,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                         'Reset',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230),
+                          color: isDarkMode ? Colors.blue : Colors.blue,
                         ),
                       ),
                     ],
@@ -813,9 +799,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode
-                        ? Colors.white
-                        : Color.fromARGB(181, 113, 5, 214),
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 SizedBox(width: 8),
@@ -842,9 +826,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                         'Sign Up',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230),
+                          color: isDarkMode ? Colors.blue : Colors.blue,
                         ),
                       ),
                     ],
@@ -890,6 +872,57 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   // Builds the content for the Sign-Up screen, responsive for both small and large screens
   List<Widget> _buildSignUpContent(bool isSmallScreen, bool isDarkMode) {
     return [
+      // Welcome container
+      Container(
+        width: isSmallScreen ? double.infinity : 400,
+        height: 500,
+        color: isDarkMode
+            ? const Color.fromARGB(255, 231, 231, 231)
+            : const Color.fromARGB(255, 38, 37, 37),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 40),
+            Text(
+              'Welcome!',
+              style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.black : Colors.white),
+            ),
+            SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              child: Text(
+                'Enter your personal details and start your journey with us.',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode
+                      ? const Color.fromARGB(255, 13, 123, 233)
+                      : const Color.fromARGB(255, 49, 145, 241),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Container(
+                width: 250,
+                height: 220,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(40),
+                  image: DecorationImage(
+                    image: AssetImage('assets/signin.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
       // Form container
       Container(
         width: isSmallScreen ? double.infinity : 400,
@@ -897,7 +930,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         padding: EdgeInsets.all(32.0),
         color: isDarkMode
             ? const Color.fromARGB(255, 38, 37, 37)
-            : const Color.fromARGB(155, 255, 255, 255),
+            : const Color.fromARGB(255, 231, 231, 231),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -908,9 +941,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode
-                    ? Colors.white
-                    : const Color.fromARGB(243, 173, 21, 211),
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
             SizedBox(height: 24),
@@ -996,10 +1027,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                             : const Color.fromARGB(255, 245, 241, 240)),
                   ),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 8),
                     backgroundColor: isDarkMode
-                        ? Colors.purple
-                        : const Color.fromARGB(223, 205, 108, 230),
+                        ? const Color.fromARGB(255, 13, 123, 233)
+                        : const Color.fromARGB(255, 49, 145, 241),
                   ),
                 ),
               ),
@@ -1013,83 +1044,41 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode
-                        ? Colors.white
-                        : const Color.fromARGB(181, 113, 5, 214),
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _isSignIn = true;
+                      _isSignIn = true; // Switch to sign-in form
                     });
                   },
-                  child: Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? Colors.blue
-                          : const Color.fromARGB(243, 32, 39, 230),
-                    ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        bottom: -1,
+                        child: Container(
+                          height: 1.5,
+                          width: 45,
+                          color: isDarkMode
+                              ? Colors.blue
+                              : Color.fromARGB(243, 32, 39, 230),
+                        ),
+                      ),
+                      Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.blue : Colors.blue,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             )
-          ],
-        ),
-      ),
-      SizedBox(height: isSmallScreen ? 32 : 0),
-      // Welcome container
-      Container(
-        width: isSmallScreen ? double.infinity : 400,
-        height: 500,
-        color: isDarkMode
-            ? const Color.fromARGB(155, 255, 255, 255)
-            : const Color.fromARGB(155, 0, 0, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 55),
-            Text(
-              'Welcome!',
-              style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode
-                      ? Colors.black
-                      : const Color.fromARGB(223, 216, 226, 231)),
-            ),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-              child: Text(
-                'Enter your personal details and start your journey with us.',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode
-                        ? Colors.purple
-                        : const Color.fromARGB(223, 205, 108, 230)),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Container(
-                width: 290,
-                height: 190,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  image: DecorationImage(
-                    image: AssetImage('assets/login.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),

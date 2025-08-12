@@ -64,8 +64,9 @@ class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
   Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-
   Color _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
+
+  bool isHovered = false;
 
   Future<void> _handleLoginNavigation() async {
     try {
@@ -98,6 +99,9 @@ class _HomePageState extends State<HomePage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return LayoutBuilder(builder: (context, constraints) {
       bool isMobile = constraints.maxWidth < 800;
+      final horizontalPadding =
+          MediaQuery.of(context).size.width < 800 ? 0.0 : 280.0;
+
       return Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(
@@ -106,61 +110,71 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: isDarkMode
               ? const Color.fromARGB(255, 50, 50, 50)
               : const Color.fromARGB(255, 231, 231, 231),
-          title: Row(
-            children: [
-              isMobile ? SizedBox(width: 10) : SizedBox(width: 80),
-              Icon(
-                Icons.cloud,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-              SizedBox(width: isMobile ? 10 : 20),
-              Text(
-                'Cloud Sense Vis',
-                style: TextStyle(
+          title: Padding(
+            padding: EdgeInsets.only(left: horizontalPadding),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.cloud,
                   color: isDarkMode ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isMobile ? 20 : 32,
                 ),
-              ),
-              Spacer(), // Pushes items to the right.
-              if (isMobile)
-                IconButton(
-                  icon: Icon(
-                    themeProvider.isDarkMode
-                        ? Icons.light_mode
-                        : Icons.dark_mode,
+                SizedBox(width: isMobile ? 10 : 20),
+                Text(
+                  'Cloud Sense Vis',
+                  style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: isMobile ? 20 : 32,
                   ),
-                  onPressed: () => themeProvider.toggleTheme(),
                 ),
-              if (!isMobile) ...[
-                IconButton(
-                  icon: Icon(
-                    themeProvider.isDarkMode
-                        ? Icons.light_mode
-                        : Icons.dark_mode,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                Spacer(), // Pushes items to the right.
+                if (isMobile)
+                  IconButton(
+                    icon: Icon(
+                      themeProvider.isDarkMode
+                          ? Icons.light_mode
+                          : Icons.dark_mode,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    onPressed: () => themeProvider.toggleTheme(),
                   ),
-                  onPressed: () => themeProvider.toggleTheme(),
-                ),
-                SizedBox(width: 20),
-                _buildNavButton('ABOUT US', _aboutUsColor, () {
-                  Navigator.pushNamed(context, '/about-us');
-                }),
-                SizedBox(width: 20),
-                _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-                  _handleLoginNavigation();
-                }),
-                SizedBox(width: 20),
-                _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
-                  Navigator.pushNamed(context, '/accountinfo');
-                }),
-                SizedBox(width: 20),
-                _buildNavButton('DEVICE STATUS', _devicemapinfoColor, () {
-                  Navigator.pushNamed(context, '/devicemapinfo');
-                }),
+                if (!isMobile)
+                  Padding(
+                    padding: EdgeInsets.only(right: horizontalPadding),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            themeProvider.isDarkMode
+                                ? Icons.light_mode
+                                : Icons.dark_mode,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
+                          onPressed: () => themeProvider.toggleTheme(),
+                        ),
+                        SizedBox(width: 20),
+                        _buildNavButton('ABOUT US', _aboutUsColor, () {
+                          Navigator.pushNamed(context, '/about-us');
+                        }),
+                        SizedBox(width: 20),
+                        _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
+                          _handleLoginNavigation();
+                        }),
+                        SizedBox(width: 20),
+                        _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
+                          Navigator.pushNamed(context, '/accountinfo');
+                        }),
+                        SizedBox(width: 20),
+                        _buildNavButton('DEVICE STATUS', _devicemapinfoColor,
+                            () {
+                          Navigator.pushNamed(context, '/devicemapinfo');
+                        }),
+                      ],
+                    ),
+                  ),
               ],
-            ],
+            ),
           ),
         ),
         endDrawer: isMobile
@@ -218,198 +232,156 @@ class _HomePageState extends State<HomePage> {
             children: [
               Stack(
                 children: [
-                  Image.asset(
-                    'assets/soil.jpg',
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.width < 800 ? 400 : 550,
-                    fit: BoxFit.cover,
-                  ),
                   Container(
                     width: double.infinity,
-                    height: MediaQuery.of(context).size.width < 800 ? 400 : 550,
-                    color: Colors.black.withOpacity(0.5),
+                    // height: MediaQuery.of(context).size.width < 800 ? 450 : 650,
+                    color: Colors.transparent,
                     alignment: Alignment.centerLeft,
                     padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width < 800 ? 20 : 100,
-                      top: MediaQuery.of(context).size.width < 800 ? 60 : 120,
+                      left: MediaQuery.of(context).size.width < 800 ? 40 : 280,
+                      top: MediaQuery.of(context).size.width < 800 ? 60 : 80,
                       right:
-                          MediaQuery.of(context).size.width < 1000 ? 60 : 400,
+                          MediaQuery.of(context).size.width < 1000 ? 30 : 400,
                       bottom: 20,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome to Cloud Sense Vis',
+                          'WEATHER FORECASTS\nTAILORED FOR YOUR\nLOCATION',
                           style: TextStyle(
                             fontFamily: 'OpenSans',
                             fontSize: MediaQuery.of(context).size.width < 800
-                                ? 30
-                                : 65,
+                                ? 26
+                                : 50,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: isDarkMode
+                                ? const Color.fromARGB(255, 255, 255, 255)
+                                : Colors.black,
+                            height: 1.3,
+                          ),
+                        ),
+                        SizedBox(height: 40),
+                        Text(
+                          'Get hyper-local forecasts powered by your weather station.\nAccurate, hourly insights for temperature, humidity,\nprecipitation, and much more.',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width < 800
+                                ? 16
+                                : 22,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            height: 1.5,
                           ),
                         ),
                         SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                          child: Text(
-                            "At Cloud Sense Vis, we're dedicated to providing you with real-time data to help you make informed decisions about your surroundings.Our app uses advanced technology to ensure the data is accurate and timely, giving you the insights you need when it matters most. ",
-                            style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width < 800
-                                  ? 16
-                                  : 22,
-                              color: Colors.white,
+                        MouseRegion(
+                          onEnter: (_) => setState(() => isHovered = true),
+                          onExit: (_) => setState(() => isHovered = false),
+                          child: Transform.scale(
+                            scale: isHovered ? 1.05 : 1.0,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/weatherinfo');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 49, 145, 241),
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isMobile ? 10 : 24,
+                                    vertical: isMobile ? 8 : 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  elevation: isHovered ? 8 : 4,
+                                ),
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  transitionBuilder: (child, animation) =>
+                                      SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0.3, 0),
+                                      end: Offset.zero,
+                                    ).animate(animation),
+                                    child: FadeTransition(
+                                        opacity: animation, child: child),
+                                  ),
+                                  child: isHovered
+                                      ? Row(
+                                          key: const ValueKey('hover'),
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            Text(
+                                              'GET STARTED NOW',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Icon(Icons.arrow_forward, size: 20),
+                                          ],
+                                        )
+                                      : const Text(
+                                          'GET STARTED NOW',
+                                          key: ValueKey('normal'),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
+                              ),
                             ),
-                            textAlign: TextAlign.justify,
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
                 ],
               ),
-
-              SizedBox(height: 50),
-// "What We Offer" Section
+              SizedBox(height: 20),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                padding: EdgeInsets.symmetric(
+                  horizontal:
+                      MediaQuery.of(context).size.width < 800 ? 40 : 280,
+                  vertical: 20,
+                ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    return Column(
-                      children: [
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? const Color.fromARGB(255, 32, 29, 29)
-                                : const Color.fromARGB(255, 231, 231, 231),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDarkMode
-                                    ? const Color.fromARGB(255, 196, 194, 194)
-                                    : const Color.fromARGB(255, 32, 29, 29)
-                                        .withOpacity(0.4),
-                                spreadRadius: 1.5,
-                                blurRadius: 5,
-                                offset:
-                                    Offset(0, 4), // changes position of shadow
+                    bool isMobile = constraints.maxWidth < 800;
+                    return isMobile
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildTextContent(isDarkMode),
+                              SizedBox(height: 30),
+                              _buildImageContent(),
+                            ],
+                          )
+                        : Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: _buildTextContent(isDarkMode),
                               ),
-                              BoxShadow(
-                                color: isDarkMode
-                                    ? const Color.fromARGB(255, 196, 194, 194)
-                                    : const Color.fromARGB(255, 32, 29, 29)
-                                        .withOpacity(0.4),
-                                spreadRadius: 1.5,
-                                blurRadius: 5,
-                                offset: Offset(0, -4), // shadow at the top
-                              ),
-                              BoxShadow(
-                                color: isDarkMode
-                                    ? const Color.fromARGB(255, 196, 194, 194)
-                                    : const Color.fromARGB(255, 32, 29, 29)
-                                        .withOpacity(0.4),
-                                spreadRadius: 1.5,
-                                blurRadius: 5,
-                                offset: Offset(-4, 0), // shadow at the left
-                              ),
-                              BoxShadow(
-                                color: isDarkMode
-                                    ? const Color.fromARGB(255, 196, 194, 194)
-                                    : const Color.fromARGB(255, 32, 29, 29)
-                                        .withOpacity(0.4),
-                                spreadRadius: 1.5,
-                                blurRadius: 5,
-                                offset: Offset(4, 0), // shadow at the right
+                              SizedBox(width: 40),
+                              Expanded(
+                                flex: 3,
+                                child: isMobile
+                                    ? _buildImageContent()
+                                    : Transform.translate(
+                                        offset: Offset(110, -200),
+                                        child: _buildImageContent(),
+                                      ),
                               ),
                             ],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(60.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'What We Offer?',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : const Color.fromARGB(255, 0, 0, 0),
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  'Explore the sensors and dive into the live data they capture. With just a tap, you can access detailed insights for each sensor, keeping you informed.\n\nMonitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. Track various factors to help you plan effectively and contribute to optimizing your usage. Fine-tune your surroundings to prevent potential problems and adjust settings for comfort and efficiency. With all the essential insights at your fingertips, you can create a more comfortable and sustainable living space.',
-                                  style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width < 800
-                                            ? 14
-                                            : 20,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
+                          );
                   },
                 ),
-              ),
-
-              SizedBox(height: 50),
-              // "Our Mission" Section
-              Stack(
-                children: [
-                  Image.asset(
-                    'assets/weather.png',
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
-                    fit: BoxFit.cover,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
-                    color: Colors.black.withOpacity(0.5),
-                    padding: EdgeInsets.fromLTRB(
-                      MediaQuery.of(context).size.width < 800 ? 20.0 : 80.0,
-                      MediaQuery.of(context).size.width < 800 ? 40.0 : 85.0,
-                      MediaQuery.of(context).size.width < 800 ? 20.0 : 90.0,
-                      50.0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Our Mission',
-                          style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width < 800
-                                ? 30
-                                : 50,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'At Cloud Sense Vis, we aim to revolutionize the way you interact with your surroundings by offering intuitive and seamless monitoring solutions. Our innovative app provides instant access to essential data, giving you the tools to anticipate and respond to changes. With Cloud Sense Vis, you can trust that you’re equipped with the knowledge needed to maintain a safe, healthy, and efficient lifestyle.',
-                          style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width < 800
-                                ? 14
-                                : 24,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.justify,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
               SizedBox(height: 0),
             ],
@@ -417,6 +389,83 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     });
+  }
+
+  Widget _buildTextContent(bool isDarkMode) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Forecasting Applications',
+          style: TextStyle(
+            fontSize: 36,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        SizedBox(height: 16),
+        Text(
+          'Benefits include:',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        SizedBox(height: 10),
+        _buildBulletPoint(
+            '10-day Hourly Forecasts: Temperature; Relative Humidity; Precipitation.'),
+        _buildBulletPoint(
+            'Instant IoT Sync: Connect to your weather station in minutes and get real-time, AI-powered forecasts.'),
+        _buildBulletPoint(
+            'Up to 85% More Accurate Than National Weather Services.'),
+      ],
+    );
+  }
+
+  Widget _buildImageContent() {
+    return Center(
+      child: SizedBox(
+        width: 750, // You can adjust this to smaller like 300 or 250 if needed
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(
+            'assets/weatherforecasting.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '• ',
+            style: TextStyle(
+              fontSize: 18,
+              color: const Color.fromARGB(255, 49, 145, 241),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.5,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildNavButton(String text, Color color, VoidCallback onPressed) {
@@ -427,8 +476,8 @@ class _HomePageState extends State<HomePage> {
         if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
         if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
         if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
-
         if (text == 'DEVICE STATUS') _devicemapinfoColor = Colors.blue;
+        // if (text == 'WEATHER FORECAST') _weatherinfoColor = Colors.blue;
       }),
       onExit: (_) => setState(() {
         if (text == 'ABOUT US')
