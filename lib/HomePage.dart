@@ -279,7 +279,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               color: themeProvider.isDarkMode
                   ? Colors.black.withOpacity(0.8)
-                  : const Color.fromARGB(255, 114, 112, 112).withOpacity(0.6),
+                  : Colors.black.withOpacity(0.8),
             ),
 
             // Content
@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                         color: themeProvider.isDarkMode
                             ? Colors.white
-                            : Colors.black,
+                            : Colors.white,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -315,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 22,
                           color: themeProvider.isDarkMode
                               ? Colors.white
-                              : Colors.black,
+                              : Colors.white,
                           fontWeight: FontWeight.w500,
                         ),
                         child: AnimatedTextKit(
@@ -331,23 +331,23 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     Text(
                       "Explore the sensors and dive into the live data they capture. "
                       "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
                       "Monitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. "
                       "Track various factors to help you plan effectively and contribute to optimizing your usage.",
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.justify,
                       style: TextStyle(
                         color: themeProvider.isDarkMode
                             ? Colors.white70
-                            : Colors.black87,
+                            : Colors.white70,
                         fontSize:
                             MediaQuery.of(context).size.width < 800 ? 16 : 30,
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 40),
 
                     Wrap(
                       alignment: WrapAlignment.center,
@@ -384,10 +384,10 @@ class _HomePageState extends State<HomePage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: themeProvider.isDarkMode
                                 ? Colors.white
-                                : Colors.black,
+                                : Colors.white,
                             foregroundColor: themeProvider.isDarkMode
                                 ? Colors.black
-                                : Colors.white,
+                                : Colors.black,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 14),
                             shape: RoundedRectangleBorder(
@@ -417,7 +417,7 @@ class _HomePageState extends State<HomePage> {
         Text(
           value,
           style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+            color: themeProvider.isDarkMode ? Colors.white : Colors.white,
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
@@ -426,7 +426,7 @@ class _HomePageState extends State<HomePage> {
         Text(
           label,
           style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.white70 : Colors.black54,
+            color: themeProvider.isDarkMode ? Colors.white70 : Colors.white70,
             fontSize: 16,
           ),
         ),
