@@ -177,11 +177,13 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
             IconThemeData(color: isDarkMode ? Colors.black : Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: Icon(Icons.refresh,
+                color: isDarkMode ? Colors.black : Colors.white),
             onPressed: fetchDevices, // reload data
           ),
           IconButton(
-            icon: Icon(Icons.map, color: Colors.white),
+            icon: Icon(Icons.map,
+                color: isDarkMode ? Colors.black : Colors.white),
             tooltip: 'Open Map',
             onPressed: () {
               Navigator.push(

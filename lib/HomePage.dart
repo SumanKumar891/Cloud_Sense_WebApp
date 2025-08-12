@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_sense_webapp/devicelocationinfo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -134,12 +136,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
     return LayoutBuilder(builder: (context, constraints) {
       bool isMobile = constraints.maxWidth < 800;
-      final horizontalPadding =
-          MediaQuery.of(context).size.width < 800 ? 0.0 : 280.0;
+      bool isTablet =
+          constraints.maxWidth >= 800 && constraints.maxWidth <= 1024;
+      final horizontalPadding = isMobile ? 0.0 : (isTablet ? 120.0 : 280.0);
 
       return Scaffold(
         backgroundColor: isDarkMode
@@ -158,13 +163,13 @@ class _HomePageState extends State<HomePage> {
                   Icons.cloud,
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                SizedBox(width: isMobile ? 10 : 20),
+                SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
                 Text(
                   'Cloud Sense Vis',
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                     fontWeight: FontWeight.bold,
-                    fontSize: isMobile ? 20 : 32,
+                    fontSize: isMobile ? 20 : (isTablet ? 26 : 32),
                   ),
                 ),
                 Spacer(), // Pushes items to the right.
@@ -193,14 +198,21 @@ class _HomePageState extends State<HomePage> {
                           ),
                           onPressed: () => themeProvider.toggleTheme(),
                         ),
-                        SizedBox(width: 20),
-                        _buildNavButton('LOGIN/SIGNUP', _loginTestColor, () {
-                          _handleLoginNavigation();
-                        }),
-                        SizedBox(width: 20),
-                        _buildNavButton('ACCOUNT INFO', _accountinfoColor, () {
-                          Navigator.pushNamed(context, '/accountinfo');
-                        }),
+                        SizedBox(width: isTablet ? 12 : 20),
+                        _buildNavButton(
+                          'LOGIN/SIGNUP',
+                          _loginTestColor,
+                          _handleLoginNavigation,
+                          fontSize:
+                              isTablet ? 14 : 16, // smaller font for tablets
+                        ),
+                        SizedBox(width: isTablet ? 14 : 20),
+                        _buildNavButton(
+                          'ACCOUNT INFO',
+                          _accountinfoColor,
+                          () => Navigator.pushNamed(context, '/accountinfo'),
+                          fontSize: isTablet ? 14 : 16,
+                        ),
                         // SizedBox(width: 20),
                         // _buildNavButton('DEVICE STATUS', _devicemapinfoColor,
                         //     () {
@@ -255,178 +267,213 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             : null,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                isMobile
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              height: 160,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/devicelocationinfo');
-                                },
-                                child: _buildStatCard(
-                                  title: "Total Devices",
-                                  value: _totalDevices.toString(),
-                                  icon: Icons.devices,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            SizedBox(
-                              width: 250,
-                              height: 160,
-                              child: _buildStatCard(
-                                title: "Total Data Points",
-                                value:
-                                    "-", // Replace with actual data point count
-                                icon: Icons.data_usage,
-                              ),
-                            ),
+        body: Stack(
+          children: [
+            SizedBox.expand(
+              child: Image.asset(
+                'assets/soil.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            Container(
+              color: themeProvider.isDarkMode
+                  ? Colors.black.withOpacity(0.8)
+                  : Colors.white.withOpacity(0.3),
+            ),
+
+            // Content
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth < 600 ? 20 : 80,
+                  vertical: 60,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 60),
+
+                    Text(
+                      "Welcome to Cloud Sense",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 800 ? 30 : 60,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      height: 40,
+                      child: DefaultTextStyle(
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: themeProvider.isDarkMode
+                              ? Colors.white
+                              : Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        child: AnimatedTextKit(
+                          repeatForever: true,
+                          pause: const Duration(milliseconds: 1000),
+                          animatedTexts: [
+                            TyperAnimatedText('Explore Sensors'),
+                            TyperAnimatedText('Real time Data'),
+                            TyperAnimatedText('Detailed insights '),
+                            TyperAnimatedText('Interact with Surrounding'),
+                            TyperAnimatedText('IoT enabled Devices'),
                           ],
                         ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 250,
-                            height: 160,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, '/devicelocationinfo');
-                              },
-                              child: _buildStatCard(
-                                title: "Total Devices",
-                                value: _totalDevices.toString(),
-                                icon: Icons.devices,
-                                showArrow: true,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          SizedBox(
-                            width: 250,
-                            height: 160,
-                            child: _buildStatCard(
-                              title: "Total Data Points",
-                              value: "-",
-                              icon: Icons.data_usage,
-                            ),
-                          ),
-                        ],
                       ),
-              ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    Text(
+                      "Explore the sensors and dive into the live data they capture. "
+                      "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
+                      "Monitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. "
+                      "Track various factors to help you plan effectively and contribute to optimizing your usage.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: themeProvider.isDarkMode
+                            ? Colors.white70
+                            : Colors.black87,
+                        fontSize:
+                            MediaQuery.of(context).size.width < 800 ? 16 : 30,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 40,
+                      runSpacing: 20,
+                      children: [
+                        _buildStat(
+                          _totalDevices.toString(),
+                          "Devices",
+                          themeProvider,
+                        ),
+                        _buildStat(
+                          "500K+", // static for now
+                          "Data Points",
+                          themeProvider,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 50),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DeviceActivityPage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                            foregroundColor: themeProvider.isDarkMode
+                                ? Colors.black
+                                : Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            "Explore Devices",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       );
     });
   }
 
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    bool showArrow = false,
-  }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return Card(
-      color: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: isDarkMode ? Colors.grey[200]! : Colors.blueGrey[900]!,
-          width: 2,
+  Widget _buildStat(String value, String label, ThemeProvider themeProvider) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top row: icon + arrow
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  icon,
-                  size: 40,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-                if (showArrow)
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 20,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-          ],
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: themeProvider.isDarkMode ? Colors.white70 : Colors.black54,
+            fontSize: 16,
+          ),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildNavButton(String text, Color color, VoidCallback onPressed) {
+  Widget _buildNavButton(
+    String text,
+    Color color,
+    VoidCallback onPressed, {
+    double fontSize = 14,
+  }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() {
-        if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
-        if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
-        if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
-        if (text == 'DEVICE STATUS') _devicemapinfoColor = Colors.blue;
-        // if (text == 'WEATHER FORECAST') _weatherinfoColor = Colors.blue;
-      }),
-      onExit: (_) => setState(() {
-        if (text == 'ABOUT US')
-          _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
-        if (text == 'LOGIN/SIGNUP')
-          _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
-        if (text == 'ACCOUNT INFO')
-          _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
-
-        if (text == 'DEVICE STATUS')
-          _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
-      }),
-      child: TextButton(
-        onPressed: onPressed,
-        child: Text(
-          text,
-          style: TextStyle(
-            color:
-                isDarkMode ? Colors.white : Colors.black, // Adjust color here
-            fontWeight: FontWeight.bold, // Optional for better emphasis
+    return Flexible(
+      // ✅ Makes button adapt inside row
+      child: MouseRegion(
+        onEnter: (_) => setState(() {
+          if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
+          if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
+          if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
+          if (text == 'DEVICE STATUS') _devicemapinfoColor = Colors.blue;
+        }),
+        onExit: (_) => setState(() {
+          if (text == 'ABOUT US')
+            _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
+          if (text == 'LOGIN/SIGNUP')
+            _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
+          if (text == 'ACCOUNT INFO')
+            _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
+          if (text == 'DEVICE STATUS')
+            _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
+        }),
+        child: TextButton(
+          onPressed: onPressed,
+          child: FittedBox(
+            // ✅ Automatically shrinks text if needed
+            fit: BoxFit.scaleDown,
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: fontSize,
+                color: isDarkMode ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ),
