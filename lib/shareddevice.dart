@@ -26,6 +26,7 @@ class DeviceUtils {
     if (deviceId.startsWith('WF')) return 'WF Sensor';
     if (deviceId.startsWith('KD')) return 'Kargil Sensor';
     if (deviceId.startsWith('VD')) return 'Vanix Sensor';
+    if (deviceId.startsWith('NA')) return 'NARL Sensor';
     return 'Rain Sensor';
   }
 
@@ -141,6 +142,7 @@ class DeviceUtils {
     'CB',
     'WF',
     'KD',
-    'VD'
+    'VD',
+    'NA'
   ];
 }

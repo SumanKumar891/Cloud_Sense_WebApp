@@ -156,6 +156,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'Kargil Sensors';
       case 'VD':
         return 'Vanix Sensors';
+      case 'NA':
+        return 'NARL Sensors';
       default:
         return 'Rain Sensors';
     }
