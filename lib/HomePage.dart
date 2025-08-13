@@ -269,17 +269,17 @@ class _HomePageState extends State<HomePage> {
             : null,
         body: Stack(
           children: [
-            SizedBox.expand(
-              child: Image.asset(
-                'assets/soil.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
+            // SizedBox.expand(
+            //   child: Image.asset(
+            //     'assets/soil.jpg',
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
 
             Container(
               color: themeProvider.isDarkMode
-                  ? Colors.black.withOpacity(0.8)
-                  : Colors.black.withOpacity(0.8),
+                  ? Colors.grey[200] // Dark mode → blueGrey background
+                  : Colors.blueGrey[900],
             ),
 
             // Content
@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> {
                             MediaQuery.of(context).size.width < 800 ? 30 : 60,
                         fontWeight: FontWeight.bold,
                         color: themeProvider.isDarkMode
-                            ? Colors.white
+                            ? Colors.black
                             : Colors.white,
                       ),
                     ),
@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: 22,
                           color: themeProvider.isDarkMode
-                              ? Colors.white
+                              ? Colors.black
                               : Colors.white,
                           fontWeight: FontWeight.w500,
                         ),
@@ -341,7 +341,7 @@ class _HomePageState extends State<HomePage> {
                       textAlign: TextAlign.justify,
                       style: TextStyle(
                         color: themeProvider.isDarkMode
-                            ? Colors.white70
+                            ? Colors.black87
                             : Colors.white70,
                         fontSize:
                             MediaQuery.of(context).size.width < 800 ? 16 : 30,
@@ -383,10 +383,10 @@ class _HomePageState extends State<HomePage> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: themeProvider.isDarkMode
-                                ? Colors.white
+                                ? Colors.black
                                 : Colors.white,
                             foregroundColor: themeProvider.isDarkMode
-                                ? Colors.black
+                                ? Colors.white
                                 : Colors.black,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 24, vertical: 14),
@@ -417,7 +417,7 @@ class _HomePageState extends State<HomePage> {
         Text(
           value,
           style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.white : Colors.white,
+            color: themeProvider.isDarkMode ? Colors.black : Colors.white,
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
@@ -426,7 +426,7 @@ class _HomePageState extends State<HomePage> {
         Text(
           label,
           style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.white70 : Colors.white70,
+            color: themeProvider.isDarkMode ? Colors.black87 : Colors.white70,
             fontSize: 16,
           ),
         ),
