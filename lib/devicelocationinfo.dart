@@ -171,20 +171,27 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
         title: Text('Device Status',
-            style: TextStyle(color: isDarkMode ? Colors.black : Colors.white)),
-        iconTheme:
-            IconThemeData(color: isDarkMode ? Colors.black : Colors.white),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+            )),
+        iconTheme: IconThemeData(
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh,
-                color: isDarkMode ? Colors.black : Colors.white),
+            icon: Icon(
+              Icons.refresh,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
             onPressed: fetchDevices, // reload data
           ),
           IconButton(
-            icon: Icon(Icons.map,
-                color: isDarkMode ? Colors.black : Colors.white),
+            icon: Icon(
+              Icons.map,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
             tooltip: 'Open Map',
             onPressed: () {
               Navigator.push(
@@ -196,151 +203,175 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: fetchDevices,
-              child: Column(
-                children: [
-                  // Header with total count and counts
-                  Container(
-                    color: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Text(
-                          "Total Devices: ${allDevices.length}",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              "Active: $totalActive",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isDarkMode
-                                    ? Colors.green[300]
-                                    : Colors.green,
-                              ),
-                            ),
-                            Text(
-                              "Inactive: $totalInactive",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color:
-                                    isDarkMode ? Colors.red[300] : Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        // Dropdown filter
-                        DropdownButton<String>(
-                          dropdownColor:
-                              isDarkMode ? Colors.grey[900] : Colors.white,
-                          hint: Text(
-                            "Select Device Type",
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [
+                    const Color.fromARGB(255, 192, 185, 185)!,
+                    const Color.fromARGB(255, 123, 159, 174)!,
+                  ]
+                : [
+                    const Color.fromARGB(255, 126, 171, 166)!,
+                    const Color.fromARGB(255, 54, 58, 59)!,
+                  ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: fetchDevices,
+                child: Column(
+                  children: [
+                    Container(
+                      color: Colors.transparent,
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Total Devices: ${allDevices.length}",
                             style: TextStyle(
-                                color:
-                                    isDarkMode ? Colors.white70 : Colors.black),
-                          ),
-                          value: filter,
-                          items: const [
-                            DropdownMenuItem(
-                                value: "All", child: Text("All Devices")),
-                            DropdownMenuItem(
-                                value: "Active", child: Text("Active Devices")),
-                            DropdownMenuItem(
-                                value: "Inactive",
-                                child: Text("Inactive Devices")),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              if (value == "Clear") {
-                                filter = null;
-                                showList = false;
-                              } else if (value == filter) {
-                                // toggle if same option is selected again
-                                showList = !showList;
-                              } else {
-                                filter = value;
-                                showList = true;
-                              }
-                            });
-                          },
-                          style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        AnimatedTextKit(
-                          onTap: () {
-                            Navigator.pushNamed(context, "/login");
-                          },
-                          repeatForever: true,
-                          pause: const Duration(milliseconds: 2000),
-                          animatedTexts: [
-                            TyperAnimatedText(
-                              'To see your device data, login/signup',
-                              textStyle: TextStyle(
-                                fontSize: 16, // font size
-                                color: isDarkMode
-                                    ? Colors.deepOrange
-                                    : Colors.deepOrange, // font color
-                                fontWeight: FontWeight.bold, // optional
-                              ),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.black : Colors.white,
                             ),
-                          ],
-                          displayFullTextOnTap: true,
-                          stopPauseOnTap: true,
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Show list only if toggle is true
-                  Expanded(
-                    child: (!showList || filter == null)
-                        ? const Center()
-                        : filteredDevices.isEmpty
-                            ? const Center(child: Text("No devices found"))
-                            : ListView.builder(
-                                itemCount: filteredDevices.length,
-                                itemBuilder: (context, index) {
-                                  final device = filteredDevices[index];
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6),
-                                    child: ListTile(
-                                      leading: Icon(Icons.devices,
-                                          color: device['isActive']
-                                              ? Colors.green
-                                              : Colors.red),
-                                      title: Text(
-                                          "Device ID: ${device['DeviceId']}"),
-                                      subtitle: Text(
-                                        "Last Received: ${device['lastReceivedTime']}"
-                                        // "\nGroup: ${device['Group']
-                                        // }"
-                                        "${device['Topic'] != null && device['Topic'] != '' ? '\nTopic: ${device['Topic']}' : ''}",
-                                      ),
-                                      onTap: () {
-                                        Navigator.pushNamed(context, "/login");
-                                      },
-                                    ),
-                                  );
-                                },
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                "Active: $totalActive",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: isDarkMode
+                                      ? Colors.green
+                                      : const Color.fromARGB(255, 9, 138, 181),
+                                ),
                               ),
-                  )
-                ],
+                              Text(
+                                "Inactive: $totalInactive",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: isDarkMode ? Colors.red : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          // Dropdown filter
+                          DropdownButton<String>(
+                            dropdownColor: isDarkMode
+                                ? const Color.fromARGB(255, 92, 90, 90)
+                                : Colors.white70,
+                            hint: Text(
+                              "Select Device Type",
+                              style: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.black
+                                      : Colors.white70),
+                            ),
+                            iconEnabledColor: isDarkMode
+                                ? Colors.black
+                                : Colors.white, // 🔹 Icon color
+                            iconDisabledColor: Colors
+                                .grey, // Optional: when dropdown is disabled
+                            value: filter,
+                            items: const [
+                              DropdownMenuItem(
+                                  value: "All", child: Text("All Devices")),
+                              DropdownMenuItem(
+                                  value: "Active",
+                                  child: Text("Active Devices")),
+                              DropdownMenuItem(
+                                  value: "Inactive",
+                                  child: Text("Inactive Devices")),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == "Clear") {
+                                  filter = null;
+                                  showList = false;
+                                } else if (value == filter) {
+                                  // toggle if same option is selected again
+                                  showList = !showList;
+                                } else {
+                                  filter = value;
+                                  showList = true;
+                                }
+                              });
+                            },
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.black : Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          AnimatedTextKit(
+                            onTap: () {
+                              Navigator.pushNamed(context, "/login");
+                            },
+                            repeatForever: true,
+                            pause: const Duration(milliseconds: 2000),
+                            animatedTexts: [
+                              TyperAnimatedText(
+                                'To see your device data, login/signup',
+                                textStyle: TextStyle(
+                                  fontSize: 16, // font size
+                                  color: isDarkMode
+                                      ? Colors.deepOrange
+                                      : Colors.deepOrange, // font color
+                                  fontWeight: FontWeight.bold, // optional
+                                ),
+                              ),
+                            ],
+                            displayFullTextOnTap: true,
+                            stopPauseOnTap: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Show list only if toggle is true
+                    Expanded(
+                      child: (!showList || filter == null)
+                          ? const Center()
+                          : filteredDevices.isEmpty
+                              ? const Center(child: Text("No devices found"))
+                              : ListView.builder(
+                                  itemCount: filteredDevices.length,
+                                  itemBuilder: (context, index) {
+                                    final device = filteredDevices[index];
+                                    return Card(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      child: ListTile(
+                                        leading: Icon(Icons.devices,
+                                            color: device['isActive']
+                                                ? Colors.green
+                                                : Colors.red),
+                                        title: Text(
+                                            "Device ID: ${device['DeviceId']}"),
+                                        subtitle: Text(
+                                          "Last Received: ${device['lastReceivedTime']}"
+                                          // "\nGroup: ${device['Group']
+                                          // }"
+                                          "${device['Topic'] != null && device['Topic'] != '' ? '\nTopic: ${device['Topic']}' : ''}",
+                                        ),
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, "/login");
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                    )
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 }

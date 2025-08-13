@@ -140,6 +140,7 @@ class _HomePageState extends State<HomePage> {
 
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return LayoutBuilder(builder: (context, constraints) {
       bool isMobile = constraints.maxWidth < 800;
       bool isTablet =
@@ -147,22 +148,18 @@ class _HomePageState extends State<HomePage> {
       final horizontalPadding = isMobile ? 0.0 : (isTablet ? 120.0 : 280.0);
 
       return Scaffold(
-        backgroundColor: isDarkMode
-            ? Colors.grey[200] // Dark mode → blueGrey background
-            : Colors.blueGrey[900], // Light mode → grey[200] background
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
           iconTheme: IconThemeData(
             color: isDarkMode ? Colors.white : Colors.black,
           ),
-          backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+          backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
           title: Padding(
             padding: EdgeInsets.only(left: horizontalPadding),
             child: Row(
               children: [
-                Icon(
-                  Icons.cloud,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
+                Icon(Icons.cloud,
+                    color: isDarkMode ? Colors.white : Colors.black),
                 SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
                 Text(
                   'Cloud Sense Vis',
@@ -172,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                     fontSize: isMobile ? 20 : (isTablet ? 26 : 32),
                   ),
                 ),
-                Spacer(), // Pushes items to the right.
+                Spacer(),
                 if (isMobile)
                   IconButton(
                     icon: Icon(
@@ -203,8 +200,7 @@ class _HomePageState extends State<HomePage> {
                           'LOGIN/SIGNUP',
                           _loginTestColor,
                           _handleLoginNavigation,
-                          fontSize:
-                              isTablet ? 14 : 16, // smaller font for tablets
+                          fontSize: isTablet ? 14 : 16,
                         ),
                         SizedBox(width: isTablet ? 14 : 20),
                         _buildNavButton(
@@ -213,11 +209,6 @@ class _HomePageState extends State<HomePage> {
                           () => Navigator.pushNamed(context, '/accountinfo'),
                           fontSize: isTablet ? 14 : 16,
                         ),
-                        // SizedBox(width: 20),
-                        // _buildNavButton('DEVICE STATUS', _devicemapinfoColor,
-                        //     () {
-                        //   Navigator.pushNamed(context, '/devicemapinfo');
-                        // }),
                       ],
                     ),
                   ),
@@ -231,23 +222,16 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.zero,
                   children: [
                     DrawerHeader(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[900],
-                      ),
+                      decoration: BoxDecoration(color: Colors.grey[900]),
                       child: Text(
                         'Menu',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 24),
                       ),
                     ),
                     ListTile(
                       leading: Icon(Icons.login),
                       title: Text('LOGIN/SIGNUP'),
-                      onTap: () {
-                        _handleLoginNavigation();
-                      },
+                      onTap: _handleLoginNavigation,
                     ),
                     ListTile(
                       leading: Icon(Icons.login),
@@ -256,30 +240,29 @@ class _HomePageState extends State<HomePage> {
                         Navigator.pushNamed(context, '/accountinfo');
                       },
                     ),
-                    // ListTile(
-                    //   leading: Icon(Icons.login),
-                    //   title: Text('DEVICE STATUS'),
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/devicemapinfo');
-                    //   },
-                    // ),
                   ],
                 ),
               )
             : null,
         body: Stack(
           children: [
-            // SizedBox.expand(
-            //   child: Image.asset(
-            //     'assets/soil.jpg',
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
-
+            // Gradient background
             Container(
-              color: themeProvider.isDarkMode
-                  ? Colors.grey[200] // Dark mode → blueGrey background
-                  : Colors.blueGrey[900],
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: themeProvider.isDarkMode
+                      ? [
+                          const Color.fromARGB(255, 192, 185, 185)!,
+                          const Color.fromARGB(255, 123, 159, 174)!,
+                        ]
+                      : [
+                          const Color.fromARGB(255, 126, 171, 166)!,
+                          const Color.fromARGB(255, 54, 58, 59)!,
+                        ],
+                ),
+              ),
             ),
 
             // Content
@@ -293,7 +276,6 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 60),
-
                     Text(
                       "Welcome to Cloud Sense",
                       textAlign: TextAlign.center,
@@ -307,7 +289,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
                     SizedBox(
                       height: 40,
                       child: DefaultTextStyle(
@@ -332,7 +313,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-
                     Text(
                       "Explore the sensors and dive into the live data they capture. "
                       "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
@@ -348,7 +328,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 40),
-
                     Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 40,
@@ -360,15 +339,13 @@ class _HomePageState extends State<HomePage> {
                           themeProvider,
                         ),
                         _buildStat(
-                          "500K+", // static for now
+                          "500K+",
                           "Data Points",
                           themeProvider,
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 50),
-                    // Buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
