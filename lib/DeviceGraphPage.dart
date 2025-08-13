@@ -228,6 +228,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Map<String, List<ChartData>> kdParametersData = {};
   Map<String, List<ChartData>> vdParametersData = {};
   Map<String, List<ChartData>> NARLParametersData = {};
+  Map<String, List<ChartData>> csParametersData = {};
   List<ChartData> cod2Data = [];
   List<ChartData> bod2Data = [];
   List<ChartData> temp2Data = [];
@@ -396,6 +397,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   double _lastvdBattery = 0.0;
   double _lastkdBattery = 0.0;
   double _lastNARLBattery = 0.0;
+  double _lastcsBattery = 0.0;
   double _lastsvBattery = 0.0;
   String _lastRSSI_Value = "";
 
@@ -456,6 +458,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       _lastvdBattery = 0.0;
       _lastkdBattery = 0.0;
       _lastNARLBattery = 0.0;
+
+      _lastcsBattery = 0.0;
       _lastsvBattery = 0.0;
 
       fswindspeedData.clear();
@@ -467,7 +471,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       wfAverageTemperatureData.clear();
       wfrainfallData.clear();
       kdParametersData.clear();
-      NARLParametersData.clear();
 
       _weeklyPrecipitationData.clear();
     });
@@ -543,6 +546,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     } else if (widget.deviceName.startsWith('NA')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/ssmetnarldata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('CP')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/campusdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -888,6 +894,54 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 for (var key in NARLParametersData.keys) {
                   var value = NARLParametersData[key]!.length > i
                       ? NARLParametersData[key]![i].value
+                      : null;
+                  // ✅ Preserve 0, replace null with empty string
+                  row.add(value ?? '');
+                }
+                dataRows.add(row);
+              }
+
+              _csvRows = [headers, ...dataRows];
+            }
+
+            // Clear unrelated data
+            temperatureData = [];
+            humidityData = [];
+          });
+
+          // // ✅ Now trigger download
+          // downloadCSV(context);
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('CP')) {
+          setState(() {
+            csParametersData.clear();
+            csParametersData = _parsecsParametersData(data);
+
+            if (csParametersData.isEmpty) {
+              _csvRows = [
+                ['Timestamp', 'Message'],
+                ['', 'No data available']
+              ];
+            } else {
+              List<String> headers = ['Timestamp'];
+              headers.addAll(csParametersData.keys);
+
+              List<List<dynamic>> dataRows = [];
+              int maxLength = csParametersData.values
+                  .map((list) => list.length)
+                  .reduce((a, b) => a > b ? a : b);
+
+              for (int i = 0; i < maxLength; i++) {
+                List<dynamic> row = [
+                  csParametersData.values.isNotEmpty &&
+                          csParametersData.values.first.length > i
+                      ? formatter
+                          .format(csParametersData.values.first[i].timestamp)
+                      : ''
+                ];
+                for (var key in csParametersData.keys) {
+                  var value = csParametersData[key]!.length > i
+                      ? csParametersData[key]![i].value
                       : null;
                   // ✅ Preserve 0, replace null with empty string
                   row.add(value ?? '');
@@ -1488,7 +1542,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
           if (!widget.deviceName.startsWith('SM') &&
               !widget.deviceName.startsWith('CF') &&
               !widget.deviceName.startsWith('VD') &&
-              !widget.deviceName.startsWith('NA') &&
+              !widget.deviceName.startsWith('CP') &&
               !widget.deviceName.startsWith('SV')) {
             _csvRows = rows;
           }
@@ -2163,6 +2217,64 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     for (var item in items.reversed) {
       if (item != null && item['BatteryVoltage'] != null) {
         _lastNARLBattery =
+            double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
+
+        break; // Exit after finding the latest non-null value
+      }
+    }
+
+    // Remove parameters with empty lists (i.e., all values were null)
+    parametersData.removeWhere((key, value) => value.isEmpty);
+
+    return parametersData;
+  }
+
+  Map<String, List<ChartData>> _parsecsParametersData(
+      Map<String, dynamic> data) {
+    final List<dynamic> items = data['items'] ?? [];
+    Map<String, List<ChartData>> parametersData = {};
+
+    if (items.isEmpty) {
+      return parametersData;
+    }
+
+    // Collect all possible parameter keys from the first item, excluding non-numeric fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      // Exclude non-numeric fields like TimeStamp, Topic, IMEINumber, DeviceId, Latitude, Longitude
+      return ![
+        'TimeStamp',
+        'Topic',
+        'IMEINumber',
+        'DeviceId',
+        'Latitude',
+        'Longitude'
+      ].contains(key);
+    }).toList();
+
+    // Initialize ChartData lists for each parameter
+    for (var key in parameterKeys) {
+      parametersData[key] = [];
+    }
+
+    // Parse data for each item
+    for (var item in items) {
+      if (item == null) continue;
+      DateTime timestamp = _parsecsDate(item['TimeStamp']);
+      for (var key in parameterKeys) {
+        if (item[key] != null) {
+          // Only include non-null values
+          double value = double.tryParse(item[key].toString()) ?? 0.0;
+          parametersData[key]!
+              .add(ChartData(timestamp: timestamp, value: value));
+        }
+      }
+    }
+
+    // Update _lastkdBattery with the latest BatteryVoltage (from the last item)
+    for (var item in items.reversed) {
+      if (item != null && item['BatteryVoltage'] != null) {
+        _lastcsBattery =
             double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
 
         break; // Exit after finding the latest non-null value
@@ -3699,6 +3811,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     }
   }
 
+  DateTime _parsecsDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return DateTime.now();
+    }
+    try {
+      // Parse the timestamp format: YYYY-MM-DD HH:MM:SS (e.g., 2025-06-15 01:01:02)
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      return DateTime.now();
+    }
+  }
+
   DateTime _parseSVDate(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) {
       return DateTime.now();
@@ -4305,6 +4429,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             SizedBox(height: 2),
                             Text(
                               '${_lastNARLBattery.toStringAsFixed(2)} V',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                if (widget.deviceName.startsWith('CP'))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getfsBatteryIcon(_lastcsBattery),
+                              color: _getBatteryColor(_lastcsBattery),
+                              size: 28,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${_lastcsBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -5062,6 +5214,63 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'AverageTemperature',
                               'RainfallDaily',
                               'RainfallWeekly',
+                              'AverageHumidity',
+                              'MinimumHumidity',
+                              'MaximumHumidity',
+                              'HumidityHourlyComulative',
+                              'PressureHourlyComulative',
+                              'LuxHourlyComulative',
+                              'TemperatureHourlyComulative',
+                              'WindDirection'
+                            ];
+
+                            if (!excludedParams.contains(paramName) &&
+                                data.isNotEmpty) {
+                              final displayInfo =
+                                  _getParameterDisplayInfo(paramName);
+                              String displayName = displayInfo['displayName'];
+                              String unit = displayInfo['unit'];
+
+                              // Customize chart title for specific parameters
+                              String chartTitle;
+                              if (paramName.toLowerCase() ==
+                                  'currenthumidity') {
+                                chartTitle = 'Humidity Graph ($unit)';
+                              } else if (paramName.toLowerCase() ==
+                                  'currenttemperature') {
+                                chartTitle = 'Temperature Graph ($unit)';
+                              } else {
+                                chartTitle = unit.isNotEmpty
+                                    ? '$displayName ($unit)'
+                                    : displayName;
+                              }
+
+                              return _buildChartContainer(
+                                displayName,
+                                data,
+                                chartTitle,
+                                ChartType.line,
+                              );
+                            } else {}
+                            return const SizedBox.shrink();
+                          }).toList(),
+
+                        if (widget.deviceName.startsWith('CP'))
+                          ...csParametersData.entries.map((entry) {
+                            String paramName = entry.key;
+                            List<ChartData> data = entry.value;
+
+                            // Exclude specified parameters
+                            List<String> excludedParams = [
+                              'Longitude',
+                              'Latitude',
+                              'SignalStrength',
+                              'BatteryVoltage',
+                              'MaximumTemperature',
+                              'MinimumTemperature',
+                              'AverageTemperature',
+                              // 'RainfallDaily',
+                              // 'RainfallWeekly',
                               'AverageHumidity',
                               'MinimumHumidity',
                               'MaximumHumidity',
