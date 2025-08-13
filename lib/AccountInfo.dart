@@ -331,22 +331,34 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
         title: Text('Account Info',
             style: TextStyle(
-              color: isDarkMode ? Colors.black : Colors.white,
+              color: isDarkMode ? Colors.white : Colors.black,
               fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
               fontWeight: FontWeight.bold,
             )),
         iconTheme: IconThemeData(
-            color: isDarkMode ? Colors.black : Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black,
             size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
       ),
       body: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+              gradient: LinearGradient(
+                colors: isDarkMode
+                    ? [
+                        const Color.fromARGB(255, 192, 185, 185)!,
+                        const Color.fromARGB(255, 123, 159, 174)!,
+                      ]
+                    : [
+                        const Color.fromARGB(255, 126, 171, 166)!,
+                        const Color.fromARGB(255, 54, 58, 59)!,
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
           ),
           Padding(
@@ -360,7 +372,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                   decoration: InputDecoration(
                     labelText: 'Enter Email ID',
                     labelStyle: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black,
+                      color: isDarkMode ? Colors.black : Colors.white,
                     ),
                     border: OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
@@ -370,13 +382,13 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: isDarkMode ? Colors.black : Colors.white,
                       ),
                     ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
                 SizedBox(height: 15),
@@ -384,12 +396,12 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                   onPressed: _fetchData,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
+                        isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
                     foregroundColor: Colors.white,
                   ),
                   child: Text("Fetch Devices",
                       style: TextStyle(
-                        color: isDarkMode ? Colors.black : Colors.white,
+                        color: isDarkMode ? Colors.white : Colors.black,
                       )),
                 ),
                 SizedBox(height: 20),

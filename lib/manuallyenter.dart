@@ -108,82 +108,105 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
       appBar: AppBar(
         title: Text(
           'Add Device Manually',
           style: TextStyle(
-            color: isDarkMode ? Colors.black : Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black,
             fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.black : Colors.white,
-              size: MediaQuery.of(context).size.width < 800
-                  ? 16
-                  : 32), // white back arrow
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDarkMode ? Colors.white : Colors.black,
+            size: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 40),
-            // Input field for device ID
-            TextField(
-              controller: deviceIdController,
-              decoration: InputDecoration(
-                labelText: 'Enter Device ID',
-                border: OutlineInputBorder(),
-                helperText: 'Enter the device ID (e.g., WD101, CL102, TH200)',
-              ),
-            ),
-            SizedBox(height: 20),
-            Center(
-              // Add device button
-              child: SizedBox(
-                width: 150,
-                child: ElevatedButton(
-                  onPressed: () {
-                    String deviceId = deviceIdController.text.trim();
-                    if (deviceId.isNotEmpty) {
-                      // Show confirmation dialog before adding the device
-                      DeviceUtils.showConfirmationDialog(
-                        context: context,
-                        deviceId: deviceId,
-                        devices: widget.devices,
-                        onConfirm: () async {
-                          await _addDevice(deviceId);
-                          await _showSuccessMessage();
-                        },
-                      );
-                    } else {
-                      // Show error if device ID is empty
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please enter a valid device ID'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
-                  child: Text('Add Device'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: isDarkMode ? Colors.black : Colors.white,
-                    backgroundColor:
-                        isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
-                    padding: EdgeInsets.symmetric(vertical: 16),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [
+                    const Color.fromARGB(255, 192, 185, 185)!,
+                    const Color.fromARGB(255, 123, 159, 174)!,
+                  ]
+                : [
+                    const Color.fromARGB(255, 126, 171, 166)!,
+                    const Color.fromARGB(255, 54, 58, 59)!,
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 40),
+              // Input field for device ID
+              TextField(
+                controller: deviceIdController,
+                decoration: InputDecoration(
+                  labelText: 'Enter Device ID',
+                  labelStyle: TextStyle(
+                    color: isDarkMode ? Colors.black : Colors.white,
+                  ),
+                  border: const OutlineInputBorder(),
+                  helperText: 'Enter the device ID (e.g., WD101, CL102, TH200)',
+                  helperStyle: TextStyle(
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Center(
+                child: SizedBox(
+                  width: 150,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      String deviceId = deviceIdController.text.trim();
+                      if (deviceId.isNotEmpty) {
+                        DeviceUtils.showConfirmationDialog(
+                          context: context,
+                          deviceId: deviceId,
+                          devices: widget.devices,
+                          onConfirm: () async {
+                            await _addDevice(deviceId);
+                            await _showSuccessMessage();
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please enter a valid device ID'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: isDarkMode ? Colors.white : Colors.black,
+                      backgroundColor:
+                          isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text('Add Device'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

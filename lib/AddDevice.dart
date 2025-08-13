@@ -115,21 +115,23 @@ class _QRScannerPageState extends State<QRScannerPage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+      backgroundColor:
+          isDarkMode ? Colors.grey[200] : Colors.blueGrey[900], // AppBar color
       appBar: AppBar(
         title: Text(
           'QR Scanner',
           style: TextStyle(
-            color: isDarkMode ? Colors.black : Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black,
             fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.black : Colors.white,
+              color: isDarkMode ? Colors.white : Colors.black,
               size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
           onPressed: () => Navigator.pop(context),
         ),
@@ -148,58 +150,80 @@ class _QRScannerPageState extends State<QRScannerPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: isDarkMode ? Colors.grey[200]! : Colors.blueGrey[900]!,
-                  width: 4,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [
+                    const Color.fromARGB(255, 192, 185, 185)!,
+                    const Color.fromARGB(255, 123, 159, 174)!,
+                  ]
+                : [
+                    const Color.fromARGB(255, 126, 171, 166)!,
+                    const Color.fromARGB(255, 54, 58, 59)!,
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color:
+                        isDarkMode ? Colors.blueGrey[900]! : Colors.grey[200]!,
+                    width: 4,
+                  ),
+                ),
+                child: MobileScanner(
+                  controller: _controller,
+                  onDetect: (BarcodeCapture capture) {
+                    final List<Barcode> barcodes = capture.barcodes;
+                    for (final barcode in barcodes) {
+                      final String? code = barcode.rawValue;
+                      if (code != null && code != scannedQRCode) {
+                        setState(() {
+                          scannedQRCode = code;
+                          message = "Detected QR Code";
+                        });
+                        _controller.stop();
+                        DeviceUtils.showConfirmationDialog(
+                          context: context,
+                          deviceId: code,
+                          devices: widget.devices,
+                          onConfirm: () async {
+                            await _addDevice(code);
+                            await _showSuccessMessage();
+                          },
+                        );
+                        break;
+                      }
+                    }
+                  },
                 ),
               ),
-              child: MobileScanner(
-                controller: _controller,
-                onDetect: (BarcodeCapture capture) {
-                  final List<Barcode> barcodes = capture.barcodes;
-                  for (final barcode in barcodes) {
-                    final String? code = barcode.rawValue;
-                    if (code != null && code != scannedQRCode) {
-                      setState(() {
-                        scannedQRCode = code;
-                        message = "Detected QR Code";
-                      });
-                      _controller.stop();
-                      DeviceUtils.showConfirmationDialog(
-                        context: context,
-                        deviceId: code,
-                        devices: widget.devices,
-                        onConfirm: () async {
-                          await _addDevice(code);
-                          await _showSuccessMessage();
-                        },
-                      );
-                      break; // Exit after processing the first valid barcode
-                    }
-                  }
-                },
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: resetScanner,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                  backgroundColor:
+                      isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+                ),
+                child: Text('Scan Again',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    )),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: resetScanner,
-              child: Text('Scan Again'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: isDarkMode ? Colors.black : Colors.white,
-                backgroundColor:
-                    isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -4163,51 +4163,28 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the background image based on the device type
-    String backgroundImagePath;
-
-    // Check the device name and assign the appropriate image
-    if (widget.deviceName.startsWith('WD')) {
-      backgroundImagePath = 'assets/tree.jpg';
-    } else if (widget.deviceName.startsWith('CL')) {
-      backgroundImagePath = 'assets/Chloritronn.png';
-    } else if (widget.deviceName.startsWith('TE')) {
-      backgroundImagePath = 'assets/tree.jpg';
-    } else if (widget.deviceName.startsWith('LU')) {
-      backgroundImagePath = 'assets/tree.jpg';
-    } else if (widget.deviceName.startsWith('TH')) {
-      backgroundImagePath = 'assets/tree.jpg';
-    } else if (widget.deviceName.startsWith('WQ') ||
-        (widget.deviceName.startsWith('WS'))) {
-      backgroundImagePath = 'assets/water_quality.jpg';
-    } else {
-      // For water quality sensor
-      backgroundImagePath = 'assets/tree.jpg';
-    }
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     String _selectedRange = 'ee';
-    // : 'assets/soil.jpg';
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(
-          255, 202, 213, 223), // Blue background color for the entire page
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          // Background image with blur effect
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(backgroundImagePath),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black
-                        .withOpacity(0.3), // Add a semi-transparent overlay
-                    BlendMode.darken,
-                  ),
-                ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDarkMode
+                    ? [
+                        const Color.fromARGB(255, 192, 185, 185)!,
+                        const Color.fromARGB(255, 123, 159, 174)!,
+                      ]
+                    : [
+                        const Color.fromARGB(255, 126, 171, 166)!,
+                        const Color.fromARGB(255, 54, 58, 59)!,
+                      ],
               ),
-              width: double.infinity,
-              height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
             ),
           ),
           // AppBar
@@ -4216,13 +4193,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             left: 0,
             right: 0,
             child: AppBar(
-              backgroundColor: Colors.transparent,
+              backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
               elevation: 0,
               title: Text.rich(
                 TextSpan(
                   text: widget.sequentialName, // Main title
                   style: TextStyle(
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black,
                     fontSize: MediaQuery.of(context).size.width < 800 ? 14 : 32,
                     fontWeight: FontWeight.bold,
                   ),
@@ -4234,14 +4211,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             ? 14
                             : 30, // Smaller font
                         fontWeight: FontWeight.bold,
-                        color: Colors.white70, // Slightly dim color
+                        color: isDarkMode
+                            ? Colors.white
+                            : Colors.black, // Slightly dim color
                       ),
                     ),
                   ],
                 ),
               ),
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -4258,7 +4240,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             _parseBatteryPercentage(_lastBatteryPercentage),
                           ),
                           size: 26,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                         SizedBox(width: 4),
                         Text(
@@ -4266,7 +4248,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                       ],
@@ -4291,7 +4273,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastfsBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4319,7 +4301,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastsmBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4347,7 +4329,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastcfBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4375,7 +4357,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastvdBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4403,7 +4385,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastkdBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4431,7 +4413,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastNARLBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4459,7 +4441,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastcsBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4487,7 +4469,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               '${_lastsvBattery.toStringAsFixed(2)} V',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -4499,7 +4481,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 Padding(
                   padding: const EdgeInsets.only(right: 12.0),
                   child: IconButton(
-                    icon: Icon(Icons.refresh, color: Colors.white, size: 26),
+                    icon: Icon(Icons.refresh,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        size: 26),
                     onPressed: () {
                       _reloadData();
                     },
