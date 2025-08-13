@@ -248,7 +248,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                   fontSize: 16,
                                   color: isDarkMode
                                       ? Colors.green
-                                      : const Color.fromARGB(255, 9, 138, 181),
+                                      : const Color.fromARGB(255, 244, 225, 54),
                                 ),
                               ),
                               Text(

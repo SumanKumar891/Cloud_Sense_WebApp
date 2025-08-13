@@ -5836,7 +5836,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 autoScrollingDelta: 100,
                                 autoScrollingMode: AutoScrollingMode.end,
                                 enableAutoIntervalOnZooming: true,
-                                majorGridLines: MajorGridLines(width: 1.0),
+                                majorGridLines: MajorGridLines(
+                                  width: 1.0,
+                                  dashArray: [
+                                    5,
+                                    5
+                                  ], // <-- Makes vertical grid lines dotted
+                                  color:
+                                      const Color.fromARGB(255, 141, 144, 148),
+                                ),
                               ),
                               primaryYAxis: NumericAxis(
                                 labelStyle: TextStyle(color: Colors.white),
@@ -5849,43 +5857,30 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 axisLine: AxisLine(width: 1),
                                 majorGridLines: MajorGridLines(width: 0),
                               ),
-                              tooltipBehavior: TooltipBehavior(
+                              // ✅ Trackball for hover line + dot
+                              trackballBehavior: TrackballBehavior(
                                 enable: true,
-                                duration: 4000,
-                                builder: (dynamic data,
-                                    dynamic point,
-                                    dynamic series,
-                                    int pointIndex,
-                                    int seriesIndex) {
-                                  final ChartData chartData = data as ChartData;
-                                  return Container(
-                                    padding: EdgeInsets.all(8),
-                                    color: const Color.fromARGB(127, 0, 0, 0),
-                                    constraints: BoxConstraints(
-                                      maxWidth: 200,
-                                      maxHeight: 60,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${chartData.timestamp}',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          'Value: ${chartData.value}',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                                activationMode: ActivationMode.singleTap,
+                                lineType: TrackballLineType.vertical,
+                                lineColor: Colors.blue,
+                                lineWidth: 1,
+                                markerSettings: const TrackballMarkerSettings(
+                                  markerVisibility:
+                                      TrackballVisibilityMode.visible,
+                                  width: 8,
+                                  height: 8,
+                                  borderWidth: 2,
+                                  color: Colors.blue,
+                                ),
+                                tooltipSettings: const InteractiveTooltip(
+                                  enable: true,
+                                  format: 'point.x : point.y',
+                                  borderWidth: 1,
+                                  color: Color.fromARGB(200, 0, 0, 0),
+                                  textStyle: TextStyle(color: Colors.white),
+                                ),
                               ),
+
                               zoomPanBehavior: ZoomPanBehavior(
                                 zoomMode: ZoomMode.x,
                                 enablePanning: true,
@@ -5934,18 +5929,23 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     switch (chartType) {
       case ChartType.line:
         if (widget.deviceName.startsWith('CL')) {
-          // Chlorine sensor
-          return LineSeries<ChartData, DateTime>(
-            markerSettings: const MarkerSettings(
-              height: 6.0,
-              width: 6.0,
-              isVisible: true,
-            ),
+          // Chlorine sensor with gradient + color ranges
+          return AreaSeries<ChartData, DateTime>(
             dataSource: data,
             xValueMapper: (ChartData data, _) => data.timestamp,
             yValueMapper: (ChartData data, _) => data.value,
             name: title,
-            color: Colors.blue,
+            borderColor: Colors.blue, // Line color
+            borderWidth: 2,
+            gradient: LinearGradient(
+              colors: [
+                Colors.blue.withOpacity(0.4),
+                Colors.blue.withOpacity(0.0),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            markerSettings: const MarkerSettings(isVisible: false),
             pointColorMapper: (ChartData data, _) {
               // Color range for chlorine sensor
               if (data.value >= 0.01 && data.value <= 0.5) {
@@ -5961,28 +5961,43 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             },
           );
         } else {
-          // Other devices
-          return LineSeries<ChartData, DateTime>(
-            markerSettings: const MarkerSettings(
-              height: 6.0,
-              width: 6.0,
-              isVisible: true,
-            ),
+          // Other devices — blue gradient
+          return AreaSeries<ChartData, DateTime>(
             dataSource: data,
             xValueMapper: (ChartData data, _) => data.timestamp,
             yValueMapper: (ChartData data, _) => data.value,
             name: title,
-            color: Colors.blue, // Single color for non-chlorine sensors
+            borderColor: Colors.blue, // Line color
+            borderWidth: 2,
+            gradient: LinearGradient(
+              colors: [
+                Colors.blue.withOpacity(0.4),
+                Colors.blue.withOpacity(0.0),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            markerSettings: const MarkerSettings(isVisible: false),
           );
         }
 
       default:
-        return LineSeries<ChartData, DateTime>(
+        return AreaSeries<ChartData, DateTime>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.timestamp,
           yValueMapper: (ChartData data, _) => data.value,
           name: title,
-          color: Colors.blue,
+          borderColor: Colors.blue,
+          borderWidth: 2,
+          gradient: LinearGradient(
+            colors: [
+              Colors.blue.withOpacity(0.4),
+              Colors.blue.withOpacity(0.0),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          markerSettings: const MarkerSettings(isVisible: false),
         );
     }
   }
