@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_sense_webapp/devicemap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -276,7 +277,30 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                           style: TextStyle(
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
-                        )
+                        ),
+                        const SizedBox(height: 8),
+
+                        AnimatedTextKit(
+                          onTap: () {
+                            Navigator.pushNamed(context, "/login");
+                          },
+                          repeatForever: true,
+                          pause: const Duration(milliseconds: 2000),
+                          animatedTexts: [
+                            TyperAnimatedText(
+                              'To see your device data, login/signup',
+                              textStyle: TextStyle(
+                                fontSize: 16, // font size
+                                color: isDarkMode
+                                    ? Colors.deepOrange
+                                    : Colors.deepOrange, // font color
+                                fontWeight: FontWeight.bold, // optional
+                              ),
+                            ),
+                          ],
+                          displayFullTextOnTap: true,
+                          stopPauseOnTap: true,
+                        ),
                       ],
                     ),
                   ),
@@ -306,6 +330,9 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                         // }"
                                         "${device['Topic'] != null && device['Topic'] != '' ? '\nTopic: ${device['Topic']}' : ''}",
                                       ),
+                                      onTap: () {
+                                        Navigator.pushNamed(context, "/login");
+                                      },
                                     ),
                                   );
                                 },
