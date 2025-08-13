@@ -203,82 +203,93 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDarkMode
-          ? Colors.blueGrey[900] // Dark mode → blueGrey background
-          : Colors.grey[200], // Light mode → grey[200] background
       appBar: AppBar(
         iconTheme: IconThemeData(
-            color: isDarkMode ? Colors.black : Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black,
             size: MediaQuery.of(context).size.width < 800
                 ? 16
                 : 32), // back arrow color
         title: Text(
           'Your Chosen Devices',
           style: TextStyle(
-            color: isDarkMode ? Colors.black : Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black,
             fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: isDarkMode
-            ? Colors.grey[200]
-            : Colors.blueGrey[900], // Blue background for AppBar
+        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
         elevation: 0,
         actions: [
           TextButton.icon(
             onPressed: _handleLogout,
             icon: Icon(
               Icons.logout,
-              color: isDarkMode ? Colors.black : Colors.white,
+              color: isDarkMode ? Colors.white : Colors.black,
               size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
             ),
             label: Text(
               'Log out',
               style: TextStyle(
-                color: isDarkMode ? Colors.black : Colors.white,
+                color: isDarkMode ? Colors.white : Colors.black,
                 fontSize: MediaQuery.of(context).size.width < 800 ? 12 : 24,
               ),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Center(
-              child: _isLoading
-                  ? CircularProgressIndicator()
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 90.0, left: 16.0, right: 16.0),
-                          child: Text(
-                            "Select a device to unlock insights into data.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'OpenSans',
-                              fontSize: MediaQuery.of(context).size.width < 800
-                                  ? 30
-                                  : 45,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode
-                                  ? Colors.white
-                                  : Colors
-                                      .black, // Black text on white background
+      body: Container(
+        height: MediaQuery.of(context).size.height, // full height
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [
+                    const Color.fromARGB(255, 192, 185, 185)!,
+                    const Color.fromARGB(255, 123, 159, 174)!,
+                  ]
+                : [
+                    const Color.fromARGB(255, 126, 171, 166)!,
+                    const Color.fromARGB(255, 54, 58, 59)!,
+                  ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Center(
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 90.0, left: 16.0, right: 16.0),
+                            child: Text(
+                              "Select a device to unlock insights into data.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'OpenSans',
+                                fontSize:
+                                    MediaQuery.of(context).size.width < 800
+                                        ? 30
+                                        : 45,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.black : Colors.white,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 50),
-                        _deviceCategories.isNotEmpty
-                            ? _buildDeviceCards()
-                            : _buildNoDevicesCard(),
-                      ],
-                    ),
-            ),
-          ],
+                          const SizedBox(height: 50),
+                          _deviceCategories.isNotEmpty
+                              ? _buildDeviceCards()
+                              : _buildNoDevicesCard(),
+                        ],
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -487,24 +498,29 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
     return Scrollbar(
       controller: _scrollController,
-      thumbVisibility: true, // Always show scrollbar
+      thumbVisibility: true,
       trackVisibility: true,
       thickness: 6,
-      radius: Radius.circular(8),
-      child: GestureDetector(
-        onHorizontalDragUpdate: (details) {
-          _scrollController.jumpTo(
-            _scrollController.offset - details.delta.dx,
-          );
-        },
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          controller: _scrollController,
-          // <-- add bottom padding here to create a gap between cards and scrollbar
-          padding: const EdgeInsets.only(bottom: 15.0, left: 12.0, right: 12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: cardList,
+      radius: const Radius.circular(8),
+      interactive: true,
+      child: Container(
+        // 🔹 Transparent container so gradient is visible under scrollbar
+        color: Colors.transparent,
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            _scrollController.jumpTo(
+              _scrollController.offset - details.delta.dx,
+            );
+          },
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            controller: _scrollController,
+            padding:
+                const EdgeInsets.only(bottom: 15.0, left: 12.0, right: 12.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: cardList,
+            ),
           ),
         ),
       ),
