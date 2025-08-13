@@ -22,6 +22,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
   int totalInactive = 0;
 
   String? filter = "All"; // Default to show all devices
+  String searchQuery = "";
 
   @override
   void initState() {
@@ -262,51 +263,138 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                           ),
                           const SizedBox(height: 8),
                           // Dropdown filter
-                          DropdownButton<String>(
-                            dropdownColor: isDarkMode
-                                ? const Color.fromARGB(255, 92, 90, 90)
-                                : Colors.white70,
-                            hint: Text(
-                              "Select Device Type",
-                              style: TextStyle(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 48,
+                                width: 180,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
                                   color: isDarkMode
-                                      ? Colors.black
-                                      : Colors.white70),
-                            ),
-                            iconEnabledColor: isDarkMode
-                                ? Colors.black
-                                : Colors.white, // 🔹 Icon color
-                            iconDisabledColor: Colors
-                                .grey, // Optional: when dropdown is disabled
-                            value: filter,
-                            items: const [
-                              DropdownMenuItem(
-                                  value: "All", child: Text("All Devices")),
-                              DropdownMenuItem(
-                                  value: "Active",
-                                  child: Text("Active Devices")),
-                              DropdownMenuItem(
-                                  value: "Inactive",
-                                  child: Text("Inactive Devices")),
+                                      ? Colors.grey[850]
+                                      : Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: DropdownButton<String>(
+                                  dropdownColor: isDarkMode
+                                      ? const Color.fromARGB(255, 92, 90, 90)
+                                      : Colors.white70,
+                                  hint: Text(
+                                    "Select Device Type",
+                                    style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.black
+                                            : Colors.white70),
+                                  ),
+                                  iconEnabledColor: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black, // 🔹 Icon color
+                                  iconDisabledColor: Colors
+                                      .grey, // Optional: when dropdown is disabled
+                                  value: filter,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: "All",
+                                      child: Text(
+                                        "All Devices",
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Active",
+                                      child: Text(
+                                        "Active Devices",
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Inactive",
+                                      child: Text(
+                                        "Inactive Devices",
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value == "Clear") {
+                                        filter = null;
+                                        showList = false;
+                                      } else if (value == filter) {
+                                        // toggle if same option is selected again
+                                        showList = !showList;
+                                      } else {
+                                        filter = value;
+                                        showList = true;
+                                      }
+                                    });
+                                  },
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                height: 48,
+                                width: 200,
+                                child: TextField(
+                                  onChanged: (query) {
+                                    setState(() {
+                                      searchQuery = query.toLowerCase();
+                                      showList = true;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    hintText: "Search device...",
+                                    hintStyle: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                    prefixIcon: Icon(Icons.search,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
+                                    filled: true,
+                                    fillColor: isDarkMode
+                                        ? Colors.grey[850]
+                                        : Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 0, horizontal: 12),
+                                  ),
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
                             ],
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == "Clear") {
-                                  filter = null;
-                                  showList = false;
-                                } else if (value == filter) {
-                                  // toggle if same option is selected again
-                                  showList = !showList;
-                                } else {
-                                  filter = value;
-                                  showList = true;
-                                }
-                              });
-                            },
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.black : Colors.white,
-                            ),
                           ),
+
                           const SizedBox(height: 8),
 
                           AnimatedTextKit(

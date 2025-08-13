@@ -141,6 +141,23 @@ class _HomePageState extends State<HomePage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
 
+    // Responsive font sizes
+    double titleFont = screenWidth < 800
+        ? 28
+        : screenWidth < 1024
+            ? 48
+            : 60;
+    double subtitleFont = screenWidth < 600
+        ? 18
+        : screenWidth < 1024
+            ? 22
+            : 30;
+    double paragraphFont = screenWidth < 600
+        ? 14
+        : screenWidth < 1024
+            ? 18
+            : 18;
+
     return LayoutBuilder(builder: (context, constraints) {
       bool isMobile = constraints.maxWidth < 800;
       bool isTablet =
@@ -253,18 +270,11 @@ class _HomePageState extends State<HomePage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: themeProvider.isDarkMode
-                      ? [
-                          const Color.fromARGB(255, 192, 185, 185)!,
-                          const Color.fromARGB(255, 123, 159, 174)!,
-                        ]
-                      : [
-                          const Color.fromARGB(255, 126, 171, 166)!,
-                          const Color.fromARGB(255, 54, 58, 59)!,
-                        ],
+                      ? [Color(0xFFC0B9B9), Color(0xFF7B9FAE)]
+                      : [Color(0xFF7EABA6), Color(0xFF363A3B)],
                 ),
               ),
             ),
-
             // Content
             SingleChildScrollView(
               child: Padding(
@@ -275,25 +285,43 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 40),
                     Text(
                       "Welcome to Cloud Sense",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize:
-                            MediaQuery.of(context).size.width < 800 ? 30 : 60,
+                        fontSize: titleFont,
                         fontWeight: FontWeight.bold,
                         color: themeProvider.isDarkMode
-                            ? Colors.black
+                            ? Colors.black87
                             : Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.black26,
+                            offset: Offset(1.5, 1.5),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      height: 3,
+                      width: 160,
+                      decoration: BoxDecoration(
+                        color: themeProvider.isDarkMode
+                            ? Colors.black54
+                            : Colors.white70,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
                     SizedBox(
                       height: 40,
                       child: DefaultTextStyle(
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: subtitleFont,
                           color: themeProvider.isDarkMode
                               ? Colors.black
                               : Colors.white,
@@ -305,14 +333,14 @@ class _HomePageState extends State<HomePage> {
                           animatedTexts: [
                             TyperAnimatedText('Explore Sensors'),
                             TyperAnimatedText('Real time Data'),
-                            TyperAnimatedText('Detailed insights '),
+                            TyperAnimatedText('Detailed insights'),
                             TyperAnimatedText('Interact with Surrounding'),
                             TyperAnimatedText('IoT enabled Devices'),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 60),
                     Text(
                       "Explore the sensors and dive into the live data they capture. "
                       "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
@@ -321,63 +349,114 @@ class _HomePageState extends State<HomePage> {
                       textAlign: TextAlign.justify,
                       style: TextStyle(
                         color: themeProvider.isDarkMode
-                            ? Colors.black87
+                            ? Colors.black
                             : Colors.white70,
-                        fontSize:
-                            MediaQuery.of(context).size.width < 800 ? 16 : 30,
+                        fontSize: paragraphFont,
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 60),
+                    // Animated cards for stats
                     Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 40,
                       runSpacing: 20,
                       children: [
-                        _buildStat(
-                          _totalDevices.toString(),
-                          "Devices",
-                          themeProvider,
+                        _buildAnimatedStatCard(
+                          statValue: _totalDevices.toString(),
+                          label: "Devices",
+                          themeProvider: themeProvider,
+                          context: context,
+                          // 👈 upar defined
                         ),
-                        _buildStat(
-                          "500K+",
-                          "Data Points",
-                          themeProvider,
+                        _buildAnimatedStatCard(
+                          statValue: "500K",
+                          label: "Data Points",
+                          themeProvider: themeProvider,
+                          context: context,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 60),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DeviceActivityPage(),
+                        MouseRegion(
+                          onEnter: (_) =>
+                              setState(() => _isHoveredbutton = true),
+                          onExit: (_) =>
+                              setState(() => _isHoveredbutton = false),
+                          child: GestureDetector(
+                            onTapDown: (_) => setState(() => _isPressed = true),
+                            onTapUp: (_) => setState(() => _isPressed = false),
+                            onTapCancel: () =>
+                                setState(() => _isPressed = false),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              transform: Matrix4.identity()
+                                ..scale(_isPressed
+                                    ? 0.95
+                                    : (_isHoveredbutton ? 1.05 : 1.0)),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _isHoveredbutton
+                                        ? Colors.black.withOpacity(0.4)
+                                        : Colors.black.withOpacity(0.2),
+                                    blurRadius: _isHoveredbutton ? 12 : 6,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: themeProvider.isDarkMode
-                                ? Colors.black
-                                : Colors.white,
-                            foregroundColor: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DeviceActivityPage(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: themeProvider.isDarkMode
+                                      ? Colors.black
+                                      : Colors.white,
+                                  foregroundColor: themeProvider.isDarkMode
+                                      ? Colors.white
+                                      : Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 18,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Explore Devices",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: paragraphFont,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                        width: 8), // gap between text and icon
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      size: paragraphFont + 2,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            "Explore Devices",
-                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -386,29 +465,6 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     });
-  }
-
-  Widget _buildStat(String value, String label, ThemeProvider themeProvider) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.black : Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.black87 : Colors.white70,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _buildNavButton(
@@ -451,6 +507,115 @@ class _HomePageState extends State<HomePage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool _isHoveredbutton = false;
+  bool _isHovered = false; // state variable
+  bool _isPressed = false;
+
+  Widget _buildAnimatedStatCard({
+    required String statValue,
+    required String label,
+    required ThemeProvider themeProvider,
+    required BuildContext context,
+  }) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double cardSize = screenWidth < 500
+        ? 80
+        : screenWidth < 800
+            ? 150
+            : 180;
+
+    double valueFontSize = cardSize * 0.12;
+    double labelFontSize = cardSize * 0.10;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        scale: _isHovered ? 1.05 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        child: Container(
+          width: cardSize,
+          height: cardSize,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              colors: themeProvider.isDarkMode
+                  ? (_isHovered
+                      ? [const Color(0xFF3B6A7F), const Color(0xFF8C6C8E)]
+                      : [
+                          const Color.fromARGB(255, 29, 56, 68),
+                          const Color.fromARGB(228, 69, 59, 71)
+                        ])
+                  : (_isHovered
+                      ? [const Color(0xFF5BAA9D), const Color(0xFFA7DCA1)]
+                      : [
+                          const Color.fromARGB(255, 73, 117, 121),
+                          const Color(0xFF81C784)
+                        ]),
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.6),
+                blurRadius: _isHovered ? 16 : 12,
+                offset: const Offset(4, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: const Duration(seconds: 1),
+                builder: (context, progressValue, child) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: cardSize * 0.5,
+                        height: cardSize * 0.5,
+                        child: CircularProgressIndicator(
+                          value: progressValue,
+                          strokeWidth: 6,
+                          color: themeProvider.isDarkMode
+                              ? const Color.fromARGB(255, 95, 154, 172)
+                              : Colors.white,
+                          backgroundColor: themeProvider.isDarkMode
+                              ? Colors.white10
+                              : Colors.white24,
+                        ),
+                      ),
+                      Text(
+                        statValue,
+                        style: TextStyle(
+                          fontSize: valueFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: labelFontSize,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),
