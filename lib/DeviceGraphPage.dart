@@ -5929,23 +5929,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     switch (chartType) {
       case ChartType.line:
         if (widget.deviceName.startsWith('CL')) {
-          // Chlorine sensor with gradient + color ranges
-          return AreaSeries<ChartData, DateTime>(
+          // Chlorine sensor
+          return LineSeries<ChartData, DateTime>(
+            markerSettings: const MarkerSettings(
+              height: 6.0,
+              width: 6.0,
+              isVisible: true,
+            ),
             dataSource: data,
             xValueMapper: (ChartData data, _) => data.timestamp,
             yValueMapper: (ChartData data, _) => data.value,
             name: title,
-            borderColor: Colors.blue, // Line color
-            borderWidth: 2,
-            gradient: LinearGradient(
-              colors: [
-                Colors.blue.withOpacity(0.4),
-                Colors.blue.withOpacity(0.0),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            markerSettings: const MarkerSettings(isVisible: false),
+            color: Colors.blue,
             pointColorMapper: (ChartData data, _) {
               // Color range for chlorine sensor
               if (data.value >= 0.01 && data.value <= 0.5) {
