@@ -3266,6 +3266,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     double fontSize = screenWidth < 800 ? 13 : 16;
     double headerFontSize = screenWidth < 800 ? 16 : 22;
 
+    // Check if there is any valid data
+    bool hasValidData = [
+      ittempStats['current']?[0],
+      itpressureStats['current']?[0],
+      ithumStats['current']?[0],
+      itrainStats['current']?[0],
+      itradiationStats['current']?[0],
+      itvisibilityStats['current']?[0],
+      itwindspeedStats['current']?[0],
+    ].any((value) => value != null && value.toStringAsFixed(2) != '0.00');
+
+    // Only render the table if there is valid data
+    if (!hasValidData) {
+      return SizedBox.shrink(); // Return an empty widget if no data
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
@@ -3403,7 +3419,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     };
   }
 
-  // Create a table displaying statistics
   Widget buildfsStatisticsTable() {
     final fstempStats = _calculatefsStatistics(fstempData);
     final fspressureStats = _calculatefsStatistics(fspressureData);
@@ -3417,7 +3432,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 27;
     double headerFontSize = screenWidth < 800 ? 16 : 33;
+// Check if there is any valid data
+    bool hasValidData = [
+      fstempStats['current']?[0],
+      fspressureStats['current']?[0],
+      fshumStats['current']?[0],
+      fsrainStats['current']?[0],
+      fsradiationStats['current']?[0],
+      fswindspeedStats['current']?[0],
+      fswinddirectionStats['current']?[0],
+    ].any((value) => value != null && value.toStringAsFixed(2) != '0.00');
 
+    // Only render the table if there is valid data
+    if (!hasValidData) {
+      return SizedBox.shrink(); // Return an empty widget if no data
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
@@ -3613,6 +3642,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
 
     List<String> includedParameters = parameterLabels.keys.toList();
 
+    // Check if there is any valid data
+    bool hasValidData = vdParametersData.entries.any((entry) {
+      return includedParameters.contains(entry.key) &&
+          entry.value.isNotEmpty &&
+          entry.value.last.value != null &&
+          entry.value.last.value.toStringAsFixed(2) !=
+              '0.00'; // Exclude zero or null values
+    });
+
+    // Only render the table if there is valid data
+    if (!hasValidData) {
+      return SizedBox.shrink(); // Return an empty widget if no data
+    }
+
     List<DataRow> rows = vdParametersData.entries
         .where((entry) => includedParameters.contains(entry.key))
         .map((entry) {
@@ -3698,8 +3741,120 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     };
 
     List<String> includedParameters = parameterLabels.keys.toList();
+    // Check if there is any valid data
+    bool hasValidData = NARLParametersData.entries.any((entry) {
+      return includedParameters.contains(entry.key) &&
+          entry.value.isNotEmpty &&
+          entry.value.last.value != null &&
+          entry.value.last.value.toStringAsFixed(2) !=
+              '0.00'; // Exclude zero or null values
+    });
+
+    // Only render the table if there is valid data
+    if (!hasValidData) {
+      return SizedBox.shrink(); // Return an empty widget if no data
+    }
 
     List<DataRow> rows = NARLParametersData.entries
+        .where((entry) => includedParameters.contains(entry.key))
+        .map((entry) {
+      final current = entry.value.isNotEmpty
+          ? entry.value.last.value.toStringAsFixed(2)
+          : '-';
+      return DataRow(cells: [
+        DataCell(Text(
+          parameterLabels[entry.key] ?? entry.key,
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        )),
+        DataCell(Text(
+          '$current',
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        )),
+      ]);
+    }).toList();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 400,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 400,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                      fontSize: headerFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                      fontSize: headerFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+              rows: rows,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCPStatisticsTable() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    // Map internal keys to readable labels with units
+    Map<String, String> parameterLabels = {
+      'CurrentTemperature': 'Temperature (°C)',
+      'CurrentHumidity': 'Humidity (%)',
+      'LightIntensity': 'Light Intensity (lux)',
+      'RainfallHourly': 'Rainfall (mm)',
+      'WindSpeed': 'Wind Speed(m/s)',
+      'AtmPressure': 'Atm Pressure(hpa)',
+      'WindDirection': 'Wind Direction(°)'
+    };
+
+    List<String> includedParameters = parameterLabels.keys.toList();
+    // Check if there is any valid data
+    bool hasValidData = csParametersData.entries.any((entry) {
+      return includedParameters.contains(entry.key) &&
+          entry.value.isNotEmpty &&
+          entry.value.last.value != null &&
+          entry.value.last.value.toStringAsFixed(2) !=
+              '0.00'; // Exclude zero or null values
+    });
+
+    // Only render the table if there is valid data
+    if (!hasValidData) {
+      return SizedBox.shrink(); // Return an empty widget if no data
+    }
+
+    List<DataRow> rows = csParametersData.entries
         .where((entry) => includedParameters.contains(entry.key))
         .map((entry) {
       final current = entry.value.isNotEmpty
@@ -5037,6 +5192,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildVDStatisticsTable(),
                     if (widget.deviceName.startsWith('NA'))
                       buildNAStatisticsTable(),
+                    if (widget.deviceName.startsWith('CP'))
+                      buildCPStatisticsTable(),
                     if (widget.deviceName.startsWith('WD211') ||
                         (widget.deviceName.startsWith('WD511')))
                       SingleChildScrollView(
