@@ -3681,6 +3681,89 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+  Widget buildNAStatisticsTable() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize = screenWidth < 800 ? 13 : 16;
+    double headerFontSize = screenWidth < 800 ? 16 : 22;
+
+    // Map internal keys to readable labels with units
+    Map<String, String> parameterLabels = {
+      'CurrentTemperature': 'Temperature (°C)',
+      'CurrentHumidity': 'Humidity (%)',
+      'LightIntensity': 'Light Intensity (lux)',
+      'RainfallHourly': 'Rainfall (mm)',
+    };
+
+    List<String> includedParameters = parameterLabels.keys.toList();
+
+    List<DataRow> rows = NARLParametersData.entries
+        .where((entry) => includedParameters.contains(entry.key))
+        .map((entry) {
+      final current = entry.value.isNotEmpty
+          ? entry.value.last.value.toStringAsFixed(2)
+          : '-';
+      return DataRow(cells: [
+        DataCell(Text(
+          parameterLabels[entry.key] ?? entry.key,
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        )),
+        DataCell(Text(
+          '$current',
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        )),
+      ]);
+    }).toList();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white, width: 1),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.black.withOpacity(0.6),
+        ),
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(8),
+        width: screenWidth < 800 ? double.infinity : 400,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: screenWidth < 800 ? screenWidth - 32 : 400,
+            ),
+            child: DataTable(
+              horizontalMargin: 16,
+              columnSpacing: 16,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    'Parameter',
+                    style: TextStyle(
+                      fontSize: headerFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Current',
+                    style: TextStyle(
+                      fontSize: headerFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+              rows: rows,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
         'yyyy-MM-dd hh:mm a'); // Ensure this matches your date format
@@ -5205,7 +5288,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'PressureHourlyComulative',
                               'LuxHourlyComulative',
                               'TemperatureHourlyComulative',
-                              'WindDirection'
                             ];
 
                             if (!excludedParams.contains(paramName) &&
@@ -5263,7 +5345,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               'PressureHourlyComulative',
                               'LuxHourlyComulative',
                               'TemperatureHourlyComulative',
-                              'WindDirection'
                             ];
 
                             if (!excludedParams.contains(paramName) &&

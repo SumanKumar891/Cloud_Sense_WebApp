@@ -156,14 +156,24 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
   }
 
   List<Map<String, dynamic>> get filteredDevices {
+    List<Map<String, dynamic>> filteredList = allDevices;
+
     if (filter == "Active") {
-      return allDevices.where((d) => d['isActive']).toList();
+      filteredList = filteredList.where((d) => d['isActive']).toList();
     } else if (filter == "Inactive") {
-      return allDevices.where((d) => !d['isActive']).toList();
-    } else if (filter == "All") {
-      return allDevices;
+      filteredList = filteredList.where((d) => !d['isActive']).toList();
     }
-    return [];
+
+    if (searchQuery.isNotEmpty) {
+      filteredList = filteredList
+          .where((d) =>
+              d['DeviceId'].toString().toLowerCase().contains(searchQuery) ||
+              (d['Topic'] != null &&
+                  d['Topic'].toString().toLowerCase().contains(searchQuery)))
+          .toList();
+    }
+
+    return filteredList;
   }
 
   @override
