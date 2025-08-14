@@ -5032,6 +5032,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       buildSMStatisticsTable(),
                     if (widget.deviceName.startsWith('VD'))
                       buildVDStatisticsTable(),
+                    if (widget.deviceName.startsWith('NA'))
+                      buildNAStatisticsTable(),
                     if (widget.deviceName.startsWith('WD211') ||
                         (widget.deviceName.startsWith('WD511')))
                       SingleChildScrollView(
