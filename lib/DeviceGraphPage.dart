@@ -3735,9 +3735,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       'CurrentHumidity': 'Humidity (%)',
       'LightIntensity': 'Light Intensity (lux)',
       'RainfallHourly': 'Rainfall (mm)',
-      'WindSpeed': 'Wind Speed(m/s)',
-      'AtmPressure': 'Atm Pressure(hpa)',
-      'WindDirection': 'Wind Direction(°)'
+      'WindSpeed': 'Wind Speed (m/s)',
+      'AtmPressure': 'Atm Pressure (hpa)',
+      'WindDirection': 'Wind Direction (°)',
+      'RainfallMinutly': 'Rainfall Minutely (mm)'
     };
 
     List<String> includedParameters = parameterLabels.keys.toList();
