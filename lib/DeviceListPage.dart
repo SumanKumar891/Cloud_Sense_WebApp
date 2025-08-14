@@ -352,7 +352,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                           sequentialName =
                               '${category.split(" ").first} Sensor ${index + 1}';
                         }
-
+                        // ✅ Only for the button text
+                        String buttonLabel = '$sequentialName ($sensorName)';
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ElevatedButton(
@@ -411,7 +412,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                               }
                             },
                             child: Text(
-                              sequentialName,
+                              buttonLabel,
                               style: TextStyle(fontSize: 14),
                             ),
                           ),
