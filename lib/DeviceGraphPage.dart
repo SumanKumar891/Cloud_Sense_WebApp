@@ -269,14 +269,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               },
             ),
             _buildMobileMenuButton(
-              'Last 6 Months',
-              '6months',
+              'Last 1 Year',
+              '1year',
               Icons.date_range,
               isDarkMode,
               context,
               onPressed: () {
-                _fetchDataForRange('6months');
-                setState(() => _activeButton = '6months');
+                _fetchDataForRange('1year');
+                setState(() => _activeButton = '1year');
                 Navigator.pop(context);
               },
             ),
@@ -624,8 +624,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       case '3months':
         startDate = endDate.subtract(Duration(days: 90));
         break;
-      case '6months':
-        startDate = endDate.subtract(Duration(days: 180));
+      case '1year':
+        startDate = endDate.subtract(Duration(days: 365));
         break;
       case 'single':
         startDate = _selectedDay; // Use the selected day as startDate
@@ -4987,14 +4987,14 @@ if (!isMobile)
                     ),
                     SizedBox(height: 8),
                     _buildSidebarButton(
-                      'Last 6 Months',
-                      '6months',
+                      'Last 1 Year',
+                      '1year',
                       Icons.date_range,
                       isDarkMode,
                       onPressed: () {
-                        _fetchDataForRange('6months');
+                        _fetchDataForRange('1year');
                         setState(() {
-                          _activeButton = '6months';
+                          _activeButton = '1year';
                         });
                       },
                     ),
@@ -5900,7 +5900,7 @@ if (!isMobile)
                 elevation: 0,
                 title: Text.rich(
                   TextSpan(
-                    text: widget.sequentialName,
+                    text: "${widget.sequentialName}\n",
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black,
                       fontSize: MediaQuery.of(context).size.width < 800 ? 14 : 32,
@@ -6300,14 +6300,14 @@ if (!isMobile)
                                     ),
                                     SizedBox(height: 8),
                                     _buildSidebarButton(
-                                      'Last 6 Months',
-                                      '6months',
+                                      'Last 1 Year',
+                                      '1year',
                                       Icons.date_range,
                                       isDarkMode,
                                       onPressed: () {
-                                        _fetchDataForRange('6months');
+                                        _fetchDataForRange('1year');
                                         setState(() {
-                                          _activeButton = '6months';
+                                          _activeButton = '1year';
                                         });
                                       },
                                     ),
