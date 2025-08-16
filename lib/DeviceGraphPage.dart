@@ -4919,10 +4919,10 @@ if (!isMobile)
                   ),
                   SizedBox(width: 12),
                   Text(
-                    'Time Period',
+                    'Select Time Period',
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black,
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -6232,7 +6232,7 @@ if (!isMobile)
                                   ),
                                   SizedBox(width: 12),
                                   Text(
-                                    'Time Period',
+                                    'Select Time Period',
                                     style: TextStyle(
                                       color: isDarkMode ? Colors.white : Colors.black,
                                       fontSize: MediaQuery.of(context).size.width < 800 ? 14 : 18,
