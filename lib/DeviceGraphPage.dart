@@ -7256,31 +7256,32 @@ if (!isMobile)
                             child: SfCartesianChart(
                               plotAreaBackgroundColor:
                                   const Color.fromARGB(100, 0, 0, 0),
-                              primaryXAxis: DateTimeAxis(
-                                dateFormat: DateFormat('MM/dd hh:mm a'),
-                                title: AxisTitle(
-                                  text: 'Time',
-                                  textStyle: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                labelStyle: TextStyle(color: Colors.white),
-                                labelRotation: 70,
-                                edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                intervalType: DateTimeIntervalType.auto,
-                                autoScrollingDelta: 100,
-                                autoScrollingMode: AutoScrollingMode.end,
-                                enableAutoIntervalOnZooming: true,
-                                majorGridLines: MajorGridLines(
-                                  width: 1.0,
-                                  dashArray: [
-                                    5,
-                                    5
-                                  ], // <-- Makes vertical grid lines dotted
-                                  color:
-                                      const Color.fromARGB(255, 141, 144, 148),
-                                ),
-                              ),
+                            primaryXAxis: DateTimeAxis(
+  // ✅ Show only date for 1 year, otherwise date + time
+  dateFormat: _lastSelectedRange == '1year'
+      ? DateFormat('MM/dd/yyyy')   // only date
+      : DateFormat('MM/dd hh:mm a'), // date + time
+  title: AxisTitle(
+    text: 'Time',
+    textStyle: TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+  ),
+  labelStyle: const TextStyle(color: Colors.white),
+  labelRotation: 70,
+  edgeLabelPlacement: EdgeLabelPlacement.shift,
+  intervalType: DateTimeIntervalType.auto,
+  autoScrollingDelta: 100,
+  autoScrollingMode: AutoScrollingMode.end,
+  enableAutoIntervalOnZooming: true,
+  majorGridLines: const MajorGridLines(
+    width: 1.0,
+    dashArray: [5, 5], // dotted vertical grid lines
+    color: Color.fromARGB(255, 141, 144, 148),
+  ),
+),
+
                               primaryYAxis: NumericAxis(
                                 labelStyle: TextStyle(color: Colors.white),
                                 title: AxisTitle(
