@@ -7292,8 +7292,7 @@ if (!isMobile)
                                 axisLine: AxisLine(width: 1),
                                 majorGridLines: MajorGridLines(width: 0),
                               ),
-                              // ✅ Trackball for hover line + dot
-                              trackballBehavior: TrackballBehavior(
+                             trackballBehavior: TrackballBehavior(
   enable: true,
   activationMode: ActivationMode.singleTap,
   lineType: TrackballLineType.vertical,
@@ -7315,6 +7314,14 @@ if (!isMobile)
         return const SizedBox();
       }
 
+      // ✅ Format: only "1year" removes time, rest show date + time
+      String formattedDate;
+      if (_lastSelectedRange == '1year') {
+        formattedDate = DateFormat('MM/dd').format(time); // only date
+      } else {
+        formattedDate = DateFormat('MM/dd hh:mm a').format(time); // date + time
+      }
+
       return Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -7326,7 +7333,7 @@ if (!isMobile)
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              DateFormat('MM/dd hh:mm a').format(time),
+              formattedDate,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
