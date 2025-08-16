@@ -4,25 +4,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'shareddevice.dart';
 
-class ManualEntryPage extends StatefulWidget {
+class ManualEntryPopup extends StatefulWidget {
   final Map<String, List<String>> devices;
 
-  ManualEntryPage({required this.devices});
+  ManualEntryPopup({required this.devices});
 
   @override
-  _ManualEntryPageState createState() => _ManualEntryPageState();
+  _ManualEntryPopupState createState() => _ManualEntryPopupState();
 }
 
-class _ManualEntryPageState extends State<ManualEntryPage> {
+class _ManualEntryPopupState extends State<ManualEntryPopup> {
   TextEditingController deviceIdController = TextEditingController();
   String? _email;
   String message = "";
   Color messageColor = Colors.teal;
+   bool _canClose = true; 
 
   @override
   void initState() {
     super.initState();
-    _loadEmail(); // Load email when the page initializes
+    _loadEmail();
   }
 
   @override
@@ -31,22 +32,15 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
     super.dispose();
   }
 
-  // Load user's email from shared preferences
   Future<void> _loadEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
 
-    if (email != null) {
-      setState(() {
-        _email = email; // Store email for future API calls
-      });
-    } else {
-      // Redirect to sign-in page if email is not found
-      Navigator.pushReplacementNamed(context, '/signin');
+    setState(() {
+      _email = email;
+    });
     }
-  }
 
-  // Show a dialog with success or error message
   Future<void> _showSuccessMessage() async {
     return showDialog<void>(
       context: context,
@@ -64,8 +58,8 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
             TextButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.pop(context);
-                // Navigate to the data display page
+                Navigator.pop(context); // success/error dialog close
+                Navigator.pop(context); // manual entry popup close
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => DataDisplayPage()),
@@ -78,8 +72,11 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
     );
   }
 
-  // Add a device by sending a GET request to the API
   Future<void> _addDevice(String deviceID) async {
+     setState(() {
+      _canClose = false; 
+    });
+
     final String apiUrl =
         "https://ymfmk699j5.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_add_devices?email_id=$_email&device_id=$deviceID";
 
@@ -109,104 +106,92 @@ class _ManualEntryPageState extends State<ManualEntryPage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
-      appBar: AppBar(
-        title: Text(
-          'Add Device Manually',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
-            size: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        width: 400,
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 192, 185, 185)!,
-                    const Color.fromARGB(255, 123, 159, 174)!,
-                  ]
-                : [
-                    const Color.fromARGB(255, 126, 171, 166)!,
-                    const Color.fromARGB(255, 54, 58, 59)!,
-                  ],
+                ? [Color(0xFFC0B9B9), Color(0xFF7B9FAE)]
+                : [Color(0xFF7EABA6), Color(0xFF363A3B)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 40),
-              // Input field for device ID
-              TextField(
-                controller: deviceIdController,
-                decoration: InputDecoration(
-                  labelText: 'Enter Device ID',
-                  labelStyle: TextStyle(
-                    color: isDarkMode ? Colors.black : Colors.white,
-                  ),
-                  border: const OutlineInputBorder(),
-                  helperText: 'Enter the device ID (e.g., WD101, CL102, TH200)',
-                  helperStyle: TextStyle(
-                    color: isDarkMode ? Colors.black : Colors.white,
-                  ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Add Device Manually',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: deviceIdController,
+              decoration: InputDecoration(
+                labelText: 'Enter Device ID',
+                labelStyle: TextStyle(
+                  color: isDarkMode ? Colors.black : Colors.white,
+                ),
+                border: OutlineInputBorder(),
+                helperText: 'Enter the device ID (e.g., WD101, CL102, TH200)',
+                helperStyle: TextStyle(
+                  color: isDarkMode ? Colors.black : Colors.white,
                 ),
               ),
-              const SizedBox(height: 20),
-              Center(
-                child: SizedBox(
-                  width: 150,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      String deviceId = deviceIdController.text.trim();
-                      if (deviceId.isNotEmpty) {
-                        DeviceUtils.showConfirmationDialog(
-                          context: context,
-                          deviceId: deviceId,
-                          devices: widget.devices,
-                          onConfirm: () async {
-                            await _addDevice(deviceId);
-                            await _showSuccessMessage();
-                          },
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please enter a valid device ID'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                String deviceId = deviceIdController.text.trim();
+                if (deviceId.isNotEmpty) {
+                  DeviceUtils.showConfirmationDialog(
+                    context: context,
+                    deviceId: deviceId,
+                    devices: widget.devices,
+                    onConfirm: () async {
+                      await _addDevice(deviceId);
+                      await _showSuccessMessage();
                     },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: isDarkMode ? Colors.white : Colors.black,
-                      backgroundColor:
-                          isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a valid device ID'),
+                      backgroundColor: Colors.red,
                     ),
-                    child: const Text('Add Device'),
-                  ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                backgroundColor:
+                    isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+              ),
+              child: Text(
+                'Add Device',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(height: 10),
+           if (_canClose)
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "Close",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+          ],
         ),
       ),
     );

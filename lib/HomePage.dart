@@ -280,12 +280,12 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: screenWidth < 600 ? 20 : 80,
-                  vertical: 60,
+                  vertical: 40,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 40),
+                    // const SizedBox(height: 20),
                     Text(
                       "Welcome to Cloud Sense",
                       textAlign: TextAlign.center,

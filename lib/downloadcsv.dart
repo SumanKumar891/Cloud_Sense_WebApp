@@ -699,12 +699,10 @@ class _CsvDownloaderState extends State<CsvDownloader> {
                         firstDate: DateTime(2020),
                         lastDate: DateTime.now(),
                       );
-                      if (pickedStartDate != null) {
-                        setState(() {
-                          startDate = pickedStartDate;
-                        });
-                      }
-                    },
+                      setState(() {
+                        startDate = pickedStartDate;
+                      });
+                                        },
                   ),
                   ListTile(
                     title: Text(
@@ -718,12 +716,10 @@ class _CsvDownloaderState extends State<CsvDownloader> {
                         firstDate: startDate ?? DateTime(2020),
                         lastDate: DateTime.now(),
                       );
-                      if (pickedEndDate != null) {
-                        setState(() {
-                          endDate = pickedEndDate;
-                        });
-                      }
-                    },
+                      setState(() {
+                        endDate = pickedEndDate;
+                      });
+                                        },
                   ),
                 ],
               ),

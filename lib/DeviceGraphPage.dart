@@ -149,6 +149,143 @@ class DeviceGraphPage extends StatefulWidget {
 }
 
 class _DeviceGraphPageState extends State<DeviceGraphPage> {
+  // Mobile menu button builder
+  Widget _buildMobileMenuButton(
+    String title,
+    String value,
+    IconData icon,
+    bool isDarkMode,
+    BuildContext context, {
+    required VoidCallback onPressed,
+  }) {
+    bool isActive = _activeButton == value;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 12, vertical: 10), // smaller height
+          backgroundColor: isActive
+              ? (isDarkMode ? Colors.blue[700] : Colors.blue[600])
+              : (isDarkMode ? Colors.grey[850] : Colors.grey[200]),
+          foregroundColor: isActive
+              ? Colors.white
+              : (isDarkMode ? Colors.white70 : Colors.black87),
+          elevation: isActive ? 3 : 0,
+          minimumSize: const Size(0, 40), // compact height
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+            if (isActive) const Icon(Icons.check_circle, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Build the drawer widget
+  Widget _buildDrawer(bool isDarkMode, BuildContext context) {
+    return Drawer(
+      child: Container(
+        color: isDarkMode
+            ? Colors.blueGrey[900]
+            : Colors.grey[200], // Entire background
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
+              ),
+              child: Text(
+                'Select Time Period',
+                style: TextStyle(
+                    color: isDarkMode ? Colors.black : Colors.white,
+                    fontSize: 20),
+              ),
+            ),
+            _buildMobileMenuButton(
+              '1 Day',
+              'date',
+              Icons.today,
+              isDarkMode,
+              context,
+              onPressed: () async {
+                await _selectDate(); // same as sidebar button
+                setState(() => _activeButton = 'date');
+                Navigator.pop(context); // close drawer
+              },
+            ),
+            _buildMobileMenuButton(
+              'Last 7 Days',
+              '7days',
+              Icons.calendar_view_week,
+              isDarkMode,
+              context,
+              onPressed: () {
+                _fetchDataForRange('7days');
+                setState(() => _activeButton = '7days');
+                Navigator.pop(context);
+              },
+            ),
+            _buildMobileMenuButton(
+              'Last 30 Days',
+              '30days',
+              Icons.calendar_view_month,
+              isDarkMode,
+              context,
+              onPressed: () {
+                _fetchDataForRange('30days');
+                setState(() => _activeButton = '30days');
+                Navigator.pop(context);
+              },
+            ),
+            _buildMobileMenuButton(
+              'Last 3 Months',
+              '3months',
+              Icons.calendar_today,
+              isDarkMode,
+              context,
+              onPressed: () {
+                _fetchDataForRange('3months');
+                setState(() => _activeButton = '3months');
+                Navigator.pop(context);
+              },
+            ),
+            _buildMobileMenuButton(
+              'Last 6 Months',
+              '6months',
+              Icons.date_range,
+              isDarkMode,
+              context,
+              onPressed: () {
+                _fetchDataForRange('6months');
+                setState(() => _activeButton = '6months');
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   DateTime _selectedDay = DateTime.now();
   List<ChartData> temperatureData = [];
   List<ChartData> humidityData = [];
@@ -3265,8 +3402,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 16;
     double headerFontSize = screenWidth < 800 ? 16 : 22;
-
-    // Check if there is any valid data
+// Check if there is any valid data
     bool hasValidData = [
       ittempStats['current']?[0],
       itpressureStats['current']?[0],
@@ -3281,7 +3417,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     if (!hasValidData) {
       return SizedBox.shrink(); // Return an empty widget if no data
     }
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
@@ -3419,6 +3554,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     };
   }
 
+  // Create a table displaying statistics
   Widget buildfsStatisticsTable() {
     final fstempStats = _calculatefsStatistics(fstempData);
     final fspressureStats = _calculatefsStatistics(fspressureData);
@@ -3627,6 +3763,79 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+
+// Widget to display current values horizontally
+Widget buildCurrentValuesRow() {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  double screenWidth = MediaQuery.of(context).size.width;
+  double fontSize = screenWidth < 800 ? 14 : 18;
+
+  // Calculate statistics for each parameter
+  final fstempStats = _calculatefsStatistics(fstempData);
+  final fspressureStats = _calculatefsStatistics(fspressureData);
+  final fshumStats = _calculatefsStatistics(fshumidityData);
+  final fsrainStats = _calculatefsStatistics(fsrainData);
+  final fsradiationStats = _calculatefsStatistics(fsradiationData);
+  final fswindspeedStats = _calculatefsStatistics(fswindspeedData);
+  final fswinddirectionStats = _calculatefsStatistics(fswinddirectionData);
+
+  // Map of parameters and their current values with units
+  final currentValues = {
+    'Temperature': '${fstempStats['current']?[0]?.toStringAsFixed(2) ?? '-'} °C',
+    'Pressure': '${fspressureStats['current']?[0]?.toStringAsFixed(2) ?? '-'} hPa',
+    'Relative Humidity': '${fshumStats['current']?[0]?.toStringAsFixed(2) ?? '-'} %',
+    'Rain Level': '${fsrainStats['current']?[0]?.toStringAsFixed(2) ?? '-'} mm',
+    'Radiation': '${fsradiationStats['current']?[0]?.toStringAsFixed(2) ?? '-'} W/m²',
+    'Wind Speed': '${fswindspeedStats['current']?[0]?.toStringAsFixed(2) ?? '-'} m/s',
+    'Wind Direction': '${fswinddirectionStats['current']?[0]?.toStringAsFixed(2) ?? '-'} °',
+  };
+
+  // Filter out entries where the value is null or effectively zero
+  final filteredValues = currentValues.entries.where((entry) {
+    final value = entry.value.replaceAll(RegExp(r'[^\d.-]'), ''); // Extract numeric part
+    return value.isNotEmpty && value != '-' && double.parse(value) != 0.00;
+  }).toList();
+
+  // Return an empty container if no valid data
+  if (filteredValues.isEmpty) {
+    return SizedBox.shrink();
+  }
+
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: filteredValues.map((entry) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                entry.key,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 4),
+              Text(
+                entry.value,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
   Widget buildVDStatisticsTable() {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth < 800 ? 13 : 16;
@@ -3922,6 +4131,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       ),
     );
   }
+
+
 
   DateTime _parseBDDate(String dateString) {
     final dateFormat = DateFormat(
@@ -4403,13 +4614,211 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     return {'displayName': displayName, 'unit': unit};
   }
 
+
+
+// Updated _buildHorizontalStatsRow and _buildParamStat
+Widget _buildHorizontalStatsRow(bool isDarkMode) {
+  if (widget.deviceName.startsWith('WQ')) {
+    final tempStats = _calculateStatistics(tempData);
+    final tdsStats = _calculateStatistics(tdsData);
+    final codStats = _calculateStatistics(codData);
+    final bodStats = _calculateStatistics(bodData);
+    final pHStats = _calculateStatistics(pHData);
+    final doStats = _calculateStatistics(doData);
+    final ecStats = _calculateStatistics(ecData);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildParamStat('Temp', tempStats['current']?[0], tempStats['min']?[0], tempStats['max']?[0], '°C', isDarkMode),
+        _buildParamStat('TDS', tdsStats['current']?[0], tdsStats['min']?[0], tdsStats['max']?[0], 'ppm', isDarkMode),
+        _buildParamStat('COD', codStats['current']?[0], codStats['min']?[0], codStats['max']?[0], 'mg/L', isDarkMode),
+        _buildParamStat('BOD', bodStats['current']?[0], bodStats['min']?[0], bodStats['max']?[0], 'mg/L', isDarkMode),
+        _buildParamStat('pH', pHStats['current']?[0], pHStats['min']?[0], pHStats['max']?[0], '', isDarkMode),
+        _buildParamStat('DO', doStats['current']?[0], doStats['min']?[0], doStats['max']?[0], 'mg/L', isDarkMode),
+        _buildParamStat('EC', ecStats['current']?[0], ecStats['min']?[0], ecStats['max']?[0], 'mS/cm', isDarkMode),
+      ],
+    );
+  } else if (widget.deviceName.startsWith('CB')) {
+    final temp2Stats = _calculateCBStatistics(temp2Data);
+    final cod2Stats = _calculateCBStatistics(cod2Data);
+    final bod2Stats = _calculateCBStatistics(bod2Data);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildParamStat('Temp', temp2Stats['current']?[0], temp2Stats['min']?[0], temp2Stats['max']?[0], '°C', isDarkMode),
+        _buildParamStat('COD', cod2Stats['current']?[0], cod2Stats['min']?[0], cod2Stats['max']?[0], 'mg/L', isDarkMode),
+        _buildParamStat('BOD', bod2Stats['current']?[0], bod2Stats['min']?[0], bod2Stats['max']?[0], 'mg/L', isDarkMode),
+      ],
+    );
+  } else if (widget.deviceName.startsWith('NH')) {
+    final ammoniaStats = _calculateNHStatistics(ammoniaData);
+    final temppStats = _calculateNHStatistics(temperaturedata);
+    final humStats = _calculateNHStatistics(humiditydata);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildParamStat('AMMONIA', ammoniaStats['current']?[0], ammoniaStats['min']?[0], ammoniaStats['max']?[0], 'PPM', isDarkMode),
+        _buildParamStat('TEMP', temppStats['current']?[0], temppStats['min']?[0], temppStats['max']?[0], '°C', isDarkMode),
+        _buildParamStat('HUMIDITY', humStats['current']?[0], humStats['min']?[0], humStats['max']?[0], '%', isDarkMode),
+      ],
+    );
+  } else if (widget.deviceName.startsWith('DO')) {
+    final ttempStats = _calculateDOStatistics(ttempData);
+    final dovalueStats = _calculateDOStatistics(dovaluedata);
+    final dopercentageStats = _calculateDOStatistics(dopercentagedata);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildParamStat('Temperature', ttempStats['current']?[0], ttempStats['min']?[0], ttempStats['max']?[0], '°C', isDarkMode),
+        _buildParamStat('DO Value', dovalueStats['current']?[0], dovalueStats['min']?[0], dovalueStats['max']?[0], 'mg/L', isDarkMode),
+        _buildParamStat('DO Percentage', dopercentageStats['current']?[0], dopercentageStats['min']?[0], dopercentageStats['max']?[0], '%', isDarkMode),
+      ],
+    );
+  } else if (widget.deviceName.startsWith('NA')) {
+    Map<String, String> parameterLabels = {
+      'CurrentTemperature': 'Temperature',
+      'CurrentHumidity': 'Humidity',
+      'LightIntensity': 'Light Intensity',
+      
+      'WindSpeed': 'Wind Speed',
+      'AtmPressure': 'Atm Pressure',
+      'WindDirection': 'Wind Direction',
+      'RainfallMinutly': 'Rainfall'
+    };
+    List<String> includedParameters = parameterLabels.keys.toList();
+
+    List<Widget> children = NARLParametersData.entries
+        .where((entry) => includedParameters.contains(entry.key))
+        .map((entry) {
+          String label = parameterLabels[entry.key] ?? entry.key;
+          double? current = entry.value.isNotEmpty ? entry.value.last.value : null;
+          String unit = '';
+          if (label == 'Temperature') unit = '°C';
+          else if (label == 'Humidity') unit = '%';
+          else if (label == 'Light Intensity') unit = 'lux';
+          else if (label == 'Rainfall' || label == 'Rainfall Minutely') unit = 'mm';
+          else if (label == 'Wind Speed') unit = 'm/s';
+          else if (label == 'Atm Pressure') unit = 'hpa';
+          else if (label == 'Wind Direction') unit = '°';
+          return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        }).toList();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: children,
+    );
+  } else if (widget.deviceName.startsWith('VD')) {
+    Map<String, String> parameterLabels = {
+      'CurrentTemperature': 'Temperature',
+      'CurrentHumidity': 'Humidity',
+      'LightIntensity': 'Light Intensity',
+      'RainfallHourly': 'Rainfall',
+    };
+    List<String> includedParameters = parameterLabels.keys.toList();
+
+    List<Widget> children = vdParametersData.entries
+        .where((entry) => includedParameters.contains(entry.key))
+        .map((entry) {
+          String label = parameterLabels[entry.key] ?? entry.key;
+          double? current = entry.value.isNotEmpty ? entry.value.last.value : null;
+          String unit = '';
+          if (label == 'Temperature') unit = '°C';
+          else if (label == 'Humidity') unit = '%';
+          else if (label == 'Light Intensity') unit = 'lux';
+          else if (label == 'Rainfall') unit = 'mm';
+          return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        }).toList();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: children,
+    );
+  } else if (widget.deviceName.startsWith('CP')) {
+    Map<String, String> parameterLabels = {
+      'CurrentTemperature': 'Temperature',
+      'CurrentHumidity': 'Humidity',
+      'LightIntensity': 'Light Intensity',
+      'RainfallMinutly': 'Rainfall',
+      'WindSpeed': 'Wind Speed',
+      'AtmPressure': 'Atm Pressure',
+      'WindDirection': 'Wind Direction'
+    };
+    List<String> includedParameters = parameterLabels.keys.toList();
+
+    List<Widget> children = csParametersData.entries
+        .where((entry) => includedParameters.contains(entry.key))
+        .map((entry) {
+          String label = parameterLabels[entry.key] ?? entry.key;
+          double? current = entry.value.isNotEmpty ? entry.value.last.value : null;
+          String unit = '';
+          if (label == 'Temperature') unit = '°C';
+          else if (label == 'Humidity') unit = '%';
+          else if (label == 'Light Intensity') unit = 'lux';
+          else if (label == 'Rainfall') unit = 'mm';
+          else if (label == 'Wind Speed') unit = 'm/s';
+          else if (label == 'Atm Pressure') unit = 'hpa';
+          else if (label == 'Wind Direction') unit = '°';
+          return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        }).toList();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: children,
+    );
+  }
+  return Row(); // Default empty
+}
+
+// Helper to build param stat column
+Widget _buildParamStat(String label, double? current, double? min, double? max, String unit, bool isDarkMode) {
+  // Apply background color only if current value exists
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    child: Container(
+      color: current != null
+          ? (isDarkMode ?  Colors.blueGrey[900] : Colors.grey[200])
+          : Colors.transparent, // Transparent for undefined sensors
+      padding: EdgeInsets.all(4.0), // Optional padding for the bar
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ?  Colors.white : Colors.black,
+            ),
+          ),
+          Text(
+            '${current?.toStringAsFixed(2) ?? '-'} $unit',
+            style: TextStyle(
+              color: isDarkMode ?  Colors.white : Colors.black,
+            ),
+          ),
+          if (min != null)
+            Text(
+              'Min: ${min.toStringAsFixed(2)} $unit',
+              style: TextStyle(color: isDarkMode ?  Colors.white : Colors.black),
+            ),
+          if (max != null)
+            Text(
+              'Max: ${max.toStringAsFixed(2)} $unit',
+              style: TextStyle(color: isDarkMode ?  Colors.white : Colors.black),
+            ),
+        ],
+      ),
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     String _selectedRange = 'ee';
 
+    // Calculate sidebar width based on screen size
+    double sidebarWidth = MediaQuery.of(context).size.width < 800 ? 250 : 220;
+    bool isMobile = MediaQuery.of(context).size.width < 800;
+
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      drawer: _buildDrawer(isDarkMode, context),
+      // backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           Container(
@@ -4435,7 +4844,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             left: 0,
             right: 0,
             child: AppBar(
-              backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
+              backgroundColor:
+                  isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
               elevation: 0,
               title: Text.rich(
                 TextSpan(
@@ -4461,15 +4871,25 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   ],
                 ),
               ),
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+              leading: isMobile
+                  ? Builder(
+                      builder: (context) => IconButton(
+                        icon: Icon(
+                          Icons.menu,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                      ),
+                    )
+                  : IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
               actions: [
                 if (widget.deviceName.startsWith('WD'))
                   Padding(
@@ -4734,393 +5154,209 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ],
             ),
           ),
-          // Main content
+          
+          // Content area below AppBar with Left Sidebar
           Positioned(
-            top: AppBar()
-                .preferredSize
-                .height, // Position content below the AppBar
+            top: AppBar().preferredSize.height,
             left: 0,
             right: 0,
             bottom: 0,
-            child: SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.only(top: 16), // Adjust padding as needed
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Column(
-                            children: [
-                              // Space between status and buttons
-                              SizedBox(height: 20),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: MediaQuery.of(context).size.width < 800
-                                    ? Container(
-                                        width: 200,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(6),
-                                          color: const Color.fromARGB(
-                                              150, 0, 0, 0),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(width: 8),
-                                            Expanded(
-                                              child: DropdownButton<String>(
-                                                isExpanded: true,
-                                                hint: Text(
-                                                    'Select a time period'),
-                                                dropdownColor: Colors.black
-                                                    .withOpacity(0.5),
-                                                value: _selectedRange,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    _selectedRange = value!;
-                                                    if (value == 'date') {
-                                                      _selectDate(); // Your date picker function
-                                                    } else if (value ==
-                                                        '7days') {
-                                                      _fetchDataForRange(
-                                                          '7days'); // Fetch data for 7 days
-                                                    } else if (value ==
-                                                        '30days') {
-                                                      _fetchDataForRange(
-                                                          '30days'); // Fetch data for 30 days
-                                                    } else if (value ==
-                                                        '3months') {
-                                                      _fetchDataForRange(
-                                                          '3months'); // Fetch data for 3 months
-                                                    } else if (value ==
-                                                        '6months') {
-                                                      _fetchDataForRange(
-                                                          '6months'); // Fetch data for 6 months
-                                                    }
-                                                  });
-                                                },
-                                                items: [
-                                                  DropdownMenuItem(
-                                                    child: Text(
-                                                      'Select Time Period',
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          color: Colors.white),
-                                                    ),
-                                                    value: 'ee',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: Text(
-                                                      'Select One Day',
-                                                      style: TextStyle(
-                                                          fontSize: 20,
-                                                          color: Colors.white),
-                                                    ),
-                                                    value: 'date',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: Text(
-                                                      'Last 7 Days',
-                                                      style: TextStyle(
-                                                          fontSize: 20,
-                                                          color: Colors.white),
-                                                    ),
-                                                    value: '7days',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: Text(
-                                                      'Last 30 Days',
-                                                      style: TextStyle(
-                                                          fontSize: 20,
-                                                          color: Colors.white),
-                                                    ),
-                                                    value: '30days',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: Text(
-                                                      'Last 3 months',
-                                                      style: TextStyle(
-                                                          fontSize: 20,
-                                                          color: Colors.white),
-                                                    ),
-                                                    value: '3months',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: Text(
-                                                      'Last 6 months',
-                                                      style: TextStyle(
-                                                          fontSize: 20,
-                                                          color: Colors.white),
-                                                    ),
-                                                    value: '6months',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            color: const Color.fromARGB(
-                                                150, 0, 0, 0),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              // Date Picker button
-                                              Expanded(
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    _selectDate(); // Your date picker function
-                                                    setState(() {
-                                                      _activeButton =
-                                                          'date'; // Set the active button
-                                                    });
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 36,
-                                                            vertical: 28),
-                                                    side: _activeButton ==
-                                                            'date'
-                                                        ? BorderSide(
-                                                            color: Colors.white,
-                                                            width: 2)
-                                                        : BorderSide.none,
-                                                  ),
-                                                  child: Text(
-                                                    'Select Date: ${DateFormat('yyyy-MM-dd').format(_selectedDay)}',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: _activeButton ==
-                                                              'date'
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(width: 8),
-                                              // 7 Days button
-                                              Expanded(
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    _fetchDataForRange(
-                                                        '7days'); // Fetch data for 7 days range
-                                                    setState(() {
-                                                      _activeButton = '7days';
-                                                    });
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 36,
-                                                            vertical: 28),
-                                                    side: _activeButton ==
-                                                            '7days'
-                                                        ? BorderSide(
-                                                            color: Colors.white,
-                                                            width: 2)
-                                                        : BorderSide.none,
-                                                  ),
-                                                  child: Text(
-                                                    'Last 7 Days',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: _activeButton ==
-                                                              '7days'
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(width: 8),
-                                              // 30 Days button
-                                              Expanded(
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    _fetchDataForRange(
-                                                        '30days'); // Fetch data for 30 days range
-                                                    setState(() {
-                                                      _activeButton = '30days';
-                                                    });
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 36,
-                                                            vertical: 28),
-                                                    side: _activeButton ==
-                                                            '30days'
-                                                        ? BorderSide(
-                                                            color: Colors.white,
-                                                            width: 2)
-                                                        : BorderSide.none,
-                                                  ),
-                                                  child: Text(
-                                                    'Last 30 Days',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: _activeButton ==
-                                                              '30days'
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(width: 8),
-                                              // 3 Months button
-                                              Expanded(
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    _fetchDataForRange(
-                                                        '3months'); // Fetch data for 3 months range
-                                                    setState(() {
-                                                      _activeButton = '3months';
-                                                    });
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 36,
-                                                            vertical: 28),
-                                                    side: _activeButton ==
-                                                            '3months'
-                                                        ? BorderSide(
-                                                            color: Colors.white,
-                                                            width: 2)
-                                                        : BorderSide.none,
-                                                  ),
-                                                  child: Text(
-                                                    'Last 3 months',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: _activeButton ==
-                                                              '3months'
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(width: 8),
-                                              // 3 Months button
-                                              Expanded(
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    _fetchDataForRange(
-                                                        '6months'); // Fetch data for 6 months range
-                                                    setState(() {
-                                                      _activeButton = '6months';
-                                                    });
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 36,
-                                                            vertical: 28),
-                                                    side: _activeButton ==
-                                                            '6months'
-                                                        ? BorderSide(
-                                                            color: Colors.white,
-                                                            width: 2)
-                                                        : BorderSide.none,
-                                                  ),
-                                                  child: Text(
-                                                    'Last 6 months',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: _activeButton ==
-                                                              '6months'
-                                                          ? Colors.blue
-                                                          : Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+            child: Row(
+              children: [
+                // Left Sidebar - Only show on large screens
+                if (!isMobile)
+                  Container(
+                    width: sidebarWidth,
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? Colors.blueGrey[900] : Colors.grey[200], // Solid color
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(2, 0),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Sidebar Header
+                        Container(
+                          height: 64,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? Colors.blueGrey[900] : Colors.grey[200], // Light mode header
+                            border: Border(
+                              bottom: BorderSide(
+                                color: isDarkMode
+                                    ?Colors.blueGrey[900]! : Colors.grey[200]!,
+                                width: 0,
                               ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                color: isDarkMode ? Colors.white : Colors.black,
+                                size: 24,
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                'Time Period',
+                                style: TextStyle(
+                                  color:
+                                      isDarkMode ?  Colors.white : Colors.black,
+                                   fontSize: MediaQuery.of(context).size.width < 800 ? 14 : 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
-                              SizedBox(
-                                  height:
-                                      20), // Space between buttons and the next section
-// Wind Direction widget in the center
-
-                              if (widget.deviceName.startsWith('WD') &&
-                                  isWindDirectionValid(_lastWindDirection) &&
-                                  _lastWindDirection != null &&
-                                  _lastWindDirection.isNotEmpty)
+                        // Time Period Selection
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                // Button List for larger screens
                                 Column(
                                   children: [
-                                    Icon(
-                                      Icons.wind_power,
-                                      size: 40,
-                                      color: Colors.white,
+                                    _buildSidebarButton(
+                                      '1 Day',
+                                      'date',
+                                      Icons.today,
+                                      isDarkMode,
+                                      onPressed: () {
+                                        _selectDate();
+                                        setState(() {
+                                          _activeButton = 'date';
+                                        });
+                                      },
                                     ),
                                     SizedBox(height: 8),
-                                    Text(
-                                      'Wind Direction : $_lastWindDirection',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                        color: Colors.white,
-                                      ),
+                                    _buildSidebarButton(
+                                      'Last 7 Days',
+                                      '7days',
+                                      Icons.calendar_view_week,
+                                      isDarkMode,
+                                      onPressed: () {
+                                        _fetchDataForRange('7days');
+                                        setState(() {
+                                          _activeButton = '7days';
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(height: 8),
+                                    _buildSidebarButton(
+                                      'Last 30 Days',
+                                      '30days',
+                                      Icons.calendar_view_month,
+                                      isDarkMode,
+                                      onPressed: () {
+                                        _fetchDataForRange('30days');
+                                        setState(() {
+                                          _activeButton = '30days';
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(height: 8),
+                                    _buildSidebarButton(
+                                      'Last 3 Months',
+                                      '3months',
+                                      Icons.calendar_today,
+                                      isDarkMode,
+                                      onPressed: () {
+                                        _fetchDataForRange('3months');
+                                        setState(() {
+                                          _activeButton = '3months';
+                                        });
+                                      },
+                                    ),
+                                    SizedBox(height: 8),
+                                    _buildSidebarButton(
+                                      'Last 6 Months',
+                                      '6months',
+                                      Icons.date_range,
+                                      isDarkMode,
+                                      onPressed: () {
+                                        _fetchDataForRange('6months');
+                                        setState(() {
+                                          _activeButton = '6months';
+                                        });
+                                      },
                                     ),
                                   ],
                                 ),
-// Weather Forecast button for WF devices
-                              if (widget.deviceName.startsWith('WF'))
-                                Column(
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                 
+// Main content area
+Expanded(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Horizontal stats row
+      Container(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        color: isDarkMode ?  Colors.blueGrey[900] : Colors.grey[200],
+        child: MediaQuery.of(context).size.width < 1200
+            ? SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: _buildHorizontalStatsRow(isDarkMode),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: _buildHorizontalStatsRow(isDarkMode),
+                  ),
+                ],
+              ),
+      ),
+    
+                // Main Content Area
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      padding: EdgeInsets.only(top: 0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Column(
                                   children: [
-                                    SizedBox(height: 20),
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                WeatherForecastPage(
-                                              deviceName: widget.deviceName,
-                                              sequentialName:
-                                                  widget.sequentialName,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Column(
+                                    SizedBox(height: 0),
+
+                                    // Wind Direction widget in the center
+                                    if (widget.deviceName.startsWith('WD') &&
+                                        isWindDirectionValid(
+                                            _lastWindDirection) &&
+                                        _lastWindDirection != null &&
+                                        _lastWindDirection.isNotEmpty)
+                                      Column(
                                         children: [
                                           Icon(
-                                            Icons.cloud,
+                                            Icons.wind_power,
                                             size: 40,
                                             color: Colors.white,
                                           ),
-                                          SizedBox(height: 8),
+                                          SizedBox(height: 0),
                                           Text(
-                                            'Weather Forecast',
+                                            'Wind Direction : $_lastWindDirection',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20,
@@ -5129,681 +5365,791 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           ),
                                         ],
                                       ),
-                                    ),
+
+// Weather Forecast button for WF devices
+                                    if (widget.deviceName.startsWith('WF'))
+                                      Column(
+                                        children: [
+                                          SizedBox(height: 0),
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      WeatherForecastPage(
+                                                    deviceName:
+                                                        widget.deviceName,
+                                                    sequentialName:
+                                                        widget.sequentialName,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Icon(
+                                                  Icons.cloud,
+                                                  size: 40,
+                                                  color: Colors.white,
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Weather Forecast',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    SizedBox(height: 0),
+                                    if (widget.deviceName.startsWith('TE'))
+                                      Text(
+                                        'RSSI Value : $_lastRSSI_Value',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                   ],
-                                ),
-                              SizedBox(height: 20),
-                              if (widget.deviceName.startsWith('TE'))
-                                Text(
-                                  'RSSI Value : $_lastRSSI_Value',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          // Check if the device is a chlorine sensor device
-                          if (widget.deviceName.startsWith('CL'))
-                            _buildCurrentValue('Chlorine Level',
-                                _currentChlorineValue, 'mg/L'),
-
-                          if (widget.deviceName.startsWith('20'))
-                            _buildCurrentValue(
-                                'Rain Level ', _currentrfdValue, 'mm'),
-
-                          // Add compass for IT devices with debugging
-                          () {
-                            if (widget.deviceName.startsWith('IT') &&
-                                iswinddirectionValid(_lastwinddirection) &&
-                                _lastwinddirection != null &&
-                                _lastwinddirection.isNotEmpty) {
-                              return _buildWindCompass(_lastwinddirection);
-                            } else {
-                              return SizedBox
-                                  .shrink(); // Return empty widget if conditions fail
-                            }
-                          }(),
-                        ],
-                      ),
-                    ),
-                    if (widget.deviceName.startsWith('WQ'))
-                      buildStatisticsTable(),
-                    if (widget.deviceName.startsWith('CB'))
-                      buildCBStatisticsTable(),
-                    if (widget.deviceName.startsWith('NH'))
-                      buildNHStatisticsTable(),
-                    if (widget.deviceName.startsWith('DO'))
-                      buildDOStatisticsTable(),
-                    if (widget.deviceName.startsWith('IT'))
-                      buildITStatisticsTable(),
-                    if (widget.deviceName.startsWith('FS'))
-                      buildfsStatisticsTable(),
-                    if (widget.deviceName.startsWith('SM'))
-                      buildSMStatisticsTable(),
-                    if (widget.deviceName.startsWith('VD'))
-                      buildVDStatisticsTable(),
-                    if (widget.deviceName.startsWith('NA'))
-                      buildNAStatisticsTable(),
-                    if (widget.deviceName.startsWith('CP'))
-                      buildCPStatisticsTable(),
-                    if (widget.deviceName.startsWith('WD211') ||
-                        (widget.deviceName.startsWith('WD511')))
-                      SingleChildScrollView(
-                        // Make the whole layout scrollable
-                        child: Center(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              double screenWidth = constraints.maxWidth;
-
-                              // Check if the screen width is large enough to show the tables side by side
-                              bool isLargeScreen = screenWidth > 800;
-
-                              return isLargeScreen
-                                  ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        buildWeatherStatisticsTable(), // Weather Statistics Table
-                                        SizedBox(
-                                            width: 5), // Space between tables
-                                        buildRainDataTable(), // Rain Data Table
-                                      ],
-                                    )
-                                  : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        buildWeatherStatisticsTable(), // Weather Statistics Table
-                                        SizedBox(
-                                            height: 5), // Space between tables
-                                        buildRainDataTable(), // Rain Data Table
-                                      ],
-                                    );
-                            },
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ),
-                    Column(
-                      children: [
-                        // SM sensor parameters (dynamic)
-                        if (widget.deviceName.startsWith('SM'))
-                          ...smParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                          Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: Column(
+                              children: [
+                                // Check if the device is a chlorine sensor device
+                                if (widget.deviceName.startsWith('CL'))
+                                  _buildCurrentValue('Chlorine Level',
+                                      _currentChlorineValue, 'mg/L'),
 
-                            // Exclude specified Parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'TemperatureHourlyComulative',
-                              'LuxHourlyComulative',
-                              'PressureHourlyComulative',
-                              'HumidityHourlyComulative'
-                            ];
+                                if (widget.deviceName.startsWith('20'))
+                                  _buildCurrentValue(
+                                      'Rain Level ', _currentrfdValue, 'mm'),
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName,
-                                ChartType.line,
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          }).toList(),
-                        if (widget.deviceName.startsWith('CF'))
-                          ...cfParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                                // Add compass for IT devices with debugging
+                                () {
+                                  if (widget.deviceName.startsWith('IT') &&
+                                      iswinddirectionValid(
+                                          _lastwinddirection) &&
+                                      _lastwinddirection != null &&
+                                      _lastwinddirection.isNotEmpty) {
+                                    return _buildWindCompass(
+                                        _lastwinddirection);
+                                  } else {
+                                    return SizedBox
+                                        .shrink(); // Return empty widget if conditions fail
+                                  }
+                                }(),
+                              ],
+                            ),
+                          ),
+                          if (widget.deviceName.startsWith('WQ'))
+                            buildStatisticsTable(),
+                          if (widget.deviceName.startsWith('CB'))
+                            buildCBStatisticsTable(),
+                          if (widget.deviceName.startsWith('NH'))
+                            buildNHStatisticsTable(),
+                          if (widget.deviceName.startsWith('DO'))
+                            buildDOStatisticsTable(),
+                          if (widget.deviceName.startsWith('IT'))
+                            buildITStatisticsTable(),
+                          if (widget.deviceName.startsWith('FS'))
+                           buildfsStatisticsTable(),
+                          
+                          if (widget.deviceName.startsWith('WD211') ||
+                              (widget.deviceName.startsWith('WD511')))
+                            SingleChildScrollView(
+                              // Make the whole layout scrollable
+                              child: Center(
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    double screenWidth = constraints.maxWidth;
 
-                            // Exclude specified parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'MaximumTemperature',
-                              'MinimumTemperature',
-                              'AverageTemperature',
-                              'RainfallDaily',
-                              'RainfallWeekly',
-                              'AverageHumidity',
-                              'MinimumHumidity',
-                              'MaximumHumidity',
-                              'HumidityHourlyComulative',
-                              'PressureHourlyComulative',
-                              'LuxHourlyComulative',
-                              'TemperatureHourlyComulative',
-                            ];
+                                    // Check if the screen width is large enough to show the tables side by side
+                                    bool isLargeScreen = screenWidth > 800;
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
+                                    return isLargeScreen
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              buildWeatherStatisticsTable(), // Weather Statistics Table
+                                              SizedBox(
+                                                  width:
+                                                      5), // Space between tables
+                                              buildRainDataTable(), // Rain Data Table
+                                            ],
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              buildWeatherStatisticsTable(), // Weather Statistics Table
+                                              SizedBox(
+                                                  height:
+                                                      5), // Space between tables
+                                              buildRainDataTable(), // Rain Data Table
+                                            ],
+                                          );
+                                  },
+                                ),
+                              ),
+                            ),
+                          Column(
+                            children: [
+                              // SM sensor parameters (dynamic)
+                              if (widget.deviceName.startsWith('SM'))
+                                ...smParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                              // Customize chart title for specific parameters
-                              String chartTitle;
-                              if (paramName.toLowerCase() ==
-                                  'currenthumidity') {
-                                chartTitle = 'Humidity Graph ($unit)';
-                              } else if (paramName.toLowerCase() ==
-                                  'currenttemperature') {
-                                chartTitle = 'Temperature Graph ($unit)';
-                              } else {
-                                chartTitle = unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName;
-                              }
+                                  // Exclude specified Parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'TemperatureHourlyComulative',
+                                    'LuxHourlyComulative',
+                                    'PressureHourlyComulative',
+                                    'HumidityHourlyComulative'
+                                  ];
 
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                chartTitle,
-                                ChartType.line,
-                              );
-                            } else {}
-                            return const SizedBox.shrink();
-                          }).toList(),
-                        if (widget.deviceName.startsWith('VD'))
-                          ...vdParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName,
+                                      ChartType.line,
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                }).toList(),
+                              if (widget.deviceName.startsWith('CF'))
+                                ...cfParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                            // Exclude specified parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'MaximumTemperature',
-                              'MinimumTemperature',
-                              'AverageTemperature',
-                              'RainfallDaily',
-                              'RainfallWeekly',
-                              'AverageHumidity',
-                              'MinimumHumidity',
-                              'MaximumHumidity',
-                            ];
+                                  // Exclude specified parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'MaximumTemperature',
+                                    'MinimumTemperature',
+                                    'AverageTemperature',
+                                    'RainfallDaily',
+                                    'RainfallWeekly',
+                                    'AverageHumidity',
+                                    'MinimumHumidity',
+                                    'MaximumHumidity',
+                                    'HumidityHourlyComulative',
+                                    'PressureHourlyComulative',
+                                    'LuxHourlyComulative',
+                                    'TemperatureHourlyComulative',
+                                  ];
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
 
-                              // Customize chart title for specific parameters
-                              String chartTitle;
-                              if (paramName.toLowerCase() ==
-                                  'currenthumidity') {
-                                chartTitle = 'Humidity Graph ($unit)';
-                              } else if (paramName.toLowerCase() ==
-                                  'currenttemperature') {
-                                chartTitle = 'Temperature Graph ($unit)';
-                              } else {
-                                chartTitle = unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName;
-                              }
+                                    // Customize chart title for specific parameters
+                                    String chartTitle;
+                                    if (paramName.toLowerCase() ==
+                                        'currenthumidity') {
+                                      chartTitle = 'Humidity Graph ($unit)';
+                                    } else if (paramName.toLowerCase() ==
+                                        'currenttemperature') {
+                                      chartTitle = 'Temperature Graph ($unit)';
+                                    } else {
+                                      chartTitle = unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName;
+                                    }
 
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                chartTitle,
-                                ChartType.line,
-                              );
-                            } else {}
-                            return const SizedBox.shrink();
-                          }).toList(),
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      chartTitle,
+                                      ChartType.line,
+                                    );
+                                  } else {}
+                                  return const SizedBox.shrink();
+                                }).toList(),
+                              if (widget.deviceName.startsWith('VD'))
+                                ...vdParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                        if (widget.deviceName.startsWith('KD'))
-                          ...kdParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                                  // Exclude specified parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'MaximumTemperature',
+                                    'MinimumTemperature',
+                                    'AverageTemperature',
+                                    'RainfallDaily',
+                                    'RainfallWeekly',
+                                    'AverageHumidity',
+                                    'MinimumHumidity',
+                                    'MaximumHumidity',
+                                  ];
 
-                            // Exclude specified parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'MaximumTemperature',
-                              'MinimumTemperature',
-                              'AverageTemperature',
-                              'RainfallDaily',
-                              'RainfallWeekly',
-                              'AverageHumidity',
-                              'MinimumHumidity',
-                              'MaximumHumidity',
-                            ];
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
+                                    // Customize chart title for specific parameters
+                                    String chartTitle;
+                                    if (paramName.toLowerCase() ==
+                                        'currenthumidity') {
+                                      chartTitle = 'Humidity Graph ($unit)';
+                                    } else if (paramName.toLowerCase() ==
+                                        'currenttemperature') {
+                                      chartTitle = 'Temperature Graph ($unit)';
+                                    } else {
+                                      chartTitle = unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName;
+                                    }
 
-                              // Customize chart title for specific parameters
-                              String chartTitle;
-                              if (paramName.toLowerCase() ==
-                                  'currenthumidity') {
-                                chartTitle = 'Humidity Graph ($unit)';
-                              } else if (paramName.toLowerCase() ==
-                                  'currenttemperature') {
-                                chartTitle = 'Temperature Graph ($unit)';
-                              } else {
-                                chartTitle = unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName;
-                              }
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      chartTitle,
+                                      ChartType.line,
+                                    );
+                                  } else {}
+                                  return const SizedBox.shrink();
+                                }).toList(),
 
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                chartTitle,
-                                ChartType.line,
-                              );
-                            } else {}
-                            return const SizedBox.shrink();
-                          }).toList(),
+                              if (widget.deviceName.startsWith('KD'))
+                                ...kdParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                        if (widget.deviceName.startsWith('NA'))
-                          ...NARLParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                                  // Exclude specified parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'MaximumTemperature',
+                                    'MinimumTemperature',
+                                    'AverageTemperature',
+                                    'RainfallDaily',
+                                    'RainfallWeekly',
+                                    'AverageHumidity',
+                                    'MinimumHumidity',
+                                    'MaximumHumidity',
+                                  ];
 
-                            // Exclude specified parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'MaximumTemperature',
-                              'MinimumTemperature',
-                              'AverageTemperature',
-                              'RainfallDaily',
-                              'RainfallWeekly',
-                              'AverageHumidity',
-                              'MinimumHumidity',
-                              'MaximumHumidity',
-                              'HumidityHourlyComulative',
-                              'PressureHourlyComulative',
-                              'LuxHourlyComulative',
-                              'TemperatureHourlyComulative',
-                            ];
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
+                                    // Customize chart title for specific parameters
+                                    String chartTitle;
+                                    if (paramName.toLowerCase() ==
+                                        'currenthumidity') {
+                                      chartTitle = 'Humidity Graph ($unit)';
+                                    } else if (paramName.toLowerCase() ==
+                                        'currenttemperature') {
+                                      chartTitle = 'Temperature Graph ($unit)';
+                                    } else {
+                                      chartTitle = unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName;
+                                    }
 
-                              // Customize chart title for specific parameters
-                              String chartTitle;
-                              if (paramName.toLowerCase() ==
-                                  'currenthumidity') {
-                                chartTitle = 'Humidity Graph ($unit)';
-                              } else if (paramName.toLowerCase() ==
-                                  'currenttemperature') {
-                                chartTitle = 'Temperature Graph ($unit)';
-                              } else {
-                                chartTitle = unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName;
-                              }
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      chartTitle,
+                                      ChartType.line,
+                                    );
+                                  } else {}
+                                  return const SizedBox.shrink();
+                                }).toList(),
 
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                chartTitle,
-                                ChartType.line,
-                              );
-                            } else {}
-                            return const SizedBox.shrink();
-                          }).toList(),
+                              if (widget.deviceName.startsWith('NA'))
+                                ...NARLParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                        if (widget.deviceName.startsWith('CP'))
-                          ...csParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                                  // Exclude specified parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'MaximumTemperature',
+                                    'MinimumTemperature',
+                                    'AverageTemperature',
+                                    'RainfallDaily',
+                                    'RainfallWeekly',
+                                    'RainfallHourly'
+                                    'AverageHumidity',
+                                    'MinimumHumidity',
+                                    'MaximumHumidity',
+                                    'HumidityHourlyComulative',
+                                    'PressureHourlyComulative',
+                                    'LuxHourlyComulative',
+                                    'TemperatureHourlyComulative',
+                                  ];
 
-                            // Exclude specified parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'MaximumTemperature',
-                              'MinimumTemperature',
-                              'AverageTemperature',
-                              'RainfallMinutly',
-                              'RainfallDaily',
-                              'RainfallWeekly',
-                              'AverageHumidity',
-                              'MinimumHumidity',
-                              'MaximumHumidity',
-                              'HumidityHourlyComulative',
-                              'PressureHourlyComulative',
-                              'LuxHourlyComulative',
-                              'TemperatureHourlyComulative',
-                            ];
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
+                                    // Customize chart title for specific parameters
+                                    String chartTitle;
+                                    if (paramName.toLowerCase() ==
+                                        'currenthumidity') {
+                                      chartTitle = 'Humidity Graph ($unit)';
+                                    } else if (paramName.toLowerCase() ==
+                                        'currenttemperature') {
+                                      chartTitle = 'Temperature Graph ($unit)';
+                                    } else {
+                                      chartTitle = unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName;
+                                    }
 
-                              // Customize chart title for specific parameters
-                              String chartTitle;
-                              if (paramName.toLowerCase() ==
-                                  'currenthumidity') {
-                                chartTitle = 'Humidity Graph ($unit)';
-                              } else if (paramName.toLowerCase() ==
-                                  'currenttemperature') {
-                                chartTitle = 'Temperature Graph ($unit)';
-                              } else {
-                                chartTitle = unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName;
-                              }
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      chartTitle,
+                                      ChartType.line,
+                                    );
+                                  } else {}
+                                  return const SizedBox.shrink();
+                                }).toList(),
 
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                chartTitle,
-                                ChartType.line,
-                              );
-                            } else {}
-                            return const SizedBox.shrink();
-                          }).toList(),
+                              if (widget.deviceName.startsWith('CP'))
+                                ...csParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                        if (widget.deviceName.startsWith('SV'))
-                          ...svParametersData.entries.map((entry) {
-                            String paramName = entry.key;
-                            List<ChartData> data = entry.value;
+                                  // Exclude specified parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'MaximumTemperature',
+                                    'MinimumTemperature',
+                                    'AverageTemperature',
+                                    'RainfallHourly',
+                                    'RainfallDaily',
+                                    'RainfallWeekly',
+                                    'AverageHumidity',
+                                    'MinimumHumidity',
+                                    'MaximumHumidity',
+                                    'HumidityHourlyComulative',
+                                    'PressureHourlyComulative',
+                                    'LuxHourlyComulative',
+                                    'TemperatureHourlyComulative',
+                                    
+                                  ];
 
-                            // Exclude specified parameters
-                            List<String> excludedParams = [
-                              'Longitude',
-                              'Latitude',
-                              'SignalStrength',
-                              'BatteryVoltage',
-                              'MaximumTemperature',
-                              'MinimumTemperature',
-                              'AverageTemperature',
-                              'RainfallDaily',
-                              'RainfallWeekly',
-                              'AverageHumidity',
-                              'MinimumHumidity',
-                              'MaximumHumidity',
-                              'HumidityHourlyComulative',
-                              'PressureHourlyComulative',
-                              'LuxHourlyComulative',
-                              'TemperatureHourlyComulative',
-                            ];
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
 
-                            if (!excludedParams.contains(paramName) &&
-                                data.isNotEmpty) {
-                              final displayInfo =
-                                  _getParameterDisplayInfo(paramName);
-                              String displayName = displayInfo['displayName'];
-                              String unit = displayInfo['unit'];
+                                    // Customize chart title for specific parameters
+                                    String chartTitle;
+                                    if (paramName.toLowerCase() ==
+                                        'currenthumidity') {
+                                      chartTitle = 'Humidity Graph ($unit)';
+                                    } else if (paramName.toLowerCase() ==
+                                        'currenttemperature') {
+                                      chartTitle = 'Temperature Graph ($unit)';
+                                    } else {
+                                      chartTitle = unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName;
+                                    }
 
-                              // Customize chart title for specific parameters
-                              String chartTitle;
-                              if (paramName.toLowerCase() ==
-                                  'currenthumidity') {
-                                chartTitle = 'Humidity Graph ($unit)';
-                              } else if (paramName.toLowerCase() ==
-                                  'currenttemperature') {
-                                chartTitle = 'Temperature Graph ($unit)';
-                              } else {
-                                chartTitle = unit.isNotEmpty
-                                    ? '$displayName ($unit)'
-                                    : displayName;
-                              }
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      chartTitle,
+                                      ChartType.line,
+                                    );
+                                  } else {}
+                                  return const SizedBox.shrink();
+                                }).toList(),
 
-                              return _buildChartContainer(
-                                displayName,
-                                data,
-                                chartTitle,
-                                ChartType.line,
-                              );
-                            } else {}
-                            return const SizedBox.shrink();
-                          }).toList(),
-                        // Non-SM sensor parameters
-                        if (!widget.deviceName.startsWith('SM') &&
-                            !widget.deviceName.startsWith('CM') &&
-                            !widget.deviceName.startsWith('SV')) ...[
-                          if (hasNonZeroValues(chlorineData))
-                            _buildChartContainer('Chlorine', chlorineData,
-                                'Chlorine (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(temperatureData))
-                            _buildChartContainer('Temperature', temperatureData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(humidityData))
-                            _buildChartContainer('Humidity', humidityData,
-                                'Humidity (%)', ChartType.line),
-                          if (hasNonZeroValues(lightIntensityData))
-                            _buildChartContainer(
-                                'Light Intensity',
-                                lightIntensityData,
-                                'Light Intensity (Lux)',
-                                ChartType.line),
-                          if (hasNonZeroValues(windSpeedData))
-                            _buildChartContainer('Wind Speed', windSpeedData,
-                                'Wind Speed (m/s)', ChartType.line),
-                          if (hasNonZeroValues(solarIrradianceData))
-                            _buildChartContainer(
-                                'Solar Irradiance',
-                                solarIrradianceData,
-                                'Solar Irradiance (W/M^2)',
-                                ChartType.line),
-                          if (hasNonZeroValues(tempData))
-                            _buildChartContainer('Temperature', tempData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(tdsData))
-                            _buildChartContainer(
-                                'TDS', tdsData, 'TDS (ppm)', ChartType.line),
-                          if (hasNonZeroValues(codData))
-                            _buildChartContainer(
-                                'COD', codData, 'COD (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(bodData))
-                            _buildChartContainer(
-                                'BOD', bodData, 'BOD (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(pHData))
-                            _buildChartContainer(
-                                'pH', pHData, 'pH', ChartType.line),
-                          if (hasNonZeroValues(doData))
-                            _buildChartContainer(
-                                'DO', doData, 'DO (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(ecData))
-                            _buildChartContainer(
-                                'EC', ecData, 'EC (mS/cm)', ChartType.line),
-                          if (hasNonZeroValues(temppData))
-                            _buildChartContainer('Temperature', temppData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(electrodeSignalData))
-                            _buildChartContainer(
-                                'Electrode Signal',
-                                electrodeSignalData,
-                                'Electrode Signal (mV)',
-                                ChartType.line),
-                          if (hasNonZeroValues(residualchlorineData))
-                            _buildChartContainer(
-                                'Chlorine',
-                                residualchlorineData,
-                                'Chlorine (mg/L)',
-                                ChartType.line),
-                          if (hasNonZeroValues(hypochlorousData))
-                            _buildChartContainer(
-                                'Hypochlorous',
-                                hypochlorousData,
-                                'Hypochlorous (mg/L)',
-                                ChartType.line),
-                          if (hasNonZeroValues(temmppData))
-                            _buildChartContainer('Temperature', temmppData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(humidityyData))
-                            _buildChartContainer('Humidity', humidityyData,
-                                'Humidity (%)', ChartType.line),
-                          if (hasNonZeroValues(lightIntensityyData))
-                            _buildChartContainer(
-                                'Light Intensity',
-                                lightIntensityyData,
-                                'Light Intensity (Lux)',
-                                ChartType.line),
-                          if (hasNonZeroValues(windSpeeddData))
-                            _buildChartContainer('Wind Speed', windSpeeddData,
-                                'Wind Speed (m/s)', ChartType.line),
-                          if (hasNonZeroValues(ttempData))
-                            _buildChartContainer('Temperature', ttempData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(dovaluedata))
-                            _buildChartContainer('DO Value', dovaluedata,
-                                'DO (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(dopercentagedata))
-                            _buildChartContainer(
-                                'DO Percentage',
-                                dopercentagedata,
-                                'DO Percentage (%)',
-                                ChartType.line),
-                          if (hasNonZeroValues(temperaturData))
-                            _buildChartContainer('Temperature', temperaturData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(humData))
-                            _buildChartContainer('Humidity', humData,
-                                'Humidity (%)', ChartType.line),
-                          if (hasNonZeroValues(luxData))
-                            _buildChartContainer('Light Intensity', luxData,
-                                'Lux (Lux)', ChartType.line),
-                          if (hasNonZeroValues(coddata))
-                            _buildChartContainer(
-                                'COD', coddata, 'COD (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(boddata))
-                            _buildChartContainer(
-                                'BOD', boddata, 'BOD (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(phdata))
-                            _buildChartContainer(
-                                'pH', luxData, 'pH', ChartType.line),
-                          if (hasNonZeroValues(temperattureData))
-                            _buildChartContainer(
-                                'Temperature',
-                                temperattureData,
-                                'Temperature (°C)',
-                                ChartType.line),
-                          if (hasNonZeroValues(humidittyData))
-                            _buildChartContainer('Humidity', humidittyData,
-                                'Humidity (%)', ChartType.line),
-                          if (hasNonZeroValues(ammoniaData))
-                            _buildChartContainer('Ammonia', ammoniaData,
-                                'Ammonia (PPM)', ChartType.line),
-                          if (hasNonZeroValues(temperaturedata))
-                            _buildChartContainer('Temperature', temperaturedata,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(humiditydata))
-                            _buildChartContainer('Humidity', humiditydata,
-                                'Humidity (%)', ChartType.line),
-                          // if (hasNonZeroValues(rfdData))
-                          // _buildChartContainer(
-                          //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
-                          // if (hasNonZeroValues(rfsData))
-                          // _buildChartContainer(
-                          //     'RFS', rfsData, 'RFS (mm)', ChartType.line),
-                          if (hasNonZeroValues(ittempData))
-                            _buildChartContainer('Temperature', ittempData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(itpressureData))
-                            _buildChartContainer('Pressure', itpressureData,
-                                'Pressure (hPa)', ChartType.line),
-                          if (hasNonZeroValues(ithumidityData))
-                            _buildChartContainer('Humidity', ithumidityData,
-                                'Humidity (%)', ChartType.line),
-                          // if (hasNonZeroValues(itrainData))
-                          _buildChartContainer('Rain Level', itrainData,
-                              'Rain Level (mm)', ChartType.line),
-                          if (hasNonZeroValues(itvisibilityData))
-                            _buildChartContainer('Wind Speed', itwindspeedData,
-                                'Wind Speed (m/s)', ChartType.line),
-                          if (hasNonZeroValues(itradiationData))
-                            _buildChartContainer('Radiation', itradiationData,
-                                'Radiation (W/m²)', ChartType.line),
-                          if (hasNonZeroValues(itvisibilityData))
-                            _buildChartContainer('Visibilty', itvisibilityData,
-                                'Visibility (m)', ChartType.line),
-                          if (hasNonZeroValues(fstempData))
-                            _buildChartContainer('Temperature', fstempData,
-                                'Temperature (°C)', ChartType.line),
-                          if (hasNonZeroValues(fspressureData))
-                            _buildChartContainer('Pressure', fspressureData,
-                                'Pressure (hPa)', ChartType.line),
-                          if (hasNonZeroValues(fshumidityData))
-                            _buildChartContainer('Relative Humidity',
-                                fshumidityData, 'Humidity (%)', ChartType.line),
-                          // if (hasNonZeroValues(itrainData))
-                          _buildChartContainer('Rain Level', fsrainData,
-                              'Rain Level (mm)', ChartType.line),
-                          if (hasNonZeroValues(fsradiationData))
-                            _buildChartContainer('Radiation', fsradiationData,
-                                'Radiation (W/m²)', ChartType.line),
+                              if (widget.deviceName.startsWith('SV'))
+                                ...svParametersData.entries.map((entry) {
+                                  String paramName = entry.key;
+                                  List<ChartData> data = entry.value;
 
-                          if (hasNonZeroValues(fswindspeedData))
-                            _buildChartContainer('Wind Speed', fswindspeedData,
-                                'Wind Speed (m/s)', ChartType.line),
+                                  // Exclude specified parameters
+                                  List<String> excludedParams = [
+                                    'Longitude',
+                                    'Latitude',
+                                    'SignalStrength',
+                                    'BatteryVoltage',
+                                    'MaximumTemperature',
+                                    'MinimumTemperature',
+                                    'AverageTemperature',
+                                    'RainfallDaily',
+                                    'RainfallWeekly',
+                                    'AverageHumidity',
+                                    'MinimumHumidity',
+                                    'MaximumHumidity',
+                                    'HumidityHourlyComulative',
+                                    'PressureHourlyComulative',
+                                    'LuxHourlyComulative',
+                                    'TemperatureHourlyComulative',
+                                  ];
 
-                          if (hasNonZeroValues(temp2Data))
-                            _buildChartContainer('Temperature', temp2Data,
-                                'Temperature (°C)', ChartType.line),
+                                  if (!excludedParams.contains(paramName) &&
+                                      data.isNotEmpty) {
+                                    final displayInfo =
+                                        _getParameterDisplayInfo(paramName);
+                                    String displayName =
+                                        displayInfo['displayName'];
+                                    String unit = displayInfo['unit'];
 
-                          if (hasNonZeroValues(cod2Data))
-                            _buildChartContainer(
-                                'COD', cod2Data, 'COD (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(bod2Data))
-                            _buildChartContainer(
-                                'BOD', bod2Data, 'BOD (mg/L)', ChartType.line),
-                          if (hasNonZeroValues(wfAverageTemperatureData))
-                            _buildChartContainer(
-                                'Temperature',
-                                wfAverageTemperatureData,
-                                'Temperature (°C)',
-                                ChartType.line),
+                                    // Customize chart title for specific parameters
+                                    String chartTitle;
+                                    if (paramName.toLowerCase() ==
+                                        'currenthumidity') {
+                                      chartTitle = 'Humidity Graph ($unit)';
+                                    } else if (paramName.toLowerCase() ==
+                                        'currenttemperature') {
+                                      chartTitle = 'Temperature Graph ($unit)';
+                                    } else {
+                                      chartTitle = unit.isNotEmpty
+                                          ? '$displayName ($unit)'
+                                          : displayName;
+                                    }
 
-                          _buildChartContainer('Rain Level', wfrainfallData,
-                              'Rain Level (mm)', ChartType.line),
+                                    return _buildChartContainer(
+                                      displayName,
+                                      data,
+                                      chartTitle,
+                                      ChartType.line,
+                                    );
+                                  } else {}
+                                  return const SizedBox.shrink();
+                                }).toList(),
+                              // Non-SM sensor parameters
+                              if (!widget.deviceName.startsWith('SM') &&
+                                  !widget.deviceName.startsWith('CM') &&
+                                  !widget.deviceName.startsWith('SV')) ...[
+                                if (hasNonZeroValues(chlorineData))
+                                  _buildChartContainer('Chlorine', chlorineData,
+                                      'Chlorine (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(temperatureData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      temperatureData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(humidityData))
+                                  _buildChartContainer('Humidity', humidityData,
+                                      'Humidity (%)', ChartType.line),
+                                if (hasNonZeroValues(lightIntensityData))
+                                  _buildChartContainer(
+                                      'Light Intensity',
+                                      lightIntensityData,
+                                      'Light Intensity (Lux)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(windSpeedData))
+                                  _buildChartContainer(
+                                      'Wind Speed',
+                                      windSpeedData,
+                                      'Wind Speed (m/s)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(solarIrradianceData))
+                                  _buildChartContainer(
+                                      'Solar Irradiance',
+                                      solarIrradianceData,
+                                      'Solar Irradiance (W/M^2)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(tempData))
+                                  _buildChartContainer('Temperature', tempData,
+                                      'Temperature (°C)', ChartType.line),
+                                if (hasNonZeroValues(tdsData))
+                                  _buildChartContainer('TDS', tdsData,
+                                      'TDS (ppm)', ChartType.line),
+                                if (hasNonZeroValues(codData))
+                                  _buildChartContainer('COD', codData,
+                                      'COD (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(bodData))
+                                  _buildChartContainer('BOD', bodData,
+                                      'BOD (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(pHData))
+                                  _buildChartContainer(
+                                      'pH', pHData, 'pH', ChartType.line),
+                                if (hasNonZeroValues(doData))
+                                  _buildChartContainer('DO', doData,
+                                      'DO (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(ecData))
+                                  _buildChartContainer('EC', ecData,
+                                      'EC (mS/cm)', ChartType.line),
+                                if (hasNonZeroValues(temppData))
+                                  _buildChartContainer('Temperature', temppData,
+                                      'Temperature (°C)', ChartType.line),
+                                if (hasNonZeroValues(electrodeSignalData))
+                                  _buildChartContainer(
+                                      'Electrode Signal',
+                                      electrodeSignalData,
+                                      'Electrode Signal (mV)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(residualchlorineData))
+                                  _buildChartContainer(
+                                      'Chlorine',
+                                      residualchlorineData,
+                                      'Chlorine (mg/L)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(hypochlorousData))
+                                  _buildChartContainer(
+                                      'Hypochlorous',
+                                      hypochlorousData,
+                                      'Hypochlorous (mg/L)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(temmppData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      temmppData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(humidityyData))
+                                  _buildChartContainer(
+                                      'Humidity',
+                                      humidityyData,
+                                      'Humidity (%)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(lightIntensityyData))
+                                  _buildChartContainer(
+                                      'Light Intensity',
+                                      lightIntensityyData,
+                                      'Light Intensity (Lux)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(windSpeeddData))
+                                  _buildChartContainer(
+                                      'Wind Speed',
+                                      windSpeeddData,
+                                      'Wind Speed (m/s)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(ttempData))
+                                  _buildChartContainer('Temperature', ttempData,
+                                      'Temperature (°C)', ChartType.line),
+                                if (hasNonZeroValues(dovaluedata))
+                                  _buildChartContainer('DO Value', dovaluedata,
+                                      'DO (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(dopercentagedata))
+                                  _buildChartContainer(
+                                      'DO Percentage',
+                                      dopercentagedata,
+                                      'DO Percentage (%)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(temperaturData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      temperaturData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(humData))
+                                  _buildChartContainer('Humidity', humData,
+                                      'Humidity (%)', ChartType.line),
+                                if (hasNonZeroValues(luxData))
+                                  _buildChartContainer('Light Intensity',
+                                      luxData, 'Lux (Lux)', ChartType.line),
+                                if (hasNonZeroValues(coddata))
+                                  _buildChartContainer('COD', coddata,
+                                      'COD (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(boddata))
+                                  _buildChartContainer('BOD', boddata,
+                                      'BOD (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(phdata))
+                                  _buildChartContainer(
+                                      'pH', luxData, 'pH', ChartType.line),
+                                if (hasNonZeroValues(temperattureData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      temperattureData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(humidittyData))
+                                  _buildChartContainer(
+                                      'Humidity',
+                                      humidittyData,
+                                      'Humidity (%)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(ammoniaData))
+                                  _buildChartContainer('Ammonia', ammoniaData,
+                                      'Ammonia (PPM)', ChartType.line),
+                                if (hasNonZeroValues(temperaturedata))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      temperaturedata,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(humiditydata))
+                                  _buildChartContainer('Humidity', humiditydata,
+                                      'Humidity (%)', ChartType.line),
+                                // if (hasNonZeroValues(rfdData))
+                                // _buildChartContainer(
+                                //     'RFD', rfdData, 'RFD (mm)', ChartType.line),
+                                // if (hasNonZeroValues(rfsData))
+                                // _buildChartContainer(
+                                //     'RFS', rfsData, 'RFS (mm)', ChartType.line),
+                                if (hasNonZeroValues(ittempData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      ittempData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(itpressureData))
+                                  _buildChartContainer(
+                                      'Pressure',
+                                      itpressureData,
+                                      'Pressure (hPa)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(ithumidityData))
+                                  _buildChartContainer(
+                                      'Humidity',
+                                      ithumidityData,
+                                      'Humidity (%)',
+                                      ChartType.line),
+                                // if (hasNonZeroValues(itrainData))
+                                _buildChartContainer('Rain Level', itrainData,
+                                    'Rain Level (mm)', ChartType.line),
+                                if (hasNonZeroValues(itvisibilityData))
+                                  _buildChartContainer(
+                                      'Wind Speed',
+                                      itwindspeedData,
+                                      'Wind Speed (m/s)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(itradiationData))
+                                  _buildChartContainer(
+                                      'Radiation',
+                                      itradiationData,
+                                      'Radiation (W/m²)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(itvisibilityData))
+                                  _buildChartContainer(
+                                      'Visibilty',
+                                      itvisibilityData,
+                                      'Visibility (m)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(fstempData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      fstempData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(fspressureData))
+                                  _buildChartContainer(
+                                      'Pressure',
+                                      fspressureData,
+                                      'Pressure (hPa)',
+                                      ChartType.line),
+                                if (hasNonZeroValues(fshumidityData))
+                                  _buildChartContainer(
+                                      'Relative Humidity',
+                                      fshumidityData,
+                                      'Humidity (%)',
+                                      ChartType.line),
+                                // if (hasNonZeroValues(itrainData))
+                                _buildChartContainer('Rain Level', fsrainData,
+                                    'Rain Level (mm)', ChartType.line),
+                                if (hasNonZeroValues(fsradiationData))
+                                  _buildChartContainer(
+                                      'Radiation',
+                                      fsradiationData,
+                                      'Radiation (W/m²)',
+                                      ChartType.line),
+
+                                if (hasNonZeroValues(fswindspeedData))
+                                  _buildChartContainer(
+                                      'Wind Speed',
+                                      fswindspeedData,
+                                      'Wind Speed (m/s)',
+                                      ChartType.line),
+
+                                if (hasNonZeroValues(temp2Data))
+                                  _buildChartContainer('Temperature', temp2Data,
+                                      'Temperature (°C)', ChartType.line),
+
+                                if (hasNonZeroValues(cod2Data))
+                                  _buildChartContainer('COD', cod2Data,
+                                      'COD (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(bod2Data))
+                                  _buildChartContainer('BOD', bod2Data,
+                                      'BOD (mg/L)', ChartType.line),
+                                if (hasNonZeroValues(wfAverageTemperatureData))
+                                  _buildChartContainer(
+                                      'Temperature',
+                                      wfAverageTemperatureData,
+                                      'Temperature (°C)',
+                                      ChartType.line),
+
+                                _buildChartContainer(
+                                    'Rain Level',
+                                    wfrainfallData,
+                                    'Rain Level (mm)',
+                                    ChartType.line),
+                              ],
+                            ],
+                          )
                         ],
-                      ],
-                    )
-                  ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-
+           ],
+            ),
+          ),
           // Loader overlay
           if (_isLoading) // Show loader only when _isLoading is true
             Positioned.fill(
@@ -5856,6 +6202,66 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+// Helper method to build sidebar buttons
+  Widget _buildSidebarButton(
+    String title,
+    String value,
+    IconData icon,
+    bool isDarkMode, {
+    required VoidCallback onPressed,
+  }) {
+    bool isActive = _activeButton == value;
+
+    return Container(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isActive
+              ? (isDarkMode ? Colors.blue[700] : Colors.blue[600])
+              : (isDarkMode
+                  ? Colors.grey[700]!.withOpacity(0.7)
+                  : Colors.white.withOpacity(0.9)),
+          foregroundColor: isActive
+              ? Colors.white
+              : (isDarkMode ? Colors.white : Colors.black),
+          elevation: isActive ? 4 : 1,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(
+              color: isActive
+                  ? (isDarkMode ? Colors.blue[400]! : Colors.blue[300]!)
+                  : (isDarkMode ? Colors.grey[600]! : Colors.grey[400]!),
+              width: isActive ? 2 : 1,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isActive
+                  ? Colors.white
+                  : (isDarkMode ? Colors.white70 : Colors.black54),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -6104,27 +6510,57 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               ),
                               // ✅ Trackball for hover line + dot
                               trackballBehavior: TrackballBehavior(
-                                enable: true,
-                                activationMode: ActivationMode.singleTap,
-                                lineType: TrackballLineType.vertical,
-                                lineColor: Colors.blue,
-                                lineWidth: 1,
-                                markerSettings: const TrackballMarkerSettings(
-                                  markerVisibility:
-                                      TrackballVisibilityMode.visible,
-                                  width: 8,
-                                  height: 8,
-                                  borderWidth: 2,
-                                  color: Colors.blue,
-                                ),
-                                tooltipSettings: const InteractiveTooltip(
-                                  enable: true,
-                                  format: 'point.x : point.y',
-                                  borderWidth: 1,
-                                  color: Color.fromARGB(200, 0, 0, 0),
-                                  textStyle: TextStyle(color: Colors.white),
-                                ),
-                              ),
+  enable: true,
+  activationMode: ActivationMode.singleTap,
+  lineType: TrackballLineType.vertical,
+  lineColor: Colors.blue,
+  lineWidth: 1,
+  markerSettings: const TrackballMarkerSettings(
+    markerVisibility: TrackballVisibilityMode.visible,
+    width: 8,
+    height: 8,
+    borderWidth: 2,
+    color: Colors.blue,
+  ),
+  builder: (BuildContext context, TrackballDetails details) {
+    try {
+      final DateTime? time = details.point?.x;
+      final num? value = details.point?.y;
+
+      if (time == null || value == null) {
+        return const SizedBox();
+      }
+
+      return Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(200, 0, 0, 0),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              DateFormat('MM/dd hh:mm a').format(time),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'Value: $value',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      return const SizedBox();
+    }
+  },
+),
+
 
                               zoomPanBehavior: ZoomPanBehavior(
                                 zoomMode: ZoomMode.x,

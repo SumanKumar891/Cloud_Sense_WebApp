@@ -6,21 +6,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'shareddevice.dart'; // Shared utilities file
 
-class QRScannerPage extends StatefulWidget {
+class QRScannerPopup extends StatefulWidget {
   final Map<String, List<String>> devices;
 
-  QRScannerPage({required this.devices});
+  QRScannerPopup({required this.devices});
 
   @override
-  _QRScannerPageState createState() => _QRScannerPageState();
+  _QRScannerPopupState createState() => _QRScannerPopupState();
 }
 
-class _QRScannerPageState extends State<QRScannerPage> {
+class _QRScannerPopupState extends State<QRScannerPopup> {
   String? scannedQRCode;
   String message = "Position the QR code inside the scanner";
   late MobileScannerController _controller;
   String? _email;
   Color messageColor = Colors.teal;
+  bool _canClose = true; 
 
   @override
   void initState() {
@@ -48,14 +49,10 @@ class _QRScannerPageState extends State<QRScannerPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
 
-    if (email != null) {
-      setState(() {
-        _email = email;
-      });
-    } else {
-      Navigator.pushReplacementNamed(context, '/signin');
+    setState(() {
+      _email = email;
+    });
     }
-  }
 
   Future<void> _showSuccessMessage() async {
     return showDialog<void>(
@@ -63,11 +60,13 @@ class _QRScannerPageState extends State<QRScannerPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text(message,
-              style: TextStyle(
-                color: messageColor,
-                fontSize: 16,
-              )),
+          content: Text(
+            message,
+            style: TextStyle(
+              color: messageColor,
+              fontSize: 16,
+            ),
+          ),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
@@ -87,6 +86,10 @@ class _QRScannerPageState extends State<QRScannerPage> {
   }
 
   Future<void> _addDevice(String deviceID) async {
+    setState(() {
+      _canClose = false; 
+    });
+
     final String apiUrl =
         "https://ymfmk699j5.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_add_devices?email_id=$_email&device_id=$deviceID";
 
@@ -110,120 +113,108 @@ class _QRScannerPageState extends State<QRScannerPage> {
         messageColor = Colors.red;
       });
     }
+
+    await _showSuccessMessage(); 
   }
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor:
-          isDarkMode ? Colors.grey[200] : Colors.blueGrey[900], // AppBar color
-      appBar: AppBar(
-        title: Text(
-          'QR Scanner',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDarkMode ? Colors.white : Colors.black,
-              size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ManualEntryPage(devices: widget.devices),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        width: 400,
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDarkMode
-                ? [
-                    const Color.fromARGB(255, 192, 185, 185)!,
-                    const Color.fromARGB(255, 123, 159, 174)!,
-                  ]
-                : [
-                    const Color.fromARGB(255, 126, 171, 166)!,
-                    const Color.fromARGB(255, 54, 58, 59)!,
-                  ],
+                ? [Color(0xFFC0B9B9), Color(0xFF7B9FAE)]
+                : [Color(0xFF7EABA6), Color(0xFF363A3B)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color:
-                        isDarkMode ? Colors.blueGrey[900]! : Colors.grey[200]!,
-                    width: 4,
-                  ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'QR Scanner',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: isDarkMode ? Colors.blueGrey[900]! : Colors.grey[200]!,
+                  width: 4,
                 ),
-                child: MobileScanner(
-                  controller: _controller,
-                  onDetect: (BarcodeCapture capture) {
-                    final List<Barcode> barcodes = capture.barcodes;
-                    for (final barcode in barcodes) {
-                      final String? code = barcode.rawValue;
-                      if (code != null && code != scannedQRCode) {
-                        setState(() {
-                          scannedQRCode = code;
-                          message = "Detected QR Code";
-                        });
-                        _controller.stop();
-                        DeviceUtils.showConfirmationDialog(
-                          context: context,
-                          deviceId: code,
-                          devices: widget.devices,
-                          onConfirm: () async {
-                            await _addDevice(code);
-                            await _showSuccessMessage();
-                          },
-                        );
-                        break;
-                      }
+              ),
+              child: MobileScanner(
+                controller: _controller,
+                onDetect: (BarcodeCapture capture) {
+                  final List<Barcode> barcodes = capture.barcodes;
+                  for (final barcode in barcodes) {
+                    final String? code = barcode.rawValue;
+                    if (code != null && code != scannedQRCode) {
+                      setState(() {
+                        scannedQRCode = code;
+                        message = "Detected QR Code";
+                      });
+                      _controller.stop();
+                      DeviceUtils.showConfirmationDialog(
+                        context: context,
+                        deviceId: code,
+                        devices: widget.devices,
+                        onConfirm: () async {
+                          await _addDevice(code);
+                        },
+                      );
+                      break;
                     }
-                  },
+                  }
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              message,
+              style: TextStyle(color: messageColor),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: resetScanner,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                backgroundColor:
+                    isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+              ),
+              child: Text(
+                'Scan Again',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: resetScanner,
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: isDarkMode ? Colors.black : Colors.white,
-                  backgroundColor:
-                      isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+            ),
+            SizedBox(height: 10),
+
+           
+            if (_canClose)
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  "Close",
+                  style: TextStyle(color: Colors.red),
                 ),
-                child: Text('Scan Again',
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    )),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );

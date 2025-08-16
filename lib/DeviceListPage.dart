@@ -446,51 +446,42 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+            ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+    backgroundColor: isDarkMode ? Colors.black : Colors.white,
+  ),
+  onPressed: () {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => QRScannerPopup(devices: _deviceCategories),
+    );
+  },
+  child: Text(
+    'Scan QR Code',
+    style: TextStyle(fontSize: 16),
+  ),
+),
 
-                  backgroundColor:
-                      isDarkMode ? Colors.black : Colors.white, // background,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QRScannerPage(
-                        devices: _deviceCategories,
-                      ),
-                    ),
-                  );
-                },
-                child: Text(
-                  'Scan QR Code',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
               SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: isDarkMode ? Colors.black : Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ManualEntryPage(
-                        devices: _deviceCategories,
-                      ),
-                    ),
-                  );
-                },
-                child: Text(
-                  'Add Manually',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              ),
+        ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+ backgroundColor: isDarkMode ? Colors.black : Colors.white,
+  ),
+  onPressed: () {
+    showDialog(
+      context: context,
+      builder: (context) => ManualEntryPopup(devices: _deviceCategories),
+    );
+  },
+  child: Text(
+    'Add Manually',
+    style: TextStyle(fontSize: 16),
+  ),
+)
+
             ],
           ),
         ),
@@ -563,47 +554,42 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: Colors.black,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QRScannerPage(
-                        devices: _deviceCategories,
-                      ),
-                    ),
-                  );
-                },
-                child: Text(
-                  'Scan QR Code',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
+           ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+    backgroundColor:  Colors.black 
+  ),
+  onPressed: () {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => QRScannerPopup(devices: _deviceCategories),
+    );
+  },
+  child: Text(
+    'Scan QR Code',
+    style: TextStyle(fontSize: 16),
+  ),
+),
+
               SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: Colors.black,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ManualEntryPage(
-                        devices: _deviceCategories,
-                      ),
-                    ),
-                  );
-                },
-                child: Text(
-                  'Add Manually',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
+            ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+    backgroundColor: Colors.black,
+  ),
+  onPressed: () {
+    showDialog(
+      context: context,
+      builder: (context) => ManualEntryPopup(devices: _deviceCategories),
+    );
+  },
+  child: Text(
+    'Add Manually',
+    style: TextStyle(fontSize: 16, color: Colors.white),
+  ),
+)
+
             ],
           ),
         ),
