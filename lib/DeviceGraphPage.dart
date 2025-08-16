@@ -4766,41 +4766,74 @@ Widget _buildHorizontalStatsRow(bool isDarkMode) {
   return Row(); // Default empty
 }
 
-// Helper to build param stat column
 Widget _buildParamStat(String label, double? current, double? min, double? max, String unit, bool isDarkMode) {
-  // Apply background color only if current value exists
+  final Map<String, IconData> parameterIcons = {
+    'Atm Pressure': Icons.compress,
+    'Light Intensity': Icons.lightbulb,
+    'Rainfall': Icons.umbrella,
+    'Temperature': Icons.thermostat,
+    'Wind Direction': Icons.navigation,
+    'Wind Speed': Icons.air,
+    'Humidity': Icons.water,
+    'Temp': Icons.thermostat, // For backward compatibility
+    'TDS': Icons.water_drop,
+    'COD': Icons.science,
+    'BOD': Icons.science,
+    'pH': Icons.opacity,
+    'DO': Icons.bubble_chart,
+    'EC': Icons.electrical_services,
+    'AMMONIA': Icons.cloud,
+  };
+
+  final IconData icon = parameterIcons[label] ?? Icons.help; // Fallback to a neutral icon
+
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 8.0),
     child: Container(
       color: current != null
-          ? (isDarkMode ?  Colors.blueGrey[900] : Colors.grey[200])
-          : Colors.transparent, // Transparent for undefined sensors
-      padding: EdgeInsets.all(4.0), // Optional padding for the bar
+          ? (isDarkMode ? Colors.blueGrey[900] : Colors.grey[200])
+          : Colors.transparent,
+      padding: EdgeInsets.all(4.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ?  Colors.white : Colors.black,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20.0,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+              SizedBox(width: 4.0),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+            ],
           ),
+          SizedBox(height: 4.0), // Spacing between label and value
           Text(
             '${current?.toStringAsFixed(2) ?? '-'} $unit',
+            textAlign: TextAlign.center,
             style: TextStyle(
-              color: isDarkMode ?  Colors.white : Colors.black,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
           if (min != null)
             Text(
               'Min: ${min.toStringAsFixed(2)} $unit',
-              style: TextStyle(color: isDarkMode ?  Colors.white : Colors.black),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
           if (max != null)
             Text(
               'Max: ${max.toStringAsFixed(2)} $unit',
-              style: TextStyle(color: isDarkMode ?  Colors.white : Colors.black),
+              textAlign: TextAlign.center,
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
         ],
       ),
@@ -6190,6 +6223,11 @@ if (!isMobile)
                   ),
                 ],
               ),
+              // Colored line for differentiation
+      Container(
+        height: 2.0,
+        color: isDarkMode ? Colors.white : Colors.black, // Adjust color as needed
+      ),
               // Content area below AppBar
               Expanded(
                 child: Row(
