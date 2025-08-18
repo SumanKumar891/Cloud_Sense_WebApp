@@ -4943,8 +4943,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       double? max, String unit, bool isDarkMode) {
     final Map<String, IconData> parameterIcons = {
       'Atm Pressure': Icons.compress,
-      'Light Intensity': Icons.lightbulb,
-      'Rainfall': Icons.umbrella,
+      'Light Intensity': Icons.wb_sunny,
+      'Rainfall': Icons.cloudy_snowing,
       'Temperature': Icons.thermostat,
       'Wind Direction': Icons.navigation,
       'Wind Speed': Icons.air,
@@ -4957,6 +4957,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
       'DO': Icons.bubble_chart,
       'EC': Icons.electrical_services,
       'AMMONIA': Icons.cloud,
+      'Pressure': Icons.compress,
+      'Rain Level': Icons.cloudy_snowing, // Cloud + rain
+      'Radiation': Icons.wb_sunny, // Sun icon for solar radiation
     };
 
     final IconData icon =
