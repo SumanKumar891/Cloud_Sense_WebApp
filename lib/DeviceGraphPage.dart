@@ -4742,6 +4742,34 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               ecStats['max']?[0], 'mS/cm', isDarkMode),
         ],
       );
+    } else if (widget.deviceName.startsWith('FS')) {
+      final fstempStats = _calculatefsStatistics(fstempData);
+      final fspressureStats = _calculatefsStatistics(fspressureData);
+      final fshumStats = _calculatefsStatistics(fshumidityData);
+      final fsrainStats = _calculatefsStatistics(fsrainData);
+      final fsradiationStats = _calculatefsStatistics(fsradiationData);
+      final fswindspeedStats = _calculatefsStatistics(fswindspeedData);
+      final fswinddirectionStats = _calculatefsStatistics(fswinddirectionData);
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildParamStat('Temperature', fstempStats['current']?[0], null, null,
+              '°C', isDarkMode),
+          _buildParamStat('Pressure', fspressureStats['current']?[0], null,
+              null, 'hPa', isDarkMode),
+          _buildParamStat('Humidity', fshumStats['current']?[0], null, null,
+              '%', isDarkMode),
+          _buildParamStat('Rain Level', fsrainStats['current']?[0], null, null,
+              'mm', isDarkMode),
+          _buildParamStat('Radiation', fsradiationStats['current']?[0], null,
+              null, 'W/m²', isDarkMode),
+          _buildParamStat('Wind Speed', fswindspeedStats['current']?[0], null,
+              null, 'm/s', isDarkMode),
+          _buildParamStat('Wind Direction', fswinddirectionStats['current']?[0],
+              null, null, '°', isDarkMode),
+        ],
+      );
     } else if (widget.deviceName.startsWith('CB')) {
       final temp2Stats = _calculateCBStatistics(temp2Data);
       final cod2Stats = _calculateCBStatistics(cod2Data);
@@ -5307,6 +5335,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                               'EC': ecData,
                                             },
                                           ),
+                                        if (widget.deviceName.startsWith('FS'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': fstempData,
+                                              'Pressure': fspressureData,
+                                              'Humidity': fshumidityData,
+                                              'Rainfall': fsrainData,
+                                              'Radiation': fsradiationData,
+                                              'Wind Speed': fswindspeedData,
+                                              'Wind Direction':
+                                                  fswinddirectionData,
+                                            },
+                                          ),
                                         if (widget.deviceName.startsWith('CB'))
                                           _buildMinMaxTable(
                                             isDarkMode,
@@ -5846,8 +5888,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                   buildDOStatisticsTable(),
                                 if (widget.deviceName.startsWith('IT'))
                                   buildITStatisticsTable(),
-                                if (widget.deviceName.startsWith('FS'))
-                                  buildfsStatisticsTable(),
                                 if (widget.deviceName.startsWith('WD211') ||
                                     (widget.deviceName.startsWith('WD511')))
                                   SingleChildScrollView(
@@ -7180,8 +7220,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                         buildDOStatisticsTable(),
                                       if (widget.deviceName.startsWith('IT'))
                                         buildITStatisticsTable(),
-                                      if (widget.deviceName.startsWith('FS'))
-                                        buildfsStatisticsTable(),
+
                                       if (widget.deviceName
                                               .startsWith('WD211') ||
                                           (widget.deviceName
