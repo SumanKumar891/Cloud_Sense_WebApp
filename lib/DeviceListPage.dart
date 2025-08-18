@@ -145,7 +145,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'SM':
         return 'SSMET Sensors';
       case 'CF':
-        return 'Colonel Farm Sensors';
+        return 'SEKHU Farm Sensors';
       case 'SV':
         return 'SVPU Sensors (Meerut)';
       case 'CB':
