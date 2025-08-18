@@ -5442,11 +5442,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Container(
-                            padding: EdgeInsets.only(top: 0),
+                            padding: EdgeInsets.only(top: 10),
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(16.0),
+                                  padding: const EdgeInsets.all(0.0),
                                   child: LayoutBuilder(
                                     builder: (context, constraints) {
                                       return Column(
@@ -5472,48 +5472,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 20,
                                                     color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          if (widget.deviceName
-                                              .startsWith('WF'))
-                                            Column(
-                                              children: [
-                                                SizedBox(height: 0),
-                                                InkWell(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            WeatherForecastPage(
-                                                          deviceName:
-                                                              widget.deviceName,
-                                                          sequentialName: widget
-                                                              .sequentialName,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Column(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.cloud,
-                                                        size: 40,
-                                                        color: Colors.white,
-                                                      ),
-                                                      SizedBox(height: 8),
-                                                      Text(
-                                                        'Weather Forecast',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ],
                                                   ),
                                                 ),
                                               ],
@@ -6763,137 +6721,137 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             Expanded(
                               child: SingleChildScrollView(
                                 child: Container(
-                                  padding: EdgeInsets.only(top: 0),
+                                  padding: EdgeInsets.only(top: 10),
                                   child: Column(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                        padding: const EdgeInsets.all(0.0),
                                         child: LayoutBuilder(
                                           builder: (context, constraints) {
                                             return Column(
-                                              children: [
-                                                SizedBox(height: 0),
-                                                if (widget.deviceName
-                                                        .startsWith('WD') &&
-                                                    isWindDirectionValid(
-                                                        _lastWindDirection) &&
-                                                    _lastWindDirection !=
-                                                        null &&
-                                                    _lastWindDirection
-                                                        .isNotEmpty)
-                                                  Column(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.wind_power,
-                                                        size: 40,
-                                                        color: Colors.white,
-                                                      ),
-                                                      SizedBox(height: 0),
-                                                      Text(
-                                                        'Wind Direction : $_lastWindDirection',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20,
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                if (widget.deviceName
-                                                    .startsWith('WF'))
-                                                  Column(
-                                                    children: [
-                                                      SizedBox(height: 0),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  WeatherForecastPage(
-                                                                deviceName: widget
-                                                                    .deviceName,
-                                                                sequentialName:
-                                                                    widget
-                                                                        .sequentialName,
-                                                              ),
-                                                            ),
-                                                          );
-                                                        },
-                                                        child: Column(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.cloud,
-                                                              size: 40,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                            SizedBox(height: 8),
-                                                            Text(
-                                                              'Weather Forecast',
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 20,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                SizedBox(height: 0),
-                                                if (widget.deviceName
-                                                    .startsWith('TE'))
-                                                  Text(
-                                                    'RSSI Value : $_lastRSSI_Value',
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 20,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                              ],
-                                            );
+                                                // children: [
+                                                // SizedBox(height: 0),
+                                                // if (widget.deviceName
+                                                //         .startsWith('WD') &&
+                                                //     isWindDirectionValid(
+                                                //         _lastWindDirection) &&
+                                                //     _lastWindDirection !=
+                                                //         null &&
+                                                //     _lastWindDirection
+                                                //         .isNotEmpty)
+                                                // Column(
+                                                //   children: [
+                                                //     Icon(
+                                                //       Icons.wind_power,
+                                                //       size: 40,
+                                                //       color: Colors.white,
+                                                //     ),
+                                                //     SizedBox(height: 0),
+                                                //     Text(
+                                                //       'Wind Direction : $_lastWindDirection',
+                                                //       style: TextStyle(
+                                                //         fontWeight:
+                                                //             FontWeight.bold,
+                                                //         fontSize: 20,
+                                                //         color: Colors.white,
+                                                //       ),
+                                                //     ),
+                                                //   ],
+                                                // ),
+                                                // if (widget.deviceName
+                                                //     .startsWith('WF'))
+                                                //   Column(
+                                                //     children: [
+                                                //       SizedBox(height: 0),
+                                                //       InkWell(
+                                                //         onTap: () {
+                                                //           Navigator.push(
+                                                //             context,
+                                                //             MaterialPageRoute(
+                                                //               builder: (context) =>
+                                                //                   WeatherForecastPage(
+                                                //                 deviceName: widget
+                                                //                     .deviceName,
+                                                //                 sequentialName:
+                                                //                     widget
+                                                //                         .sequentialName,
+                                                //               ),
+                                                //             ),
+                                                //           );
+                                                //         },
+                                                //         child: Column(
+                                                //           children: [
+                                                //             Icon(
+                                                //               Icons.cloud,
+                                                //               size: 40,
+                                                //               color:
+                                                //                   Colors.white,
+                                                //             ),
+                                                //             SizedBox(height: 8),
+                                                //             Text(
+                                                //               'Weather Forecast',
+                                                //               style: TextStyle(
+                                                //                 fontWeight:
+                                                //                     FontWeight
+                                                //                         .bold,
+                                                //                 fontSize: 20,
+                                                //                 color: Colors
+                                                //                     .white,
+                                                //               ),
+                                                //             ),
+                                                //           ],
+                                                //         ),
+                                                //       ),
+                                                //     ],
+                                                //   ),
+                                                // SizedBox(height: 0),
+                                                // if (widget.deviceName
+                                                //     .startsWith('TE'))
+                                                //   Text(
+                                                //     'RSSI Value : $_lastRSSI_Value',
+                                                //     style: TextStyle(
+                                                //       fontWeight:
+                                                //           FontWeight.bold,
+                                                //       fontSize: 20,
+                                                //       color: Colors.white,
+                                                //     ),
+                                                //   ),
+                                                // ],
+                                                );
                                           },
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(0.0),
-                                        child: Column(
-                                          children: [
-                                            if (widget.deviceName
-                                                .startsWith('CL'))
-                                              _buildCurrentValue(
-                                                  'Chlorine Level',
-                                                  _currentChlorineValue,
-                                                  'mg/L'),
-                                            if (widget.deviceName
-                                                .startsWith('20'))
-                                              _buildCurrentValue('Rain Level ',
-                                                  _currentrfdValue, 'mm'),
-                                            () {
-                                              if (widget.deviceName
-                                                      .startsWith('IT') &&
-                                                  iswinddirectionValid(
-                                                      _lastwinddirection) &&
-                                                  _lastwinddirection != null &&
-                                                  _lastwinddirection
-                                                      .isNotEmpty) {
-                                                return _buildWindCompass(
-                                                    _lastwinddirection);
-                                              } else {
-                                                return SizedBox.shrink();
-                                              }
-                                            }(),
-                                          ],
-                                        ),
-                                      ),
+                                      // Padding(
+                                      //   padding: const EdgeInsets.all(0.0),
+                                      //   child: Column(
+                                      //     children: [
+                                      //       if (widget.deviceName
+                                      //           .startsWith('CL'))
+                                      //         _buildCurrentValue(
+                                      //             'Chlorine Level',
+                                      //             _currentChlorineValue,
+                                      //             'mg/L'),
+                                      //       if (widget.deviceName
+                                      //           .startsWith('20'))
+                                      //         _buildCurrentValue('Rain Level ',
+                                      //             _currentrfdValue, 'mm'),
+                                      //       () {
+                                      //         if (widget.deviceName
+                                      //                 .startsWith('IT') &&
+                                      //             iswinddirectionValid(
+                                      //                 _lastwinddirection) &&
+                                      //             _lastwinddirection != null &&
+                                      //             _lastwinddirection
+                                      //                 .isNotEmpty) {
+                                      //           return _buildWindCompass(
+                                      //               _lastwinddirection);
+                                      //         } else {
+                                      //           return SizedBox.shrink();
+                                      //         }
+                                      //       }(),
+                                      //     ],
+                                      //   ),
+                                      // ),
                                       if (widget.deviceName.startsWith('WQ'))
                                         buildStatisticsTable(),
                                       if (widget.deviceName.startsWith('CB'))
@@ -7867,7 +7825,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   ) {
     return data.isNotEmpty
         ? Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(0.0),
             child: Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
@@ -7883,7 +7841,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Text(
                       '$title Graph',
                       style: TextStyle(
@@ -8012,10 +7970,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                       0), // Dark mode: semi-transparent black
                               primaryXAxis: DateTimeAxis(
                                 // ✅ Show only date for 1 year, otherwise date + time
-                                dateFormat: _lastSelectedRange == '1year'
-                                    ? DateFormat('MM/dd/yyyy') // only date
-                                    : DateFormat(
-                                        'MM/dd hh:mm a'), // date + time
+                                dateFormat: _lastSelectedRange == 'single'
+                                    ? DateFormat('MM/dd hh:mm a') // date + time
+                                    : DateFormat('MM/dd'), // only date
+
                                 title: AxisTitle(
                                   text: 'Time',
                                   textStyle: TextStyle(
@@ -8035,9 +7993,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 labelRotation: 70,
                                 edgeLabelPlacement: EdgeLabelPlacement.shift,
                                 intervalType: DateTimeIntervalType.auto,
-                                autoScrollingDelta: 100,
-                                autoScrollingMode: AutoScrollingMode.end,
+                                // autoScrollingDelta: 100,
+                                // autoScrollingMode: AutoScrollingMode.end,
                                 enableAutoIntervalOnZooming: true,
+
                                 majorGridLines: MajorGridLines(
                                   width: 1.0,
                                   dashArray: [
