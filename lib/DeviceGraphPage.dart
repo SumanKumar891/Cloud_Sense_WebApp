@@ -279,6 +279,99 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                 setState(() => _activeButton = '1year');
                 Navigator.pop(context);
               },
+            ), // Min/Max Values of Parameters
+            Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.07),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.deviceName.startsWith('WQ'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'temp': tempData,
+                        'TDS': tdsData,
+                        'COD': codData,
+                        'BOD': bodData,
+                        'pH': pHData,
+                        'DO': doData,
+                        'EC': ecData,
+                      },
+                    ),
+                  if (widget.deviceName.startsWith('CB'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'temp': temp2Data,
+                        'COD': cod2Data,
+                        'BOD': bod2Data,
+                      },
+                    ),
+                  if (widget.deviceName.startsWith('NH'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'AMMONIA': ammoniaData,
+                        'TEMP': temperaturedata,
+                        'HUMIDITY': humiditydata,
+                      },
+                    ),
+                  if (widget.deviceName.startsWith('DO'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'Temperature': ttempData,
+                        'DO Value': dovaluedata,
+                        'DO Percentage': dopercentagedata,
+                      },
+                    ),
+                  if (widget.deviceName.startsWith('NA'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'Temperature':
+                            NARLParametersData['CurrentTemperature'] ?? [],
+                        'Humidity': NARLParametersData['CurrentHumidity'] ?? [],
+                        'Light Intensity':
+                            NARLParametersData['LightIntensity'] ?? [],
+                        'Wind Speed': NARLParametersData['WindSpeed'] ?? [],
+                        'Atm Pressure': NARLParametersData['AtmPressure'] ?? [],
+                        'Wind Direction':
+                            NARLParametersData['WindDirection'] ?? [],
+                        'Rainfall': NARLParametersData['RainfallMinutly'] ?? [],
+                      },
+                    ),
+                  if (widget.deviceName.startsWith('VD'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'Temperature':
+                            vdParametersData['CurrentTemperature'] ?? [],
+                        'Humidity': vdParametersData['CurrentHumidity'] ?? [],
+                        'Light Intensity':
+                            vdParametersData['LightIntensity'] ?? [],
+                        'Rainfall': vdParametersData['RainfallHourly'] ?? [],
+                      },
+                    ),
+                  if (widget.deviceName.startsWith('CP'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'Temperature':
+                            csParametersData['CurrentTemperature'] ?? [],
+                        'Humidity': csParametersData['CurrentHumidity'] ?? [],
+                        'Light Intensity':
+                            csParametersData['LightIntensity'] ?? [],
+                        'Rainfall': csParametersData['RainfallMinutly'] ?? [],
+                        'Wind Speed': csParametersData['WindSpeed'] ?? [],
+                        'Atm Pressure': csParametersData['AtmPressure'] ?? [],
+                        'Wind Direction':
+                            csParametersData['WindDirection'] ?? [],
+                      },
+                    ),
+                ],
+              ),
             ),
           ],
         ),
@@ -4897,13 +4990,99 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
     );
   }
 
+  Widget _buildMinMaxTable(
+      bool isDarkMode, Map<String, List<ChartData>> parameters) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Align(
+            alignment: Alignment.center, // keep table centered
+            child: SizedBox(
+              width:
+                  isMobile ? constraints.maxWidth * 0.95 : constraints.maxWidth,
+              child: Table(
+                border: TableBorder.all(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                columnWidths: const {
+                  0: FlexColumnWidth(2), // Parameter column
+                  1: FlexColumnWidth(1), // Min column
+                  2: FlexColumnWidth(1), // Max column
+                },
+                children: [
+                  TableRow(
+                    children: [
+                      _buildCenteredCell('Parameter', isDarkMode,
+                          isHeader: true),
+                      _buildCenteredCell('Min', isDarkMode, isHeader: true),
+                      _buildCenteredCell('Max', isDarkMode, isHeader: true),
+                    ],
+                  ),
+                  ...parameters.entries.map((entry) {
+                    final paramName = entry.key;
+                    final data = entry.value;
+
+                    if (data.isEmpty) {
+                      return TableRow(children: [
+                        SizedBox.shrink(),
+                        SizedBox.shrink(),
+                        SizedBox.shrink()
+                      ]);
+                    }
+
+                    final values = data.map((d) => d.value).toList();
+                    final minValue = values
+                        .reduce((a, b) => a < b ? a : b)
+                        .toStringAsFixed(2);
+                    final maxValue = values
+                        .reduce((a, b) => a > b ? a : b)
+                        .toStringAsFixed(2);
+
+                    return TableRow(
+                      children: [
+                        _buildCenteredCell(paramName, isDarkMode),
+                        _buildCenteredCell(minValue, isDarkMode, fontSize: 12),
+                        _buildCenteredCell(maxValue, isDarkMode, fontSize: 12),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCenteredCell(String text, bool isDarkMode,
+      {bool isHeader = false, double fontSize = 14}) {
+    return Padding(
+      padding: EdgeInsets.all(4.0),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+            color: isDarkMode ? Colors.white : Colors.black,
+            fontSize: fontSize,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     String _selectedRange = 'ee';
 
     // Calculate sidebar width based on screen size
-    double sidebarWidth = MediaQuery.of(context).size.width < 800 ? 250 : 220;
+    double sidebarWidth = MediaQuery.of(context).size.width < 800 ? 250 : 260;
     bool isMobile = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
@@ -4972,7 +5151,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 style: TextStyle(
                                   color:
                                       isDarkMode ? Colors.white : Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 children: [
@@ -4980,7 +5159,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     text:
                                         " (${widget.deviceName})", // Device name on next line
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: isDarkMode
                                           ? Colors.white
@@ -5033,73 +5212,212 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                       Expanded(
                         child: Padding(
                           padding: EdgeInsets.all(16),
-                          child: Column(
-                            children: [
-                              _buildSidebarButton(
-                                '1 Day',
-                                'date',
-                                Icons.today,
-                                isDarkMode,
-                                onPressed: () {
-                                  _selectDate();
-                                  setState(() {
-                                    _activeButton = 'date';
-                                  });
-                                },
+                          child: Scrollbar(
+                            // 👈 Visible scrollbar
+                            // thumbVisibility: true, // Always show the thumb
+                            thickness: 6, // Scrollbar thickness
+                            radius: Radius.circular(8),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  _buildSidebarButton(
+                                    '1 Day',
+                                    'date',
+                                    Icons.today,
+                                    isDarkMode,
+                                    onPressed: () {
+                                      _selectDate();
+                                      setState(() {
+                                        _activeButton = 'date';
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  _buildSidebarButton(
+                                    'Last 7 Days',
+                                    '7days',
+                                    Icons.calendar_view_week,
+                                    isDarkMode,
+                                    onPressed: () {
+                                      _fetchDataForRange('7days');
+                                      setState(() {
+                                        _activeButton = '7days';
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  _buildSidebarButton(
+                                    'Last 30 Days',
+                                    '30days',
+                                    Icons.calendar_view_month,
+                                    isDarkMode,
+                                    onPressed: () {
+                                      _fetchDataForRange('30days');
+                                      setState(() {
+                                        _activeButton = '30days';
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  _buildSidebarButton(
+                                    'Last 3 Months',
+                                    '3months',
+                                    Icons.calendar_today,
+                                    isDarkMode,
+                                    onPressed: () {
+                                      _fetchDataForRange('3months');
+                                      setState(() {
+                                        _activeButton = '3months';
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: 8),
+                                  _buildSidebarButton(
+                                    'Last 1 Year',
+                                    '1year',
+                                    Icons.date_range,
+                                    isDarkMode,
+                                    onPressed: () {
+                                      _fetchDataForRange('1year');
+                                      setState(() {
+                                        _activeButton = '1year';
+                                      });
+                                    },
+                                  ), // Min/Max Values of Parameters
+                                  // Min/Max Values of Parameters
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.07),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (widget.deviceName.startsWith('WQ'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'temp': tempData,
+                                              'TDS': tdsData,
+                                              'COD': codData,
+                                              'BOD': bodData,
+                                              'pH': pHData,
+                                              'DO': doData,
+                                              'EC': ecData,
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('CB'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'temp': temp2Data,
+                                              'COD': cod2Data,
+                                              'BOD': bod2Data,
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('NH'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'AMMONIA': ammoniaData,
+                                              'TEMP': temperaturedata,
+                                              'HUMIDITY': humiditydata,
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('DO'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': ttempData,
+                                              'DO Value': dovaluedata,
+                                              'DO Percentage': dopercentagedata,
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('NA'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': NARLParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': NARLParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Light Intensity':
+                                                  NARLParametersData[
+                                                          'LightIntensity'] ??
+                                                      [],
+                                              'Wind Speed': NARLParametersData[
+                                                      'WindSpeed'] ??
+                                                  [],
+                                              'Atm Pressure':
+                                                  NARLParametersData[
+                                                          'AtmPressure'] ??
+                                                      [],
+                                              'Wind Direction':
+                                                  NARLParametersData[
+                                                          'WindDirection'] ??
+                                                      [],
+                                              'Rainfall': NARLParametersData[
+                                                      'RainfallMinutly'] ??
+                                                  [],
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('VD'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': vdParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': vdParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Light Intensity':
+                                                  vdParametersData[
+                                                          'LightIntensity'] ??
+                                                      [],
+                                              'Rainfall': vdParametersData[
+                                                      'RainfallHourly'] ??
+                                                  [],
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('CP'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': csParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': csParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Light Intensity':
+                                                  csParametersData[
+                                                          'LightIntensity'] ??
+                                                      [],
+                                              'Rainfall': csParametersData[
+                                                      'RainfallMinutly'] ??
+                                                  [],
+                                              'Wind Speed': csParametersData[
+                                                      'WindSpeed'] ??
+                                                  [],
+                                              'Atm Pressure': csParametersData[
+                                                      'AtmPressure'] ??
+                                                  [],
+                                              'Wind Direction':
+                                                  csParametersData[
+                                                          'WindDirection'] ??
+                                                      [],
+                                            },
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 8),
-                              _buildSidebarButton(
-                                'Last 7 Days',
-                                '7days',
-                                Icons.calendar_view_week,
-                                isDarkMode,
-                                onPressed: () {
-                                  _fetchDataForRange('7days');
-                                  setState(() {
-                                    _activeButton = '7days';
-                                  });
-                                },
-                              ),
-                              SizedBox(height: 8),
-                              _buildSidebarButton(
-                                'Last 30 Days',
-                                '30days',
-                                Icons.calendar_view_month,
-                                isDarkMode,
-                                onPressed: () {
-                                  _fetchDataForRange('30days');
-                                  setState(() {
-                                    _activeButton = '30days';
-                                  });
-                                },
-                              ),
-                              SizedBox(height: 8),
-                              _buildSidebarButton(
-                                'Last 3 Months',
-                                '3months',
-                                Icons.calendar_today,
-                                isDarkMode,
-                                onPressed: () {
-                                  _fetchDataForRange('3months');
-                                  setState(() {
-                                    _activeButton = '3months';
-                                  });
-                                },
-                              ),
-                              SizedBox(height: 8),
-                              _buildSidebarButton(
-                                'Last 1 Year',
-                                '1year',
-                                Icons.date_range,
-                                isDarkMode,
-                                onPressed: () {
-                                  _fetchDataForRange('1year');
-                                  setState(() {
-                                    _activeButton = '1year';
-                                  });
-                                },
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -5122,7 +5440,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: MediaQuery.of(context).size.width < 1200
+                              child: MediaQuery.of(context).size.width < 1400
                                   ? SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child:
