@@ -125,7 +125,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'DO':
         return 'DO Sensors';
       case 'IT':
-        return 'IIT Weather Sensors';
+        return 'IIT Bombay Weather Sensors';
       case 'WS':
         return 'Water Sensors';
       case 'LU':
@@ -141,13 +141,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'NH':
         return 'Ammonia Sensors';
       case 'FS':
-        return 'Forest Sensors';
+        return 'Forest Sensors (Bhopal)';
       case 'SM':
         return 'SSMET Sensors';
       case 'CF':
         return 'Colonel Farm Sensors';
       case 'SV':
-        return 'SVPU Sensors';
+        return 'SVPU Sensors (Meerut)';
       case 'CB':
         return 'COD/BOD Sensors';
       case 'WF':
@@ -159,7 +159,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'NA':
         return 'NARL Sensors';
       case 'CP':
-        return 'Campus Sensors';
+        return 'Campus Sensors (IIT Ropar)';
       default:
         return 'Rain Sensors';
     }
@@ -446,42 +446,42 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
               ),
               SizedBox(height: 20),
-            ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-    backgroundColor: isDarkMode ? Colors.black : Colors.white,
-  ),
-  onPressed: () {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => QRScannerPopup(devices: _deviceCategories),
-    );
-  },
-  child: Text(
-    'Scan QR Code',
-    style: TextStyle(fontSize: 16),
-  ),
-),
-
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                  backgroundColor: isDarkMode ? Colors.black : Colors.white,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) =>
+                        QRScannerPopup(devices: _deviceCategories),
+                  );
+                },
+                child: Text(
+                  'Scan QR Code',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
               SizedBox(height: 16),
-        ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
- backgroundColor: isDarkMode ? Colors.black : Colors.white,
-  ),
-  onPressed: () {
-    showDialog(
-      context: context,
-      builder: (context) => ManualEntryPopup(devices: _deviceCategories),
-    );
-  },
-  child: Text(
-    'Add Manually',
-    style: TextStyle(fontSize: 16),
-  ),
-)
-
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                  backgroundColor: isDarkMode ? Colors.black : Colors.white,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        ManualEntryPopup(devices: _deviceCategories),
+                  );
+                },
+                child: Text(
+                  'Add Manually',
+                  style: TextStyle(fontSize: 16),
+                ),
+              )
             ],
           ),
         ),
@@ -554,42 +554,42 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 ),
               ),
               SizedBox(height: 20),
-           ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-    backgroundColor:  Colors.black 
-  ),
-  onPressed: () {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => QRScannerPopup(devices: _deviceCategories),
-    );
-  },
-  child: Text(
-    'Scan QR Code',
-    style: TextStyle(fontSize: 16),
-  ),
-),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                    backgroundColor: Colors.black),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) =>
+                        QRScannerPopup(devices: _deviceCategories),
+                  );
+                },
+                child: Text(
+                  'Scan QR Code',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
 
               SizedBox(height: 16),
-            ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-    backgroundColor: Colors.black,
-  ),
-  onPressed: () {
-    showDialog(
-      context: context,
-      builder: (context) => ManualEntryPopup(devices: _deviceCategories),
-    );
-  },
-  child: Text(
-    'Add Manually',
-    style: TextStyle(fontSize: 16, color: Colors.white),
-  ),
-)
-
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>
+                        ManualEntryPopup(devices: _deviceCategories),
+                  );
+                },
+                child: Text(
+                  'Add Manually',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              )
             ],
           ),
         ),
