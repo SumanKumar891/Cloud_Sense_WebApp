@@ -352,7 +352,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         'Atm Pressure': NARLParametersData['AtmPressure'] ?? [],
                         'Wind Direction':
                             NARLParametersData['WindDirection'] ?? [],
-                        'Rainfall': NARLParametersData['RainfallMinutly'] ?? [],
+                        'Rainfall': NARLParametersData['RainfallHourly'] ?? [],
                       },
                     ),
                   if (widget.deviceName.startsWith('VD'))
@@ -376,7 +376,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         'Humidity': csParametersData['CurrentHumidity'] ?? [],
                         'Light Intensity':
                             csParametersData['LightIntensity'] ?? [],
-                        'Rainfall': csParametersData['RainfallMinutly'] ?? [],
+                        'Rainfall': csParametersData['RainfallHourly'] ?? [],
                         'Wind Speed': csParametersData['WindSpeed'] ?? [],
                         'Atm Pressure': csParametersData['AtmPressure'] ?? [],
                         'Wind Direction':
@@ -392,7 +392,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                         'Humidity': cfParametersData['CurrentHumidity'] ?? [],
                         'Light Intensity':
                             cfParametersData['LightIntensity'] ?? [],
-                        'Rainfall': cfParametersData['RainfallMinutly'] ?? [],
+                        'Rainfall': cfParametersData['RainfallHourly'] ?? [],
                         'Wind Speed': cfParametersData['WindSpeed'] ?? [],
                         'Atm Pressure': cfParametersData['AtmPressure'] ?? [],
                         'Wind Direction':
@@ -4351,7 +4351,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         'WindSpeed': 'Wind Speed',
         'AtmPressure': 'Atm Pressure',
         'WindDirection': 'Wind Direction',
-        'RainfallMinutly': 'Rainfall'
+        'RainfallHourly': 'Rainfall'
       };
       List<String> includedParameters = parameterLabels.keys.toList();
 
@@ -4415,7 +4415,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         'CurrentTemperature': 'Temperature',
         'CurrentHumidity': 'Humidity',
         'LightIntensity': 'Light Intensity',
-        'RainfallMinutly': 'Rainfall',
+        'RainfallHourly': 'Rainfall',
         'WindSpeed': 'Wind Speed',
         'AtmPressure': 'Atm Pressure',
         'WindDirection': 'Wind Direction'
@@ -4453,7 +4453,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         'CurrentTemperature': 'Temperature',
         'CurrentHumidity': 'Humidity',
         'LightIntensity': 'Light Intensity',
-        'RainfallMinutly': 'Rainfall',
+        'RainfallHourly': 'Rainfall',
         'WindSpeed': 'Wind Speed',
         'AtmPressure': 'Atm Pressure',
         'WindDirection': 'Wind Direction'
@@ -4956,7 +4956,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                           'WindDirection'] ??
                                                       [],
                                               'Rainfall': NARLParametersData[
-                                                      'RainfallMinutly'] ??
+                                                      'RainfallHourly'] ??
                                                   [],
                                             },
                                           ),
@@ -4994,7 +4994,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                           'LightIntensity'] ??
                                                       [],
                                               'Rainfall': cfParametersData[
-                                                      'RainfallMinutly'] ??
+                                                      'RainfallHourly'] ??
                                                   [],
                                               'Wind Speed': cfParametersData[
                                                       'WindSpeed'] ??
@@ -5023,7 +5023,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                           'LightIntensity'] ??
                                                       [],
                                               'Rainfall': csParametersData[
-                                                      'RainfallMinutly'] ??
+                                                      'RainfallHourly'] ??
                                                   [],
                                               'Wind Speed': csParametersData[
                                                       'WindSpeed'] ??
@@ -5554,6 +5554,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           'AverageTemperature',
                                           'RainfallDaily',
                                           'RainfallWeekly',
+                                          'RainfallMinutly',
                                           'AverageHumidity',
                                           'MinimumHumidity',
                                           'MaximumHumidity',
@@ -5703,7 +5704,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           'AverageTemperature',
                                           'RainfallDaily',
                                           'RainfallWeekly',
-                                          'RainfallHourly',
+                                          'RainfallMinutly',
                                           'AverageHumidity',
                                           'MinimumHumidity',
                                           'MaximumHumidity',
@@ -5754,7 +5755,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           'MaximumTemperature',
                                           'MinimumTemperature',
                                           'AverageTemperature',
-                                          'RainfallHourly',
+                                          'RainfallMinutly',
                                           'RainfallDaily',
                                           'RainfallWeekly',
                                           'AverageHumidity',
@@ -5809,6 +5810,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           'AverageTemperature',
                                           'RainfallDaily',
                                           'RainfallWeekly',
+                                          'RainfallMinutly',
                                           'AverageHumidity',
                                           'MinimumHumidity',
                                           'MaximumHumidity',
