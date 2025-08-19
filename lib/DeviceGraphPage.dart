@@ -227,6 +227,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               context,
               onPressed: () async {
                 await _selectDate(); // same as sidebar button
+                _reloadData(range: '1day');
                 setState(() => _activeButton = 'date');
                 Navigator.pop(context); // close drawer
               },
@@ -237,7 +238,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.calendar_view_week,
               isDarkMode,
               context,
-              onPressed: () {
+              onPressed: () { _reloadData(range: '7days');
                 _fetchDataForRange('7days');
                 setState(() => _activeButton = '7days');
                 Navigator.pop(context);
@@ -249,7 +250,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.calendar_view_month,
               isDarkMode,
               context,
-              onPressed: () {
+              onPressed: () { _reloadData(range: '30days');
                 _fetchDataForRange('30days');
                 setState(() => _activeButton = '30days');
                 Navigator.pop(context);
@@ -261,7 +262,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.calendar_today,
               isDarkMode,
               context,
-              onPressed: () {
+              onPressed: () { _reloadData(range: '3months');
                 _fetchDataForRange('3months');
                 setState(() => _activeButton = '3months');
                 Navigator.pop(context);
@@ -273,7 +274,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.date_range,
               isDarkMode,
               context,
-              onPressed: () {
+              onPressed: () { _reloadData(range: '1year');
                 _fetchDataForRange('1year');
                 setState(() => _activeButton = '1year');
                 Navigator.pop(context);
@@ -572,14 +573,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
       vsync: this,
     );
  // Trigger initial data fetch with _reloadData to rotate icon
-    print('initState: Triggering initial data fetch');
-    _reloadData();
+   
+    _reloadData(range: 'single');
 
       // Set up the periodic timer to reload data every 120 seconds
     _reloadTimer = Timer.periodic(const Duration(seconds: 180), (timer) {
       if (!_isLoading) {
         
-        _reloadData();
+         _reloadData(range: _lastSelectedRange);
       } else {
        
       }
@@ -4013,7 +4014,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
     }
   }
 
-  Future<void> _selectDate() async {
+    Future<void> _selectDate() async {
+    print('selectDate: Opening date picker');
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDay,
@@ -4024,31 +4026,31 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
     if (picked != null) {
       setState(() {
         _selectedDay = picked;
-
-        _fetchDataForRange('single'); // Fetch data for the selected date
+        print('selectDate: Selected new date $_selectedDay');
       });
+    } else {
+      print('selectDate: No new date selected, using $_selectedDay');
+    }
+
+    if (mounted) {
+      print('selectDate: Triggering reload for single day');
+      _reloadData(range: 'single', selectedDate: picked ?? _selectedDay);
     }
   }
-
-  void _reloadData({DateTime? selectedDate}) async {
-        
+    void _reloadData({String range = 'single', DateTime? selectedDate}) async {
+    
     setState(() {
       _isLoading = true;
       _rotationController.repeat();
-      
+     
     });
 
-    if (selectedDate != null) {
-      _lastSelectedRange = 'single';
-      await _fetchDataForRange('single', selectedDate);
-    } else {
-      await _fetchDataForRange(_lastSelectedRange);
-    }
+    await _fetchDataForRange(range, selectedDate);
 
-        if (mounted) {
+    if (mounted) {
       setState(() {
         _isLoading = false;
-        _rotationController.stop();
+        _rotationController.stop(canceled: true); // Immediately stop rotation
         
       });
     } else {
@@ -4831,7 +4833,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     Icons.today,
                                     isDarkMode,
                                     onPressed: () {
-                                      _selectDate();
+                                      _selectDate();_reloadData(range: '1day');
                                       setState(() {
                                         _activeButton = 'date';
                                       });
@@ -4843,7 +4845,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '7days',
                                     Icons.calendar_view_week,
                                     isDarkMode,
-                                    onPressed: () {
+                                    onPressed: () {_reloadData(range: '7days');
                                       _fetchDataForRange('7days');
                                       setState(() {
                                         _activeButton = '7days';
@@ -4856,7 +4858,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '30days',
                                     Icons.calendar_view_month,
                                     isDarkMode,
-                                    onPressed: () {
+                                    onPressed: () {_reloadData(range: '30days');
                                       _fetchDataForRange('30days');
                                       setState(() {
                                         _activeButton = '30days';
@@ -4869,7 +4871,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '3months',
                                     Icons.calendar_today,
                                     isDarkMode,
-                                    onPressed: () {
+                                    onPressed: () {_reloadData(range: '3months');
                                       _fetchDataForRange('3months');
                                       setState(() {
                                         _activeButton = '3months';
@@ -4882,13 +4884,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '1year',
                                     Icons.date_range,
                                     isDarkMode,
-                                    onPressed: () {
+                                    onPressed: () {_reloadData(range: '1year');
                                       _fetchDataForRange('1year');
                                       setState(() {
                                         _activeButton = '1year';
                                       });
                                     },
-                                  ), // Min/Max Values of Parameters
+                                  ),
                                   // Min/Max Values of Parameters
                                   Padding(
                                     padding: EdgeInsets.only(
@@ -5396,11 +5398,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                   color: isDarkMode ? Colors.white : Colors.black,
                   size: 26,
                 ),
-                onPressed: _isLoading
-                    ? null // Disable button during loading
-                    : () {
-                        _reloadData();
-                      },
+                 onPressed: _isLoading
+                  ? null
+                  : () {
+                     
+                      _reloadData(range: _lastSelectedRange);
+                    },
+            
               ),
             ),
           ),
@@ -6470,10 +6474,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                   size: 26,
                 ),
                 onPressed: _isLoading
-                    ? null // Disable button during loading
-                    : () {
-                        _reloadData();
-                      },
+                  ? null
+                  : () {
+                    
+                      _reloadData(range: _lastSelectedRange);
+                    },
+            
               ),
             ),
           ),
@@ -7749,7 +7755,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
     }
   }
 
-  Widget _buildChartContainer(
+Widget _buildChartContainer(
     String title,
     List<ChartData> data,
     String yAxisTitle,
@@ -7900,52 +7906,50 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                       218) // Light mode: white plot area
                                   : const Color.fromARGB(100, 0, 0,
                                       0), // Dark mode: semi-transparent black
-                            primaryXAxis: DateTimeAxis(
-  // Conditional interval type and interval based on range
-  intervalType: _lastSelectedRange == 'single' ? DateTimeIntervalType.auto : DateTimeIntervalType.hours,
-  interval: _lastSelectedRange == 'single' ? null : 24.0, // Auto for single, 24 hours for others
-  minorTicksPerInterval: _lastSelectedRange == 'single' ? 0 : 1, // No minor ticks for single, 1 for others
-  dateFormat: _lastSelectedRange == 'single'
-      ? DateFormat('MM/dd hh:mm a') // date + time for single range
-      : DateFormat('MM/dd'), // only date for other ranges
-  title: AxisTitle(
-    text: 'Time',
-    textStyle: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: Theme.of(context).brightness == Brightness.light
-          ? Colors.black
-          : Colors.white,
-    ),
-  ),
-  labelStyle: TextStyle(
-    color: Theme.of(context).brightness == Brightness.light
-        ? Colors.black
-        : Colors.white,
-  ),
-  labelRotation: 70,
-  edgeLabelPlacement: EdgeLabelPlacement.shift,
-  majorGridLines: MajorGridLines(
-    width: 1.0,
-    dashArray: [5, 5], // Dotted vertical grid lines
-    color: Theme.of(context).brightness == Brightness.light
-        ? Color.fromARGB(255, 48, 48, 48) // Light mode: light gray
-        : Color.fromARGB(255, 141, 144, 148), // Dark mode: medium gray
-  ),
-  minorGridLines: MinorGridLines(
-    width: _lastSelectedRange == 'single' ? 0 : 0.5, // No minor grid for single, thinner for others
-    dashArray: _lastSelectedRange == 'single' ? null : [3, 3], // No dashes for single, smaller dashes for others
-    color: Theme.of(context).brightness == Brightness.light
-        ? Color.fromARGB(255, 100, 100, 100) // Light mode: lighter gray
-        : Color.fromARGB(255, 180, 180, 180), // Dark mode: lighter gray
-  ),
-  minorTickLines: MinorTickLines(
-    size: _lastSelectedRange == 'single' ? 0 : 5.0, // No ticks for single, small ticks for others
-    color: Theme.of(context).brightness == Brightness.light
-        ? Color.fromARGB(255, 100, 100, 100)
-        : Color.fromARGB(255, 180, 180, 180),
-  ),
-  enableAutoIntervalOnZooming: true,
-),
+                              primaryXAxis: DateTimeAxis(
+                                // ✅ Show only date for 1 year, otherwise date + time
+                                dateFormat: _lastSelectedRange == 'single'
+                                    ? DateFormat('MM/dd hh:mm a') // date + time
+                                    : DateFormat('MM/dd'), // only date
+
+                                title: AxisTitle(
+                                  text: 'Time',
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                                labelStyle: TextStyle(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Colors.black
+                                      : Colors.white,
+                                ),
+                                labelRotation: 70,
+                                edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                intervalType: DateTimeIntervalType.auto,
+                                // autoScrollingDelta: 100,
+                                // autoScrollingMode: AutoScrollingMode.end,
+                                enableAutoIntervalOnZooming: true,
+
+                                majorGridLines: MajorGridLines(
+                                  width: 1.0,
+                                  dashArray: [
+                                    5,
+                                    5
+                                  ], // dotted vertical grid lines
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Color.fromARGB(255, 48, 48,
+                                          48) // Light mode: light gray
+                                      : Color.fromARGB(255, 141, 144,
+                                          148), // Dark mode: medium gray
+                                ),
+                              ),
+
                               primaryYAxis: NumericAxis(
                                 title: AxisTitle(
                                   text: yAxisTitle, // <- e.g. "°C", "mg/L"
@@ -8075,7 +8079,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
           )
         : Container();
   }
-
   Widget _buildColorBox(
       Color color, String range, double boxSize, double textSize) {
     return Row(
