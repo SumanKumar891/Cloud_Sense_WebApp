@@ -1116,7 +1116,8 @@ class _MapPageState extends State<MapPage> {
                                       hintStyle: TextStyle(
                                         color: Colors.white,
                                       ),
-                                      prefixIcon: Icon(Icons.search),
+                                      prefixIcon: Icon(Icons.search,
+                                          color: Colors.white),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -1154,6 +1155,8 @@ class _MapPageState extends State<MapPage> {
                                       });
                                     },
                                     decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.gps_fixed,
+                                          color: Colors.white),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -1169,6 +1172,8 @@ class _MapPageState extends State<MapPage> {
                                       color: Colors.white,
                                     ),
                                     decoration: InputDecoration(
+                                      prefixIcon: Icon(Icons.calendar_today,
+                                          color: Colors.white),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
