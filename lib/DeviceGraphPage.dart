@@ -383,6 +383,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                             csParametersData['WindDirection'] ?? [],
                       },
                     ),
+                  if (widget.deviceName.startsWith('CF'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'Temperature':
+                            cfParametersData['CurrentTemperature'] ?? [],
+                        'Humidity': cfParametersData['CurrentHumidity'] ?? [],
+                        'Light Intensity':
+                            cfParametersData['LightIntensity'] ?? [],
+                        'Rainfall': cfParametersData['RainfallMinutly'] ?? [],
+                        'Wind Speed': cfParametersData['WindSpeed'] ?? [],
+                        'Atm Pressure': cfParametersData['AtmPressure'] ?? [],
+                        'Wind Direction':
+                            cfParametersData['WindDirection'] ?? [],
+                      },
+                    ),
                 ],
               ),
             ),
@@ -4394,6 +4410,44 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: children,
       );
+    } else if (widget.deviceName.startsWith('CF')) {
+      Map<String, String> parameterLabels = {
+        'CurrentTemperature': 'Temperature',
+        'CurrentHumidity': 'Humidity',
+        'LightIntensity': 'Light Intensity',
+        'RainfallMinutly': 'Rainfall',
+        'WindSpeed': 'Wind Speed',
+        'AtmPressure': 'Atm Pressure',
+        'WindDirection': 'Wind Direction'
+      };
+      List<String> includedParameters = parameterLabels.keys.toList();
+
+      List<Widget> children = cfParametersData.entries
+          .where((entry) => includedParameters.contains(entry.key))
+          .map((entry) {
+        String label = parameterLabels[entry.key] ?? entry.key;
+        double? current =
+            entry.value.isNotEmpty ? entry.value.last.value : null;
+        String unit = '';
+        if (label == 'Temperature')
+          unit = '°C';
+        else if (label == 'Humidity')
+          unit = '%';
+        else if (label == 'Light Intensity')
+          unit = 'lux';
+        else if (label == 'Rainfall')
+          unit = 'mm';
+        else if (label == 'Wind Speed')
+          unit = 'm/s';
+        else if (label == 'Atm Pressure')
+          unit = 'hpa';
+        else if (label == 'Wind Direction') unit = '°';
+        return _buildParamStat(label, current, null, null, unit, isDarkMode);
+      }).toList();
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: children,
+      );
     } else if (widget.deviceName.startsWith('CP')) {
       Map<String, String> parameterLabels = {
         'CurrentTemperature': 'Temperature',
@@ -4925,6 +4979,35 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                   [],
                                             },
                                           ),
+                                        if (widget.deviceName.startsWith('CF'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': cfParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': cfParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Light Intensity':
+                                                  cfParametersData[
+                                                          'LightIntensity'] ??
+                                                      [],
+                                              'Rainfall': cfParametersData[
+                                                      'RainfallMinutly'] ??
+                                                  [],
+                                              'Wind Speed': cfParametersData[
+                                                      'WindSpeed'] ??
+                                                  [],
+                                              'Atm Pressure': cfParametersData[
+                                                      'AtmPressure'] ??
+                                                  [],
+                                              'Wind Direction':
+                                                  cfParametersData[
+                                                          'WindDirection'] ??
+                                                      [],
+                                            },
+                                          ),
                                         if (widget.deviceName.startsWith('CP'))
                                           _buildMinMaxTable(
                                             isDarkMode,
@@ -5450,7 +5533,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                             displayName,
                                             data,
                                             unit.isNotEmpty
-                                                ? '$displayName ($unit)'
+                                                ? '($unit)'
                                                 : displayName,
                                             ChartType.line,
                                           );
@@ -5491,15 +5574,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           String chartTitle;
                                           if (paramName.toLowerCase() ==
                                               'currenthumidity') {
-                                            chartTitle =
-                                                'Humidity Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else if (paramName.toLowerCase() ==
                                               'currenttemperature') {
-                                            chartTitle =
-                                                'Temperature Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else {
                                             chartTitle = unit.isNotEmpty
-                                                ? '$displayName ($unit)'
+                                                ? '($unit)'
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
@@ -5541,12 +5622,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           String chartTitle;
                                           if (paramName.toLowerCase() ==
                                               'currenthumidity') {
-                                            chartTitle =
-                                                'Humidity Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else if (paramName.toLowerCase() ==
                                               'currenttemperature') {
-                                            chartTitle =
-                                                'Temperature Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else {
                                             chartTitle = unit.isNotEmpty
                                                 ? '$displayName ($unit)'
@@ -5591,12 +5670,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           String chartTitle;
                                           if (paramName.toLowerCase() ==
                                               'currenthumidity') {
-                                            chartTitle =
-                                                'Humidity Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else if (paramName.toLowerCase() ==
                                               'currenttemperature') {
-                                            chartTitle =
-                                                'Temperature Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else {
                                             chartTitle = unit.isNotEmpty
                                                 ? '$displayName ($unit)'
@@ -5647,15 +5724,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           String chartTitle;
                                           if (paramName.toLowerCase() ==
                                               'currenthumidity') {
-                                            chartTitle =
-                                                'Humidity Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else if (paramName.toLowerCase() ==
                                               'currenttemperature') {
-                                            chartTitle =
-                                                'Temperature Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else {
                                             chartTitle = unit.isNotEmpty
-                                                ? '$displayName ($unit)'
+                                                ? '($unit)'
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
@@ -5702,15 +5777,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           String chartTitle;
                                           if (paramName.toLowerCase() ==
                                               'currenthumidity') {
-                                            chartTitle =
-                                                'Humidity Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else if (paramName.toLowerCase() ==
                                               'currenttemperature') {
-                                            chartTitle =
-                                                'Temperature Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else {
                                             chartTitle = unit.isNotEmpty
-                                                ? '$displayName ($unit)'
+                                                ? '($unit)'
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
@@ -5756,15 +5829,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           String chartTitle;
                                           if (paramName.toLowerCase() ==
                                               'currenthumidity') {
-                                            chartTitle =
-                                                'Humidity Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else if (paramName.toLowerCase() ==
                                               'currenttemperature') {
-                                            chartTitle =
-                                                'Temperature Graph ($unit)';
+                                            chartTitle = '($unit)';
                                           } else {
                                             chartTitle = unit.isNotEmpty
-                                                ? '$displayName ($unit)'
+                                                ? '($unit)'
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
@@ -5777,160 +5848,146 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                         return const SizedBox.shrink();
                                       }).toList(),
                                     if (!widget.deviceName.startsWith('SM') &&
-                                        !widget.deviceName.startsWith('CM') &&
+                                        !widget.deviceName.startsWith('CF') &&
+                                        !widget.deviceName.startsWith('VD') &&
+                                        !widget.deviceName.startsWith('KD') &&
+                                        !widget.deviceName.startsWith('NA') &&
+                                        !widget.deviceName.startsWith('CP') &&
                                         !widget.deviceName
                                             .startsWith('SV')) ...[
                                       if (hasNonZeroValues(chlorineData))
                                         _buildChartContainer(
                                             'Chlorine',
                                             chlorineData,
-                                            'Chlorine (mg/L)',
+                                            '(mg/L)',
                                             ChartType.line),
                                       if (hasNonZeroValues(temperatureData))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperatureData,
-                                            'Temperature (°C)',
+                                            '(°C)',
                                             ChartType.line),
                                       if (hasNonZeroValues(humidityData))
                                         _buildChartContainer(
                                             'Humidity',
                                             humidityData,
-                                            'Humidity (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(lightIntensityData))
                                         _buildChartContainer(
                                             'Light Intensity',
                                             lightIntensityData,
-                                            'Light Intensity (Lux)',
+                                            '(Lux)',
                                             ChartType.line),
                                       if (hasNonZeroValues(windSpeedData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             windSpeedData,
-                                            'Wind Speed (m/s)',
+                                            '(m/s)',
                                             ChartType.line),
                                       if (hasNonZeroValues(solarIrradianceData))
                                         _buildChartContainer(
                                             'Solar Irradiance',
                                             solarIrradianceData,
-                                            'Solar Irradiance (W/M^2)',
+                                            '(W/M^2)',
                                             ChartType.line),
                                       if (hasNonZeroValues(tempData))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            tempData,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            tempData, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(tdsData))
                                         _buildChartContainer('TDS', tdsData,
-                                            'TDS (ppm)', ChartType.line),
+                                            '(ppm)', ChartType.line),
                                       if (hasNonZeroValues(codData))
                                         _buildChartContainer('COD', codData,
-                                            'COD (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(bodData))
                                         _buildChartContainer('BOD', bodData,
-                                            'BOD (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(pHData))
                                         _buildChartContainer(
                                             'pH', pHData, 'pH', ChartType.line),
                                       if (hasNonZeroValues(doData))
                                         _buildChartContainer('DO', doData,
-                                            'DO (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(ecData))
                                         _buildChartContainer('EC', ecData,
-                                            'EC (mS/cm)', ChartType.line),
+                                            '(mS/cm)', ChartType.line),
                                       if (hasNonZeroValues(temppData))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            temppData,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            temppData, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(electrodeSignalData))
                                         _buildChartContainer(
                                             'Electrode Signal',
                                             electrodeSignalData,
-                                            'Electrode Signal (mV)',
+                                            '(mV)',
                                             ChartType.line),
                                       if (hasNonZeroValues(
                                           residualchlorineData))
                                         _buildChartContainer(
                                             'Chlorine',
                                             residualchlorineData,
-                                            'Chlorine (mg/L)',
+                                            '(mg/L)',
                                             ChartType.line),
                                       if (hasNonZeroValues(hypochlorousData))
                                         _buildChartContainer(
                                             'Hypochlorous',
                                             hypochlorousData,
-                                            'Hypochlorous (mg/L)',
+                                            '(mg/L)',
                                             ChartType.line),
                                       if (hasNonZeroValues(temmppData))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            temmppData,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            temmppData, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(humidityyData))
                                         _buildChartContainer(
                                             'Humidity',
                                             humidityyData,
-                                            'Humidity (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(lightIntensityyData))
                                         _buildChartContainer(
                                             'Light Intensity',
                                             lightIntensityyData,
-                                            'Light Intensity (Lux)',
+                                            '(Lux)',
                                             ChartType.line),
                                       if (hasNonZeroValues(windSpeeddData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             windSpeeddData,
-                                            'Wind Speed (m/s)',
+                                            '(m/s)',
                                             ChartType.line),
                                       if (hasNonZeroValues(ttempData))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            ttempData,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            ttempData, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(dovaluedata))
                                         _buildChartContainer(
                                             'DO Value',
                                             dovaluedata,
-                                            'DO (mg/L)',
+                                            '(mg/L)',
                                             ChartType.line),
                                       if (hasNonZeroValues(dopercentagedata))
                                         _buildChartContainer(
                                             'DO Percentage',
                                             dopercentagedata,
-                                            'DO Percentage (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(temperaturData))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperaturData,
-                                            'Temperature (°C)',
+                                            '(°C)',
                                             ChartType.line),
                                       if (hasNonZeroValues(humData))
-                                        _buildChartContainer(
-                                            'Humidity',
-                                            humData,
-                                            'Humidity (%)',
-                                            ChartType.line),
+                                        _buildChartContainer('Humidity',
+                                            humData, '(%)', ChartType.line),
                                       if (hasNonZeroValues(luxData))
-                                        _buildChartContainer(
-                                            'Light Intensity',
-                                            luxData,
-                                            'Lux (Lux)',
-                                            ChartType.line),
+                                        _buildChartContainer('Light Intensity',
+                                            luxData, '(Lux)', ChartType.line),
                                       if (hasNonZeroValues(coddata))
                                         _buildChartContainer('COD', coddata,
-                                            'COD (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(boddata))
                                         _buildChartContainer('BOD', boddata,
-                                            'BOD (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(phdata))
                                         _buildChartContainer(
                                             'pH', phdata, 'pH', ChartType.line),
@@ -5938,133 +5995,118 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                         _buildChartContainer(
                                             'Temperature',
                                             temperattureData,
-                                            'Temperature (°C)',
+                                            '(°C)',
                                             ChartType.line),
                                       if (hasNonZeroValues(humidittyData))
                                         _buildChartContainer(
                                             'Humidity',
                                             humidittyData,
-                                            'Humidity (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(ammoniaData))
                                         _buildChartContainer(
                                             'Ammonia',
                                             ammoniaData,
-                                            'Ammonia (PPM)',
+                                            '(PPM)',
                                             ChartType.line),
                                       if (hasNonZeroValues(temperaturedata))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperaturedata,
-                                            'Temperature (°C)',
+                                            '(°C)',
                                             ChartType.line),
                                       if (hasNonZeroValues(humiditydata))
                                         _buildChartContainer(
                                             'Humidity',
                                             humiditydata,
-                                            'Humidity (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(ittempData))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            ittempData,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            ittempData, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(itpressureData))
                                         _buildChartContainer(
                                             'Pressure',
                                             itpressureData,
-                                            'Pressure (hPa)',
+                                            '(hPa)',
                                             ChartType.line),
                                       if (hasNonZeroValues(ithumidityData))
                                         _buildChartContainer(
                                             'Humidity',
                                             ithumidityData,
-                                            'Humidity (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(itrainData))
-                                        _buildChartContainer(
-                                            'Rain Level',
-                                            itrainData,
-                                            'Rain Level (mm)',
-                                            ChartType.line),
+                                        _buildChartContainer('Rain Level',
+                                            itrainData, '(mm)', ChartType.line),
                                       if (hasNonZeroValues(itvisibilityData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             itwindspeedData,
-                                            'Wind Speed (m/s)',
+                                            '(m/s)',
                                             ChartType.line),
                                       if (hasNonZeroValues(itradiationData))
                                         _buildChartContainer(
                                             'Radiation',
                                             itradiationData,
-                                            'Radiation (W/m²)',
+                                            '(W/m²)',
                                             ChartType.line),
                                       if (hasNonZeroValues(itvisibilityData))
                                         _buildChartContainer(
                                             'Visibilty',
                                             itvisibilityData,
-                                            'Visibility (m)',
+                                            '(m)',
                                             ChartType.line),
                                       if (hasNonZeroValues(fstempData))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            fstempData,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            fstempData, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(fspressureData))
                                         _buildChartContainer(
                                             'Pressure',
                                             fspressureData,
-                                            'Pressure (hPa)',
+                                            '(hPa)',
                                             ChartType.line),
                                       if (hasNonZeroValues(fshumidityData))
                                         _buildChartContainer(
                                             'Relative Humidity',
                                             fshumidityData,
-                                            'Humidity (%)',
+                                            '(%)',
                                             ChartType.line),
                                       if (hasNonZeroValues(fsrainData))
-                                        _buildChartContainer(
-                                            'Rain Level',
-                                            fsrainData,
-                                            'Rain Level (mm)',
-                                            ChartType.line),
+                                        _buildChartContainer('Rain Level',
+                                            fsrainData, '(mm)', ChartType.line),
                                       if (hasNonZeroValues(fsradiationData))
                                         _buildChartContainer(
                                             'Radiation',
                                             fsradiationData,
-                                            'Radiation (W/m²)',
+                                            '(W/m²)',
                                             ChartType.line),
                                       if (hasNonZeroValues(fswindspeedData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             fswindspeedData,
-                                            'Wind Speed (m/s)',
+                                            '(m/s)',
                                             ChartType.line),
                                       if (hasNonZeroValues(temp2Data))
-                                        _buildChartContainer(
-                                            'Temperature',
-                                            temp2Data,
-                                            'Temperature (°C)',
-                                            ChartType.line),
+                                        _buildChartContainer('Temperature',
+                                            temp2Data, '(°C)', ChartType.line),
                                       if (hasNonZeroValues(cod2Data))
                                         _buildChartContainer('COD', cod2Data,
-                                            'COD (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(bod2Data))
                                         _buildChartContainer('BOD', bod2Data,
-                                            'BOD (mg/L)', ChartType.line),
+                                            '(mg/L)', ChartType.line),
                                       if (hasNonZeroValues(
                                           wfAverageTemperatureData))
                                         _buildChartContainer(
                                             'Temperature',
                                             wfAverageTemperatureData,
-                                            'Temperature (°C)',
+                                            '(°C)',
                                             ChartType.line),
                                       _buildChartContainer(
                                           'Rain Level',
                                           wfrainfallData,
-                                          'Rain Level (mm)',
+                                          '(mm)',
                                           ChartType.line),
                                     ],
                                   ],
@@ -6791,7 +6833,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                   displayName,
                                                   data,
                                                   unit.isNotEmpty
-                                                      ? '$displayName ($unit)'
+                                                      ? '($unit)'
                                                       : displayName,
                                                   ChartType.line,
                                                 );
@@ -6836,16 +6878,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                 String chartTitle;
                                                 if (paramName.toLowerCase() ==
                                                     'currenthumidity') {
-                                                  chartTitle =
-                                                      'Humidity Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else if (paramName
                                                         .toLowerCase() ==
                                                     'currenttemperature') {
-                                                  chartTitle =
-                                                      'Temperature Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else {
                                                   chartTitle = unit.isNotEmpty
-                                                      ? '$displayName ($unit)'
+                                                      ? '($unit)'
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
@@ -6891,13 +6931,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                 String chartTitle;
                                                 if (paramName.toLowerCase() ==
                                                     'currenthumidity') {
-                                                  chartTitle =
-                                                      'Humidity Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else if (paramName
                                                         .toLowerCase() ==
                                                     'currenttemperature') {
-                                                  chartTitle =
-                                                      'Temperature Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else {
                                                   chartTitle = unit.isNotEmpty
                                                       ? '$displayName ($unit)'
@@ -6946,13 +6984,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                 String chartTitle;
                                                 if (paramName.toLowerCase() ==
                                                     'currenthumidity') {
-                                                  chartTitle =
-                                                      'Humidity Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else if (paramName
                                                         .toLowerCase() ==
                                                     'currenttemperature') {
-                                                  chartTitle =
-                                                      'Temperature Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else {
                                                   chartTitle = unit.isNotEmpty
                                                       ? '$displayName ($unit)'
@@ -7006,16 +7042,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                 String chartTitle;
                                                 if (paramName.toLowerCase() ==
                                                     'currenthumidity') {
-                                                  chartTitle =
-                                                      'Humidity Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else if (paramName
                                                         .toLowerCase() ==
                                                     'currenttemperature') {
-                                                  chartTitle =
-                                                      'Temperature Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else {
                                                   chartTitle = unit.isNotEmpty
-                                                      ? '$displayName ($unit)'
+                                                      ? '($unit)'
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
@@ -7066,16 +7100,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                 String chartTitle;
                                                 if (paramName.toLowerCase() ==
                                                     'currenthumidity') {
-                                                  chartTitle =
-                                                      'Humidity Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else if (paramName
                                                         .toLowerCase() ==
                                                     'currenttemperature') {
-                                                  chartTitle =
-                                                      'Temperature Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else {
                                                   chartTitle = unit.isNotEmpty
-                                                      ? '$displayName ($unit)'
+                                                      ? '($unit)'
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
@@ -7125,16 +7157,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                                 String chartTitle;
                                                 if (paramName.toLowerCase() ==
                                                     'currenthumidity') {
-                                                  chartTitle =
-                                                      'Humidity Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else if (paramName
                                                         .toLowerCase() ==
                                                     'currenttemperature') {
-                                                  chartTitle =
-                                                      'Temperature Graph ($unit)';
+                                                  chartTitle = '($unit)';
                                                 } else {
                                                   chartTitle = unit.isNotEmpty
-                                                      ? '$displayName ($unit)'
+                                                      ? '($unit)'
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
@@ -7149,183 +7179,191 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                           if (!widget.deviceName
                                                   .startsWith('SM') &&
                                               !widget.deviceName
-                                                  .startsWith('CM') &&
+                                                  .startsWith('CF') &&
+                                              !widget.deviceName
+                                                  .startsWith('VD') &&
+                                              !widget.deviceName
+                                                  .startsWith('KD') &&
+                                              !widget.deviceName
+                                                  .startsWith('NA') &&
+                                              !widget.deviceName
+                                                  .startsWith('CP') &&
                                               !widget.deviceName
                                                   .startsWith('SV')) ...[
                                             if (hasNonZeroValues(chlorineData))
                                               _buildChartContainer(
                                                   'Chlorine',
                                                   chlorineData,
-                                                  'Chlorine (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 temperatureData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperatureData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(humidityData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humidityData,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 lightIntensityData))
                                               _buildChartContainer(
                                                   'Light Intensity',
                                                   lightIntensityData,
-                                                  'Light Intensity (Lux)',
+                                                  '(Lux)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(windSpeedData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   windSpeedData,
-                                                  'Wind Speed (m/s)',
+                                                  '(m/s)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 solarIrradianceData))
                                               _buildChartContainer(
                                                   'Solar Irradiance',
                                                   solarIrradianceData,
-                                                  'Solar Irradiance (W/M^2)',
+                                                  '(W/M^2)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(tempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   tempData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(tdsData))
                                               _buildChartContainer(
                                                   'TDS',
                                                   tdsData,
-                                                  'TDS (ppm)',
+                                                  '(ppm)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(codData))
                                               _buildChartContainer(
                                                   'COD',
                                                   codData,
-                                                  'COD (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(bodData))
                                               _buildChartContainer(
                                                   'BOD',
                                                   bodData,
-                                                  'BOD (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(pHData))
                                               _buildChartContainer('pH', pHData,
                                                   'pH', ChartType.line),
                                             if (hasNonZeroValues(doData))
                                               _buildChartContainer('DO', doData,
-                                                  'DO (mg/L)', ChartType.line),
+                                                  '(mg/L)', ChartType.line),
                                             if (hasNonZeroValues(ecData))
                                               _buildChartContainer('EC', ecData,
-                                                  'EC (mS/cm)', ChartType.line),
+                                                  '(mS/cm)', ChartType.line),
                                             if (hasNonZeroValues(temppData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temppData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 electrodeSignalData))
                                               _buildChartContainer(
                                                   'Electrode Signal',
                                                   electrodeSignalData,
-                                                  'Electrode Signal (mV)',
+                                                  '(mV)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 residualchlorineData))
                                               _buildChartContainer(
                                                   'Chlorine',
                                                   residualchlorineData,
-                                                  'Chlorine (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 hypochlorousData))
                                               _buildChartContainer(
                                                   'Hypochlorous',
                                                   hypochlorousData,
-                                                  'Hypochlorous (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(temmppData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temmppData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(humidityyData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humidityyData,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 lightIntensityyData))
                                               _buildChartContainer(
                                                   'Light Intensity',
                                                   lightIntensityyData,
-                                                  'Light Intensity (Lux)',
+                                                  '(Lux)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 windSpeeddData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   windSpeeddData,
-                                                  'Wind Speed (m/s)',
+                                                  '(m/s)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(ttempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   ttempData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(dovaluedata))
                                               _buildChartContainer(
                                                   'DO Value',
                                                   dovaluedata,
-                                                  'DO (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 dopercentagedata))
                                               _buildChartContainer(
                                                   'DO Percentage',
                                                   dopercentagedata,
-                                                  'DO Percentage (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 temperaturData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperaturData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(humData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humData,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(luxData))
                                               _buildChartContainer(
                                                   'Light Intensity',
                                                   luxData,
-                                                  'Lux (Lux)',
+                                                  '(Lux)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(coddata))
                                               _buildChartContainer(
                                                   'COD',
                                                   coddata,
-                                                  'COD (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(boddata))
                                               _buildChartContainer(
                                                   'BOD',
                                                   boddata,
-                                                  'BOD (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(phdata))
                                               _buildChartContainer('pH', phdata,
@@ -7335,149 +7373,149 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperattureData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(humidittyData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humidittyData,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(ammoniaData))
                                               _buildChartContainer(
                                                   'Ammonia',
                                                   ammoniaData,
-                                                  'Ammonia (PPM)',
+                                                  '(PPM)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 temperaturedata))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperaturedata,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(humiditydata))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humiditydata,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(ittempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   ittempData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 itpressureData))
                                               _buildChartContainer(
                                                   'Pressure',
                                                   itpressureData,
-                                                  'Pressure (hPa)',
+                                                  '(hPa)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 ithumidityData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   ithumidityData,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(itrainData))
                                               _buildChartContainer(
                                                   'Rain Level',
                                                   itrainData,
-                                                  'Rain Level (mm)',
+                                                  '(mm)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 itvisibilityData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   itwindspeedData,
-                                                  'Wind Speed (m/s)',
+                                                  '(m/s)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 itradiationData))
                                               _buildChartContainer(
                                                   'Radiation',
                                                   itradiationData,
-                                                  'Radiation (W/m²)',
+                                                  '(W/m²)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 itvisibilityData))
                                               _buildChartContainer(
                                                   'Visibilty',
                                                   itvisibilityData,
-                                                  'Visibility (m)',
+                                                  '(m)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(fstempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   fstempData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 fspressureData))
                                               _buildChartContainer(
                                                   'Pressure',
                                                   fspressureData,
-                                                  'Pressure (hPa)',
+                                                  '(hPa)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 fshumidityData))
                                               _buildChartContainer(
                                                   'Relative Humidity',
                                                   fshumidityData,
-                                                  'Humidity (%)',
+                                                  '(%)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(fsrainData))
                                               _buildChartContainer(
                                                   'Rain Level',
                                                   fsrainData,
-                                                  'Rain Level (mm)',
+                                                  '(mm)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 fsradiationData))
                                               _buildChartContainer(
                                                   'Radiation',
                                                   fsradiationData,
-                                                  'Radiation (W/m²)',
+                                                  '(W/m²)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 fswindspeedData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   fswindspeedData,
-                                                  'Wind Speed (m/s)',
+                                                  '(m/s)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(temp2Data))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temp2Data,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(cod2Data))
                                               _buildChartContainer(
                                                   'COD',
                                                   cod2Data,
-                                                  'COD (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(bod2Data))
                                               _buildChartContainer(
                                                   'BOD',
                                                   bod2Data,
-                                                  'BOD (mg/L)',
+                                                  '(mg/L)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(
                                                 wfAverageTemperatureData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   wfAverageTemperatureData,
-                                                  'Temperature (°C)',
+                                                  '(°C)',
                                                   ChartType.line),
                                             _buildChartContainer(
                                                 'Rain Level',
                                                 wfrainfallData,
-                                                'Rain Level (mm)',
+                                                '(mm)',
                                                 ChartType.line),
                                           ],
                                         ],
@@ -7700,7 +7738,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Text(
-                      '$title Graph',
+                      '$title',
                       style: TextStyle(
                           fontSize:
                               MediaQuery.of(context).size.width < 800 ? 18 : 22,
@@ -7870,6 +7908,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                               ),
 
                               primaryYAxis: NumericAxis(
+                                title: AxisTitle(
+                                  text: yAxisTitle, // <- e.g. "°C", "mg/L"
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: Theme.of(context).brightness ==
                                           Brightness.light

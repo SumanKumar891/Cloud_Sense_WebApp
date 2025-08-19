@@ -20,7 +20,7 @@ class DeviceUtils {
     if (deviceId.startsWith('NH')) return 'Ammonia Sensor';
     if (deviceId.startsWith('FS')) return 'Forest Sensor';
     if (deviceId.startsWith('SM')) return 'SSMET Sensor';
-    if (deviceId.startsWith('CF')) return 'SEKHU Farm Sensor';
+    if (deviceId.startsWith('CF')) return 'Sekhon Biotech Pvt Ltd Farm Sensor';
     if (deviceId.startsWith('SV')) return 'SVPU Sensor';
     if (deviceId.startsWith('CB')) return 'COD/BOD Sensor';
     if (deviceId.startsWith('WF')) return 'WF Sensor';

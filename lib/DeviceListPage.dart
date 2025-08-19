@@ -125,7 +125,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'DO':
         return 'DO Sensors';
       case 'IT':
-        return 'IIT Bombay Weather Sensors';
+        return 'IIT Bombay\nWeather Sensors';
       case 'WS':
         return 'Water Sensors';
       case 'LU':
@@ -141,13 +141,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'NH':
         return 'Ammonia Sensors';
       case 'FS':
-        return 'Forest Sensors (Bhopal)';
+        return 'Forest Sensors\n(Bhopal)';
       case 'SM':
         return 'SSMET Sensors';
       case 'CF':
-        return 'SEKHU Farm Sensors';
+        return 'Sekhon Biotech Pvt\nLtd Farm Sensors';
       case 'SV':
-        return 'SVPU Sensors (Meerut)';
+        return 'SVPU Sensors\n(Meerut)';
       case 'CB':
         return 'COD/BOD Sensors';
       case 'WF':
@@ -159,7 +159,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'NA':
         return 'NARL Sensors';
       case 'CP':
-        return 'Campus Sensors (IIT Ropar)';
+        return 'Campus Sensors\n(IIT Ropar)';
       default:
         return 'Rain Sensors';
     }
@@ -203,42 +203,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-            color: isDarkMode ? Colors.white : Colors.black,
-            size: MediaQuery.of(context).size.width < 800
-                ? 16
-                : 32), // back arrow color
-        title: Text(
-          'Your Chosen Devices',
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-        elevation: 0,
-        actions: [
-          TextButton.icon(
-            onPressed: _handleLogout,
-            icon: Icon(
-              Icons.logout,
-              color: isDarkMode ? Colors.white : Colors.black,
-              size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
-            ),
-            label: Text(
-              'Log out',
-              style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black,
-                fontSize: MediaQuery.of(context).size.width < 800 ? 12 : 24,
-              ),
-            ),
-          ),
-        ],
-      ),
       body: Container(
-        height: MediaQuery.of(context).size.height, // full height
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDarkMode
@@ -254,39 +220,84 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: SingleChildScrollView(
+        child: SafeArea(
           child: Column(
             children: [
-              const SizedBox(height: 20),
-              Center(
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 90.0, left: 16.0, right: 16.0),
-                            child: Text(
-                              "Select a device to unlock insights into data.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'OpenSans',
-                                fontSize:
-                                    MediaQuery.of(context).size.width < 800
-                                        ? 30
-                                        : 45,
-                                fontWeight: FontWeight.bold,
-                                color: isDarkMode ? Colors.black : Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 50),
-                          _deviceCategories.isNotEmpty
-                              ? _buildDeviceCards()
-                              : _buildNoDevicesCard(),
-                        ],
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        size: MediaQuery.of(context).size.width < 800 ? 20 : 28,
                       ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    TextButton.icon(
+                      onPressed: _handleLogout,
+                      icon: Icon(
+                        Icons.logout,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
+                      ),
+                      label: Text(
+                        'Log out',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize:
+                              MediaQuery.of(context).size.width < 800 ? 12 : 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Center(
+                        child: _isLoading
+                            ? const CircularProgressIndicator()
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 40.0, left: 16.0, right: 16.0),
+                                    child: Text(
+                                      "Select a device to unlock insights into data.",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'OpenSans',
+                                        fontSize:
+                                            MediaQuery.of(context).size.width <
+                                                    800
+                                                ? 30
+                                                : 45,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 50),
+                                  _deviceCategories.isNotEmpty
+                                      ? _buildCategoryCards()
+                                      : _buildNoDevicesCard(),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -295,44 +306,158 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     );
   }
 
-  Widget _buildDeviceCards() {
+  Widget _buildCategoryCards() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Separate counters for each sensor type
+    final categories = [..._deviceCategories.keys, "AddDevice"];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.all(32),
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 220,
+        crossAxisSpacing: 24,
+        mainAxisSpacing: 24,
+        childAspectRatio: 1.1,
+      ),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        String category = categories[index];
+
+        return _HoverableCard(
+          isDarkMode: isDarkMode,
+          category: category,
+          onTap: () {
+            if (category == "AddDevice") {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    title: Center(
+                      child: Text(
+                        "Add New Device",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) =>
+                                  QRScannerPopup(devices: _deviceCategories),
+                            );
+                          },
+                          child: Text(" Scan QR Code"),
+                        ),
+                        SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  ManualEntryPopup(devices: _deviceCategories),
+                            );
+                          },
+                          child: Text(" Add Manually"),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            } else {
+              _showSensorsPopup(category, _deviceCategories[category]!);
+            }
+          },
+          getCardColor: _getCardColor,
+          getCardTextColor: _getCardTextColor,
+        );
+      },
+    );
+  }
+
+  void _showSensorsPopup(String category, List<String> sensors) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     int luxSensorCount = 0;
     int tempSensorCount = 0;
     int accelerometerSensorCount = 0;
 
-    List<Widget> cardList = _deviceCategories.keys.map((category) {
-      return Container(
-          width: 300,
-          height: 300,
-          margin: EdgeInsets.all(10),
-          child: Card(
-            color: _getCardColor(category),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: 30),
-                  Text(
-                    category,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: _getCardTextColor(),
-                    ),
+    showDialog(
+      context: context,
+      builder: (context) {
+        double screenWidth = MediaQuery.of(context).size.width;
+        double screenHeight = MediaQuery.of(context).size.height;
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Container(
+            width: screenWidth * 0.6,
+            height: screenHeight * 0.6,
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                colors: isDarkMode
+                    ? [Color(0xFF1C1F26), Color(0xFF2A2D36)]
+                    : [
+                        Color.fromARGB(255, 240, 244, 245),
+                        Color.fromARGB(255, 91, 99, 102)
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black38,
+                  blurRadius: 16,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Title
+                Text(
+                  category,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black45,
+                        offset: Offset(2, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 10),
-                  Expanded(
+                ),
+                SizedBox(height: 24),
+                // Sensor List
+                Expanded(
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
                     child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _deviceCategories[category]?.length ?? 0,
+                      itemCount: sensors.length,
                       itemBuilder: (context, index) {
-                        String sensorName = _deviceCategories[category]![index];
+                        String sensorName = sensors[index];
                         String sequentialName = '';
 
                         if (category == 'CPS Lab Sensors') {
@@ -352,170 +477,128 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                           sequentialName =
                               '${category.split(" ").first} Sensor ${index + 1}';
                         }
-                        // ✅ Only for the button text
+
                         String buttonLabel = '$sequentialName ($sensorName)';
+
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: isDarkMode
-                                  ? Colors.white
-                                  : Colors.black, // text color
-                              backgroundColor: isDarkMode
-                                  ? Colors.black
-                                  : Colors.white, // background
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                            ),
-                            onPressed: () {
-                              if (sensorName.startsWith('BF')) {
-                                String numericNodeId =
-                                    sensorName.replaceAll(RegExp(r'\D'), '');
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BuffaloData(
-                                      startDateTime: DateTime.now(),
-                                      endDateTime:
-                                          DateTime.now().add(Duration(days: 1)),
-                                      nodeId: numericNodeId,
-                                    ),
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                gradient: LinearGradient(
+                                  colors: isDarkMode
+                                      ? [Color(0xFF3B6A7F), Color(0xFF8C6C8E)]
+                                      : [
+                                          Color.fromARGB(255, 92, 129, 123),
+                                          Color.fromARGB(255, 40, 53, 70)
+                                        ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
                                   ),
-                                );
-                              } else if (sensorName.startsWith('CS')) {
-                                String numericNodeId =
-                                    sensorName.replaceAll(RegExp(r'\D'), '');
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CowData(
-                                      startDateTime: DateTime.now(),
-                                      endDateTime:
-                                          DateTime.now().add(Duration(days: 1)),
-                                      nodeId: numericNodeId,
-                                    ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                );
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DeviceGraphPage(
-                                      deviceName:
-                                          _deviceCategories[category]![index],
-                                      sequentialName: sequentialName,
-                                      backgroundImagePath:
-                                          'assets/backgroundd.jpg',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            child: Text(
-                              buttonLabel,
-                              style: TextStyle(fontSize: 14),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  if (sensorName.startsWith('BF')) {
+                                    String numericNodeId = sensorName
+                                        .replaceAll(RegExp(r'\D'), '');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => BuffaloData(
+                                          startDateTime: DateTime.now(),
+                                          endDateTime: DateTime.now()
+                                              .add(Duration(days: 1)),
+                                          nodeId: numericNodeId,
+                                        ),
+                                      ),
+                                    );
+                                  } else if (sensorName.startsWith('CS')) {
+                                    String numericNodeId = sensorName
+                                        .replaceAll(RegExp(r'\D'), '');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CowData(
+                                          startDateTime: DateTime.now(),
+                                          endDateTime: DateTime.now()
+                                              .add(Duration(days: 1)),
+                                          nodeId: numericNodeId,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DeviceGraphPage(
+                                          deviceName: sensorName,
+                                          sequentialName: sequentialName,
+                                          backgroundImagePath:
+                                              'assets/backgroundd.jpg',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  buttonLabel,
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
+                              ),
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                ],
-              ),
-            ),
-          ));
-    }).toList();
+                ),
+                SizedBox(height: 16),
 
-    // Add the "Add Devices" button as a card
-    cardList.add(
-      Container(
-        width: 300,
-        height: 300,
-        margin: EdgeInsets.all(10),
-        child: Card(
-          color: _getCardColor('AddDevice'),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Add New Device',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.black : Colors.white,
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    "Close",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: isDarkMode ? Colors.black : Colors.white,
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) =>
-                        QRScannerPopup(devices: _deviceCategories),
-                  );
-                },
-                child: Text(
-                  'Scan QR Code',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-                  backgroundColor: isDarkMode ? Colors.black : Colors.white,
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) =>
-                        ManualEntryPopup(devices: _deviceCategories),
-                  );
-                },
-                child: Text(
-                  'Add Manually',
-                  style: TextStyle(fontSize: 16),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-
-    return Scrollbar(
-      controller: _scrollController,
-      thumbVisibility: true,
-      trackVisibility: true,
-      thickness: 6,
-      radius: const Radius.circular(8),
-      interactive: true,
-      child: Container(
-        // 🔹 Transparent container so gradient is visible under scrollbar
-        color: Colors.transparent,
-        child: GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            _scrollController.jumpTo(
-              _scrollController.offset - details.delta.dx,
-            );
-          },
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: _scrollController,
-            padding:
-                const EdgeInsets.only(bottom: 15.0, left: 12.0, right: 12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: cardList,
+              ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -605,5 +688,66 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   Color _getCardTextColor() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return isDarkMode ? Colors.black : Colors.white;
+  }
+}
+
+class _HoverableCard extends StatefulWidget {
+  final bool isDarkMode;
+  final String category;
+  final VoidCallback onTap;
+  final Color Function(String) getCardColor;
+  final Color Function() getCardTextColor;
+
+  const _HoverableCard({
+    required this.isDarkMode,
+    required this.category,
+    required this.onTap,
+    required this.getCardColor,
+    required this.getCardTextColor,
+  });
+
+  @override
+  State<_HoverableCard> createState() => _HoverableCardState();
+}
+
+class _HoverableCardState extends State<_HoverableCard> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: AnimatedScale(
+        scale: _isHovering ? 1.15 : 1.0, // ✅ hover zoom
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: Card(
+            elevation: _isHovering ? 10 : 4, // ✅ thoda shadow effect
+            color: widget.getCardColor(widget.category),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                widget.category == "AddDevice"
+                    ? "➕ Add Device"
+                    : widget.category,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: widget.category == "AddDevice"
+                      ? (widget.isDarkMode ? Colors.black : Colors.white)
+                      : widget.getCardTextColor(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

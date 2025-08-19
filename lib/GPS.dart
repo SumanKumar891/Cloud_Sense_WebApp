@@ -41,7 +41,7 @@ class _MapPageState extends State<MapPage> {
   final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
 
   Map<String, Map<String, dynamic>> previousPositions = {};
-  final double displacementThreshold = 200.0;
+  final double displacementThreshold = 100.0;
   final Distance distance = Distance();
   final int stationaryTimeThreshold = 10 * 60 * 1000;
 
@@ -270,10 +270,10 @@ class _MapPageState extends State<MapPage> {
               hasMoved = true;
               initialMovedTimestamp = currentTimestamp;
               print(
-                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>200m), setting to red');
+                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>100m), setting to red');
             } else {
               hasMoved = prevData['has_moved'] ?? false;
-              print('Device $deviceId stationary (<200m), retaining color');
+              print('Device $deviceId stationary (<100m), retaining color');
             }
           } else {
             hasMoved = false;
@@ -623,7 +623,7 @@ class _MapPageState extends State<MapPage> {
                   Text('Country: $country'),
                   Text('Last Active: $lastActive'),
                   Text(
-                    'Status: ${hasMoved ? "Moved (>200m)" : "Stationary (<200m or >10 min)"}',
+                    'Status: ${hasMoved ? "Moved (>100m)" : "Stationary (<100m or >10 min)"}',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
