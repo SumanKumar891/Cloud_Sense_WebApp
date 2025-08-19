@@ -758,7 +758,7 @@ class _MapPageState extends State<MapPage> {
       builder: (BuildContext context) {
         final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: isDarkMode ? Colors.black : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -948,7 +948,7 @@ class _MapPageState extends State<MapPage> {
                           icon: Icon(
                             Icons.arrow_back,
                           ),
-                          color: isDarkMode ? Colors.white : Colors.black,
+                          color: Colors.black,
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         // Text(
@@ -1019,7 +1019,8 @@ class _MapPageState extends State<MapPage> {
                                         hintStyle: TextStyle(
                                           color: Colors.white,
                                         ),
-                                        prefixIcon: Icon(Icons.search),
+                                        prefixIcon: Icon(Icons.search,
+                                            color: Colors.white),
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -1062,6 +1063,8 @@ class _MapPageState extends State<MapPage> {
                                         });
                                       },
                                       decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.gps_fixed,
+                                            color: Colors.white),
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -1081,6 +1084,8 @@ class _MapPageState extends State<MapPage> {
                                         color: Colors.white,
                                       ),
                                       decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.calendar_today,
+                                            color: Colors.white),
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),
