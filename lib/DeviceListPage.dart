@@ -289,7 +289,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                     ),
                                   ),
                                   const SizedBox(height: 50),
-                                  _deviceCategories.isNotEmpty
+                                  _deviceCategories.isNotEmpty ||
+                                          _email == 'sharmasejal2701@gmail.com'
                                       ? _buildCategoryCards()
                                       : _buildNoDevicesCard(),
                                 ],
@@ -309,7 +310,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   Widget _buildCategoryCards() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    final categories = [..._deviceCategories.keys, "AddDevice"];
+    // Create the list of categories, including "AddDevice" and conditionally "GPS"
+    final categories = [
+      ..._deviceCategories.keys,
+      if (_email == 'sharmasejal2701@gmail.com') 'GPS',
+      "AddDevice"
+    ];
 
     return GridView.builder(
       shrinkWrap: true,
@@ -377,6 +383,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     ),
                   );
                 },
+              );
+            } else if (category == "GPS") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MapPage()),
               );
             } else {
               _showSensorsPopup(category, _deviceCategories[category]!);
@@ -719,13 +730,13 @@ class _HoverableCardState extends State<_HoverableCard> {
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: AnimatedScale(
-        scale: _isHovering ? 1.15 : 1.0, // ✅ hover zoom
+        scale: _isHovering ? 1.15 : 1.0,
         duration: Duration(milliseconds: 250),
         curve: Curves.easeOut,
         child: GestureDetector(
           onTap: widget.onTap,
           child: Card(
-            elevation: _isHovering ? 10 : 4, // ✅ thoda shadow effect
+            elevation: _isHovering ? 10 : 4,
             color: widget.getCardColor(widget.category),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
