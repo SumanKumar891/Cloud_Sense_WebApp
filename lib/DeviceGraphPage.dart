@@ -134,8 +134,8 @@ class CompassBackgroundPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
 class DeviceGraphPage extends StatefulWidget {
+  
   final String deviceName;
   final sequentialName;
 
@@ -143,12 +143,11 @@ class DeviceGraphPage extends StatefulWidget {
       {required this.deviceName,
       required this.sequentialName,
       required String backgroundImagePath});
-
   @override
   _DeviceGraphPageState createState() => _DeviceGraphPageState();
 }
 
-class _DeviceGraphPageState extends State<DeviceGraphPage> {
+class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProviderStateMixin {
   // Mobile menu button builder
   Widget _buildMobileMenuButton(
     String title,
@@ -499,6 +498,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   Timer? _reloadTimer;
   double? _fsDailyRainBaseline;
   String? _fsLastRainDate;
+   // AnimationController for rotating refresh icon
+  late AnimationController _rotationController;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -559,23 +560,38 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   @override
   void initState() {
     super.initState();
-    requestPermissions();
+     requestPermissions();
     _fetchDeviceDetails();
     _fetchDataForRange('single');
     _focusNode = FocusNode();
     _initializeNotifications();
 
-    // Set up the periodic timer to reload data every 30 seconds
-    _reloadTimer = Timer.periodic(Duration(seconds: 120), (timer) {
-      _reloadData();
+    // Initialize AnimationController
+    _rotationController = AnimationController(
+      duration: const Duration(milliseconds: 500), // Slower for visibility
+      vsync: this,
+    );
+ // Trigger initial data fetch with _reloadData to rotate icon
+    print('initState: Triggering initial data fetch');
+    _reloadData();
+
+      // Set up the periodic timer to reload data every 120 seconds
+    _reloadTimer = Timer.periodic(const Duration(seconds: 180), (timer) {
+      if (!_isLoading) {
+        
+        _reloadData();
+      } else {
+       
+      }
     });
   }
 
   @override
   void dispose() {
-    // Cancel the timer to prevent memory leaks
+      // Cancel the timer to prevent memory leaks
     _reloadTimer?.cancel();
     _focusNode.dispose();
+     _rotationController.dispose();
     super.dispose();
   }
 
@@ -4015,22 +4031,29 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
   }
 
   void _reloadData({DateTime? selectedDate}) async {
+        
     setState(() {
-      _isLoading = true; // Start loading
+      _isLoading = true;
+      _rotationController.repeat();
+      
     });
 
     if (selectedDate != null) {
-      // If a single date is selected, pass 'single' to fetch data for that day
-      _lastSelectedRange = 'single'; // Update last selected range
+      _lastSelectedRange = 'single';
       await _fetchDataForRange('single', selectedDate);
     } else {
-      // If no date is selected, reload the last selected range
       await _fetchDataForRange(_lastSelectedRange);
     }
 
-    setState(() {
-      _isLoading = false; // Stop loading once data is fetched
-    });
+        if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _rotationController.stop();
+        
+      });
+    } else {
+      
+    }
   }
 
   // Updated _buildWindCompass
@@ -5363,19 +5386,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                       ],
                                     ),
                                   ),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 12.0),
-                                  child: IconButton(
-                                    icon: Icon(Icons.refresh,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
-                                        size: 26),
-                                    onPressed: () {
-                                      _reloadData();
-                                    },
-                                  ),
-                                ),
+                                     Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: RotationTransition(
+              turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
+              child: IconButton(
+                icon: Icon(
+                  Icons.refresh,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  size: 26,
+                ),
+                onPressed: _isLoading
+                    ? null // Disable button during loading
+                    : () {
+                        _reloadData();
+                      },
+              ),
+            ),
+          ),
                               ],
                             ),
                           ],
@@ -6431,17 +6459,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                           ],
                         ),
                       ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: IconButton(
-                        icon: Icon(Icons.refresh,
-                            color: isDarkMode ? Colors.white : Colors.black,
-                            size: 26),
-                        onPressed: () {
-                          _reloadData();
-                        },
-                      ),
-                    ),
+                        Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: RotationTransition(
+              turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
+              child: IconButton(
+                icon: Icon(
+                  Icons.refresh,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  size: 26,
+                ),
+                onPressed: _isLoading
+                    ? null // Disable button during loading
+                    : () {
+                        _reloadData();
+                      },
+              ),
+            ),
+          ),
                   ],
                 ),
                 // Colored line for differentiation
@@ -7541,11 +7576,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
             Positioned.fill(
               child: Container(
                 color: Colors.black.withOpacity(0.5),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                ),
+                // child: Center(
+                //   child: CircularProgressIndicator(
+                //     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                //   ),
+                // ),
               ),
             ),
           // Download CSV button
@@ -7865,50 +7900,52 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                       218) // Light mode: white plot area
                                   : const Color.fromARGB(100, 0, 0,
                                       0), // Dark mode: semi-transparent black
-                              primaryXAxis: DateTimeAxis(
-                                // ✅ Show only date for 1 year, otherwise date + time
-                                dateFormat: _lastSelectedRange == 'single'
-                                    ? DateFormat('MM/dd hh:mm a') // date + time
-                                    : DateFormat('MM/dd'), // only date
-
-                                title: AxisTitle(
-                                  text: 'Time',
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Colors.black
-                                        : Colors.white,
-                                  ),
-                                ),
-                                labelStyle: TextStyle(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black
-                                      : Colors.white,
-                                ),
-                                labelRotation: 70,
-                                edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                intervalType: DateTimeIntervalType.auto,
-                                // autoScrollingDelta: 100,
-                                // autoScrollingMode: AutoScrollingMode.end,
-                                enableAutoIntervalOnZooming: true,
-
-                                majorGridLines: MajorGridLines(
-                                  width: 1.0,
-                                  dashArray: [
-                                    5,
-                                    5
-                                  ], // dotted vertical grid lines
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Color.fromARGB(255, 48, 48,
-                                          48) // Light mode: light gray
-                                      : Color.fromARGB(255, 141, 144,
-                                          148), // Dark mode: medium gray
-                                ),
-                              ),
-
+                            primaryXAxis: DateTimeAxis(
+  // Conditional interval type and interval based on range
+  intervalType: _lastSelectedRange == 'single' ? DateTimeIntervalType.auto : DateTimeIntervalType.hours,
+  interval: _lastSelectedRange == 'single' ? null : 24.0, // Auto for single, 24 hours for others
+  minorTicksPerInterval: _lastSelectedRange == 'single' ? 0 : 1, // No minor ticks for single, 1 for others
+  dateFormat: _lastSelectedRange == 'single'
+      ? DateFormat('MM/dd hh:mm a') // date + time for single range
+      : DateFormat('MM/dd'), // only date for other ranges
+  title: AxisTitle(
+    text: 'Time',
+    textStyle: TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Theme.of(context).brightness == Brightness.light
+          ? Colors.black
+          : Colors.white,
+    ),
+  ),
+  labelStyle: TextStyle(
+    color: Theme.of(context).brightness == Brightness.light
+        ? Colors.black
+        : Colors.white,
+  ),
+  labelRotation: 70,
+  edgeLabelPlacement: EdgeLabelPlacement.shift,
+  majorGridLines: MajorGridLines(
+    width: 1.0,
+    dashArray: [5, 5], // Dotted vertical grid lines
+    color: Theme.of(context).brightness == Brightness.light
+        ? Color.fromARGB(255, 48, 48, 48) // Light mode: light gray
+        : Color.fromARGB(255, 141, 144, 148), // Dark mode: medium gray
+  ),
+  minorGridLines: MinorGridLines(
+    width: _lastSelectedRange == 'single' ? 0 : 0.5, // No minor grid for single, thinner for others
+    dashArray: _lastSelectedRange == 'single' ? null : [3, 3], // No dashes for single, smaller dashes for others
+    color: Theme.of(context).brightness == Brightness.light
+        ? Color.fromARGB(255, 100, 100, 100) // Light mode: lighter gray
+        : Color.fromARGB(255, 180, 180, 180), // Dark mode: lighter gray
+  ),
+  minorTickLines: MinorTickLines(
+    size: _lastSelectedRange == 'single' ? 0 : 5.0, // No ticks for single, small ticks for others
+    color: Theme.of(context).brightness == Brightness.light
+        ? Color.fromARGB(255, 100, 100, 100)
+        : Color.fromARGB(255, 180, 180, 180),
+  ),
+  enableAutoIntervalOnZooming: true,
+),
                               primaryYAxis: NumericAxis(
                                 title: AxisTitle(
                                   text: yAxisTitle, // <- e.g. "°C", "mg/L"

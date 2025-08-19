@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'dart:ui'; // Required for ImageFilter
 
 class DeviceMapScreen extends StatefulWidget {
   @override
@@ -122,49 +123,55 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
     }
   }
 
-  void _showDeviceInfoDialog(
-      BuildContext context, Map<String, dynamic> device) {
-    final deviceId = device['deviceId'];
-    final imagePath = deviceImageMap[deviceId];
+  void _showDeviceInfoDialog(BuildContext context, Map<String, dynamic> device) {
+  final deviceId = device['deviceId'];
+  bool isToday = false;
+  try {
+    if (device['last_active'] != null) {
+      final lastActive = DateTime.tryParse(device['last_active'].toString());
+      if (lastActive != null) {
+        final now = DateTime.now();
+        isToday = lastActive.year == now.year &&
+            lastActive.month == now.month &&
+            lastActive.day == now.day;
+      }
+    }
+  } catch (_) {
+    isToday = false;
+  }
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        contentPadding: EdgeInsets.zero, // Remove default padding
-        content: Container(
-          width: 300,
-          height: 300,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            image: imagePath != null
-                ? DecorationImage(
-                    image: AssetImage(imagePath),
-                    fit: BoxFit.cover,
-                  )
-                : null,
-            color: Colors.white, // fallback if image is null
-          ),
-          child: Stack(
-            children: [
-              if (imagePath == null)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.black.withOpacity(0.5),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+  showDialog(
+    context: context,
+    barrierColor: Colors.black.withOpacity(0.3), // dim background
+    builder: (_) => Dialog(
+      backgroundColor: Colors.transparent, // make dialog itself transparent
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // blur effect
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.2), // semi-transparent overlay
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isToday ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    SizedBox(width: 8),
                     Text(
                       'Device $deviceId',
                       style: TextStyle(
@@ -172,44 +179,44 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
                           fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 6),
-                    Text(
-                      'Latitude: ${device['latitude']}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      'Longitude: ${device['longitude']}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      'Location: ${device['place']}, ${device['state']}, ${device['country']}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      'Last Active: ${device['last_active']}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Spacer(),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: TextButton(
-                        child: Text(
-                          'Close',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
                   ],
                 ),
-              ),
-            ],
+                SizedBox(height: 6),
+                Text(
+                  'Latitude: ${device['latitude']}',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  'Longitude: ${device['longitude']}',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  'Location: ${device['place']}, ${device['state']}, ${device['country']}',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  'Last Active: ${device['last_active']}',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Spacer(),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: TextButton(
+                    child: Text(
+                      'Close',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -464,7 +471,7 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
                         child: Icon(
                           Icons.location_on,
                           size: 40,
-                          color: isToday ? Colors.green : Colors.red,
+                          color: Colors.red,
                         ),
                       ),
                     );
