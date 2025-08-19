@@ -38,6 +38,7 @@ class _MapPageState extends State<MapPage> {
   String? selectedDeviceId;
   DateTime? startDate;
   DateTime? endDate;
+  DateTime? selectedDate;
   final DateFormat dateFormatter = DateFormat('dd-MM-yyyy');
 
   Map<String, Map<String, dynamic>> previousPositions = {};
@@ -158,7 +159,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _fetchDeviceLocations(
-      {String? deviceId, DateTime? start, DateTime? end}) async {
+      {String? deviceId, DateTime? selectedDate}) async {
     setState(() {
       isLoading = true;
       searchPin = null;
@@ -167,90 +168,85 @@ class _MapPageState extends State<MapPage> {
     try {
       String url =
           'https://nv9spsjdpe.execute-api.us-east-1.amazonaws.com/default/GPS_API_Data_func';
-      if (deviceId != null && start != null && end != null) {
-        final String startStr = dateFormatter.format(start);
-        final String endStr = dateFormatter.format(end);
-        url += '?Device_id=$deviceId&startdate=$startStr&enddate=$endStr';
+      if (deviceId != null && deviceId != 'None' && selectedDate != null) {
+        final String dateStr = dateFormatter.format(selectedDate);
+        url += '?Device_id=$deviceId&startdate=$dateStr&enddate=$dateStr';
       }
-
+      print('Fetching device locations from URL: $url');
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        if (data.isEmpty) {
-          print('No new data returned from API');
-          _updateDeviceStatusesForInactivity();
-          setState(() {
-            isLoading = false;
-          });
-          return;
-        }
+        print('API Response: $data');
 
         Map<String, Map<String, dynamic>> latestDevices = {};
+        List<Map<String, dynamic>> fetchedDevices = [];
+        bool positionsUpdated = false;
 
+        // Process API response
         for (var device in data) {
-          String deviceId = device['Device_id'].toString();
+          String devId = device['Device_id'].toString();
+          // Only process the selected device if deviceId is specified and not 'None'
+          if (deviceId != null && deviceId != 'None' && devId != deviceId) {
+            continue;
+          }
+
           String timestamp = device['Timestamp'].toString();
           bool hasNote =
               device.containsKey('Note') && device['Note'].isNotEmpty;
 
-          if (!latestDevices.containsKey(deviceId)) {
-            latestDevices[deviceId] = device;
+          if (!latestDevices.containsKey(devId)) {
+            latestDevices[devId] = device;
+            print('Added device $devId to latestDevices');
           } else {
-            String existingTimestamp = latestDevices[deviceId]!['Timestamp'];
-            bool existingHasNote =
-                latestDevices[deviceId]!.containsKey('Note') &&
-                    latestDevices[deviceId]!['Note'].isNotEmpty;
+            String existingTimestamp = latestDevices[devId]!['Timestamp'];
+            bool existingHasNote = latestDevices[devId]!.containsKey('Note') &&
+                latestDevices[devId]!['Note'].isNotEmpty;
 
             DateTime currentTime = DateTime.parse(timestamp);
             DateTime existingTime = DateTime.parse(existingTimestamp);
 
             if (currentTime.isAfter(existingTime)) {
-              latestDevices[deviceId] = device;
+              latestDevices[devId] = device;
             } else if (currentTime.isAtSameMomentAs(existingTime)) {
               if (hasNote && !existingHasNote) {
-                latestDevices[deviceId] = device;
+                latestDevices[devId] = device;
+                print(
+                    'Updated device $devId with note at same timestamp: $timestamp');
               }
             }
           }
         }
 
-        if (deviceId == null) {
-          deviceIds = latestDevices.keys.toList();
-          deviceIds.sort();
-          if (!deviceIds.contains('None')) {
-            deviceIds.insert(0, 'None');
-          }
-        }
-
-        List<Map<String, dynamic>> fetchedDevices = [];
-        bool positionsUpdated = false;
-
-        for (var device in latestDevices.values) {
-          String deviceId = device['Device_id'].toString();
+        // Process devices from the API response or previous positions
+        for (var devId in latestDevices.keys) {
+          var device = latestDevices[devId]!;
           double lat = device['Latitude'] is String
-              ? _truncateToThreeDecimals(double.parse(device['Latitude']))
-              : _truncateToThreeDecimals(device['Latitude']);
+              ? double.parse(device['Latitude'])
+              : device['Latitude'].toDouble();
           double lon = device['Longitude'] is String
-              ? _truncateToThreeDecimals(double.parse(device['Longitude']))
-              : _truncateToThreeDecimals(device['Longitude']);
+              ? double.parse(device['Longitude'])
+              : device['Longitude'].toDouble();
           LatLng currentPosition = LatLng(lat, lon);
           String currentTimestamp = device['Timestamp'].toString();
-
+          print(
+              'Device $devId: Current Position (Lat: $lat, Lon: $lon), Timestamp: $currentTimestamp');
           bool hasMoved = false;
           String? initialMovedTimestamp;
 
-          if (previousPositions.containsKey(deviceId)) {
-            final prevData = previousPositions[deviceId]!;
+          if (previousPositions.containsKey(devId)) {
+            final prevData = previousPositions[devId]!;
             final LatLng prevPosition =
                 LatLng(prevData['latitude'], prevData['longitude']);
             final String prevTimestamp = prevData['timestamp'];
             initialMovedTimestamp = prevData['initial_moved_timestamp'];
+            print(
+                'Device $devId: Previous Position (Lat: ${prevData['latitude']}, Lon: ${prevData['longitude']}), Previous Timestamp: $prevTimestamp, Initial Moved Timestamp: $initialMovedTimestamp');
 
             if (currentTimestamp == prevTimestamp) {
-              print('No new timestamp for device $deviceId, skipping update');
+              print('No new timestamp for device $devId, using previous data');
               fetchedDevices.add({
-                'name': 'Device: $deviceId',
+                'name': 'Device: $devId',
                 'latitude': lat,
                 'longitude': lon,
                 'place': prevData['place'] ?? 'Unknown',
@@ -265,24 +261,30 @@ class _MapPageState extends State<MapPage> {
 
             double dist =
                 distance.as(LengthUnit.Meter, prevPosition, currentPosition);
+            print(
+                'Device $devId: Distance moved = ${dist.toStringAsFixed(2)} meters');
 
             if (dist >= displacementThreshold) {
               hasMoved = true;
               initialMovedTimestamp = currentTimestamp;
               print(
-                  'Device $deviceId moved ${dist.toStringAsFixed(2)}m (>100m), setting to red');
+                  'Device $devId moved ${dist.toStringAsFixed(2)}m (>= ${displacementThreshold}m), setting color to red, updating initial_moved_timestamp to $currentTimestamp');
             } else {
               hasMoved = prevData['has_moved'] ?? false;
-              print('Device $deviceId stationary (<100m), retaining color');
+              print(
+                  'Device $devId stationary (< ${displacementThreshold}m, distance = ${dist.toStringAsFixed(2)}m), retaining color (has_moved: $hasMoved)');
             }
           } else {
             hasMoved = false;
             initialMovedTimestamp = currentTimestamp;
-            print('First time tracking device $deviceId, setting to green');
+            print(
+                'First time tracking device $devId, setting color to green, initial_moved_timestamp: $currentTimestamp');
           }
 
           final geoData = await _reverseGeocode(lat, lon);
-          previousPositions[deviceId] = {
+          print(
+              'Device $devId: Reverse Geocode Result - Place: ${geoData['place']}, State: ${geoData['state']}, Country: ${geoData['country']}');
+          previousPositions[devId] = {
             'latitude': lat,
             'longitude': lon,
             'timestamp': currentTimestamp,
@@ -296,7 +298,7 @@ class _MapPageState extends State<MapPage> {
           positionsUpdated = true;
 
           fetchedDevices.add({
-            'name': 'Device: $deviceId',
+            'name': 'Device: $devId',
             'latitude': lat,
             'longitude': lon,
             'place': geoData['place'] ?? 'Unknown',
@@ -306,15 +308,124 @@ class _MapPageState extends State<MapPage> {
             'has_moved': hasMoved,
             'note': device['Note'] ?? '',
           });
+          print(
+              'Device $devId: Added to fetchedDevices with has_moved: $hasMoved');
+        }
+
+        // Only add devices from previousPositions if no specific deviceId is selected
+        if (deviceId == null || deviceId == 'None') {
+          for (var devId in previousPositions.keys) {
+            if (!latestDevices.containsKey(devId)) {
+              final prevData = previousPositions[devId]!;
+              fetchedDevices.add({
+                'name': 'Device: $devId',
+                'latitude': prevData['latitude'],
+                'longitude': prevData['longitude'],
+                'place': prevData['place'] ?? 'Unknown',
+                'state': prevData['state'] ?? 'Unknown',
+                'country': prevData['country'] ?? 'Unknown',
+                'last_active': prevData['timestamp'],
+                'has_moved': prevData['has_moved'] ?? false,
+                'note': '',
+              });
+              print('Device $devId: Added from previousPositions');
+            }
+          }
         }
 
         if (positionsUpdated) {
           await _savePreviousPositions();
         }
 
+        // Update deviceIds
+        deviceIds = fetchedDevices
+            .map((device) =>
+                device['name'].replaceFirst('Device: ', '') as String)
+            .toSet()
+            .toList();
+        deviceIds.sort();
+        if (!deviceIds.contains('None')) {
+          deviceIds.insert(0, 'None');
+        }
+        print('Updated deviceIds: $deviceIds');
+
         setState(() {
           deviceLocations = fetchedDevices;
           filteredDevices = fetchedDevices;
+          print(
+              'Updated deviceLocations with ${deviceLocations.length} devices');
+          _updateDeviceStatusesForInactivity();
+          if (fetchedDevices.isNotEmpty) {
+            centerCoordinates = LatLng(
+                fetchedDevices[0]['latitude'], fetchedDevices[0]['longitude']);
+            zoomLevel = 12.0;
+            mapController.move(centerCoordinates, zoomLevel);
+            print(
+                'Map centered at (${centerCoordinates.latitude}, ${centerCoordinates.longitude}), zoom: $zoomLevel');
+          } else {
+            centerCoordinates = LatLng(0, 0);
+            zoomLevel = 5.0;
+            mapController.move(centerCoordinates, zoomLevel);
+            print('No devices found, map centered at (0, 0), zoom: $zoomLevel');
+          }
+        });
+      } else {
+        print('Failed to fetch devices: HTTP Status ${response.statusCode}');
+        _showError('Failed to fetch devices: ${response.statusCode}');
+
+        // Handle API failure
+        List<Map<String, dynamic>> fetchedDevices = [];
+        if (deviceId == null || deviceId == 'None') {
+          // Load all devices from previousPositions
+          for (var devId in previousPositions.keys) {
+            final prevData = previousPositions[devId]!;
+            fetchedDevices.add({
+              'name': 'Device: $devId',
+              'latitude': prevData['latitude'],
+              'longitude': prevData['longitude'],
+              'place': prevData['place'] ?? 'Unknown',
+              'state': prevData['state'] ?? 'Unknown',
+              'country': prevData['country'] ?? 'Unknown',
+              'last_active': prevData['timestamp'],
+              'has_moved': prevData['has_moved'] ?? false,
+              'note': '',
+            });
+            print(
+                'Device $devId: Added from previousPositions due to API failure');
+          }
+        } else if (previousPositions.containsKey(deviceId)) {
+          // Load only the selected device from previousPositions
+          final prevData = previousPositions[deviceId]!;
+          fetchedDevices.add({
+            'name': 'Device: $deviceId',
+            'latitude': prevData['latitude'],
+            'longitude': prevData['longitude'],
+            'place': prevData['place'] ?? 'Unknown',
+            'state': prevData['state'] ?? 'Unknown',
+            'country': prevData['country'] ?? 'Unknown',
+            'last_active': prevData['timestamp'],
+            'has_moved': prevData['has_moved'] ?? false,
+            'note': '',
+          });
+          print(
+              'Device $deviceId: Added from previousPositions due to API failure');
+        }
+
+        deviceIds = fetchedDevices
+            .map((device) =>
+                device['name'].replaceFirst('Device: ', '') as String)
+            .toSet()
+            .toList();
+        deviceIds.sort();
+        if (!deviceIds.contains('None')) {
+          deviceIds.insert(0, 'None');
+        }
+
+        setState(() {
+          deviceLocations = fetchedDevices;
+          filteredDevices = fetchedDevices;
+          print(
+              'Updated deviceLocations with ${deviceLocations.length} devices');
           _updateDeviceStatusesForInactivity();
           if (fetchedDevices.isNotEmpty) {
             centerCoordinates = LatLng(
@@ -327,13 +438,71 @@ class _MapPageState extends State<MapPage> {
             mapController.move(centerCoordinates, zoomLevel);
           }
         });
-      } else {
-        _showError('Failed to fetch devices: ${response.statusCode}');
-        _updateDeviceStatusesForInactivity();
       }
     } catch (e) {
       _showError('Error fetching devices: $e');
-      _updateDeviceStatusesForInactivity();
+      // Handle error by using previousPositions
+      List<Map<String, dynamic>> fetchedDevices = [];
+      if (deviceId == null || deviceId == 'None') {
+        // Load all devices from previousPositions
+        for (var devId in previousPositions.keys) {
+          final prevData = previousPositions[devId]!;
+          fetchedDevices.add({
+            'name': 'Device: $devId',
+            'latitude': prevData['latitude'],
+            'longitude': prevData['longitude'],
+            'place': prevData['place'] ?? 'Unknown',
+            'state': prevData['state'] ?? 'Unknown',
+            'country': prevData['country'] ?? 'Unknown',
+            'last_active': prevData['timestamp'],
+            'has_moved': prevData['has_moved'] ?? false,
+            'note': '',
+          });
+          print('Device $devId: Added from previousPositions due to error');
+        }
+      } else if (previousPositions.containsKey(deviceId)) {
+        // Load only the selected device from previousPositions
+        final prevData = previousPositions[deviceId]!;
+        fetchedDevices.add({
+          'name': 'Device: $deviceId',
+          'latitude': prevData['latitude'],
+          'longitude': prevData['longitude'],
+          'place': prevData['place'] ?? 'Unknown',
+          'state': prevData['state'] ?? 'Unknown',
+          'country': prevData['country'] ?? 'Unknown',
+          'last_active': prevData['timestamp'],
+          'has_moved': prevData['has_moved'] ?? false,
+          'note': '',
+        });
+        print('Device $deviceId: Added from previousPositions due to error');
+      }
+
+      deviceIds = fetchedDevices
+          .map(
+              (device) => device['name'].replaceFirst('Device: ', '') as String)
+          .toSet()
+          .toList();
+      deviceIds.sort();
+      if (!deviceIds.contains('None')) {
+        deviceIds.insert(0, 'None');
+      }
+
+      setState(() {
+        deviceLocations = fetchedDevices;
+        filteredDevices = fetchedDevices;
+        print('Updated deviceLocations with ${deviceLocations.length} devices');
+        _updateDeviceStatusesForInactivity();
+        if (fetchedDevices.isNotEmpty) {
+          centerCoordinates = LatLng(
+              fetchedDevices[0]['latitude'], fetchedDevices[0]['longitude']);
+          zoomLevel = 12.0;
+          mapController.move(centerCoordinates, zoomLevel);
+        } else {
+          centerCoordinates = LatLng(0, 0);
+          zoomLevel = 5.0;
+          mapController.move(centerCoordinates, zoomLevel);
+        }
+      });
     } finally {
       setState(() {
         isLoading = false;
@@ -554,7 +723,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context, bool isStart) async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -563,14 +732,10 @@ class _MapPageState extends State<MapPage> {
     );
     if (picked != null) {
       setState(() {
-        if (isStart) {
-          startDate = picked;
-        } else {
-          endDate = picked;
-        }
-        if (selectedDeviceId != null && startDate != null && endDate != null) {
+        selectedDate = picked;
+        if (selectedDeviceId != null && selectedDate != null) {
           _fetchDeviceLocations(
-              deviceId: selectedDeviceId, start: startDate, end: endDate);
+              deviceId: selectedDeviceId, selectedDate: selectedDate);
         }
       });
     }
@@ -705,7 +870,7 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       body: Container(
-        color: Colors.lightBlue[100],
+        color: isDarkMode ? const Color(0xFF1A2A44) : Colors.lightBlue[100],
         child: Stack(
           children: [
             FlutterMap(
@@ -719,6 +884,12 @@ class _MapPageState extends State<MapPage> {
                   flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                 ),
                 keepAlive: true,
+                cameraConstraint: CameraConstraint.contain(
+                  bounds: LatLngBounds(
+                    LatLng(-85.05112878, -180),
+                    LatLng(85.05112878, 180),
+                  ),
+                ),
               ),
               children: [
                 _getTileLayer(),
@@ -774,8 +945,10 @@ class _MapPageState extends State<MapPage> {
                     child: Row(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          color: Colors.black,
+                          icon: Icon(
+                            Icons.arrow_back,
+                          ),
+                          color: isDarkMode ? Colors.white : Colors.black,
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         Text(
@@ -783,7 +956,7 @@ class _MapPageState extends State<MapPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                         Spacer(),
@@ -803,7 +976,13 @@ class _MapPageState extends State<MapPage> {
                                       Icon(Icons.refresh, color: Colors.black),
                                   onPressed: isLoading
                                       ? null
-                                      : () => _fetchDeviceLocations(),
+                                      : () {
+                                          setState(() {
+                                            selectedDeviceId = null;
+                                            selectedDate = null;
+                                          });
+                                          _fetchDeviceLocations();
+                                        },
                                   tooltip: 'Reload Map',
                                 ),
                         ),
@@ -824,140 +1003,228 @@ class _MapPageState extends State<MapPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: searchController,
-                                onChanged: _updateSuggestions,
-                                onSubmitted: _searchDevices,
-                                decoration: InputDecoration(
-                                  hintText: 'Search Location',
-                                  hintStyle: TextStyle(
-                                    color: Colors.black,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isLargeScreen = constraints.maxWidth >= 600;
+                        return isLargeScreen
+                            ? Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: searchController,
+                                      onChanged: _updateSuggestions,
+                                      onSubmitted: _searchDevices,
+                                      decoration: InputDecoration(
+                                        hintText: 'Search Location',
+                                        hintStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                        prefixIcon: Icon(Icons.search),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? Colors.black.withOpacity(0.2)
+                                            : Colors.white.withOpacity(0.2),
+                                      ),
+                                    ),
                                   ),
-                                  prefixIcon: Icon(Icons.search),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: DropdownButtonFormField<String>(
+                                      value: selectedDeviceId,
+                                      hint: Text(
+                                        'Select Device ID',
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      items: deviceIds.map((String id) {
+                                        return DropdownMenuItem<String>(
+                                          value: id,
+                                          child: Text(id),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          selectedDeviceId = newValue;
+                                          if (selectedDeviceId != null &&
+                                              selectedDeviceId != 'None' &&
+                                              selectedDate != null) {
+                                            _fetchDeviceLocations(
+                                                deviceId: selectedDeviceId,
+                                                selectedDate: selectedDate);
+                                          } else if (selectedDeviceId ==
+                                              'None') {
+                                            _fetchDeviceLocations();
+                                          }
+                                        });
+                                      },
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? Colors.black.withOpacity(0.2)
+                                            : Colors.white.withOpacity(0.2),
+                                      ),
+                                    ),
                                   ),
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.2),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: selectedDeviceId,
-                                hint: Text(
-                                  'Select Device ID',
-                                  style: TextStyle(
-                                    color: Colors.black,
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: TextField(
+                                      readOnly: true,
+                                      onTap: () => _selectDate(context),
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        filled: true,
+                                        fillColor: isDarkMode
+                                            ? Colors.black.withOpacity(0.2)
+                                            : Colors.white.withOpacity(0.2),
+                                        hintText: selectedDate == null
+                                            ? 'Select Date'
+                                            : dateFormatter
+                                                .format(selectedDate!),
+                                        hintStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                items: deviceIds.map((String id) {
-                                  return DropdownMenuItem<String>(
-                                    value: id,
-                                    child: Text(id),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedDeviceId = newValue;
-                                    if (selectedDeviceId != null &&
-                                        startDate != null &&
-                                        endDate != null) {
-                                      _fetchDeviceLocations(
-                                          deviceId: selectedDeviceId,
-                                          start: startDate,
-                                          end: endDate);
-                                    }
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  TextField(
+                                    controller: searchController,
+                                    onChanged: _updateSuggestions,
+                                    onSubmitted: _searchDevices,
+                                    decoration: InputDecoration(
+                                      hintText: 'Search Location',
+                                      hintStyle: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      prefixIcon: Icon(Icons.search),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      filled: true,
+                                      fillColor: isDarkMode
+                                          ? Colors.black.withOpacity(0.2)
+                                          : Colors.white.withOpacity(0.2),
+                                    ),
                                   ),
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.2),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                readOnly: true,
-                                onTap: () => _selectDate(context, true),
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                  SizedBox(height: 10),
+                                  DropdownButtonFormField<String>(
+                                    value: selectedDeviceId,
+                                    hint: Text(
+                                      'Select Device ID',
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                    items: deviceIds.map((String id) {
+                                      return DropdownMenuItem<String>(
+                                        value: id,
+                                        child: Text(id),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        selectedDeviceId = newValue;
+                                        if (selectedDeviceId != null &&
+                                            selectedDeviceId != 'None' &&
+                                            selectedDate != null) {
+                                          _fetchDeviceLocations(
+                                              deviceId: selectedDeviceId,
+                                              selectedDate: selectedDate);
+                                        } else if (selectedDeviceId == 'None') {
+                                          _fetchDeviceLocations();
+                                        }
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      filled: true,
+                                      fillColor: isDarkMode
+                                          ? Colors.black.withOpacity(0.2)
+                                          : Colors.white.withOpacity(0.2),
+                                    ),
                                   ),
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.2),
-                                  hintText: startDate == null
-                                      ? 'Select Start Date'
-                                      : dateFormatter.format(startDate!),
-                                  hintStyle: TextStyle(
-                                    color: Colors.black,
+                                  SizedBox(height: 10),
+                                  TextField(
+                                    readOnly: true,
+                                    onTap: () => _selectDate(context),
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      filled: true,
+                                      fillColor: isDarkMode
+                                          ? Colors.black.withOpacity(0.2)
+                                          : Colors.white.withOpacity(0.2),
+                                      hintText: selectedDate == null
+                                          ? 'Select Date'
+                                          : dateFormatter.format(selectedDate!),
+                                      hintStyle: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: TextField(
-                                readOnly: true,
-                                onTap: () => _selectDate(context, false),
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.2),
-                                  hintText: endDate == null
-                                      ? 'Select End Date'
-                                      : dateFormatter.format(endDate!),
-                                  hintStyle: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        if (suggestions.isNotEmpty)
-                          Container(
-                            color: Colors.white,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: suggestions.length,
-                              itemBuilder: (context, index) {
-                                final suggestion = suggestions[index];
-                                return ListTile(
-                                  title: Text(suggestion['place']),
-                                  subtitle: Text(
-                                      '${suggestion['state']}, ${suggestion['country']} - ${suggestion['name']}'),
-                                  onTap: () => _selectSuggestion(suggestion),
-                                );
-                              },
-                            ),
-                          ),
-                      ],
+                                ],
+                              );
+                      },
                     ),
                   ),
+                  SizedBox(height: 10),
+                  if (suggestions.isNotEmpty)
+                    Container(
+                      color: isDarkMode ? Colors.grey[850] : Colors.white,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: suggestions.length,
+                        itemBuilder: (context, index) {
+                          final suggestion = suggestions[index];
+                          return ListTile(
+                            title: Text(suggestion['place']),
+                            subtitle: Text(
+                                '${suggestion['state']}, ${suggestion['country']} - ${suggestion['name']}'),
+                            onTap: () => _selectSuggestion(suggestion),
+                          );
+                        },
+                      ),
+                    ),
                 ],
               ),
             ),

@@ -4733,7 +4733,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                 style: TextStyle(
                                   color:
                                       isDarkMode ? Colors.white : Colors.black,
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 children: [
@@ -4741,7 +4741,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> {
                                     text:
                                         " (${widget.deviceName})", // Device name on next line
                                     style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: isDarkMode
                                           ? Colors.white

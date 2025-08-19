@@ -147,7 +147,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'CF':
         return 'Sekhon Biotech Pvt\nLtd Farm Sensors';
       case 'SV':
-        return 'SVPU Sensors\n(Meerut)';
+        return 'Sardar Vallabhbhai Patel University of Agriculture\nand Technology Sensors (Meerut)';
       case 'CB':
         return 'COD/BOD Sensors';
       case 'WF':
@@ -157,9 +157,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
       case 'VD':
         return 'Vanix Sensors';
       case 'NA':
-        return 'NARL Sensors';
+        return 'National Atmospheric Research Labortary\nSensors';
       case 'CP':
-        return 'Campus Sensors\n(IIT Ropar)';
+        return 'IIT Ropar Campus\nSensors';
       default:
         return 'Rain Sensors';
     }
@@ -484,6 +484,23 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             sequentialName =
                                 'Accelerometer Sensor $accelerometerSensorCount';
                           }
+                        } else if (category == 'IIT Bombay\nWeather Sensors') {
+                          sequentialName = 'IIT Bombay Sensor ${index + 1}';
+                        } else if (category == 'IIT Ropar Campus\nSensors') {
+                          sequentialName = 'IIT Ropar Sensor ${index + 1}';
+                        } else if (category == 'Forest Sensors\n(Bhopal)') {
+                          sequentialName = 'Forest Sensor ${index + 1}';
+                        } else if (category == 'SSMET Sensors') {
+                          sequentialName = 'SSMET Sensor ${index + 1}';
+                        } else if (category ==
+                            'Sekhon Biotech Pvt\nLtd Farm Sensors') {
+                          sequentialName = 'Sekhon Farm Sensor ${index + 1}';
+                        } else if (category ==
+                            'Sardar Vallabhbhai Patel University of Agriculture\nand Technology Sensors (Meerut)') {
+                          sequentialName = 'SVPU Sensor ${index + 1}';
+                        } else if (category ==
+                            'National Atmospheric Research Labortary\nSensors') {
+                          sequentialName = 'NARL Sensor ${index + 1}';
                         } else {
                           sequentialName =
                               '${category.split(" ").first} Sensor ${index + 1}';
