@@ -4476,6 +4476,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         'CurrentHumidity': 'Humidity',
         'LightIntensity': 'Light Intensity',
         'RainfallHourly': 'Rainfall',
+        'WindSpeed': 'Wind Speed',
+        'AtmPressure': 'Atm Pressure',
+        'WindDirection': 'Wind Direction'
       };
       List<String> includedParameters = parameterLabels.keys.toList();
 
@@ -5049,6 +5052,16 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                               'Rainfall': csParametersData[
                                                       'RainfallHourly'] ??
                                                   [],
+                                              'Wind Speed': csParametersData[
+                                                      'WindSpeed'] ??
+                                                  [],
+                                              'Atm Pressure': csParametersData[
+                                                      'AtmPressure'] ??
+                                                  [],
+                                              'Wind Direction':
+                                                  csParametersData[
+                                                          'WindDirection'] ??
+                                                      [],
                                             },
                                           ),
                                       ],
@@ -5788,9 +5801,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           'PressureHourlyComulative',
                                           'LuxHourlyComulative',
                                           'TemperatureHourlyComulative',
-                                          'AtmPressure',
-                                          'WindDirection',
-                                          'WindSpeed',
                                         ];
                                         if (!excludedParams
                                                 .contains(paramName) &&
@@ -7122,9 +7132,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 'PressureHourlyComulative',
                                                 'LuxHourlyComulative',
                                                 'TemperatureHourlyComulative',
-                                                'AtmPressure',
-                                                'WindDirection',
-                                                'WindSpeed',
                                               ];
                                               if (!excludedParams
                                                       .contains(paramName) &&
