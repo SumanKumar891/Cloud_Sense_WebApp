@@ -134,8 +134,8 @@ class CompassBackgroundPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
 class DeviceGraphPage extends StatefulWidget {
-  
   final String deviceName;
   final sequentialName;
 
@@ -147,7 +147,8 @@ class DeviceGraphPage extends StatefulWidget {
   _DeviceGraphPageState createState() => _DeviceGraphPageState();
 }
 
-class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProviderStateMixin {
+class _DeviceGraphPageState extends State<DeviceGraphPage>
+    with SingleTickerProviderStateMixin {
   // Mobile menu button builder
   Widget _buildMobileMenuButton(
     String title,
@@ -220,7 +221,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               ),
             ),
             _buildMobileMenuButton(
-              '1 Day',
+              '1 Day : ${DateFormat('dd-MM-yyyy').format(_selectedDay)}',
               'date',
               Icons.today,
               isDarkMode,
@@ -238,7 +239,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.calendar_view_week,
               isDarkMode,
               context,
-              onPressed: () { _reloadData(range: '7days');
+              onPressed: () {
+                _reloadData(range: '7days');
                 _fetchDataForRange('7days');
                 setState(() => _activeButton = '7days');
                 Navigator.pop(context);
@@ -250,7 +252,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.calendar_view_month,
               isDarkMode,
               context,
-              onPressed: () { _reloadData(range: '30days');
+              onPressed: () {
+                _reloadData(range: '30days');
                 _fetchDataForRange('30days');
                 setState(() => _activeButton = '30days');
                 Navigator.pop(context);
@@ -262,7 +265,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.calendar_today,
               isDarkMode,
               context,
-              onPressed: () { _reloadData(range: '3months');
+              onPressed: () {
+                _reloadData(range: '3months');
                 _fetchDataForRange('3months');
                 setState(() => _activeButton = '3months');
                 Navigator.pop(context);
@@ -274,7 +278,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
               Icons.date_range,
               isDarkMode,
               context,
-              onPressed: () { _reloadData(range: '1year');
+              onPressed: () {
+                _reloadData(range: '1year');
                 _fetchDataForRange('1year');
                 setState(() => _activeButton = '1year');
                 Navigator.pop(context);
@@ -499,7 +504,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
   Timer? _reloadTimer;
   double? _fsDailyRainBaseline;
   String? _fsLastRainDate;
-   // AnimationController for rotating refresh icon
+  // AnimationController for rotating refresh icon
   late AnimationController _rotationController;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -561,7 +566,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-     requestPermissions();
+    requestPermissions();
     _fetchDeviceDetails();
     _fetchDataForRange('single');
     _focusNode = FocusNode();
@@ -572,27 +577,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
       duration: const Duration(milliseconds: 500), // Slower for visibility
       vsync: this,
     );
- // Trigger initial data fetch with _reloadData to rotate icon
-   
+    // Trigger initial data fetch with _reloadData to rotate icon
+
     _reloadData(range: 'single');
 
-      // Set up the periodic timer to reload data every 120 seconds
+    // Set up the periodic timer to reload data every 120 seconds
     _reloadTimer = Timer.periodic(const Duration(seconds: 180), (timer) {
       if (!_isLoading) {
-        
-         _reloadData(range: _lastSelectedRange);
-      } else {
-       
-      }
+        _reloadData(range: _lastSelectedRange);
+      } else {}
     });
   }
 
   @override
   void dispose() {
-      // Cancel the timer to prevent memory leaks
+    // Cancel the timer to prevent memory leaks
     _reloadTimer?.cancel();
     _focusNode.dispose();
-     _rotationController.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
@@ -4014,7 +4016,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
     }
   }
 
-    Future<void> _selectDate() async {
+  Future<void> _selectDate() async {
     print('selectDate: Opening date picker');
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -4023,26 +4025,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
       lastDate: DateTime(2027),
     );
 
-    if (picked != null) {
+    if (picked != null && picked != _selectedDay && mounted) {
       setState(() {
         _selectedDay = picked;
-        print('selectDate: Selected new date $_selectedDay');
       });
+      print('selectDate: Selected new date $_selectedDay');
     } else {
       print('selectDate: No new date selected, using $_selectedDay');
     }
-
     if (mounted) {
       print('selectDate: Triggering reload for single day');
-      _reloadData(range: 'single', selectedDate: picked ?? _selectedDay);
+      _reloadData(range: 'single', selectedDate: _selectedDay);
     }
   }
-    void _reloadData({String range = 'single', DateTime? selectedDate}) async {
-    
+
+  void _reloadData({String range = 'single', DateTime? selectedDate}) async {
     setState(() {
       _isLoading = true;
       _rotationController.repeat();
-     
     });
 
     await _fetchDataForRange(range, selectedDate);
@@ -4051,11 +4051,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
       setState(() {
         _isLoading = false;
         _rotationController.stop(canceled: true); // Immediately stop rotation
-        
       });
-    } else {
-      
-    }
+    } else {}
   }
 
   // Updated _buildWindCompass
@@ -4479,9 +4476,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
         'CurrentHumidity': 'Humidity',
         'LightIntensity': 'Light Intensity',
         'RainfallHourly': 'Rainfall',
-        'WindSpeed': 'Wind Speed',
-        'AtmPressure': 'Atm Pressure',
-        'WindDirection': 'Wind Direction'
       };
       List<String> includedParameters = parameterLabels.keys.toList();
 
@@ -4828,12 +4822,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                               child: Column(
                                 children: [
                                   _buildSidebarButton(
-                                    '1 Day',
+                                    '1 Day : ${DateFormat('dd-MM-yyyy').format(_selectedDay)}',
                                     'date',
                                     Icons.today,
                                     isDarkMode,
                                     onPressed: () {
-                                      _selectDate();_reloadData(range: '1day');
+                                      _selectDate();
+                                      _reloadData(range: '1day');
                                       setState(() {
                                         _activeButton = 'date';
                                       });
@@ -4845,7 +4840,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '7days',
                                     Icons.calendar_view_week,
                                     isDarkMode,
-                                    onPressed: () {_reloadData(range: '7days');
+                                    onPressed: () {
+                                      _reloadData(range: '7days');
                                       _fetchDataForRange('7days');
                                       setState(() {
                                         _activeButton = '7days';
@@ -4858,7 +4854,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '30days',
                                     Icons.calendar_view_month,
                                     isDarkMode,
-                                    onPressed: () {_reloadData(range: '30days');
+                                    onPressed: () {
+                                      _reloadData(range: '30days');
                                       _fetchDataForRange('30days');
                                       setState(() {
                                         _activeButton = '30days';
@@ -4871,7 +4868,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '3months',
                                     Icons.calendar_today,
                                     isDarkMode,
-                                    onPressed: () {_reloadData(range: '3months');
+                                    onPressed: () {
+                                      _reloadData(range: '3months');
                                       _fetchDataForRange('3months');
                                       setState(() {
                                         _activeButton = '3months';
@@ -4884,7 +4882,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                     '1year',
                                     Icons.date_range,
                                     isDarkMode,
-                                    onPressed: () {_reloadData(range: '1year');
+                                    onPressed: () {
+                                      _reloadData(range: '1year');
                                       _fetchDataForRange('1year');
                                       setState(() {
                                         _activeButton = '1year';
@@ -5050,16 +5049,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                               'Rainfall': csParametersData[
                                                       'RainfallHourly'] ??
                                                   [],
-                                              'Wind Speed': csParametersData[
-                                                      'WindSpeed'] ??
-                                                  [],
-                                              'Atm Pressure': csParametersData[
-                                                      'AtmPressure'] ??
-                                                  [],
-                                              'Wind Direction':
-                                                  csParametersData[
-                                                          'WindDirection'] ??
-                                                      [],
                                             },
                                           ),
                                       ],
@@ -5388,26 +5377,28 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                       ],
                                     ),
                                   ),
-                                     Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: RotationTransition(
-              turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
-              child: IconButton(
-                icon: Icon(
-                  Icons.refresh,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  size: 26,
-                ),
-                 onPressed: _isLoading
-                  ? null
-                  : () {
-                     
-                      _reloadData(range: _lastSelectedRange);
-                    },
-            
-              ),
-            ),
-          ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: RotationTransition(
+                                    turns: Tween(begin: 0.0, end: 1.0)
+                                        .animate(_rotationController),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.refresh,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                        size: 26,
+                                      ),
+                                      onPressed: _isLoading
+                                          ? null
+                                          : () {
+                                              _reloadData(
+                                                  range: _lastSelectedRange);
+                                            },
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -5797,6 +5788,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                           'PressureHourlyComulative',
                                           'LuxHourlyComulative',
                                           'TemperatureHourlyComulative',
+                                          'AtmPressure',
+                                          'WindDirection',
+                                          'WindSpeed',
                                         ];
                                         if (!excludedParams
                                                 .contains(paramName) &&
@@ -6463,26 +6457,25 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                           ],
                         ),
                       ),
-                        Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: RotationTransition(
-              turns: Tween(begin: 0.0, end: 1.0).animate(_rotationController),
-              child: IconButton(
-                icon: Icon(
-                  Icons.refresh,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  size: 26,
-                ),
-                onPressed: _isLoading
-                  ? null
-                  : () {
-                    
-                      _reloadData(range: _lastSelectedRange);
-                    },
-            
-              ),
-            ),
-          ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: RotationTransition(
+                        turns: Tween(begin: 0.0, end: 1.0)
+                            .animate(_rotationController),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.refresh,
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            size: 26,
+                          ),
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  _reloadData(range: _lastSelectedRange);
+                                },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 // Colored line for differentiation
@@ -6565,7 +6558,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                   child: Column(
                                     children: [
                                       _buildSidebarButton(
-                                        '1 Day',
+                                        '1 Day : ${DateFormat('dd-MM-yyyy').format(_selectedDay)}',
                                         'date',
                                         Icons.today,
                                         isDarkMode,
@@ -7129,6 +7122,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
                                                 'PressureHourlyComulative',
                                                 'LuxHourlyComulative',
                                                 'TemperatureHourlyComulative',
+                                                'AtmPressure',
+                                                'WindDirection',
+                                                'WindSpeed',
                                               ];
                                               if (!excludedParams
                                                       .contains(paramName) &&
@@ -7755,7 +7751,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage> with SingleTickerProv
     }
   }
 
-Widget _buildChartContainer(
+  Widget _buildChartContainer(
     String title,
     List<ChartData> data,
     String yAxisTitle,
@@ -8079,6 +8075,7 @@ Widget _buildChartContainer(
           )
         : Container();
   }
+
   Widget _buildColorBox(
       Color color, String range, double boxSize, double textSize) {
     return Row(
