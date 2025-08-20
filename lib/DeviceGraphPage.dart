@@ -8256,57 +8256,60 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     return data.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.all(0.0),
-            child: AnimatedContainer(
+            child: AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              key: _chartKeys[title],
-              width: double.infinity,
-              height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
-              margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                color: isDarkMode
-                    ? Color.fromARGB(150, 0, 0, 0)
-                    : Color.fromARGB(173, 227, 220, 220),
-                border: isSelected
-                    ? Border.all(
-                        color: isDarkMode
-                            ? Colors.lightGreenAccent
-                            : Colors.deepOrange,
-                        width: 2.0,
-                      )
-                    : null,
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0)
-                              .withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+              opacity: isSelected || _selectedParam == null ? 1.0 : 0.7, // Dim non-selected charts
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                key: _chartKeys[title],
+                width: double.infinity,
+                height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  color: isDarkMode
+                      ? Color.fromARGB(150, 0, 0, 0)
+                      : Color.fromARGB(173, 227, 220, 220),
+                  border: isSelected
+                      ? Border.all(
+                          color: isDarkMode
+                              ? Colors.deepOrange
+                              : Colors.deepOrange,
+                          width: 2.0,
+                        )
+                      : null,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: const Color.fromARGB(255, 0, 0, 0)
+                                .withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        '$title',
+                        style: TextStyle(
+                          fontSize:
+                              MediaQuery.of(context).size.width < 800 ? 18 : 22,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
-                      ]
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      '$title',
-                      style: TextStyle(
-                        fontSize:
-                            MediaQuery.of(context).size.width < 800 ? 18 : 22,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
-                  ),
                   if (widget.deviceName.startsWith('CL'))
                     Padding(
                       padding: EdgeInsets.all(20.0),
@@ -8550,7 +8553,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
               ),
             ),
           )
-        : Container();
+          )  : Container();
   }
 
   Widget _buildColorBox(
