@@ -506,6 +506,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   String? _fsLastRainDate;
   // AnimationController for rotating refresh icon
   late AnimationController _rotationController;
+  // Add a map to store hover states for each parameter
+  final Map<String, bool> _isParamHovering = {};
+  String? _selectedParam;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -547,6 +550,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     }
   }
 
+  // ScrollController for scrolling to charts
+  final ScrollController _scrollController = ScrollController();
+  // Map to associate parameter labels with their chart keys
+  final Map<String, GlobalKey> _chartKeys = {};
   // New variables to store rain forecasting data for WD 211
   String _totalRainLast24Hours = '0.00 mm';
   String _mostRecentHourRain = '0.00 mm';
@@ -587,6 +594,112 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         _reloadData(range: _lastSelectedRange);
       } else {}
     });
+    // Initialize chart keys for each parameter
+    _initializeChartKeys();
+  }
+
+  // Update _initializeChartKeys to ensure consistent parameter names
+  void _initializeChartKeys() {
+    // Initialize hover states and chart keys
+    _chartKeys.clear();
+    _isParamHovering.clear();
+    _selectedParam = null; // Reset selected parameter
+
+    if (widget.deviceName.startsWith('WQ')) {
+      const params = [
+        'Temperature',
+        'TDS',
+        'COD',
+        'BOD',
+        'pH',
+        'DO',
+        'EC',
+      ];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('FS')) {
+      const params = [
+        'Temperature',
+        'Pressure',
+        'Humidity',
+        'Rain Level',
+        'Radiation',
+        'Wind Speed',
+        'Wind Direction',
+      ];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('CB')) {
+      const params = ['Temperature', 'COD', 'BOD'];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('NH')) {
+      const params = ['Ammonia', 'Temperature', 'Humidity'];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('DO')) {
+      const params = ['Temperature', 'DO Value', 'DO Percentage'];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('NA')) {
+      const params = [
+        'Temperature',
+        'Humidity',
+        'Light Intensity',
+        'Wind Speed',
+        'Atm Pressure',
+        'Wind Direction',
+        'Rainfall',
+      ];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('VD')) {
+      const params = ['Temperature', 'Humidity', 'Light Intensity', 'Rainfall'];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('CF') ||
+        widget.deviceName.startsWith('CP')) {
+      const params = [
+        'Temperature',
+        'Humidity',
+        'Light Intensity',
+        'Rainfall',
+        'Wind Speed',
+        'Atm Pressure',
+        'Wind Direction',
+      ];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else {
+      const params = [
+        'Chlorine',
+        'Temperature',
+        'Humidity',
+        'Light Intensity',
+        'Wind Speed',
+        'Solar Irradiance',
+      ];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    }
   }
 
   @override
@@ -595,6 +708,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     _reloadTimer?.cancel();
     _focusNode.dispose();
     _rotationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -4042,6 +4156,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   void _reloadData({String range = 'single', DateTime? selectedDate}) async {
     setState(() {
       _isLoading = true;
+      _selectedParam = null; // Reset selected parameter
+      _isParamHovering
+          .updateAll((key, value) => false); // Reset all hover states
       _rotationController.repeat();
     });
 
@@ -4198,11 +4315,63 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     );
   }
 
-// Helper function to map parameter keys to display names and units
+// Updated _getParameterDisplayInfo with normalization
   Map<String, dynamic> _getParameterDisplayInfo(String paramName) {
-    String displayName = paramName
+    // Normalize the paramName by removing prefixes/suffixes like 'Current', 'Hourly', etc.
+    // Handle AtmPressure explicitly to preserve "Atm Pressure"
+    if (paramName.toLowerCase().contains('atmpressure')) {
+      return {
+        'displayName': 'Atm Pressure',
+        'unit': 'hPa',
+      };
+    }
+    String normalized = paramName
+        .replaceAll('Current', '')
+        .replaceAll('Hourly', '')
+        .replaceAll('Minutly', '')
+        .replaceAll('Daily', '')
+        .replaceAll('Weekly', '')
+        .replaceAll('Average', '')
+        .replaceAll('Maximum', '')
+        .replaceAll('Minimum', '')
+        .trim();
+
+    // Convert to title case with spaces
+    String displayName = normalized
         .replaceAllMapped(RegExp(r'([A-Z])'), (match) => ' ${match[1]}')
         .trim();
+
+    // Special cases for consistency
+    if (displayName.toLowerCase().contains('temp')) {
+      displayName = 'Temperature';
+    } else if (displayName.toLowerCase().contains('humid')) {
+      displayName = 'Humidity';
+    } else if (displayName.toLowerCase().contains('rain')) {
+      displayName = 'Rainfall';
+    } else if (displayName.toLowerCase().contains('lightintens')) {
+      displayName = 'Light Intensity';
+    } else if (displayName.toLowerCase().contains('windspeed')) {
+      displayName = 'Wind Speed';
+    } else if (displayName.toLowerCase().contains('winddirect')) {
+      displayName = 'Wind Direction';
+    } else if (displayName.toLowerCase().contains('ammon')) {
+      displayName = 'Ammonia';
+    } else if (displayName.toLowerCase().contains('press')) {
+      displayName = 'Pressure';
+    } else if (displayName.toLowerCase().contains('radiat')) {
+      displayName = 'Radiation';
+    } else if (displayName.toLowerCase().contains('visib')) {
+      displayName = 'Visibility';
+    } else if (displayName.toLowerCase().contains('solarirrad')) {
+      displayName = 'Solar Irradiance';
+    } else if (displayName.toLowerCase().contains('electrode')) {
+      displayName = 'Electrode Signal';
+    } else if (displayName.toLowerCase().contains('hypochlor')) {
+      displayName = 'Hypochlorous';
+    } else if (displayName.toLowerCase().contains('residualchlor')) {
+      displayName = 'Chlorine';
+    }
+
     String unit = '';
 
     if (paramName.contains('Rainfall'))
@@ -4224,7 +4393,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     else if (paramName.contains('WindSpeed'))
       unit = 'm/s';
     else if (paramName.contains('WindDirection'))
-      unit = 'degrees'; // Added for CF WindDirection
+      unit = 'degrees';
     else if (paramName.contains('Irradiance') ||
         paramName.contains('Radiation'))
       unit = 'W/m²';
@@ -4262,19 +4431,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildParamStat('Temp', tempStats['current']?[0],
-              tempStats['min']?[0], tempStats['max']?[0], '°C', isDarkMode),
+              tempStats['min']?[0], tempStats['max']?[0], '°C', isDarkMode,
+              onTap: () => _scrollToChart('Temp')),
           _buildParamStat('TDS', tdsStats['current']?[0], tdsStats['min']?[0],
-              tdsStats['max']?[0], 'ppm', isDarkMode),
+              tdsStats['max']?[0], 'ppm', isDarkMode,
+              onTap: () => _scrollToChart('TDS')),
           _buildParamStat('COD', codStats['current']?[0], codStats['min']?[0],
-              codStats['max']?[0], 'mg/L', isDarkMode),
+              codStats['max']?[0], 'mg/L', isDarkMode,
+              onTap: () => _scrollToChart('COD')),
           _buildParamStat('BOD', bodStats['current']?[0], bodStats['min']?[0],
-              bodStats['max']?[0], 'mg/L', isDarkMode),
+              bodStats['max']?[0], 'mg/L', isDarkMode,
+              onTap: () => _scrollToChart('BOD')),
           _buildParamStat('pH', pHStats['current']?[0], pHStats['min']?[0],
-              pHStats['max']?[0], '', isDarkMode),
+              pHStats['max']?[0], '', isDarkMode,
+              onTap: () => _scrollToChart('pH')),
           _buildParamStat('DO', doStats['current']?[0], doStats['min']?[0],
-              doStats['max']?[0], 'mg/L', isDarkMode),
+              doStats['max']?[0], 'mg/L', isDarkMode,
+              onTap: () => _scrollToChart('DO')),
           _buildParamStat('EC', ecStats['current']?[0], ecStats['min']?[0],
-              ecStats['max']?[0], 'mS/cm', isDarkMode),
+              ecStats['max']?[0], 'mS/cm', isDarkMode,
+              onTap: () => _scrollToChart('EC')),
         ],
       );
     } else if (widget.deviceName.startsWith('FS')) {
@@ -4290,19 +4466,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildParamStat('Temperature', fstempStats['current']?[0], null, null,
-              '°C', isDarkMode),
+              '°C', isDarkMode,
+              onTap: () => _scrollToChart('Temperature')),
           _buildParamStat('Pressure', fspressureStats['current']?[0], null,
-              null, 'hPa', isDarkMode),
+              null, 'hPa', isDarkMode,
+              onTap: () => _scrollToChart('Pressure')),
           _buildParamStat('Humidity', fshumStats['current']?[0], null, null,
-              '%', isDarkMode),
+              '%', isDarkMode,
+              onTap: () => _scrollToChart('Humidity')),
           _buildParamStat('Rain Level', fsrainStats['current']?[0], null, null,
-              'mm', isDarkMode),
+              'mm', isDarkMode,
+              onTap: () => _scrollToChart('Rain Level')),
           _buildParamStat('Radiation', fsradiationStats['current']?[0], null,
-              null, 'W/m²', isDarkMode),
+              null, 'W/m²', isDarkMode,
+              onTap: () => _scrollToChart('Radiation')),
           _buildParamStat('Wind Speed', fswindspeedStats['current']?[0], null,
-              null, 'm/s', isDarkMode),
+              null, 'm/s', isDarkMode,
+              onTap: () => _scrollToChart('Wind Speed')),
           _buildParamStat('Wind Direction', fswinddirectionStats['current']?[0],
-              null, null, '°', isDarkMode),
+              null, null, '°', isDarkMode,
+              onTap: () => _scrollToChart('Wind Direction')),
         ],
       );
     } else if (widget.deviceName.startsWith('CB')) {
@@ -4313,11 +4496,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildParamStat('Temp', temp2Stats['current']?[0],
-              temp2Stats['min']?[0], temp2Stats['max']?[0], '°C', isDarkMode),
+              temp2Stats['min']?[0], temp2Stats['max']?[0], '°C', isDarkMode,
+              onTap: () => _scrollToChart('Temp')),
           _buildParamStat('COD', cod2Stats['current']?[0], cod2Stats['min']?[0],
-              cod2Stats['max']?[0], 'mg/L', isDarkMode),
+              cod2Stats['max']?[0], 'mg/L', isDarkMode,
+              onTap: () => _scrollToChart('COD')),
           _buildParamStat('BOD', bod2Stats['current']?[0], bod2Stats['min']?[0],
-              bod2Stats['max']?[0], 'mg/L', isDarkMode),
+              bod2Stats['max']?[0], 'mg/L', isDarkMode,
+              onTap: () => _scrollToChart('BOD')),
         ],
       );
     } else if (widget.deviceName.startsWith('NH')) {
@@ -4333,11 +4519,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
               ammoniaStats['min']?[0],
               ammoniaStats['max']?[0],
               'PPM',
-              isDarkMode),
+              isDarkMode,
+              onTap: () => _scrollToChart('AMMONIA')),
           _buildParamStat('TEMP', temppStats['current']?[0],
-              temppStats['min']?[0], temppStats['max']?[0], '°C', isDarkMode),
+              temppStats['min']?[0], temppStats['max']?[0], '°C', isDarkMode,
+              onTap: () => _scrollToChart('TEMP')),
           _buildParamStat('HUMIDITY', humStats['current']?[0],
-              humStats['min']?[0], humStats['max']?[0], '%', isDarkMode),
+              humStats['min']?[0], humStats['max']?[0], '%', isDarkMode,
+              onTap: () => _scrollToChart('HUMIDITY')),
         ],
       );
     } else if (widget.deviceName.startsWith('DO')) {
@@ -4348,21 +4537,24 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildParamStat('Temperature', ttempStats['current']?[0],
-              ttempStats['min']?[0], ttempStats['max']?[0], '°C', isDarkMode),
+              ttempStats['min']?[0], ttempStats['max']?[0], '°C', isDarkMode,
+              onTap: () => _scrollToChart('Temperature')),
           _buildParamStat(
               'DO Value',
               dovalueStats['current']?[0],
               dovalueStats['min']?[0],
               dovalueStats['max']?[0],
               'mg/L',
-              isDarkMode),
+              isDarkMode,
+              onTap: () => _scrollToChart('DO Value')),
           _buildParamStat(
               'DO Percentage',
               dopercentageStats['current']?[0],
               dopercentageStats['min']?[0],
               dopercentageStats['max']?[0],
               '%',
-              isDarkMode),
+              isDarkMode,
+              onTap: () => _scrollToChart('DO Percentage')),
         ],
       );
     } else if (widget.deviceName.startsWith('NA')) {
@@ -4397,7 +4589,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         else if (label == 'Atm Pressure')
           unit = 'hpa';
         else if (label == 'Wind Direction') unit = '°';
-        return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        return _buildParamStat(label, current, null, null, unit, isDarkMode,
+            onTap: () => _scrollToChart(label));
       }).toList();
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -4426,7 +4619,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         else if (label == 'Light Intensity')
           unit = 'lux';
         else if (label == 'Rainfall') unit = 'mm';
-        return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        return _buildParamStat(label, current, null, null, unit, isDarkMode,
+            onTap: () => _scrollToChart(label));
       }).toList();
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -4464,7 +4658,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         else if (label == 'Atm Pressure')
           unit = 'hpa';
         else if (label == 'Wind Direction') unit = '°';
-        return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        return _buildParamStat(label, current, null, null, unit, isDarkMode,
+            onTap: () => _scrollToChart(label));
       }).toList();
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -4502,18 +4697,39 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         else if (label == 'Atm Pressure')
           unit = 'hpa';
         else if (label == 'Wind Direction') unit = '°';
-        return _buildParamStat(label, current, null, null, unit, isDarkMode);
+        return _buildParamStat(label, current, null, null, unit, isDarkMode,
+            onTap: () => _scrollToChart(label));
       }).toList();
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: children,
       );
     }
-    return Row(); // Default empty
+    return Row();
   }
 
+  void _scrollToChart(String parameter) {
+    final key = _chartKeys[parameter];
+    if (key != null && key.currentContext != null) {
+      final RenderBox renderBox =
+          key.currentContext!.findRenderObject() as RenderBox;
+      final position = renderBox.localToGlobal(Offset.zero).dy;
+      final scrollPosition = _scrollController.offset +
+          position -
+          MediaQuery.of(context).padding.top -
+          kToolbarHeight;
+      _scrollController.animateTo(
+        scrollPosition,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  // Updated _buildParamStat with hover, touch, and persistent selection
   Widget _buildParamStat(String label, double? current, double? min,
-      double? max, String unit, bool isDarkMode) {
+      double? max, String unit, bool isDarkMode,
+      {VoidCallback? onTap}) {
     final Map<String, IconData> parameterIcons = {
       'Atm Pressure': Icons.compress,
       'Light Intensity': Icons.wb_sunny,
@@ -4522,73 +4738,144 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       'Wind Direction': Icons.navigation,
       'Wind Speed': Icons.air,
       'Humidity': Icons.water,
-      'Temp': Icons.thermostat, // For backward compatibility
       'TDS': Icons.water_drop,
       'COD': Icons.science,
       'BOD': Icons.science,
       'pH': Icons.opacity,
       'DO': Icons.bubble_chart,
       'EC': Icons.electrical_services,
-      'AMMONIA': Icons.cloud,
+      'Ammonia': Icons.cloud,
       'Pressure': Icons.compress,
-      'Rain Level': Icons.cloudy_snowing, // Cloud + rain
-      'Radiation': Icons.wb_sunny, // Sun icon for solar radiation
+      'Rain Level': Icons.cloudy_snowing,
+      'Radiation': Icons.wb_sunny,
+      'DO Value': Icons.bubble_chart,
+      'DO Percentage': Icons.percent,
     };
 
-    final IconData icon =
-        parameterIcons[label] ?? Icons.help; // Fallback to a neutral icon
+    final IconData icon = parameterIcons[label] ?? Icons.help;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Container(
-        color: current != null
-            ? (isDarkMode ? Colors.blueGrey[900] : Colors.grey[200])
-            : Colors.transparent,
-        padding: EdgeInsets.all(4.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 20.0,
+    // Determine if the device is mobile based on screen width
+    bool isMobile = MediaQuery.of(context).size.width < 600;
+
+    // Determine if this parameter is selected or being hovered/touched
+    bool isSelected = _selectedParam == label;
+    bool isHovered = _isParamHovering[label] ?? false;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedParam = label; // Set this parameter as selected
+        });
+        if (onTap != null) {
+          onTap();
+        }
+      },
+      onTapDown: (_) {
+        if (isMobile) {
+          setState(() {
+            _isParamHovering[label] = true;
+          });
+        }
+      },
+      onTapUp: (_) {
+        if (isMobile) {
+          setState(() {
+            _isParamHovering[label] = false;
+          });
+        }
+      },
+      onTapCancel: () {
+        if (isMobile) {
+          setState(() {
+            _isParamHovering[label] = false;
+          });
+        }
+      },
+      child: MouseRegion(
+        onEnter: (_) {
+          if (!isMobile) {
+            setState(() {
+              _isParamHovering[label] = true;
+            });
+          }
+        },
+        onExit: (_) {
+          if (!isMobile) {
+            setState(() {
+              _isParamHovering[label] = false;
+            });
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.all(4.0),
+          decoration: BoxDecoration(
+            color: current != null
+                ? (isSelected || isHovered
+                    ? (isDarkMode
+                        ? Colors.blueGrey[700]!
+                        : const Color.fromARGB(255, 166, 163, 163))
+                    : (isDarkMode ? Colors.blueGrey[900]! : Colors.grey[200]!))
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: (isSelected || isHovered)
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 20.0,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  const SizedBox(width: 4.0),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4.0),
+              Text(
+                '${current?.toStringAsFixed(2) ?? '-'} $unit',
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                SizedBox(width: 4.0),
+              ),
+              if (min != null)
                 Text(
-                  label,
+                  'Min: ${min.toStringAsFixed(2)} $unit',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 4.0), // Spacing between label and value
-            Text(
-              '${current?.toStringAsFixed(2) ?? '-'} $unit',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-            ),
-            if (min != null)
-              Text(
-                'Min: ${min.toStringAsFixed(2)} $unit',
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-              ),
-            if (max != null)
-              Text(
-                'Max: ${max.toStringAsFixed(2)} $unit',
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-              ),
-          ],
+              if (max != null)
+                Text(
+                  'Max: ${max.toStringAsFixed(2)} $unit',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -5420,6 +5707,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                       // Main Content Area
                       Expanded(
                         child: SingleChildScrollView(
+                          controller:
+                              _scrollController, // Use ScrollController for scrolling
                           child: Container(
                             padding: EdgeInsets.only(top: 10),
                             child: Column(
@@ -6106,7 +6395,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             ChartType.line),
                                       if (hasNonZeroValues(fshumidityData))
                                         _buildChartContainer(
-                                            'Relative Humidity',
+                                            'Humidity',
                                             fshumidityData,
                                             '(%)',
                                             ChartType.line),
@@ -6124,6 +6413,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             'Wind Speed',
                                             fswindspeedData,
                                             '(m/s)',
+                                            ChartType.line),
+                                      if (hasNonZeroValues(fswinddirectionData))
+                                        _buildChartContainer(
+                                            'Wind Direction',
+                                            fswinddirectionData,
+                                            '(°)',
                                             ChartType.line),
                                       if (hasNonZeroValues(temp2Data))
                                         _buildChartContainer('Temperature',
@@ -6666,6 +6961,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                             ),
                             Expanded(
                               child: SingleChildScrollView(
+                                controller:
+                                    _scrollController, // Use ScrollController for scrolling
                                 child: Container(
                                   padding: EdgeInsets.only(top: 10),
                                   child: Column(
@@ -7509,7 +7806,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             if (hasNonZeroValues(
                                                 fshumidityData))
                                               _buildChartContainer(
-                                                  'Relative Humidity',
+                                                  'Humidity',
                                                   fshumidityData,
                                                   '(%)',
                                                   ChartType.line),
@@ -7532,6 +7829,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                   'Wind Speed',
                                                   fswindspeedData,
                                                   '(m/s)',
+                                                  ChartType.line),
+                                            if (hasNonZeroValues(
+                                                fswinddirectionData))
+                                              _buildChartContainer(
+                                                  'Wind Direction',
+                                                  fswinddirectionData,
+                                                  '(°)',
                                                   ChartType.line),
                                             if (hasNonZeroValues(temp2Data))
                                               _buildChartContainer(
@@ -7768,16 +8072,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         ? Padding(
             padding: const EdgeInsets.all(0.0),
             child: Container(
+              key: _chartKeys[title],
               width: double.infinity,
               height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
                 color: Theme.of(context).brightness == Brightness.light
-                    ? Color.fromARGB(
-                        173, 227, 220, 220) // Light mode: white background
-                    : const Color.fromARGB(
-                        150, 0, 0, 0), // Dark mode: semi-transparent black
+                    ? Color.fromARGB(173, 227, 220, 220)
+                    : const Color.fromARGB(150, 0, 0, 0),
               ),
               child: Column(
                 children: [
@@ -7801,19 +8104,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                       child: Builder(
                         builder: (BuildContext context) {
                           final screenWidth = MediaQuery.of(context).size.width;
-
-                          // Define common properties
                           double boxSize;
                           double textSize;
                           double spacing;
 
                           if (screenWidth < 800) {
-                            // For smaller screens (e.g., mobile devices)
                             boxSize = 15.0;
                             textSize = 15.0;
                             spacing = 12.0;
-
-                            // Row layout for small screens
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -7837,12 +8135,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               ),
                             );
                           } else {
-                            // For larger screens (e.g., PCs and laptops)
                             boxSize = 20.0;
                             textSize = 16.0;
                             spacing = 45.0;
-
-                            // Row layout for larger screens
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -7902,19 +8197,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   isShiftPressed) {}
                             },
                             child: SfCartesianChart(
-                              plotAreaBackgroundColor: Theme.of(context)
-                                          .brightness ==
-                                      Brightness.light
-                                  ? Color.fromARGB(189, 222, 218,
-                                      218) // Light mode: white plot area
-                                  : const Color.fromARGB(100, 0, 0,
-                                      0), // Dark mode: semi-transparent black
+                              plotAreaBackgroundColor:
+                                  Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Color.fromARGB(189, 222, 218, 218)
+                                      : const Color.fromARGB(100, 0, 0, 0),
                               primaryXAxis: DateTimeAxis(
-                                // ✅ Show only date for 1 year, otherwise date + time
                                 dateFormat: _lastSelectedRange == 'single'
-                                    ? DateFormat('MM/dd hh:mm a') // date + time
-                                    : DateFormat('MM/dd'), // only date
-
+                                    ? DateFormat('MM/dd hh:mm a')
+                                    : DateFormat('MM/dd'),
                                 title: AxisTitle(
                                   text: 'Time',
                                   textStyle: TextStyle(
@@ -7934,28 +8225,19 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                 labelRotation: 70,
                                 edgeLabelPlacement: EdgeLabelPlacement.shift,
                                 intervalType: DateTimeIntervalType.auto,
-                                // autoScrollingDelta: 100,
-                                // autoScrollingMode: AutoScrollingMode.end,
                                 enableAutoIntervalOnZooming: true,
-
                                 majorGridLines: MajorGridLines(
                                   width: 1.0,
-                                  dashArray: [
-                                    5,
-                                    5
-                                  ], // dotted vertical grid lines
+                                  dashArray: [5, 5],
                                   color: Theme.of(context).brightness ==
                                           Brightness.light
-                                      ? Color.fromARGB(255, 48, 48,
-                                          48) // Light mode: light gray
-                                      : Color.fromARGB(255, 141, 144,
-                                          148), // Dark mode: medium gray
+                                      ? Color.fromARGB(255, 48, 48, 48)
+                                      : Color.fromARGB(255, 141, 144, 148),
                                 ),
                               ),
-
                               primaryYAxis: NumericAxis(
                                 title: AxisTitle(
-                                  text: yAxisTitle, // <- e.g. "°C", "mg/L"
+                                  text: yAxisTitle,
                                   textStyle: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context).brightness ==
@@ -7979,9 +8261,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                 lineType: TrackballLineType.vertical,
                                 lineColor: Theme.of(context).brightness ==
                                         Brightness.light
-                                    ? Color.fromARGB(255, 42, 147,
-                                        212) // Light mode: light sky blue
-                                    : Colors.blue, // Dark mode: original blue
+                                    ? Color.fromARGB(255, 42, 147, 212)
+                                    : Colors.blue,
                                 lineWidth: 1,
                                 markerSettings: TrackballMarkerSettings(
                                   markerVisibility:
@@ -7991,9 +8272,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   borderWidth: 2,
                                   color: Theme.of(context).brightness ==
                                           Brightness.light
-                                      ? Color.fromARGB(255, 42, 147,
-                                          212) // Light mode: light sky blue
-                                      : Colors.blue, // Dark mode: original blue
+                                      ? Color.fromARGB(255, 42, 147, 212)
+                                      : Colors.blue,
                                 ),
                                 builder: (BuildContext context,
                                     TrackballDetails details) {
@@ -8005,15 +8285,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                       return const SizedBox();
                                     }
 
-                                    // ✅ Format: only "1year" removes time, rest show date + time
                                     String formattedDate;
                                     if (_lastSelectedRange == '1year') {
-                                      formattedDate = DateFormat('MM/dd')
-                                          .format(time); // only date
+                                      formattedDate =
+                                          DateFormat('MM/dd').format(time);
                                     } else {
                                       formattedDate =
                                           DateFormat('MM/dd hh:mm a')
-                                              .format(time); // date + time
+                                              .format(time);
                                     }
 
                                     return Container(
@@ -8060,7 +8339,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   }
                                 },
                               ),
-
                               zoomPanBehavior: ZoomPanBehavior(
                                 zoomMode: ZoomMode.x,
                                 enablePanning: true,
