@@ -7419,7 +7419,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 'MaximumTemperature',
                                                 'MinimumTemperature',
                                                 'AverageTemperature',
-                                                'RainfallHourly',
+                                                'RainfallMinutly',
                                                 'RainfallDaily',
                                                 'RainfallWeekly',
                                                 'AverageHumidity',
