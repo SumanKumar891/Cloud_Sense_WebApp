@@ -23,6 +23,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   Map<String, List<String>> _deviceCategories = {};
   String? _email;
   late ScrollController _scrollController;
+  String? _selectedCategory; // Track the selected category for the dialog
+  bool _shouldRestoreDialog = false; // Flag to control dialog restoration
 
   @override
   void initState() {
@@ -107,6 +109,21 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     } finally {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+// Restore dialog only when explicitly needed (e.g., after popping back)
+  void _restoreDialog() {
+    if (_shouldRestoreDialog &&
+        _selectedCategory != null &&
+        _deviceCategories.containsKey(_selectedCategory)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _shouldRestoreDialog) {
+          // Ensure widget is mounted and restoration is still needed
+          _showSensorsPopup(
+              _selectedCategory!, _deviceCategories[_selectedCategory]!);
+        }
       });
     }
   }
@@ -202,6 +219,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // Restore dialog after build
+    _restoreDialog();
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -390,6 +409,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 MaterialPageRoute(builder: (context) => MapPage()),
               );
             } else {
+              setState(() {
+                _selectedCategory = category; // Save the category
+                _shouldRestoreDialog =
+                    true; // Enable restoration for this category
+              });
               _showSensorsPopup(category, _deviceCategories[category]!);
             }
           },
@@ -484,9 +508,9 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             sequentialName =
                                 'Accelerometer Sensor $accelerometerSensorCount';
                           }
-                        } else if (category == 'IIT Bombay\nWeather Sensors') {
+                        } else if (category == 'IIT Bombay Sensors') {
                           sequentialName = 'IIT Bombay Sensor ${index + 1}';
-                        } else if (category == 'IIT Ropar Campus\nSensors') {
+                        } else if (category == 'IIT Ropar Sensors') {
                           sequentialName = 'IIT Ropar Sensor ${index + 1}';
                         } else if (category == 'Forest Sensors\n(Bhopal)') {
                           sequentialName = 'Forest Sensor ${index + 1}';
@@ -545,8 +569,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  Navigator.pop(context);
-
+                                  Navigator.pop(context); // Close the dialog
+                                  setState(() {
+                                    _shouldRestoreDialog =
+                                        false; // Prevent immediate restoration
+                                  });
+                                  // Store the category to restore later
+                                  String currentCategory = _selectedCategory!;
                                   if (sensorName.startsWith('BF')) {
                                     String numericNodeId = sensorName
                                         .replaceAll(RegExp(r'\D'), '');
@@ -560,7 +589,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                           nodeId: numericNodeId,
                                         ),
                                       ),
-                                    );
+                                    ).then((_) {
+                                      setState(() {
+                                        _selectedCategory = currentCategory;
+                                        _shouldRestoreDialog = true;
+                                      });
+                                    });
                                   } else if (sensorName.startsWith('CS')) {
                                     String numericNodeId = sensorName
                                         .replaceAll(RegExp(r'\D'), '');
@@ -574,7 +608,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                           nodeId: numericNodeId,
                                         ),
                                       ),
-                                    );
+                                    ).then((_) {
+                                      setState(() {
+                                        _selectedCategory = currentCategory;
+                                        _shouldRestoreDialog = true;
+                                      });
+                                    });
                                   } else {
                                     Navigator.push(
                                       context,
@@ -586,7 +625,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                               'assets/backgroundd.jpg',
                                         ),
                                       ),
-                                    );
+                                    ).then((_) {
+                                      // Restore dialog after popping back
+                                      setState(() {
+                                        _selectedCategory = currentCategory;
+                                        _shouldRestoreDialog = true;
+                                      });
+                                    });
                                   }
                                 },
                                 child: Text(
@@ -605,7 +650,14 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 SizedBox(height: 16),
 
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _selectedCategory = null; // Clear the selected category
+                      _shouldRestoreDialog = false; // Prevent restoration
+                    });
+                    Navigator.pop(context); // Close the dialog
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         isDarkMode ? Colors.grey[700] : Colors.grey[300],
