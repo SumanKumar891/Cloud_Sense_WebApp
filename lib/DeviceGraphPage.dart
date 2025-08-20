@@ -5855,13 +5855,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                               displayInfo['displayName'];
                                           String unit = displayInfo['unit'];
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            unit.isNotEmpty
-                                                ? '($unit)'
-                                                : displayName,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -5910,11 +5910,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            chartTitle,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -5958,11 +5958,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            chartTitle,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -6006,11 +6006,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            chartTitle,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -6060,11 +6060,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            chartTitle,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -6113,11 +6113,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            chartTitle,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -6166,11 +6166,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 : displayName;
                                           }
                                           return _buildChartContainer(
-                                            displayName,
-                                            data,
-                                            chartTitle,
-                                            ChartType.line,
-                                          );
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
@@ -6187,260 +6187,372 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             'Chlorine',
                                             chlorineData,
                                             '(mg/L)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(temperatureData))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperatureData,
                                             '(°C)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(humidityData))
                                         _buildChartContainer(
                                             'Humidity',
                                             humidityData,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(lightIntensityData))
                                         _buildChartContainer(
                                             'Light Intensity',
                                             lightIntensityData,
                                             '(Lux)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(windSpeedData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             windSpeedData,
                                             '(m/s)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(solarIrradianceData))
                                         _buildChartContainer(
                                             'Solar Irradiance',
                                             solarIrradianceData,
                                             '(W/M^2)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(tempData))
-                                        _buildChartContainer('Temperature',
-                                            tempData, '(°C)', ChartType.line),
-                                      if (hasNonZeroValues(tdsData))
-                                        _buildChartContainer('TDS', tdsData,
-                                            '(ppm)', ChartType.line),
-                                      if (hasNonZeroValues(codData))
-                                        _buildChartContainer('COD', codData,
-                                            '(mg/L)', ChartType.line),
-                                      if (hasNonZeroValues(bodData))
-                                        _buildChartContainer('BOD', bodData,
-                                            '(mg/L)', ChartType.line),
-                                      if (hasNonZeroValues(pHData))
                                         _buildChartContainer(
-                                            'pH', pHData, 'pH', ChartType.line),
+                                            'Temperature',
+                                            tempData,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(tdsData))
+                                        _buildChartContainer(
+                                            'TDS',
+                                            tdsData,
+                                            '(ppm)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(codData))
+                                        _buildChartContainer(
+                                            'COD',
+                                            codData,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(bodData))
+                                        _buildChartContainer(
+                                            'BOD',
+                                            bodData,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(pHData))
+                                        _buildChartContainer('pH', pHData, 'pH',
+                                            ChartType.line, isDarkMode),
                                       if (hasNonZeroValues(doData))
-                                        _buildChartContainer('DO', doData,
-                                            '(mg/L)', ChartType.line),
+                                        _buildChartContainer(
+                                            'DO',
+                                            doData,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(ecData))
-                                        _buildChartContainer('EC', ecData,
-                                            '(mS/cm)', ChartType.line),
+                                        _buildChartContainer(
+                                            'EC',
+                                            ecData,
+                                            '(mS/cm)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(temppData))
-                                        _buildChartContainer('Temperature',
-                                            temppData, '(°C)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Temperature',
+                                            temppData,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(electrodeSignalData))
                                         _buildChartContainer(
                                             'Electrode Signal',
                                             electrodeSignalData,
                                             '(mV)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(
                                           residualchlorineData))
                                         _buildChartContainer(
                                             'Chlorine',
                                             residualchlorineData,
                                             '(mg/L)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(hypochlorousData))
                                         _buildChartContainer(
                                             'Hypochlorous',
                                             hypochlorousData,
                                             '(mg/L)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(temmppData))
-                                        _buildChartContainer('Temperature',
-                                            temmppData, '(°C)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Temperature',
+                                            temmppData,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(humidityyData))
                                         _buildChartContainer(
                                             'Humidity',
                                             humidityyData,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(lightIntensityyData))
                                         _buildChartContainer(
                                             'Light Intensity',
                                             lightIntensityyData,
                                             '(Lux)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(windSpeeddData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             windSpeeddData,
                                             '(m/s)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(ttempData))
-                                        _buildChartContainer('Temperature',
-                                            ttempData, '(°C)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Temperature',
+                                            ttempData,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(dovaluedata))
                                         _buildChartContainer(
                                             'DO Value',
                                             dovaluedata,
                                             '(mg/L)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(dopercentagedata))
                                         _buildChartContainer(
                                             'DO Percentage',
                                             dopercentagedata,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(temperaturData))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperaturData,
                                             '(°C)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(humData))
-                                        _buildChartContainer('Humidity',
-                                            humData, '(%)', ChartType.line),
-                                      if (hasNonZeroValues(luxData))
-                                        _buildChartContainer('Light Intensity',
-                                            luxData, '(Lux)', ChartType.line),
-                                      if (hasNonZeroValues(coddata))
-                                        _buildChartContainer('COD', coddata,
-                                            '(mg/L)', ChartType.line),
-                                      if (hasNonZeroValues(boddata))
-                                        _buildChartContainer('BOD', boddata,
-                                            '(mg/L)', ChartType.line),
-                                      if (hasNonZeroValues(phdata))
                                         _buildChartContainer(
-                                            'pH', phdata, 'pH', ChartType.line),
+                                            'Humidity',
+                                            humData,
+                                            '(%)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(luxData))
+                                        _buildChartContainer(
+                                            'Light Intensity',
+                                            luxData,
+                                            '(Lux)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(coddata))
+                                        _buildChartContainer(
+                                            'COD',
+                                            coddata,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(boddata))
+                                        _buildChartContainer(
+                                            'BOD',
+                                            boddata,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      if (hasNonZeroValues(phdata))
+                                        _buildChartContainer('pH', phdata, 'pH',
+                                            ChartType.line, isDarkMode),
                                       if (hasNonZeroValues(temperattureData))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperattureData,
                                             '(°C)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(humidittyData))
                                         _buildChartContainer(
                                             'Humidity',
                                             humidittyData,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(ammoniaData))
                                         _buildChartContainer(
                                             'Ammonia',
                                             ammoniaData,
                                             '(PPM)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(temperaturedata))
                                         _buildChartContainer(
                                             'Temperature',
                                             temperaturedata,
                                             '(°C)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(humiditydata))
                                         _buildChartContainer(
                                             'Humidity',
                                             humiditydata,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(ittempData))
-                                        _buildChartContainer('Temperature',
-                                            ittempData, '(°C)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Temperature',
+                                            ittempData,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(itpressureData))
                                         _buildChartContainer(
                                             'Pressure',
                                             itpressureData,
                                             '(hPa)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(ithumidityData))
                                         _buildChartContainer(
                                             'Humidity',
                                             ithumidityData,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(itrainData))
-                                        _buildChartContainer('Rain Level',
-                                            itrainData, '(mm)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Rain Level',
+                                            itrainData,
+                                            '(mm)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(itvisibilityData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             itwindspeedData,
                                             '(m/s)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(itradiationData))
                                         _buildChartContainer(
                                             'Radiation',
                                             itradiationData,
                                             '(W/m²)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(itvisibilityData))
                                         _buildChartContainer(
                                             'Visibilty',
                                             itvisibilityData,
                                             '(m)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fstempData))
-                                        _buildChartContainer('Temperature',
-                                            fstempData, '(°C)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Temperature',
+                                            fstempData,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fspressureData))
                                         _buildChartContainer(
                                             'Pressure',
                                             fspressureData,
                                             '(hPa)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fshumidityData))
                                         _buildChartContainer(
                                             'Humidity',
                                             fshumidityData,
                                             '(%)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fsrainData))
-                                        _buildChartContainer('Rain Level',
-                                            fsrainData, '(mm)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Rain Level',
+                                            fsrainData,
+                                            '(mm)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fsradiationData))
                                         _buildChartContainer(
                                             'Radiation',
                                             fsradiationData,
                                             '(W/m²)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fswindspeedData))
                                         _buildChartContainer(
                                             'Wind Speed',
                                             fswindspeedData,
                                             '(m/s)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(fswinddirectionData))
                                         _buildChartContainer(
                                             'Wind Direction',
                                             fswinddirectionData,
                                             '(°)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(temp2Data))
-                                        _buildChartContainer('Temperature',
-                                            temp2Data, '(°C)', ChartType.line),
+                                        _buildChartContainer(
+                                            'Temperature',
+                                            temp2Data,
+                                            '(°C)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(cod2Data))
-                                        _buildChartContainer('COD', cod2Data,
-                                            '(mg/L)', ChartType.line),
+                                        _buildChartContainer(
+                                            'COD',
+                                            cod2Data,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(bod2Data))
-                                        _buildChartContainer('BOD', bod2Data,
-                                            '(mg/L)', ChartType.line),
+                                        _buildChartContainer(
+                                            'BOD',
+                                            bod2Data,
+                                            '(mg/L)',
+                                            ChartType.line,
+                                            isDarkMode),
                                       if (hasNonZeroValues(
                                           wfAverageTemperatureData))
                                         _buildChartContainer(
                                             'Temperature',
                                             wfAverageTemperatureData,
                                             '(°C)',
-                                            ChartType.line),
+                                            ChartType.line,
+                                            isDarkMode),
                                       _buildChartContainer(
                                           'Rain Level',
                                           wfrainfallData,
                                           '(mm)',
-                                          ChartType.line),
+                                          ChartType.line,
+                                          isDarkMode),
                                     ],
                                   ],
                                 )
@@ -7173,13 +7285,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 String unit =
                                                     displayInfo['unit'];
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  unit.isNotEmpty
-                                                      ? '($unit)'
-                                                      : displayName,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7200,6 +7312,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 'AverageTemperature',
                                                 'RainfallDaily',
                                                 'RainfallWeekly',
+                                                'RainfallMinutly',
                                                 'AverageHumidity',
                                                 'MinimumHumidity',
                                                 'MaximumHumidity',
@@ -7232,11 +7345,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  chartTitle,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7285,11 +7398,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  chartTitle,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7338,11 +7451,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  chartTitle,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7363,7 +7476,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 'AverageTemperature',
                                                 'RainfallDaily',
                                                 'RainfallWeekly',
-                                                'RainfallHourly',
+                                                'RainfallMinutly',
                                                 'AverageHumidity',
                                                 'MinimumHumidity',
                                                 'MaximumHumidity',
@@ -7396,11 +7509,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  chartTitle,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7454,11 +7567,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  chartTitle,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7479,6 +7592,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 'AverageTemperature',
                                                 'RainfallDaily',
                                                 'RainfallWeekly',
+                                                'RainfallMinutly',
                                                 'AverageHumidity',
                                                 'MinimumHumidity',
                                                 'MaximumHumidity',
@@ -7511,11 +7625,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       : displayName;
                                                 }
                                                 return _buildChartContainer(
-                                                  displayName,
-                                                  data,
-                                                  chartTitle,
-                                                  ChartType.line,
-                                                );
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
                                               }
                                               return const SizedBox.shrink();
                                             }).toList(),
@@ -7538,335 +7652,401 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                   'Chlorine',
                                                   chlorineData,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 temperatureData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperatureData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(humidityData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humidityData,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 lightIntensityData))
                                               _buildChartContainer(
                                                   'Light Intensity',
                                                   lightIntensityData,
                                                   '(Lux)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(windSpeedData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   windSpeedData,
                                                   '(m/s)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 solarIrradianceData))
                                               _buildChartContainer(
                                                   'Solar Irradiance',
                                                   solarIrradianceData,
                                                   '(W/M^2)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(tempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   tempData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(tdsData))
                                               _buildChartContainer(
                                                   'TDS',
                                                   tdsData,
                                                   '(ppm)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(codData))
                                               _buildChartContainer(
                                                   'COD',
                                                   codData,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(bodData))
                                               _buildChartContainer(
                                                   'BOD',
                                                   bodData,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(pHData))
-                                              _buildChartContainer('pH', pHData,
-                                                  'pH', ChartType.line),
+                                              _buildChartContainer(
+                                                  'pH',
+                                                  pHData,
+                                                  'pH',
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(doData))
-                                              _buildChartContainer('DO', doData,
-                                                  '(mg/L)', ChartType.line),
+                                              _buildChartContainer(
+                                                  'DO',
+                                                  doData,
+                                                  '(mg/L)',
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(ecData))
-                                              _buildChartContainer('EC', ecData,
-                                                  '(mS/cm)', ChartType.line),
+                                              _buildChartContainer(
+                                                  'EC',
+                                                  ecData,
+                                                  '(mS/cm)',
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(temppData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temppData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 electrodeSignalData))
                                               _buildChartContainer(
                                                   'Electrode Signal',
                                                   electrodeSignalData,
                                                   '(mV)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 residualchlorineData))
                                               _buildChartContainer(
                                                   'Chlorine',
                                                   residualchlorineData,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 hypochlorousData))
                                               _buildChartContainer(
                                                   'Hypochlorous',
                                                   hypochlorousData,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(temmppData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temmppData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(humidityyData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humidityyData,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 lightIntensityyData))
                                               _buildChartContainer(
                                                   'Light Intensity',
                                                   lightIntensityyData,
                                                   '(Lux)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 windSpeeddData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   windSpeeddData,
                                                   '(m/s)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(ttempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   ttempData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(dovaluedata))
                                               _buildChartContainer(
                                                   'DO Value',
                                                   dovaluedata,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 dopercentagedata))
                                               _buildChartContainer(
                                                   'DO Percentage',
                                                   dopercentagedata,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 temperaturData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperaturData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(humData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humData,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(luxData))
                                               _buildChartContainer(
                                                   'Light Intensity',
                                                   luxData,
                                                   '(Lux)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(coddata))
                                               _buildChartContainer(
                                                   'COD',
                                                   coddata,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(boddata))
                                               _buildChartContainer(
                                                   'BOD',
                                                   boddata,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(phdata))
-                                              _buildChartContainer('pH', phdata,
-                                                  'pH', ChartType.line),
+                                              _buildChartContainer(
+                                                  'pH',
+                                                  phdata,
+                                                  'pH',
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 temperattureData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperattureData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(humidittyData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humidittyData,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(ammoniaData))
                                               _buildChartContainer(
                                                   'Ammonia',
                                                   ammoniaData,
                                                   '(PPM)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 temperaturedata))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temperaturedata,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(humiditydata))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   humiditydata,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(ittempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   ittempData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 itpressureData))
                                               _buildChartContainer(
                                                   'Pressure',
                                                   itpressureData,
                                                   '(hPa)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 ithumidityData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   ithumidityData,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(itrainData))
                                               _buildChartContainer(
                                                   'Rain Level',
                                                   itrainData,
                                                   '(mm)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 itvisibilityData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   itwindspeedData,
                                                   '(m/s)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 itradiationData))
                                               _buildChartContainer(
                                                   'Radiation',
                                                   itradiationData,
                                                   '(W/m²)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 itvisibilityData))
                                               _buildChartContainer(
                                                   'Visibilty',
                                                   itvisibilityData,
                                                   '(m)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(fstempData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   fstempData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 fspressureData))
                                               _buildChartContainer(
                                                   'Pressure',
                                                   fspressureData,
                                                   '(hPa)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 fshumidityData))
                                               _buildChartContainer(
                                                   'Humidity',
                                                   fshumidityData,
                                                   '(%)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(fsrainData))
                                               _buildChartContainer(
                                                   'Rain Level',
                                                   fsrainData,
                                                   '(mm)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 fsradiationData))
                                               _buildChartContainer(
                                                   'Radiation',
                                                   fsradiationData,
                                                   '(W/m²)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 fswindspeedData))
                                               _buildChartContainer(
                                                   'Wind Speed',
                                                   fswindspeedData,
                                                   '(m/s)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 fswinddirectionData))
                                               _buildChartContainer(
                                                   'Wind Direction',
                                                   fswinddirectionData,
                                                   '(°)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(temp2Data))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   temp2Data,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(cod2Data))
                                               _buildChartContainer(
                                                   'COD',
                                                   cod2Data,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(bod2Data))
                                               _buildChartContainer(
                                                   'BOD',
                                                   bod2Data,
                                                   '(mg/L)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             if (hasNonZeroValues(
                                                 wfAverageTemperatureData))
                                               _buildChartContainer(
                                                   'Temperature',
                                                   wfAverageTemperatureData,
                                                   '(°C)',
-                                                  ChartType.line),
+                                                  ChartType.line,
+                                                  isDarkMode),
                                             _buildChartContainer(
                                                 'Rain Level',
                                                 wfrainfallData,
                                                 '(mm)',
-                                                ChartType.line),
+                                                ChartType.line,
+                                                isDarkMode),
                                           ],
                                         ],
                                       )
@@ -8062,25 +8242,56 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     }
   }
 
+// Updated _buildChartContainer with visual effect for selected parameter
   Widget _buildChartContainer(
     String title,
     List<ChartData> data,
     String yAxisTitle,
     ChartType chartType,
+    bool isDarkMode,
   ) {
+    // Determine if this chart corresponds to the selected parameter
+    bool isSelected = _selectedParam == title;
+
     return data.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.all(0.0),
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
               key: _chartKeys[title],
               width: double.infinity,
               height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
               margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.0),
-                color: Theme.of(context).brightness == Brightness.light
-                    ? Color.fromARGB(173, 227, 220, 220)
-                    : const Color.fromARGB(150, 0, 0, 0),
+                color: isDarkMode
+                    ? Color.fromARGB(150, 0, 0, 0)
+                    : Color.fromARGB(173, 227, 220, 220),
+                border: isSelected
+                    ? Border.all(
+                        color: isDarkMode
+                            ? Colors.lightGreenAccent
+                            : Colors.deepOrange,
+                        width: 2.0,
+                      )
+                    : null,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 0, 0, 0)
+                              .withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
               ),
               child: Column(
                 children: [
@@ -8089,13 +8300,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                     child: Text(
                       '$title',
                       style: TextStyle(
-                          fontSize:
-                              MediaQuery.of(context).size.width < 800 ? 18 : 22,
-                          fontWeight: FontWeight.bold,
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Colors.black
-                                  : Colors.white),
+                        fontSize:
+                            MediaQuery.of(context).size.width < 800 ? 18 : 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
                     ),
                   ),
                   if (widget.deviceName.startsWith('CL'))
@@ -8197,11 +8406,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   isShiftPressed) {}
                             },
                             child: SfCartesianChart(
-                              plotAreaBackgroundColor:
-                                  Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Color.fromARGB(189, 222, 218, 218)
-                                      : const Color.fromARGB(100, 0, 0, 0),
+                              plotAreaBackgroundColor: isDarkMode
+                                  ? Color.fromARGB(100, 0, 0, 0)
+                                  : Color.fromARGB(189, 222, 218, 218),
                               primaryXAxis: DateTimeAxis(
                                 dateFormat: _lastSelectedRange == 'single'
                                     ? DateFormat('MM/dd hh:mm a')
@@ -8210,17 +8417,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   text: 'Time',
                                   textStyle: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Colors.black
-                                        : Colors.white,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                                 labelStyle: TextStyle(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black
-                                      : Colors.white,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
                                 ),
                                 labelRotation: 70,
                                 edgeLabelPlacement: EdgeLabelPlacement.shift,
@@ -8229,10 +8433,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                 majorGridLines: MajorGridLines(
                                   width: 1.0,
                                   dashArray: [5, 5],
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Color.fromARGB(255, 48, 48, 48)
-                                      : Color.fromARGB(255, 141, 144, 148),
+                                  color: isDarkMode
+                                      ? Color.fromARGB(255, 141, 144, 148)
+                                      : Color.fromARGB(255, 48, 48, 48),
                                 ),
                               ),
                               primaryYAxis: NumericAxis(
@@ -8240,17 +8443,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   text: yAxisTitle,
                                   textStyle: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).brightness ==
-                                            Brightness.light
-                                        ? Colors.black
-                                        : Colors.white,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                                 labelStyle: TextStyle(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black
-                                      : Colors.white,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
                                 ),
                                 axisLine: AxisLine(width: 1),
                                 majorGridLines: MajorGridLines(width: 0),
@@ -8259,10 +8459,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                 enable: true,
                                 activationMode: ActivationMode.singleTap,
                                 lineType: TrackballLineType.vertical,
-                                lineColor: Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? Color.fromARGB(255, 42, 147, 212)
-                                    : Colors.blue,
+                                lineColor: isDarkMode
+                                    ? Colors.blue
+                                    : Color.fromARGB(255, 42, 147, 212),
                                 lineWidth: 1,
                                 markerSettings: TrackballMarkerSettings(
                                   markerVisibility:
@@ -8270,10 +8469,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                   width: 8,
                                   height: 8,
                                   borderWidth: 2,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Color.fromARGB(255, 42, 147, 212)
-                                      : Colors.blue,
+                                  color: isDarkMode
+                                      ? Colors.blue
+                                      : Color.fromARGB(255, 42, 147, 212),
                                 ),
                                 builder: (BuildContext context,
                                     TrackballDetails details) {
@@ -8298,11 +8496,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                     return Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Colors.white
-                                            : const Color.fromARGB(
-                                                200, 0, 0, 0),
+                                        color: isDarkMode
+                                            ? Color.fromARGB(200, 0, 0, 0)
+                                            : Colors.white,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Column(
@@ -8313,22 +8509,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           Text(
                                             formattedDate,
                                             style: TextStyle(
-                                              color: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.light
-                                                  ? Colors.black
-                                                  : Colors.white,
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           Text(
                                             'Value: $value',
                                             style: TextStyle(
-                                              color: Theme.of(context)
-                                                          .brightness ==
-                                                      Brightness.light
-                                                  ? Colors.black
-                                                  : Colors.white,
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black,
                                             ),
                                           ),
                                         ],
