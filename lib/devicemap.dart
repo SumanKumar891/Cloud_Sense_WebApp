@@ -123,100 +123,103 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
     }
   }
 
-  void _showDeviceInfoDialog(BuildContext context, Map<String, dynamic> device) {
-  final deviceId = device['deviceId'];
-  bool isToday = false;
-  try {
-    if (device['last_active'] != null) {
-      final lastActive = DateTime.tryParse(device['last_active'].toString());
-      if (lastActive != null) {
-        final now = DateTime.now();
-        isToday = lastActive.year == now.year &&
-            lastActive.month == now.month &&
-            lastActive.day == now.day;
+  void _showDeviceInfoDialog(
+      BuildContext context, Map<String, dynamic> device) {
+    final deviceId = device['deviceId'];
+    bool isToday = false;
+    try {
+      if (device['last_active'] != null) {
+        final lastActive = DateTime.tryParse(device['last_active'].toString());
+        if (lastActive != null) {
+          final now = DateTime.now();
+          isToday = lastActive.year == now.year &&
+              lastActive.month == now.month &&
+              lastActive.day == now.day;
+        }
       }
+    } catch (_) {
+      isToday = false;
     }
-  } catch (_) {
-    isToday = false;
-  }
 
-  showDialog(
-    context: context,
-    barrierColor: Colors.black.withOpacity(0.3), // dim background
-    builder: (_) => Dialog(
-      backgroundColor: Colors.transparent, // make dialog itself transparent
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // blur effect
-          child: Container(
-            width: 200,
-            height: 200,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.2), // semi-transparent overlay
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isToday ? Colors.green : Colors.red,
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.3), // dim background
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent, // make dialog itself transparent
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // blur effect
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                color:
+                    Colors.black.withOpacity(0.2), // semi-transparent overlay
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isToday ? Colors.green : Colors.red,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Device $deviceId',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'Latitude: ${device['latitude']}',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  'Longitude: ${device['longitude']}',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  'Location: ${device['place']}, ${device['state']}, ${device['country']}',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  'Last Active: ${device['last_active']}',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Spacer(),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: TextButton(
-                    child: Text(
-                      'Close',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () => Navigator.pop(context),
+                      SizedBox(width: 8),
+                      Text(
+                        'Device $deviceId',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  SizedBox(height: 6),
+                  Text(
+                    'Latitude: ${device['latitude']}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    'Longitude: ${device['longitude']}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    'Location: ${device['place']}, ${device['state']}, ${device['country']}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    'Last Active: ${device['last_active']}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Spacer(),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: TextButton(
+                      child: Text(
+                        'Close',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -388,13 +391,17 @@ class _DeviceMapScreenState extends State<DeviceMapScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Device Map',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black, // Set back arrow to black
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh, color: Colors.white),
