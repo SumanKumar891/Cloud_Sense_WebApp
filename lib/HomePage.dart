@@ -304,7 +304,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     ListTile(
                       leading: Icon(Icons.devices),
-                      title: Text('Devices'),
+                      title: Text('My Devices'),
                       onTap: _handleDeviceNavigation,
                     ),
                     if (userProvider.userEmail?.trim().toLowerCase() !=
@@ -320,7 +320,7 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(themeProvider.isDarkMode
                           ? Icons.light_mode
                           : Icons.dark_mode),
-                      title: Text('Toggle Theme'),
+                      title: Text('Theme'),
                       onTap: () => themeProvider.toggleTheme(),
                     ),
                     ListTile(
@@ -429,7 +429,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         _buildAnimatedStatCard(
                           statValue: _totalDevices.toString(),
-                          label: "Devices",
+                          label: "My Devices",
                           themeProvider: themeProvider,
                           context: context,
                         ),
@@ -578,56 +578,98 @@ class _HomePageState extends State<HomePage> {
         '05agriculture.05@gmail.com';
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        value: null,
-        hint: Text(
-          userProvider.userEmail ?? 'Guest',
-          style: TextStyle(
-            fontSize: isTablet ? 14 : 16,
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () async {
+        final RenderBox overlay =
+            Overlay.of(context).context.findRenderObject() as RenderBox;
+
+        final selected = await showMenu<String>(
+          context: context,
+          position: RelativeRect.fromLTRB(
+            overlay.size.width, // 👈 align to right edge
+            kToolbarHeight, // 👈 just below AppBar
+            0,
+            0,
           ),
-        ),
-        icon: Icon(
-          Icons.arrow_drop_down,
-          color: isDarkMode ? Colors.white : Colors.black,
-        ),
-        items: [
-          DropdownMenuItem<String>(
-            value: 'devices',
-            child: Text('Devices'),
-          ),
-          if (!isAdmin)
-            DropdownMenuItem<String>(
-              value: 'account',
-              child: Text('Account Info'),
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          items: [
+            PopupMenuItem(
+              value: 'devices',
+              child: Row(
+                children: [
+                  Icon(Icons.devices,
+                      color: isDarkMode ? Colors.white : Colors.black),
+                  SizedBox(width: 8),
+                  Text('My Devices'),
+                ],
+              ),
             ),
-          DropdownMenuItem<String>(
-            value: 'theme',
-            child: Text('Toggle Theme'),
+            if (!isAdmin)
+              PopupMenuItem(
+                value: 'account',
+                child: Row(
+                  children: [
+                    Icon(Icons.account_circle,
+                        color: isDarkMode ? Colors.white : Colors.black),
+                    SizedBox(width: 8),
+                    Text('Account Info'),
+                  ],
+                ),
+              ),
+            PopupMenuItem(
+              value: 'theme',
+              child: Row(
+                children: [
+                  Icon(
+                    themeProvider.isDarkMode
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  SizedBox(width: 8),
+                  Text('Theme'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'logout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout,
+                      color: isDarkMode ? Colors.white : Colors.black),
+                  SizedBox(width: 8),
+                  Text('Logout'),
+                ],
+              ),
+            ),
+          ],
+        );
+
+        if (selected == 'devices') {
+          _handleDeviceNavigation();
+        } else if (selected == 'account' && !isAdmin) {
+          Navigator.pushNamed(context, '/accountinfo');
+        } else if (selected == 'theme') {
+          themeProvider.toggleTheme();
+        } else if (selected == 'logout') {
+          _handleLogout();
+        }
+      },
+      child: Row(
+        children: [
+          Text(
+            userProvider.userEmail ?? 'Guest',
+            style: TextStyle(
+              fontSize: isTablet ? 14 : 16,
+              color: isDarkMode ? Colors.white : Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          DropdownMenuItem<String>(
-            value: 'logout',
-            child: Text('Logout'),
+          Icon(
+            Icons.arrow_drop_down,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
         ],
-        onChanged: (value) {
-          if (value == 'devices') {
-            _handleDeviceNavigation();
-          } else if (value == 'account' && !isAdmin) {
-            Navigator.pushNamed(context, '/accountinfo');
-          } else if (value == 'theme') {
-            themeProvider.toggleTheme();
-          } else if (value == 'logout') {
-            _handleLogout();
-          }
-        },
-        dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
-        style: TextStyle(
-          color: isDarkMode ? Colors.white : Colors.black,
-          fontSize: isTablet ? 14 : 16,
-        ),
       ),
     );
   }

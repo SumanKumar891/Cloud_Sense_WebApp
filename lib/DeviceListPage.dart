@@ -256,22 +256,22 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    TextButton.icon(
-                      onPressed: _handleLogout,
-                      icon: Icon(
-                        Icons.logout,
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
-                      ),
-                      label: Text(
-                        'Log out',
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.white : Colors.black,
-                          fontSize:
-                              MediaQuery.of(context).size.width < 800 ? 12 : 20,
-                        ),
-                      ),
-                    ),
+                    // TextButton.icon(
+                    //   onPressed: _handleLogout,
+                    //   icon: Icon(
+                    //     Icons.logout,
+                    //     color: isDarkMode ? Colors.white : Colors.black,
+                    //     size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
+                    //   ),
+                    //   label: Text(
+                    //     'Log out',
+                    //     style: TextStyle(
+                    //       color: isDarkMode ? Colors.white : Colors.black,
+                    //       fontSize:
+                    //           MediaQuery.of(context).size.width < 800 ? 12 : 20,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -289,7 +289,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                        top: 40.0, left: 16.0, right: 16.0),
+                                        left: 16.0, right: 16.0),
                                     child: Text(
                                       "Select a device to unlock insights into data.",
                                       textAlign: TextAlign.center,
