@@ -416,22 +416,26 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
   Future<void> _signUp() async {
     setState(() {
-      _isLoading = true;
+      _isLoading = true; // Show loading indicator during sign-up
     });
 
+    // Manual password check BEFORE sign-up attempt
     final password = _passwordController.text;
     if (!_isPasswordValid(password)) {
       setState(() {
         _isLoading = false;
       });
+
+      // Show snackbar directly without setting _errorMessage
       _showSnackbar(
-        'Password must be at least 8 characters long and include: a number, a special character, a letter',
+        'Password must be at least 8 characters long and include:a number,a special character, a letter',
       );
       return;
     }
 
     try {
-      await Amplify.Auth.signUp(
+      // Sign up with email, password, and name attributes
+      final res = await Amplify.Auth.signUp(
         username: _emailController.text,
         password: _passwordController.text,
         options: SignUpOptions(
@@ -442,22 +446,30 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         ),
       );
 
-      _emailToVerify = _emailController.text;
-      _showVerificationDialog();
+      // ✅ Here we check if sign-up is complete
+      if (res.isSignUpComplete) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign-up successful! Please sign in.')),
+        );
+        setState(() {
+          _isSignIn = true; // Switch to sign-in mode
+        });
+      } else {
+        // ⚠ Verification required
+        _emailToVerify = _emailController.text;
+        _showVerificationDialog(); // Prompt user to enter verification code
+      }
     } on UsernameExistsException {
+      // Resend code if user already exists but hasn't verified
       try {
         await Amplify.Auth.resendSignUpCode(username: _emailController.text);
         _emailToVerify = _emailController.text;
         _showVerificationDialog();
       } on AuthException catch (e) {
-        setState(() {
-          _errorMessage = e.message;
-        });
+        _showSnackbar(e.message); // 🔴 Snackbar only for error
       }
     } on AuthException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-      });
+      _showSnackbar(e.message); // 🔴 Snackbar only for error
     } finally {
       setState(() {
         _isLoading = false;
