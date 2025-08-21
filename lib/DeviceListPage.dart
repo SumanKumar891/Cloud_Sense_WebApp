@@ -228,8 +228,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    const Color.fromARGB(255, 192, 185, 185)!,
-                    const Color.fromARGB(255, 123, 159, 174)!,
+                    const Color.fromARGB(255, 45, 45, 46)!,
+                    const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
                     const Color.fromARGB(255, 126, 171, 166)!,
@@ -251,7 +251,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.black : Colors.white,
+                        color: isDarkMode ? Colors.white : Colors.black,
                         size: MediaQuery.of(context).size.width < 800 ? 20 : 28,
                       ),
                       onPressed: () => Navigator.pop(context),
@@ -302,8 +302,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                                 : 45,
                                         fontWeight: FontWeight.bold,
                                         color: isDarkMode
-                                            ? Colors.black
-                                            : Colors.white,
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
@@ -762,12 +762,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   Color _getCardColor(String category) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? Colors.blueGrey[900]! : Colors.grey[200]!;
+    return isDarkMode ? Colors.white : Colors.grey[200]!;
   }
 
   Color _getCardTextColor() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? Colors.white : Colors.black;
+    return isDarkMode ? Colors.black : Colors.black;
   }
 }
 
@@ -820,7 +820,7 @@ class _HoverableCardState extends State<_HoverableCard> {
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: widget.category == "AddDevice"
-                      ? (widget.isDarkMode ? Colors.white : Colors.black)
+                      ? (widget.isDarkMode ? Colors.black : Colors.black)
                       : widget.getCardTextColor(),
                 ),
               ),
