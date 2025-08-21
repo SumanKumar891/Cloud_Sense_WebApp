@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:cloud_sense_webapp/downloadcsv.dart';
 import 'package:cloud_sense_webapp/weatherforecasting.dart';
 import 'package:file_picker/file_picker.dart';
@@ -8242,7 +8243,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     }
   }
 
-// Updated _buildChartContainer with visual effect for selected parameter
   Widget _buildChartContainer(
     String title,
     List<ChartData> data,
@@ -8256,304 +8256,321 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     return data.isNotEmpty
         ? Padding(
             padding: const EdgeInsets.all(0.0),
-            child: AnimatedOpacity(
+            child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              opacity: isSelected || _selectedParam == null ? 1.0 : 0.7, // Dim non-selected charts
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                key: _chartKeys[title],
-                width: double.infinity,
-                height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
-                margin: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16.0),
-                  color: isDarkMode
-                      ? Color.fromARGB(150, 0, 0, 0)
-                      : Color.fromARGB(173, 227, 220, 220),
-                  border: isSelected
-                      ? Border.all(
-                          color: isDarkMode
-                              ? Colors.deepOrange
-                              : Colors.deepOrange,
-                          width: 2.0,
-                        )
-                      : null,
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: const Color.fromARGB(255, 0, 0, 0)
-                                .withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Text(
-                        '$title',
-                        style: TextStyle(
-                          fontSize:
-                              MediaQuery.of(context).size.width < 800 ? 18 : 22,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black,
+              curve: Curves.easeInOut,
+              key: _chartKeys[title],
+              width: double.infinity,
+              height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.0),
+                color: isDarkMode
+                    ? Color.fromARGB(150, 0, 0, 0)
+                    : Color.fromARGB(173, 227, 220, 220),
+                border: isSelected
+                    ? Border.all(
+                        color:
+                            isDarkMode ? Colors.deepOrange : Colors.deepOrange,
+                        width: 2.0,
+                      )
+                    : null,
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 0, 0, 0)
+                              .withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                    ),
-                  if (widget.deviceName.startsWith('CL'))
-                    Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Builder(
-                        builder: (BuildContext context) {
-                          final screenWidth = MediaQuery.of(context).size.width;
-                          double boxSize;
-                          double textSize;
-                          double spacing;
-
-                          if (screenWidth < 800) {
-                            boxSize = 15.0;
-                            textSize = 15.0;
-                            spacing = 12.0;
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _buildColorBox(Colors.white, '< 0.01 ',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.green, '> 0.01 - 0.5',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.orange, '> 1.0 - 4.0',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.red, ' Above 4.0',
-                                      boxSize, textSize),
-                                ],
-                              ),
-                            );
-                          } else {
-                            boxSize = 20.0;
-                            textSize = 16.0;
-                            spacing = 45.0;
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildColorBox(Colors.white, '< 0.01 ',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.green, '> 0.01 - 0.5',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.yellow, '> 0.5 - 1.0',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.orange, '> 1.0 - 4.0',
-                                      boxSize, textSize),
-                                  SizedBox(width: spacing),
-                                  _buildColorBox(Colors.red, ' Above 4.0',
-                                      boxSize, textSize),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  Expanded(
-                    child: Focus(
-                      autofocus: true,
-                      child: RawKeyboardListener(
-                        focusNode: _focusNode,
-                        autofocus: true,
-                        onKey: (RawKeyEvent event) {
-                          if (event is RawKeyDownEvent &&
-                              (event.logicalKey ==
-                                      LogicalKeyboardKey.shiftLeft ||
-                                  event.logicalKey ==
-                                      LogicalKeyboardKey.shiftRight)) {
-                            setState(() {
-                              isShiftPressed = true;
-                            });
-                          } else if (event is RawKeyUpEvent &&
-                              (event.logicalKey ==
-                                      LogicalKeyboardKey.shiftLeft ||
-                                  event.logicalKey ==
-                                      LogicalKeyboardKey.shiftRight)) {
-                            setState(() {
-                              isShiftPressed = false;
-                            });
-                          }
-                        },
-                        child: MouseRegion(
-                          onEnter: (_) => _focusNode.requestFocus(),
-                          child: Listener(
-                            onPointerSignal: (PointerSignalEvent event) {
-                              if (event is PointerScrollEvent &&
-                                  isShiftPressed) {}
-                            },
-                            child: SfCartesianChart(
-                              plotAreaBackgroundColor: isDarkMode
-                                  ? Color.fromARGB(100, 0, 0, 0)
-                                  : Color.fromARGB(189, 222, 218, 218),
-                              primaryXAxis: DateTimeAxis(
-                                dateFormat: _lastSelectedRange == 'single'
-                                    ? DateFormat('MM/dd hh:mm a')
-                                    : DateFormat('MM/dd'),
-                                title: AxisTitle(
-                                  text: 'Time',
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                                labelStyle: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                                labelRotation: 70,
-                                edgeLabelPlacement: EdgeLabelPlacement.shift,
-                                intervalType: DateTimeIntervalType.auto,
-                                enableAutoIntervalOnZooming: true,
-                                majorGridLines: MajorGridLines(
-                                  width: 1.0,
-                                  dashArray: [5, 5],
-                                  color: isDarkMode
-                                      ? Color.fromARGB(255, 141, 144, 148)
-                                      : Color.fromARGB(255, 48, 48, 48),
-                                ),
-                              ),
-                              primaryYAxis: NumericAxis(
-                                title: AxisTitle(
-                                  text: yAxisTitle,
-                                  textStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                                labelStyle: TextStyle(
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                                axisLine: AxisLine(width: 1),
-                                majorGridLines: MajorGridLines(width: 0),
-                              ),
-                              trackballBehavior: TrackballBehavior(
-                                enable: true,
-                                activationMode: ActivationMode.singleTap,
-                                lineType: TrackballLineType.vertical,
-                                lineColor: isDarkMode
-                                    ? Colors.blue
-                                    : Color.fromARGB(255, 42, 147, 212),
-                                lineWidth: 1,
-                                markerSettings: TrackballMarkerSettings(
-                                  markerVisibility:
-                                      TrackballVisibilityMode.visible,
-                                  width: 8,
-                                  height: 8,
-                                  borderWidth: 2,
-                                  color: isDarkMode
-                                      ? Colors.blue
-                                      : Color.fromARGB(255, 42, 147, 212),
-                                ),
-                                builder: (BuildContext context,
-                                    TrackballDetails details) {
-                                  try {
-                                    final DateTime? time = details.point?.x;
-                                    final num? value = details.point?.y;
-
-                                    if (time == null || value == null) {
-                                      return const SizedBox();
-                                    }
-
-                                    String formattedDate;
-                                    if (_lastSelectedRange == '1year') {
-                                      formattedDate =
-                                          DateFormat('MM/dd').format(time);
-                                    } else {
-                                      formattedDate =
-                                          DateFormat('MM/dd hh:mm a')
-                                              .format(time);
-                                    }
-
-                                    return Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: isDarkMode
-                                            ? Color.fromARGB(200, 0, 0, 0)
-                                            : Colors.white,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            formattedDate,
-                                            style: TextStyle(
-                                              color: isDarkMode
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Value: $value',
-                                            style: TextStyle(
-                                              color: isDarkMode
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    return const SizedBox();
-                                  }
-                                },
-                              ),
-                              zoomPanBehavior: ZoomPanBehavior(
-                                zoomMode: ZoomMode.x,
-                                enablePanning: true,
-                                enablePinching: true,
-                                enableMouseWheelZooming: isShiftPressed,
-                              ),
-                              series: <CartesianSeries<ChartData, DateTime>>[
-                                _getChartSeries(chartType, data, title),
-                              ],
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16.0),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: isSelected || _selectedParam == null ? 0.0 : 100.0,
+                    sigmaY: isSelected || _selectedParam == null ? 0.0 : 100.0,
+                  ),
+                  child: Opacity(
+                    opacity: isSelected || _selectedParam == null ? 1.0 : 0.2,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Text(
+                            '$title',
+                            style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width < 800
+                                  ? 18
+                                  : 22,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
                             ),
                           ),
                         ),
-                      ),
+                        if (widget.deviceName.startsWith('CL'))
+                          Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Builder(
+                              builder: (BuildContext context) {
+                                final screenWidth =
+                                    MediaQuery.of(context).size.width;
+                                double boxSize;
+                                double textSize;
+                                double spacing;
+
+                                if (screenWidth < 800) {
+                                  boxSize = 15.0;
+                                  textSize = 15.0;
+                                  spacing = 12.0;
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        _buildColorBox(Colors.white, '< 0.01 ',
+                                            boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.green,
+                                            '> 0.01 - 0.5', boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.yellow,
+                                            '> 0.5 - 1.0', boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.orange,
+                                            '> 1.0 - 4.0', boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.red, ' Above 4.0',
+                                            boxSize, textSize),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  boxSize = 20.0;
+                                  textSize = 16.0;
+                                  spacing = 45.0;
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _buildColorBox(Colors.white, '< 0.01 ',
+                                            boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.green,
+                                            '> 0.01 - 0.5', boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.yellow,
+                                            '> 0.5 - 1.0', boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.orange,
+                                            '> 1.0 - 4.0', boxSize, textSize),
+                                        SizedBox(width: spacing),
+                                        _buildColorBox(Colors.red, ' Above 4.0',
+                                            boxSize, textSize),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        Expanded(
+                          child: Focus(
+                            autofocus: true,
+                            child: RawKeyboardListener(
+                              focusNode: _focusNode,
+                              autofocus: true,
+                              onKey: (RawKeyEvent event) {
+                                if (event is RawKeyDownEvent &&
+                                    (event.logicalKey ==
+                                            LogicalKeyboardKey.shiftLeft ||
+                                        event.logicalKey ==
+                                            LogicalKeyboardKey.shiftRight)) {
+                                  setState(() {
+                                    isShiftPressed = true;
+                                  });
+                                } else if (event is RawKeyUpEvent &&
+                                    (event.logicalKey ==
+                                            LogicalKeyboardKey.shiftLeft ||
+                                        event.logicalKey ==
+                                            LogicalKeyboardKey.shiftRight)) {
+                                  setState(() {
+                                    isShiftPressed = false;
+                                  });
+                                }
+                              },
+                              child: MouseRegion(
+                                onEnter: (_) => _focusNode.requestFocus(),
+                                child: Listener(
+                                  onPointerSignal: (PointerSignalEvent event) {
+                                    if (event is PointerScrollEvent &&
+                                        isShiftPressed) {}
+                                  },
+                                  child: SfCartesianChart(
+                                    plotAreaBackgroundColor: isDarkMode
+                                        ? Color.fromARGB(100, 0, 0, 0)
+                                        : Color.fromARGB(189, 222, 218, 218),
+                                    primaryXAxis: DateTimeAxis(
+                                      dateFormat: _lastSelectedRange == 'single'
+                                          ? DateFormat('MM/dd hh:mm a')
+                                          : DateFormat('MM/dd'),
+                                      title: AxisTitle(
+                                        text: 'Time',
+                                        textStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      labelRotation: 70,
+                                      edgeLabelPlacement:
+                                          EdgeLabelPlacement.shift,
+                                      intervalType: DateTimeIntervalType.auto,
+                                      enableAutoIntervalOnZooming: true,
+                                      majorGridLines: MajorGridLines(
+                                        width: 1.0,
+                                        dashArray: [5, 5],
+                                        color: isDarkMode
+                                            ? Color.fromARGB(255, 141, 144, 148)
+                                            : Color.fromARGB(255, 48, 48, 48),
+                                      ),
+                                    ),
+                                    primaryYAxis: NumericAxis(
+                                      title: AxisTitle(
+                                        text: yAxisTitle,
+                                        textStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      axisLine: AxisLine(width: 1),
+                                      majorGridLines: MajorGridLines(width: 0),
+                                    ),
+                                    trackballBehavior: TrackballBehavior(
+                                      enable: true,
+                                      activationMode: ActivationMode.singleTap,
+                                      lineType: TrackballLineType.vertical,
+                                      lineColor: isDarkMode
+                                          ? Colors.blue
+                                          : Color.fromARGB(255, 42, 147, 212),
+                                      lineWidth: 1,
+                                      markerSettings: TrackballMarkerSettings(
+                                        markerVisibility:
+                                            TrackballVisibilityMode.visible,
+                                        width: 8,
+                                        height: 8,
+                                        borderWidth: 2,
+                                        color: isDarkMode
+                                            ? Colors.blue
+                                            : Color.fromARGB(255, 42, 147, 212),
+                                      ),
+                                      builder: (BuildContext context,
+                                          TrackballDetails details) {
+                                        try {
+                                          final DateTime? time =
+                                              details.point?.x;
+                                          final num? value = details.point?.y;
+
+                                          if (time == null || value == null) {
+                                            return const SizedBox();
+                                          }
+
+                                          String formattedDate;
+                                          if (_lastSelectedRange == '1year') {
+                                            formattedDate = DateFormat('MM/dd')
+                                                .format(time);
+                                          } else {
+                                            formattedDate =
+                                                DateFormat('MM/dd hh:mm a')
+                                                    .format(time);
+                                          }
+
+                                          return Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: isDarkMode
+                                                  ? Color.fromARGB(200, 0, 0, 0)
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  formattedDate,
+                                                  style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'Value: $value',
+                                                  style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        } catch (e) {
+                                          return const SizedBox();
+                                        }
+                                      },
+                                    ),
+                                    zoomPanBehavior: ZoomPanBehavior(
+                                      zoomMode: ZoomMode.x,
+                                      enablePanning: true,
+                                      enablePinching: true,
+                                      enableMouseWheelZooming: isShiftPressed,
+                                    ),
+                                    series: <CartesianSeries<ChartData,
+                                        DateTime>>[
+                                      _getChartSeries(chartType, data, title),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          )
-          )  : Container();
+            ))
+        : Container();
   }
 
   Widget _buildColorBox(
