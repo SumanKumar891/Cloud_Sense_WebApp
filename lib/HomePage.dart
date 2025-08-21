@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_sense_webapp/devicelocationinfo.dart';
@@ -7,56 +6,30 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
-
-void main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensures Flutter bindings are initialized before running the app (needed for async ops like SharedPreferences).
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) =>
-          ThemeProvider(), // Provides theme state management across the app.
-      child: MyApp(),
-    ),
-  );
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    return MaterialApp(
-      title: 'Cloud Sense Vis',
-      theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: HomePage(),
-    );
-  }
-}
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'main.dart';
 
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
 
-  bool get isDarkMode =>
-      _isDarkMode; // Getter to access the current theme mode.
+  bool get isDarkMode => _isDarkMode;
 
   ThemeProvider() {
-    _loadTheme(); // Load saved theme preference on initialization.
+    _loadTheme();
   }
 
   void toggleTheme() async {
-    _isDarkMode = !_isDarkMode; // Toggle between dark and light modes.
-    notifyListeners(); // Notify all listeners about the theme change.
-
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', _isDarkMode); // Save theme preference.
+    await prefs.setBool('isDarkMode', _isDarkMode);
   }
 
   void _loadTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _isDarkMode =
-        prefs.getBool('isDarkMode') ?? false; // Default to light theme.
-    notifyListeners(); // Ensure UI updates after loading saved theme.
+    _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    notifyListeners();
   }
 }
 
@@ -67,13 +40,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Color _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
-  Color _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
   Color _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
   Color _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
+  int _totalDevices = 0;
+  bool _isHovered = false;
 
-  int _totalDevices = 0; // Stores total devices from API
-
-  bool isHovered = false;
   @override
   void initState() {
     super.initState();
@@ -90,17 +61,17 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
         final wsDevices = data['WS_Device_Activity'] ?? [];
         final awadhDevices = data['Awadh_Jio_Device_Activity'] ?? [];
         final weatherDevices = data['weather_Device_Activity'] ?? [];
-
         final totalCount =
             wsDevices.length + awadhDevices.length + weatherDevices.length;
 
-        setState(() {
-          _totalDevices = totalCount;
-        });
+        if (mounted) {
+          setState(() {
+            _totalDevices = totalCount;
+          });
+        }
       } else {
         print('Failed to load device data. Status: ${response.statusCode}');
       }
@@ -109,39 +80,104 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _handleLoginNavigation() async {
+  Future<void> _handleLogout() async {
     try {
-      var currentUser = await Amplify.Auth.getCurrentUser();
-      var userAttributes = await Amplify.Auth.fetchUserAttributes();
-      String? email;
-      for (var attr in userAttributes) {
-        if (attr.userAttributeKey == AuthUserAttributeKey.email) {
-          email = attr.value;
-          break;
-        }
+      await Amplify.Auth.signOut();
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken != null) {
+        await unsubscribeFromGpsSnsTopic(fcmToken);
+        await unsubscribeFromSnsTopic(fcmToken);
       }
-      print('Current user ID: ${currentUser.username}, Email: $email');
-      if (email?.trim().toLowerCase() == '05agriculture.05@gmail.com') {
-        print('Navigating to MapPage (/deviceinfo)');
+      userProvider.setUser(null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logged out successfully')),
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error logging out')),
+      );
+    }
+  }
+
+  Future<void> _handleDeviceNavigation() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final email = userProvider.userEmail;
+    if (email == null) {
+      _showLoginPopup(context);
+      return;
+    }
+    try {
+      if (email.trim().toLowerCase() == '05agriculture.05@gmail.com') {
         Navigator.pushNamed(context, '/deviceinfo');
       } else {
-        print('Navigating to DeviceListPage (/devicelist)');
         Navigator.pushNamed(context, '/devicelist');
       }
+      await manageNotificationSubscription();
     } catch (e) {
-      print('No user logged in or error: $e');
+      print('Error checking user: $e');
       Navigator.pushNamed(context, '/login');
     }
+  }
+
+  void _showLoginPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Login Required'),
+          content: Text('Please log in or sign up to access your devices.'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await Navigator.pushNamed(context, '/login');
+              },
+              child: Text('Login/Signup'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildUserIcon() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final userProvider = Provider.of<UserProvider>(context);
+    final userEmail = userProvider.userEmail;
+
+    if (userEmail == null || userEmail.isEmpty) {
+      return Icon(
+        Icons.person,
+        color: isDarkMode ? Colors.white : Colors.black,
+      );
+    }
+    return CircleAvatar(
+      radius: 14,
+      backgroundColor: isDarkMode ? Colors.white : Colors.black,
+      child: Text(
+        userEmail[0].toUpperCase(),
+        style: TextStyle(
+          color: isDarkMode ? Colors.black : Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
 
-    // Responsive font sizes
     double titleFont = screenWidth < 800
         ? 28
         : screenWidth < 1024
@@ -162,7 +198,6 @@ class _HomePageState extends State<HomePage> {
       bool isMobile = constraints.maxWidth < 800;
       bool isTablet =
           constraints.maxWidth >= 800 && constraints.maxWidth <= 1024;
-      final horizontalPadding = isMobile ? 0.0 : (isTablet ? 120.0 : 280.0);
 
       return Scaffold(
         backgroundColor: Colors.transparent,
@@ -171,91 +206,127 @@ class _HomePageState extends State<HomePage> {
             color: isDarkMode ? Colors.white : Colors.black,
           ),
           backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-          title: Padding(
-            padding: EdgeInsets.only(left: horizontalPadding),
-            child: Row(
-              children: [
-                Icon(Icons.cloud,
-                    color: isDarkMode ? Colors.white : Colors.black),
-                SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
-                Text(
-                  'Cloud Sense Vis',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isMobile ? 20 : (isTablet ? 26 : 32),
-                  ),
+          title: Row(
+            children: [
+              Icon(Icons.cloud,
+                  color: isDarkMode ? Colors.white : Colors.black),
+              SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
+              Text(
+                'Cloud Sense Vis',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: isMobile ? 20 : (isTablet ? 26 : 32),
                 ),
-                Spacer(),
-                if (isMobile)
-                  IconButton(
-                    icon: Icon(
-                      themeProvider.isDarkMode
-                          ? Icons.light_mode
-                          : Icons.dark_mode,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                    onPressed: () => themeProvider.toggleTheme(),
-                  ),
-                if (!isMobile)
-                  Padding(
-                    padding: EdgeInsets.only(right: horizontalPadding),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            themeProvider.isDarkMode
-                                ? Icons.light_mode
-                                : Icons.dark_mode,
-                            color: isDarkMode ? Colors.white : Colors.black,
+              ),
+              Spacer(),
+              if (!isMobile)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    userProvider.userEmail != null
+                        ? Row(
+                            children: [
+                              _buildUserIcon(),
+                              SizedBox(width: 8),
+                              _buildUserDropdown(isDarkMode, isTablet),
+                            ],
+                          )
+                        : IconButton(
+                            icon: _buildUserIcon(),
+                            onPressed: () => _showLoginPopup(context),
                           ),
-                          onPressed: () => themeProvider.toggleTheme(),
-                        ),
-                        SizedBox(width: isTablet ? 12 : 20),
-                        _buildNavButton(
-                          'LOGIN/SIGNUP',
-                          _loginTestColor,
-                          _handleLoginNavigation,
-                          fontSize: isTablet ? 14 : 16,
-                        ),
-                        SizedBox(width: isTablet ? 14 : 20),
-                        _buildNavButton(
-                          'ACCOUNT INFO',
-                          _accountinfoColor,
-                          () => Navigator.pushNamed(context, '/accountinfo'),
-                          fontSize: isTablet ? 14 : 16,
-                        ),
-                      ],
+                  ],
+                ),
+            ],
+          ),
+          actions: isMobile
+              ? [
+                  Builder(
+                    builder: (context) => IconButton(
+                      icon: _buildUserIcon(),
+                      onPressed: () {
+                        if (userProvider.userEmail == null) {
+                          _showLoginPopup(context);
+                        } else {
+                          Scaffold.of(context).openEndDrawer();
+                        }
+                      },
                     ),
                   ),
-              ],
-            ),
-          ),
+                ]
+              : [],
         ),
-        endDrawer: isMobile
+        endDrawer: isMobile && userProvider.userEmail != null
             ? Drawer(
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
                     DrawerHeader(
                       decoration: BoxDecoration(color: Colors.grey[900]),
-                      child: Text(
-                        'Menu',
-                        style: TextStyle(color: Colors.white, fontSize: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              userProvider.userEmail == null
+                                  ? Icon(
+                                      Icons.person,
+                                      color: Colors.white70,
+                                    )
+                                  : CircleAvatar(
+                                      radius: 14,
+                                      backgroundColor: Colors.white,
+                                      child: Text(
+                                        userProvider.userEmail![0]
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                              SizedBox(width: 8),
+                              Text(
+                                userProvider.userEmail ?? 'Guest',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                     ListTile(
-                      leading: Icon(Icons.login),
-                      title: Text('LOGIN/SIGNUP'),
-                      onTap: _handleLoginNavigation,
+                      leading: Icon(Icons.devices),
+                      title: Text('Devices'),
+                      onTap: _handleDeviceNavigation,
+                    ),
+                    if (userProvider.userEmail?.trim().toLowerCase() !=
+                        '05agriculture.05@gmail.com')
+                      ListTile(
+                        leading: Icon(Icons.account_circle),
+                        title: Text('Account Info'),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/accountinfo');
+                        },
+                      ),
+                    ListTile(
+                      leading: Icon(themeProvider.isDarkMode
+                          ? Icons.light_mode
+                          : Icons.dark_mode),
+                      title: Text('Toggle Theme'),
+                      onTap: () => themeProvider.toggleTheme(),
                     ),
                     ListTile(
-                      leading: Icon(Icons.login),
-                      title: Text('ACCOUNT INFO'),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/accountinfo');
-                      },
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout'),
+                      onTap: _handleLogout,
                     ),
                   ],
                 ),
@@ -263,7 +334,6 @@ class _HomePageState extends State<HomePage> {
             : null,
         body: Stack(
           children: [
-            // Gradient background
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -275,7 +345,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            // Content
             SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.symmetric(
@@ -285,7 +354,6 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // const SizedBox(height: 20),
                     Text(
                       "Welcome to Cloud Sense",
                       textAlign: TextAlign.center,
@@ -315,7 +383,6 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 40,
@@ -355,7 +422,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 60),
-                    // Animated cards for stats
                     Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 40,
@@ -366,7 +432,6 @@ class _HomePageState extends State<HomePage> {
                           label: "Devices",
                           themeProvider: themeProvider,
                           context: context,
-                          // 👈 upar defined
                         ),
                         _buildAnimatedStatCard(
                           statValue: "500K",
@@ -443,8 +508,7 @@ class _HomePageState extends State<HomePage> {
                                         fontSize: paragraphFont,
                                       ),
                                     ),
-                                    const SizedBox(
-                                        width: 8), // gap between text and icon
+                                    const SizedBox(width: 8),
                                     Icon(
                                       Icons.arrow_forward,
                                       size: paragraphFont + 2,
@@ -476,19 +540,15 @@ class _HomePageState extends State<HomePage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Flexible(
-      // ✅ Makes button adapt inside row
       child: MouseRegion(
         onEnter: (_) => setState(() {
           if (text == 'ABOUT US') _aboutUsColor = Colors.blue;
-          if (text == 'LOGIN/SIGNUP') _loginTestColor = Colors.blue;
           if (text == 'ACCOUNT INFO') _accountinfoColor = Colors.blue;
           if (text == 'DEVICE STATUS') _devicemapinfoColor = Colors.blue;
         }),
         onExit: (_) => setState(() {
           if (text == 'ABOUT US')
             _aboutUsColor = const Color.fromARGB(255, 235, 232, 232);
-          if (text == 'LOGIN/SIGNUP')
-            _loginTestColor = const Color.fromARGB(255, 235, 232, 232);
           if (text == 'ACCOUNT INFO')
             _accountinfoColor = const Color.fromARGB(255, 235, 232, 232);
           if (text == 'DEVICE STATUS')
@@ -497,7 +557,6 @@ class _HomePageState extends State<HomePage> {
         child: TextButton(
           onPressed: onPressed,
           child: FittedBox(
-            // ✅ Automatically shrinks text if needed
             fit: BoxFit.scaleDown,
             child: Text(
               text,
@@ -513,8 +572,67 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildUserDropdown(bool isDarkMode, bool isTablet) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final isAdmin = userProvider.userEmail?.trim().toLowerCase() ==
+        '05agriculture.05@gmail.com';
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: null,
+        hint: Text(
+          userProvider.userEmail ?? 'Guest',
+          style: TextStyle(
+            fontSize: isTablet ? 14 : 16,
+            color: isDarkMode ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+        items: [
+          DropdownMenuItem<String>(
+            value: 'devices',
+            child: Text('Devices'),
+          ),
+          if (!isAdmin)
+            DropdownMenuItem<String>(
+              value: 'account',
+              child: Text('Account Info'),
+            ),
+          DropdownMenuItem<String>(
+            value: 'theme',
+            child: Text('Toggle Theme'),
+          ),
+          DropdownMenuItem<String>(
+            value: 'logout',
+            child: Text('Logout'),
+          ),
+        ],
+        onChanged: (value) {
+          if (value == 'devices') {
+            _handleDeviceNavigation();
+          } else if (value == 'account' && !isAdmin) {
+            Navigator.pushNamed(context, '/accountinfo');
+          } else if (value == 'theme') {
+            themeProvider.toggleTheme();
+          } else if (value == 'logout') {
+            _handleLogout();
+          }
+        },
+        dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontSize: isTablet ? 14 : 16,
+        ),
+      ),
+    );
+  }
+
   bool _isHoveredbutton = false;
-  bool _isHovered = false; // state variable
   bool _isPressed = false;
 
   Widget _buildAnimatedStatCard({
@@ -524,13 +642,11 @@ class _HomePageState extends State<HomePage> {
     required BuildContext context,
   }) {
     double screenWidth = MediaQuery.of(context).size.width;
-
     double cardSize = screenWidth < 500
         ? 80
         : screenWidth < 800
             ? 150
             : 180;
-
     double valueFontSize = cardSize * 0.12;
     double labelFontSize = cardSize * 0.10;
 

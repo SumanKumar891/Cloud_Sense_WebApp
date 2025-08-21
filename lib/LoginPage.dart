@@ -2,10 +2,12 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cloud_sense_webapp/GPS.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
-import 'dart:ui';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'main.dart';
 
 class SignInSignUpScreen extends StatefulWidget {
   @override
@@ -24,8 +26,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   String? _emailToVerify;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
   bool _isPasswordValid(String password) {
-    // Password must contain at least 8 characters, one letter, one number, one special character
     final passwordRegex =
         RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$');
     return passwordRegex.hasMatch(password);
@@ -34,11 +36,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   @override
   void initState() {
     super.initState();
-    _checkCurrentUser(); // Check if user is already signed in
+    _checkCurrentUser();
     _emailController.addListener(() {
       setState(() {
-        _emailValid = EmailValidator.validate(
-            _emailController.text); // Real-time email validation
+        _emailValid = EmailValidator.validate(_emailController.text);
       });
     });
   }
@@ -46,27 +47,51 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   Future<void> _checkCurrentUser() async {
     try {
       var currentUser = await Amplify.Auth.getCurrentUser();
-      if (currentUser != null) {
-        // Check if this is the special user
-        if (currentUser.username.trim().toLowerCase() ==
-            "05agriculture.05@gmail.com") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MapPage(),
-            ),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DataDisplayPage(),
-            ),
-          );
+      var userAttributes = await Amplify.Auth.fetchUserAttributes();
+      String? email;
+      for (var attr in userAttributes) {
+        if (attr.userAttributeKey == AuthUserAttributeKey.email) {
+          email = attr.value;
+          break;
+        }
+      }
+      if (email != null) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(email);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('email', email);
+        String? token = await FirebaseMessaging.instance.getToken();
+        if (token != null) {
+          if (email.trim().toLowerCase() == "05agriculture.05@gmail.com") {
+            print("Subscribing $email to GPS SNS topic in _checkCurrentUser.");
+            await subscribeToGpsSnsTopic(token);
+            await prefs.setBool('isGpsTokenSubscribed', true);
+            bool? wasAmmoniaSubscribed =
+                prefs.getBool('isAmmoniaTokenSubscribed');
+            if (wasAmmoniaSubscribed == true) {
+              await unsubscribeFromSnsTopic(token);
+              await prefs.remove('isAmmoniaTokenSubscribed');
+            }
+            Navigator.pushReplacementNamed(context, '/deviceinfo');
+          } else {
+            bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
+            if (hasAmmoniaSensor) {
+              print(
+                  "Subscribing $email to ammonia SNS topic in _checkCurrentUser.");
+              await subscribeToSnsTopic(token);
+              await prefs.setBool('isAmmoniaTokenSubscribed', true);
+            }
+            bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
+            if (wasGpsSubscribed == true) {
+              await unsubscribeFromGpsSnsTopic(token);
+              await prefs.remove('isGpsTokenSubscribed');
+            }
+            Navigator.pushReplacementNamed(context, '/devicelist');
+          }
         }
       }
     } catch (_) {
-      // Not signed in — stay on HomePage
+      // Not signed in — stay on SignInSignUpScreen
     }
   }
 
@@ -88,7 +113,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       try {
         await Amplify.Auth.signOut();
       } catch (e) {
-        // Ignoring errors here since user might not be signed in
+        print("Ignoring sign-out error before sign-in: $e");
       }
 
       // Attempt to sign in with provided credentials
@@ -101,7 +126,49 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         // Store email in shared preferences for session management
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String email = _emailController.text.trim().toLowerCase();
-        await prefs.setString('email', _emailController.text);
+        await prefs.setString('email', email);
+
+        // Update UserProvider
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.setUser(email);
+
+        print("✅ User logged in: $email");
+
+        // 🔹 Get FCM Token and subscribe to appropriate SNS topic
+        String? token = await FirebaseMessaging.instance.getToken();
+        if (token != null) {
+          if (email == "05agriculture.05@gmail.com") {
+            print("Subscribing $email to GPS SNS topic.");
+            await subscribeToGpsSnsTopic(token);
+            await prefs.setBool('isGpsTokenSubscribed', true);
+            // Ensure ammonia is unsubscribed for this user
+            bool? wasAmmoniaSubscribed =
+                prefs.getBool('isAmmoniaTokenSubscribed');
+            if (wasAmmoniaSubscribed == true) {
+              await unsubscribeFromSnsTopic(token);
+              await prefs.remove('isAmmoniaTokenSubscribed');
+            }
+          } else {
+            bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
+            if (hasAmmoniaSensor) {
+              print("Subscribing $email to ammonia SNS topic.");
+              await subscribeToSnsTopic(token);
+              await prefs.setBool('isAmmoniaTokenSubscribed', true);
+            } else {
+              print(
+                  "No ammonia sensor found for $email. Skipping subscription.");
+            }
+            // Ensure GPS is unsubscribed for non-authorized users
+            bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
+            if (wasGpsSubscribed == true) {
+              await unsubscribeFromGpsSnsTopic(token);
+              await prefs.remove('isGpsTokenSubscribed');
+            }
+          }
+          print("✅ Subscription handling completed after login.");
+        } else {
+          print("⚠ FCM Token not available at login.");
+        }
 
         // ✅ Navigate based on specific user
         if (email == "05agriculture.05@gmail.com") {
@@ -115,7 +182,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         _showSnackbar('Sign-in failed');
       }
     } on AuthException catch (e) {
+      print("AuthException during sign-in: ${e.message}");
       _showSnackbar(e.message); // Show error message if sign-in fails
+    } catch (e) {
+      print("Unexpected error during sign-in: $e");
+      _showSnackbar('An unexpected error occurred');
     } finally {
       setState(() {
         _isLoading = false; // Hide loading indicator
@@ -133,28 +204,26 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
   }
 
   Future<void> _forgotPassword() async {
-    String? email = await _showEmailInputDialog(); // Get user email
-    if (email != null && _emailValid) {
+    String? email = await _showEmailInputDialog();
+    if (email != null && EmailValidator.validate(email)) {
       try {
-        // Request password reset
         await Amplify.Auth.resetPassword(username: email);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('A password reset code has been sent to your email.'),
           ),
         );
-
-        // Ask for reset code and new password
         _showPasswordResetCodeDialog(email);
       } on AuthException catch (e) {
         setState(() {
           _errorMessage = e.message;
         });
       }
+    } else {
+      _showSnackbar('Please enter a valid email address.');
     }
   }
 
-  // Dialog to enter the reset code
   Future<void> _showPasswordResetCodeDialog(String email) async {
     String? resetCode;
 
@@ -182,7 +251,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 resetCode = resetCodeController.text;
                 Navigator.of(context).pop();
                 if (resetCode != null && resetCode!.isNotEmpty) {
-                  // Show the new password dialog after the reset code is entered
                   _showNewPasswordDialog(email, resetCode!);
                 }
               },
@@ -193,7 +261,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-  // Dialog to enter the new password and confirm password
   Future<void> _showNewPasswordDialog(String email, String resetCode) async {
     String? newPassword;
     String? confirmPassword;
@@ -349,25 +416,21 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
   Future<void> _signUp() async {
     setState(() {
-      _isLoading = true; // Show loading indicator during sign-up
+      _isLoading = true;
     });
 
-    // Manual password check BEFORE sign-up attempt
     final password = _passwordController.text;
     if (!_isPasswordValid(password)) {
       setState(() {
         _isLoading = false;
       });
-
-      // Show snackbar directly without setting _errorMessage
       _showSnackbar(
-        'Password must be at least 8 characters long and include:a number,a special character, a letter',
+        'Password must be at least 8 characters long and include: a number, a special character, a letter',
       );
       return;
     }
 
     try {
-      // Sign up with email, password, and name attributes
       await Amplify.Auth.signUp(
         username: _emailController.text,
         password: _passwordController.text,
@@ -379,11 +442,9 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         ),
       );
 
-      // Store email for verification step
       _emailToVerify = _emailController.text;
-      _showVerificationDialog(); // Prompt user to enter verification code
+      _showVerificationDialog();
     } on UsernameExistsException {
-      // Resend code if user already exists but hasn't verified
       try {
         await Amplify.Auth.resendSignUpCode(username: _emailController.text);
         _emailToVerify = _emailController.text;
@@ -395,7 +456,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       }
     } on AuthException catch (e) {
       setState(() {
-        _errorMessage = e.message; // Handle other sign-up errors
+        _errorMessage = e.message;
       });
     } finally {
       setState(() {
@@ -440,12 +501,31 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         confirmationCode: _verificationCode!,
       );
 
-      // After successful sign-up and verification, redirect to the sign-in page
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.setUser(_emailToVerify!);
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', _emailToVerify!);
+      String? token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        bool hasAmmoniaSensor = await userHasAmmoniaSensor(_emailToVerify!);
+        if (hasAmmoniaSensor) {
+          print(
+              "Subscribing $_emailToVerify to ammonia SNS topic after sign-up.");
+          await subscribeToSnsTopic(token);
+          await prefs.setBool('isAmmoniaTokenSubscribed', true);
+        }
+        bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
+        if (wasGpsSubscribed == true) {
+          await unsubscribeFromGpsSnsTopic(token);
+          await prefs.remove('isGpsTokenSubscribed');
+        }
+      }
+
       setState(() {
-        _isSignIn = true; // Switch to sign-in mode
+        _isSignIn = true;
       });
 
-      // Display a success message or snackbar to notify the user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign-up successful! Please sign in.')),
       );
@@ -473,7 +553,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   'A verification code has been sent to your email. Please enter the code below:'),
               TextField(
                 onChanged: (value) {
-                  _verificationCode = value; // Store verification code
+                  _verificationCode = value;
                 },
                 decoration: InputDecoration(labelText: 'Verification Code'),
               ),
@@ -482,14 +562,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                _resendVerificationCode(); // Resend code if needed
+                _resendVerificationCode();
               },
               child: Text('Resend Code'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _confirmSignUp(); // Confirm sign-up using the code
+                _confirmSignUp();
               },
               child: Text('Submit'),
             ),
@@ -519,9 +599,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       body: Stack(
         children: [
           Container(
-            color: isDarkMode
-                ? const Color(0xFF121212) // Dark background
-                : Colors.transparent, // Light theme background
+            color: isDarkMode ? const Color(0xFF121212) : Colors.transparent,
           ),
           Center(
             child: AnimatedSwitcher(
@@ -558,17 +636,12 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-// Builds the sign-in widget, adjusting layout based on screen size
   Widget _buildSignIn(bool isDarkMode) {
     return SingleChildScrollView(
-      key: ValueKey(
-          'SignIn'), // Used for widget identification (helpful for animations or testing)
+      key: ValueKey('SignIn'),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Check if the screen width is less than 800px (small screen)
           bool isSmallScreen = constraints.maxWidth < 800;
-
-          // Adjust layout: Column for small screens, Row for large screens
           return isSmallScreen
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -585,14 +658,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-  // Builds a list of widgets for the Sign-In screen layout
   List<Widget> _buildContent(bool isSmallScreen, bool isDarkMode) {
     return [
-      // Welcome section (Left side for large screens, top for small screens)
       Container(
-        width: isSmallScreen
-            ? double.infinity
-            : 400, // Full width for small screens
+        width: isSmallScreen ? double.infinity : 400,
         height: 500,
         color: isDarkMode
             ? const Color.fromARGB(255, 231, 231, 231)
@@ -602,7 +671,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 55),
-            // Heading text
             Text(
               'Welcome Back!',
               style: TextStyle(
@@ -612,7 +680,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
             ),
             SizedBox(height: 15),
-            // Subheading text
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: Text(
@@ -627,7 +694,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-            // Image section
             Padding(
               padding: const EdgeInsets.only(top: 5.0),
               child: Container(
@@ -645,11 +711,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           ],
         ),
       ),
-
-      // Add spacing between sections for small screens
-      // SizedBox(height: isSmallScreen ? 0 : 0),
-
-      // Sign-in form section
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
@@ -662,7 +723,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: 24),
-            // Login title
             Text(
               'Login',
               style: TextStyle(
@@ -672,8 +732,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
             ),
             SizedBox(height: 42),
-
-            // Email text field
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -690,8 +748,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
-
-            // Password text field with visibility toggle
             TextField(
               controller: _passwordController,
               obscureText: !_isPasswordVisible,
@@ -722,8 +778,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
-
-            // Show loading indicator or Sign-in button
             if (_isLoading)
               CircularProgressIndicator()
             else
@@ -748,8 +802,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 ),
               ),
             SizedBox(height: 22),
-
-            // Forgot Password link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -790,8 +842,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ],
             ),
             SizedBox(height: 8),
-
-            // Sign-up link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -807,7 +857,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _isSignIn = false; // Switch to sign-up form
+                      _isSignIn = false;
                     });
                   },
                   child: Stack(
@@ -824,7 +874,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                         ),
                       ),
                       Text(
-                        'Sign Up',
+                        'Sign In',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: isDarkMode ? Colors.blue : Colors.blue,
@@ -841,19 +891,14 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     ];
   }
 
-  // Builds the Sign-Up screen with responsive design for both small and large screens
   Widget _buildSignUp() {
-    // Checks if the current theme is in dark mode
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
       key: ValueKey('SignUp'),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Determines if the screen size is small (typically mobile screens)
           bool isSmallScreen = constraints.maxWidth < 800;
-
-          // Responsive layout: Column for small screens, Row for larger screens
           return isSmallScreen
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -870,10 +915,8 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-  // Builds the content for the Sign-Up screen, responsive for both small and large screens
   List<Widget> _buildSignUpContent(bool isSmallScreen, bool isDarkMode) {
     return [
-      // Welcome container
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
@@ -924,7 +967,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           ],
         ),
       ),
-      // Form container
       Container(
         width: isSmallScreen ? double.infinity : 400,
         height: 500,
@@ -946,7 +988,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
             ),
             SizedBox(height: 24),
-            // Name input field
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -964,7 +1005,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
-            // Email input field
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
@@ -981,7 +1021,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
             SizedBox(height: 16),
-            // Password input field
             TextField(
               controller: _passwordController,
               obscureText: !_isPasswordVisible,
@@ -1012,7 +1051,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
               style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
             ),
-            // Sign-Up button
             if (_isLoading)
               CircularProgressIndicator()
             else
@@ -1036,7 +1074,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 ),
               ),
             SizedBox(height: 24),
-            // Navigation to Sign-In
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1052,7 +1089,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _isSignIn = true; // Switch to sign-in form
+                      _isSignIn = true;
                     });
                   },
                   child: Stack(
