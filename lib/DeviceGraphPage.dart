@@ -200,7 +200,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     );
   }
 
-  // Build the drawer widget
+// Build the drawer widget
   Widget _buildDrawer(bool isDarkMode, BuildContext context) {
     return Drawer(
       child: Container(
@@ -497,6 +497,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   List<ChartData> cod2Data = [];
   List<ChartData> bod2Data = [];
   List<ChartData> temp2Data = [];
+
+  double? _lastLatitude;
+  double? _lastLongitude;
+  DateTime? _lastLocationTime;
   final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm:ss');
   List<ChartData> wfAverageTemperatureData = [];
   List<ChartData> wfrainfallData = [];
@@ -1262,6 +1266,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
             NARLParametersData.clear();
             NARLParametersData = _parseNARLParametersData(data);
 
+            // Update last location data
+            if (data.isNotEmpty) {
+              for (var item in data.reversed) {
+                if (item['Latitude'] != null &&
+                    item['Latitude'] != 0 &&
+                    item['Longitude'] != null &&
+                    item['Longitude'] != 0) {
+                  _lastLatitude = item['Latitude'].toDouble();
+                  _lastLongitude = item['Longitude'].toDouble();
+                  _lastLocationTime = DateTime.parse(item['TimeStamp']);
+                  break;
+                }
+              }
+            }
+
             if (NARLParametersData.isEmpty) {
               _csvRows = [
                 ['Timestamp', 'Message'],
@@ -1309,6 +1328,23 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
           setState(() {
             csParametersData.clear();
             csParametersData = _parsecsParametersData(data);
+
+            // Update last location data
+            if (data.isNotEmpty) {
+              // Find the most recent non-zero location data
+              for (var item in data.reversed) {
+                // Iterate in reverse to get the latest first
+                if (item['Latitude'] != null &&
+                    item['Latitude'] != 0 &&
+                    item['Longitude'] != null &&
+                    item['Longitude'] != 0) {
+                  _lastLatitude = item['Latitude'].toDouble();
+                  _lastLongitude = item['Longitude'].toDouble();
+                  _lastLocationTime = DateTime.parse(item['TimeStamp']);
+                  break; // Exit after finding the first valid location
+                }
+              }
+            }
 
             if (csParametersData.isEmpty) {
               _csvRows = [
@@ -2408,8 +2444,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         'Topic',
         'IMEINumber',
         'DeviceId',
-        'Latitude',
-        'Longitude'
       ].contains(key);
     }).toList();
 
@@ -2582,8 +2616,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         'Topic',
         'IMEINumber',
         'DeviceId',
-        'Latitude',
-        'Longitude'
       ].contains(key);
     }).toList();
 
@@ -2640,8 +2672,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         'Topic',
         'IMEINumber',
         'DeviceId',
-        'Latitude',
-        'Longitude'
       ].contains(key);
     }).toList();
 
@@ -5039,7 +5069,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                             Text.rich(
                               TextSpan(
                                 text:
-                                    "${widget.sequentialName}\n", // Sequential name first, followed by newline
+                                    "${widget.sequentialName}\n", // Sequential name first
                                 style: TextStyle(
                                   color:
                                       isDarkMode ? Colors.white : Colors.black,
@@ -5049,7 +5079,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                 children: [
                                   TextSpan(
                                     text:
-                                        " (${widget.deviceName})", // Device name on next line
+                                        "(${widget.deviceName})\n", // Device name next line
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -5058,12 +5088,63 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           : Colors.black,
                                     ),
                                   ),
+                                  TextSpan(
+                                    text: () {
+                                      // Get Lat & Long
+                                      Map<String, List<ChartData>>? paramData;
+                                      if (widget.deviceName.startsWith('SM')) {
+                                        paramData = smParametersData;
+                                      } else if (widget.deviceName
+                                          .startsWith('CF')) {
+                                        paramData = cfParametersData;
+                                      } else if (widget.deviceName
+                                          .startsWith('VD')) {
+                                        paramData = vdParametersData;
+                                      } else if (widget.deviceName
+                                          .startsWith('KD')) {
+                                        paramData = kdParametersData;
+                                      } else if (widget.deviceName
+                                          .startsWith('NA')) {
+                                        paramData = NARLParametersData;
+                                      } else if (widget.deviceName
+                                          .startsWith('CP')) {
+                                        paramData = csParametersData;
+                                      } else if (widget.deviceName
+                                          .startsWith('SV')) {
+                                        paramData = svParametersData;
+                                      }
+
+                                      double? latitude;
+                                      double? longitude;
+                                      if (paramData != null) {
+                                        final latData = paramData['Latitude'];
+                                        final longData = paramData['Longitude'];
+                                        latitude = latData?.isNotEmpty == true
+                                            ? latData!.last.value
+                                            : null;
+                                        longitude = longData?.isNotEmpty == true
+                                            ? longData!.last.value
+                                            : null;
+                                      }
+
+                                      return "Latitude : ${latitude?.toStringAsFixed(2) ?? ""}\n"
+                                          "Longitude : ${longitude?.toStringAsFixed(2) ?? ""}";
+                                    }(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDarkMode
+                                          ? Colors.white70
+                                          : Colors.black87,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                           ],
                         ),
                       ),
+
                       // Time Period Selection
                       Container(
                         height: 64,
@@ -5181,6 +5262,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                       });
                                     },
                                   ),
+
                                   // Min/Max Values of Parameters
                                   Padding(
                                     padding: EdgeInsets.only(
@@ -6579,22 +6661,62 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                   elevation: 0,
                   title: Text.rich(
                     TextSpan(
-                      text: "${widget.sequentialName}\n",
+                      text: "${widget.sequentialName}\n", // Sequential name
                       style: TextStyle(
                         color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize:
-                            MediaQuery.of(context).size.width < 800 ? 14 : 32,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                       children: [
                         TextSpan(
-                          text: " (${widget.deviceName})",
+                          text:
+                              "(${widget.deviceName})\n", // Device name + extra space
                           style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width < 800
-                                ? 14
-                                : 30,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: () {
+                            // Get Lat & Long
+                            Map<String, List<ChartData>>? paramData;
+                            if (widget.deviceName.startsWith('SM')) {
+                              paramData = smParametersData;
+                            } else if (widget.deviceName.startsWith('CF')) {
+                              paramData = cfParametersData;
+                            } else if (widget.deviceName.startsWith('VD')) {
+                              paramData = vdParametersData;
+                            } else if (widget.deviceName.startsWith('KD')) {
+                              paramData = kdParametersData;
+                            } else if (widget.deviceName.startsWith('NA')) {
+                              paramData = NARLParametersData;
+                            } else if (widget.deviceName.startsWith('CP')) {
+                              paramData = csParametersData;
+                            } else if (widget.deviceName.startsWith('SV')) {
+                              paramData = svParametersData;
+                            }
+
+                            double? latitude;
+                            double? longitude;
+                            if (paramData != null) {
+                              final latData = paramData['Latitude'];
+                              final longData = paramData['Longitude'];
+                              latitude = latData?.isNotEmpty == true
+                                  ? latData!.last.value
+                                  : null;
+                              longitude = longData?.isNotEmpty == true
+                                  ? longData!.last.value
+                                  : null;
+                            }
+
+                            return "Lat : ${latitude?.toStringAsFixed(2) ?? ""} "
+                                "Long : ${longitude?.toStringAsFixed(2) ?? ""}";
+                          }(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.white70 : Colors.black87,
+                            fontWeight: FontWeight.normal,
                           ),
                         ),
                       ],
