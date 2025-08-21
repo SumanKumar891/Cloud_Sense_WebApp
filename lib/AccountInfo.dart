@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:cloud_sense_webapp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'LoginPage.dart';
+import 'LoginPage.dart'; // Make sure to import your login page file
 
 class AccountInfoPage extends StatefulWidget {
   @override
@@ -301,6 +302,9 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
               });
               deviceCategories.removeWhere((key, value) => value.isEmpty);
             });
+            // IMPORTANT: Trigger notification subscription management
+            // This will check if the user still has ammonia sensors and update token accordingly
+            await checkAndUpdateNotificationSubscription();
           } else {
             print('Response Status Code: ${response.statusCode}');
             print('Response Body: ${response.body}');
@@ -331,7 +335,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
+        backgroundColor: Colors.transparent,
         title: Text('Account Info',
             style: TextStyle(
               color: isDarkMode ? Colors.white : Colors.black,
@@ -349,8 +353,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
               gradient: LinearGradient(
                 colors: isDarkMode
                     ? [
-                        const Color.fromARGB(255, 192, 185, 185)!,
-                        const Color.fromARGB(255, 123, 159, 174)!,
+                        const Color.fromARGB(255, 45, 45, 46)!,
+                        const Color.fromARGB(255, 2, 54, 76)!,
                       ]
                     : [
                         const Color.fromARGB(255, 126, 171, 166)!,
@@ -372,7 +376,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                   decoration: InputDecoration(
                     labelText: 'Enter Email ID',
                     labelStyle: TextStyle(
-                      color: isDarkMode ? Colors.black : Colors.white,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                     border: OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
@@ -382,26 +386,25 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isDarkMode ? Colors.black : Colors.white,
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   style: TextStyle(
-                    color: isDarkMode ? Colors.black : Colors.white,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: _fetchData,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
+                    backgroundColor: isDarkMode ? Colors.white : Colors.black,
                     foregroundColor: Colors.white,
                   ),
                   child: Text("Fetch Devices",
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: isDarkMode ? Colors.black : Colors.white,
                       )),
                 ),
                 SizedBox(height: 20),
@@ -432,13 +435,13 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                             headingRowColor:
                                                 MaterialStateProperty.all(
                                                     isDarkMode
-                                                        ? Colors.grey[200]
-                                                        : Colors.blueGrey[900]),
+                                                        ? Colors.black
+                                                        : Colors.black),
                                             dataRowColor:
                                                 MaterialStateProperty.all(
                                                     isDarkMode
-                                                        ? Colors.blueGrey[900]
-                                                        : Colors.grey[200]),
+                                                        ? Colors.white
+                                                        : Colors.white),
                                             columnSpacing: 20.0,
                                             columns: deviceCategories.keys
                                                 .map((sensorKey) => DataColumn(
@@ -450,7 +453,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                           sensorKey.trim(),
                                                           style: TextStyle(
                                                             color: isDarkMode
-                                                                ? Colors.black
+                                                                ? Colors.white
                                                                 : Colors.white,
                                                             fontWeight:
                                                                 FontWeight.bold,
@@ -494,7 +497,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                           : '',
                                                       style: TextStyle(
                                                         color: isDarkMode
-                                                            ? Colors.white
+                                                            ? Colors.black
                                                             : Colors.black,
                                                         fontSize: MediaQuery.of(
                                                                         context)
