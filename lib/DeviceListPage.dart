@@ -251,7 +251,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                        color: isDarkMode ? Colors.black : Colors.white,
                         size: MediaQuery.of(context).size.width < 800 ? 20 : 28,
                       ),
                       onPressed: () => Navigator.pop(context),
@@ -762,12 +762,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   Color _getCardColor(String category) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? Colors.grey[200]! : Colors.blueGrey[900]!;
+    return isDarkMode ? Colors.blueGrey[900]! : Colors.grey[200]!;
   }
 
   Color _getCardTextColor() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? Colors.black : Colors.white;
+    return isDarkMode ? Colors.white : Colors.black;
   }
 }
 
@@ -820,7 +820,7 @@ class _HoverableCardState extends State<_HoverableCard> {
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: widget.category == "AddDevice"
-                      ? (widget.isDarkMode ? Colors.black : Colors.white)
+                      ? (widget.isDarkMode ? Colors.white : Colors.black)
                       : widget.getCardTextColor(),
                 ),
               ),
