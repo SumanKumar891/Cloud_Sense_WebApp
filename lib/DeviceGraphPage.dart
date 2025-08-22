@@ -4902,7 +4902,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     else if (paramName.contains('WindSpeed'))
       unit = 'm/s';
     else if (paramName.contains('WindDirection'))
-      unit = 'degrees';
+      unit = '°';
     else if (paramName.contains('Irradiance') ||
         paramName.contains('Radiation'))
       unit = 'W/m²';
