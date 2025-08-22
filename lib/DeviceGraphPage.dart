@@ -2156,7 +2156,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         csvRows = [headers, ...dataRows];
       }
     } else if (widget.deviceName.startsWith('CP')) {
-      if (cfParametersData.isEmpty) {
+      if (csParametersData.isEmpty) {
         csvRows = [
           ['Timestamp', 'Message'],
           ['', 'No data available']
