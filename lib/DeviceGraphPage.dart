@@ -5122,7 +5122,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       };
       List<String> includedParameters = parameterLabels.keys.toList();
 
-      List<Widget> children = NARLParametersData.entries
+      List<Widget> children = MYParametersData.entries
           .where((entry) => includedParameters.contains(entry.key))
           .map((entry) {
         String label = parameterLabels[entry.key] ?? entry.key;
@@ -5924,28 +5924,27 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           _buildMinMaxTable(
                                             isDarkMode,
                                             {
-                                              'Temperature': NARLParametersData[
+                                              'Temperature': MYParametersData[
                                                       'CurrentTemperature'] ??
                                                   [],
-                                              'Humidity': NARLParametersData[
+                                              'Humidity': MYParametersData[
                                                       'CurrentHumidity'] ??
                                                   [],
                                               'Light Intensity':
-                                                  NARLParametersData[
+                                                  MYParametersData[
                                                           'LightIntensity'] ??
                                                       [],
-                                              'Wind Speed': NARLParametersData[
+                                              'Wind Speed': MYParametersData[
                                                       'WindSpeed'] ??
                                                   [],
-                                              'Atm Pressure':
-                                                  NARLParametersData[
-                                                          'AtmPressure'] ??
-                                                      [],
+                                              'Atm Pressure': MYParametersData[
+                                                      'AtmPressure'] ??
+                                                  [],
                                               'Wind Direction':
-                                                  NARLParametersData[
+                                                  MYParametersData[
                                                           'WindDirection'] ??
                                                       [],
-                                              'Rainfall': NARLParametersData[
+                                              'Rainfall': MYParametersData[
                                                       'RainfallHourly'] ??
                                                   [],
                                             },
@@ -6867,9 +6866,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
-                                    if (widget.deviceName.startsWith('KJ'))
-                                      ...NARLParametersData.entries
-                                          .map((entry) {
+                                    if (widget.deviceName.startsWith('MY'))
+                                      ...MYParametersData.entries.map((entry) {
                                         String paramName = entry.key;
                                         List<ChartData> data = entry.value;
                                         List<String> excludedParams = [
@@ -8542,7 +8540,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             }).toList(),
                                           if (widget.deviceName
                                               .startsWith('MY'))
-                                            ...NARLParametersData.entries
+                                            ...MYParametersData.entries
                                                 .map((entry) {
                                               String paramName = entry.key;
                                               List<ChartData> data =
@@ -9526,9 +9524,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                       labelRotation: 70,
                                       edgeLabelPlacement:
                                           EdgeLabelPlacement.shift,
-                                      intervalType: DateTimeIntervalType
-                                          .days, // Set interval to days
-                                      interval: 1, // One day interval
+                                      intervalType: DateTimeIntervalType.auto,
                                       enableAutoIntervalOnZooming: true,
                                       majorGridLines: MajorGridLines(
                                         width: 1.0,
