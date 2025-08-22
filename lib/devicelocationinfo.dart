@@ -16,12 +16,12 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
       "https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function";
 
   bool isLoading = true;
-  bool showList = true; // New toggle variable
+  bool showList = true;
   List<Map<String, dynamic>> allDevices = [];
   int totalActive = 0;
   int totalInactive = 0;
 
-  String? filter = "All"; // Default to show all devices
+  String? filter = "All";
   String searchQuery = "";
 
   @override
@@ -39,7 +39,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
 
         List<Map<String, dynamic>> devices = [];
 
-        // Merge selected groups
         final keysToInclude = [
           'WS_Device_Activity',
           'Awadh_Jio_Device_Activity',
@@ -62,14 +61,12 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                 "lastReceivedTime": lastTime?.toString() ?? "Invalid date",
                 "isActive": isActive,
                 "Group": key,
-                // Add Topic only if WS_Device_Activity has it
                 "Topic":
                     key == "WS_Device_Activity" ? device['Topic'] ?? "" : null
               });
             }
           }
         }
-        // Sort devices: Active first
         devices.sort((a, b) {
           if (a['isActive'] == b['isActive']) return 0;
           return a['isActive'] ? -1 : 1;
@@ -94,7 +91,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
 
   DateTime? parseDate(String dateStr) {
     try {
-      // 1. Handle compact format: 20250731T101428
       final compactRegex = RegExp(r'^\d{8}T\d{6}$');
       if (compactRegex.hasMatch(dateStr)) {
         final year = int.parse(dateStr.substring(0, 4));
@@ -106,7 +102,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
         return DateTime(year, month, day, hour, minute, second);
       }
 
-      // 2. Handle format: DD-MM-YYYY HH:mm:ss (01-08-2025 16:01:28)
       final dmyRegex = RegExp(r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$');
       if (dmyRegex.hasMatch(dateStr)) {
         final parts = dateStr.split(' ');
@@ -123,10 +118,8 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
         return DateTime(year, month, day, hour, minute, second);
       }
 
-      // 3. Handle format: 2024-09-24 04:28 PM (12-hour format with AM/PM)
       final amPmRegex = RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2} (AM|PM)$');
       if (amPmRegex.hasMatch(dateStr)) {
-        // Using intl is better, but here we'll handle manually
         final isPm = dateStr.endsWith('PM');
         final base = dateStr.replaceAll(RegExp(r' (AM|PM)$'), '');
         final dateTimeParts = base.split(' ');
@@ -148,7 +141,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
         );
       }
 
-      // 4. Fallback for standard ISO and space-separated formats
       return DateTime.tryParse(dateStr.replaceAll('  ', ' '));
     } catch (_) {
       return null;
@@ -183,10 +175,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        // title: Text('Device Status',
-        //     style: TextStyle(
-        //       color: isDarkMode ? Colors.white : Colors.black,
-        //     )),
         iconTheme: IconThemeData(
           color: isDarkMode ? Colors.white : Colors.black,
         ),
@@ -196,7 +184,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
               Icons.refresh,
               color: isDarkMode ? Colors.white : Colors.black,
             ),
-            onPressed: fetchDevices, // reload data
+            onPressed: fetchDevices,
           ),
           IconButton(
             icon: Icon(
@@ -207,8 +195,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => DeviceMapScreen()), // map.dart widget
+                MaterialPageRoute(builder: (context) => DeviceMapScreen()),
               );
             },
           ),
@@ -219,7 +206,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    const Color.fromARGB(255, 57, 57, 57)!,
+                    const Color.fromARGB(255, 4, 36, 49)!,
                     const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
@@ -272,7 +259,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          // Dropdown filter
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -298,11 +284,9 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                             ? Colors.black
                                             : Colors.white70),
                                   ),
-                                  iconEnabledColor: isDarkMode
-                                      ? Colors.white
-                                      : Colors.black, // 🔹 Icon color
-                                  iconDisabledColor: Colors
-                                      .grey, // Optional: when dropdown is disabled
+                                  iconEnabledColor:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                  iconDisabledColor: Colors.grey,
                                   value: filter,
                                   items: [
                                     DropdownMenuItem(
@@ -345,7 +329,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                         filter = null;
                                         showList = false;
                                       } else if (value == filter) {
-                                        // toggle if same option is selected again
                                         showList = !showList;
                                       } else {
                                         filter = value;
@@ -404,12 +387,10 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                               ),
                             ],
                           ),
-
                           const SizedBox(height: 8),
                         ],
                       ),
                     ),
-                    // Show list only if toggle is true
                     Expanded(
                       child: (!showList || filter == null)
                           ? const Center()
@@ -419,34 +400,99 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                   itemCount: filteredDevices.length,
                                   itemBuilder: (context, index) {
                                     final device = filteredDevices[index];
-                                    return Card(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 6),
-                                      child: ListTile(
-                                        leading: Icon(Icons.devices,
-                                            color: device['isActive']
-                                                ? Colors.green
-                                                : Colors.red),
-                                        title: Text(
-                                            "Device ID: ${device['DeviceId']}"),
-                                        subtitle: Text(
-                                          "Last Received: ${device['lastReceivedTime']}"
-                                          // "\nGroup: ${device['Group']
-                                          // }"
-                                          "${device['Topic'] != null && device['Topic'] != '' ? '\nTopic: ${device['Topic']}' : ''}",
-                                        ),
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                              context, "/login");
-                                        },
-                                      ),
+                                    return _HoverableDeviceCard(
+                                      isDarkMode: isDarkMode,
+                                      device: device,
+                                      onTap: () {
+                                        Navigator.pushNamed(context, "/login");
+                                      },
                                     );
                                   },
                                 ),
-                    )
+                    ),
                   ],
                 ),
               ),
+      ),
+    );
+  }
+}
+
+class _HoverableDeviceCard extends StatefulWidget {
+  final bool isDarkMode;
+  final Map<String, dynamic> device;
+  final VoidCallback onTap;
+
+  const _HoverableDeviceCard({
+    required this.isDarkMode,
+    required this.device,
+    required this.onTap,
+  });
+
+  @override
+  State<_HoverableDeviceCard> createState() => _HoverableDeviceCardState();
+}
+
+class _HoverableDeviceCardState extends State<_HoverableDeviceCard> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            gradient: LinearGradient(
+              colors: widget.isDarkMode
+                  ? (_isHovering
+                      ? [const Color(0xFF3B6A7F), const Color(0xFF8C6C8E)]
+                      : [
+                          const Color.fromARGB(255, 3, 62, 88),
+                          const Color.fromARGB(227, 41, 36, 42)
+                        ])
+                  : (_isHovering
+                      ? [const Color(0xFF5BAA9D), const Color(0xFFA7DCA1)]
+                      : [
+                          const Color.fromARGB(255, 188, 215, 215),
+                          const Color.fromARGB(255, 158, 211, 212)
+                        ]),
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: _isHovering ? 8 : 4,
+                offset: const Offset(2, 2),
+              ),
+            ],
+          ),
+          child: ListTile(
+            leading: Icon(
+              Icons.devices,
+              color: widget.device['isActive'] ? Colors.green : Colors.red,
+            ),
+            title: Text(
+              "Device ID: ${widget.device['DeviceId']}",
+              style: TextStyle(
+                color: widget.isDarkMode ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              "Last Received: ${widget.device['lastReceivedTime']}"
+              "${widget.device['Topic'] != null && widget.device['Topic'] != '' ? '\nTopic: ${widget.device['Topic']}' : ''}",
+              style: TextStyle(
+                color: widget.isDarkMode ? Colors.white70 : Colors.black87,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
