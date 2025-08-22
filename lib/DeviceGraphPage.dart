@@ -891,6 +891,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       wfAverageTemperatureData.clear();
       wfrainfallData.clear();
       kdParametersData.clear();
+      NARLParametersData.clear();
+      KJParametersData.clear();
+      csParametersData.clear();
 
       _weeklyPrecipitationData.clear();
     });
@@ -2061,6 +2064,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
               !widget.deviceName.startsWith('CF') &&
               !widget.deviceName.startsWith('VD') &&
               !widget.deviceName.startsWith('CP') &&
+              !widget.deviceName.startsWith('NA') &&
+              !widget.deviceName.startsWith('KJ') &&
               !widget.deviceName.startsWith('SV')) {
             _csvRows = rows;
           }
@@ -2139,6 +2144,102 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
           List<dynamic> row = [formatter.format(timestamp)];
           for (var key in cfParametersData.keys) {
             var dataList = cfParametersData[key]!;
+            var matchingData = dataList.firstWhere(
+              (data) => data.timestamp == timestamp,
+              orElse: () => ChartData(timestamp: timestamp, value: 0.0),
+            );
+            row.add(matchingData.value ?? '');
+          }
+          dataRows.add(row);
+        }
+
+        csvRows = [headers, ...dataRows];
+      }
+    } else if (widget.deviceName.startsWith('CP')) {
+      if (cfParametersData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        List<String> headers = ['Timestamp'];
+        headers.addAll(csParametersData.keys);
+
+        List<List<dynamic>> dataRows = [];
+        Set<DateTime> timestamps = {};
+        csParametersData.values.forEach((dataList) {
+          dataList.forEach((data) => timestamps.add(data.timestamp));
+        });
+        List<DateTime> sortedTimestamps = timestamps.toList()..sort();
+
+        for (var timestamp in sortedTimestamps) {
+          List<dynamic> row = [formatter.format(timestamp)];
+          for (var key in csParametersData.keys) {
+            var dataList = csParametersData[key]!;
+            var matchingData = dataList.firstWhere(
+              (data) => data.timestamp == timestamp,
+              orElse: () => ChartData(timestamp: timestamp, value: 0.0),
+            );
+            row.add(matchingData.value ?? '');
+          }
+          dataRows.add(row);
+        }
+
+        csvRows = [headers, ...dataRows];
+      }
+    } else if (widget.deviceName.startsWith('NA')) {
+      if (NARLParametersData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        List<String> headers = ['Timestamp'];
+        headers.addAll(NARLParametersData.keys);
+
+        List<List<dynamic>> dataRows = [];
+        Set<DateTime> timestamps = {};
+        NARLParametersData.values.forEach((dataList) {
+          dataList.forEach((data) => timestamps.add(data.timestamp));
+        });
+        List<DateTime> sortedTimestamps = timestamps.toList()..sort();
+
+        for (var timestamp in sortedTimestamps) {
+          List<dynamic> row = [formatter.format(timestamp)];
+          for (var key in NARLParametersData.keys) {
+            var dataList = NARLParametersData[key]!;
+            var matchingData = dataList.firstWhere(
+              (data) => data.timestamp == timestamp,
+              orElse: () => ChartData(timestamp: timestamp, value: 0.0),
+            );
+            row.add(matchingData.value ?? '');
+          }
+          dataRows.add(row);
+        }
+
+        csvRows = [headers, ...dataRows];
+      }
+    } else if (widget.deviceName.startsWith('KJ')) {
+      if (KJParametersData.isEmpty) {
+        csvRows = [
+          ['Timestamp', 'Message'],
+          ['', 'No data available']
+        ];
+      } else {
+        List<String> headers = ['Timestamp'];
+        headers.addAll(KJParametersData.keys);
+
+        List<List<dynamic>> dataRows = [];
+        Set<DateTime> timestamps = {};
+        KJParametersData.values.forEach((dataList) {
+          dataList.forEach((data) => timestamps.add(data.timestamp));
+        });
+        List<DateTime> sortedTimestamps = timestamps.toList()..sort();
+
+        for (var timestamp in sortedTimestamps) {
+          List<dynamic> row = [formatter.format(timestamp)];
+          for (var key in KJParametersData.keys) {
+            var dataList = KJParametersData[key]!;
             var matchingData = dataList.firstWhere(
               (data) => data.timestamp == timestamp,
               orElse: () => ChartData(timestamp: timestamp, value: 0.0),
@@ -5918,6 +6019,38 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             SizedBox(height: 2),
                                             Text(
                                               '${_lastNARLBattery.toStringAsFixed(2)} V',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (widget.deviceName.startsWith('KJ'))
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              _getfsBatteryIcon(_lastKJBattery),
+                                              color: _getBatteryColor(
+                                                  _lastKJBattery),
+                                              size: 28,
+                                            ),
+                                            SizedBox(height: 2),
+                                            Text(
+                                              '${_lastKJBattery.toStringAsFixed(2)} V',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
