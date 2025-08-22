@@ -177,6 +177,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
         return 'National Atmospheric Research Labortary\nSensors';
       case 'CP':
         return 'IIT Ropar Campus\nSensors';
+      case 'KJ':
+        return 'KJ Somaiya College of Engineering';
       default:
         return 'Rain Sensors';
     }

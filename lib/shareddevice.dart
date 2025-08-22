@@ -9,7 +9,7 @@ class DeviceUtils {
     if (deviceId.startsWith('SS')) return 'Soil Sensor';
     if (deviceId.startsWith('WQ')) return 'Water Quality Sensor';
     if (deviceId.startsWith('WS')) return 'Water Sensor';
-    if (deviceId.startsWith('IT')) return 'IIT Sensor';
+    if (deviceId.startsWith('IT')) return 'IIT Bombay Sensor';
     if (deviceId.startsWith('DO')) return 'DO Sensor';
     if (deviceId.startsWith('LU')) return 'LU Sensor';
     if (deviceId.startsWith('TE')) return 'TE Sensor';
@@ -18,16 +18,19 @@ class DeviceUtils {
     if (deviceId.startsWith('CS')) return 'Cow Sensor';
     if (deviceId.startsWith('TH')) return 'Temperature Sensor';
     if (deviceId.startsWith('NH')) return 'Ammonia Sensor';
-    if (deviceId.startsWith('FS')) return 'Forest Sensor';
+    if (deviceId.startsWith('FS')) return 'Forest Sensor (Bhopal)';
     if (deviceId.startsWith('SM')) return 'SSMET Sensor';
     if (deviceId.startsWith('CF')) return 'Sekhon Biotech Pvt Ltd Farm Sensor';
-    if (deviceId.startsWith('SV')) return 'SVPU Sensor';
+    if (deviceId.startsWith('SV'))
+      return 'Sardar Vallabhbhai Patel University of Agriculture and TechnologySensor';
     if (deviceId.startsWith('CB')) return 'COD/BOD Sensor';
     if (deviceId.startsWith('WF')) return 'WF Sensor';
     if (deviceId.startsWith('KD')) return 'Kargil Sensor';
     if (deviceId.startsWith('VD')) return 'Vanix Sensor';
-    if (deviceId.startsWith('NA')) return 'NARL Sensor';
-    if (deviceId.startsWith('CP')) return 'Campus Sensor';
+    if (deviceId.startsWith('NA'))
+      return 'National Atmospheric Research Labortary Sensor';
+    if (deviceId.startsWith('KJ')) return 'KJ Somaiya College of Engineering';
+    if (deviceId.startsWith('CP')) return 'IIT Ropar Campus Sensor';
     return 'Rain Sensor';
   }
 
@@ -145,6 +148,7 @@ class DeviceUtils {
     'KD',
     'VD',
     'NA',
-    'CP'
+    'CP',
+    'KJ'
   ];
 }
