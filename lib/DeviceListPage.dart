@@ -432,10 +432,13 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
                 colors: isDarkMode
-                    ? [Color(0xFF1C1F26), Color(0xFF2A2D36)]
+                    ? [
+                        const Color.fromARGB(255, 57, 57, 57)!,
+                        const Color.fromARGB(255, 2, 54, 76)!,
+                      ]
                     : [
-                        Color.fromARGB(255, 240, 244, 245),
-                        Color.fromARGB(255, 91, 99, 102)
+                        const Color.fromARGB(255, 126, 171, 166)!,
+                        const Color.fromARGB(255, 76, 102, 108)!,
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -621,7 +624,11 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                                 child: Text(
                                   buttonLabel,
                                   style: TextStyle(
-                                      fontSize: 16, color: Colors.white),
+                                    fontSize: 16,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -802,8 +809,8 @@ class _HoverableCardState extends State<_HoverableCard> {
                     : (_isHovering
                         ? [const Color(0xFF5BAA9D), const Color(0xFFA7DCA1)]
                         : [
-                            const Color.fromARGB(255, 166, 222, 226),
-                            const Color.fromARGB(255, 165, 222, 167)
+                            const Color.fromARGB(255, 188, 215, 215),
+                            const Color.fromARGB(255, 158, 211, 212)
                           ]),
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
