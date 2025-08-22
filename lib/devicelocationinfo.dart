@@ -180,13 +180,13 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.grey[100],
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-        title: Text('Device Status',
-            style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black,
-            )),
+        backgroundColor: Colors.transparent,
+        // title: Text('Device Status',
+        //     style: TextStyle(
+        //       color: isDarkMode ? Colors.white : Colors.black,
+        //     )),
         iconTheme: IconThemeData(
           color: isDarkMode ? Colors.white : Colors.black,
         ),
@@ -219,8 +219,8 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    const Color.fromARGB(255, 192, 185, 185)!,
-                    const Color.fromARGB(255, 123, 159, 174)!,
+                    const Color.fromARGB(255, 45, 45, 46)!,
+                    const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
                     const Color.fromARGB(255, 126, 171, 166)!,
@@ -238,7 +238,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                   children: [
                     Container(
                       color: Colors.transparent,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(32),
                       child: Column(
                         children: [
                           Text(
@@ -246,10 +246,10 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.black : Colors.white,
+                              color: isDarkMode ? Colors.white : Colors.black,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -271,7 +271,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 16),
                           // Dropdown filter
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -407,27 +407,27 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
 
                           const SizedBox(height: 8),
 
-                          AnimatedTextKit(
-                            onTap: () {
-                              Navigator.pushNamed(context, "/login");
-                            },
-                            repeatForever: true,
-                            pause: const Duration(milliseconds: 2000),
-                            animatedTexts: [
-                              TyperAnimatedText(
-                                'To see your device data, login/signup',
-                                textStyle: TextStyle(
-                                  fontSize: 16, // font size
-                                  color: isDarkMode
-                                      ? Colors.deepOrange
-                                      : Colors.deepOrange, // font color
-                                  fontWeight: FontWeight.bold, // optional
-                                ),
-                              ),
-                            ],
-                            displayFullTextOnTap: true,
-                            stopPauseOnTap: true,
-                          ),
+                          // AnimatedTextKit(
+                          //   onTap: () {
+                          //     Navigator.pushNamed(context, "/login");
+                          //   },
+                          //   repeatForever: true,
+                          //   pause: const Duration(milliseconds: 2000),
+                          //   animatedTexts: [
+                          //     TyperAnimatedText(
+                          //       'To see your device data, login/signup',
+                          //       textStyle: TextStyle(
+                          //         fontSize: 16, // font size
+                          //         color: isDarkMode
+                          //             ? Colors.deepOrange
+                          //             : Colors.deepOrange, // font color
+                          //         fontWeight: FontWeight.bold, // optional
+                          //       ),
+                          //     ),
+                          //   ],
+                          //   displayFullTextOnTap: true,
+                          //   stopPauseOnTap: true,
+                          // ),
                         ],
                       ),
                     ),
