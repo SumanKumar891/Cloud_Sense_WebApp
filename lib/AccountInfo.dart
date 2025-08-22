@@ -336,12 +336,6 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text('Account Info',
-            style: TextStyle(
-              color: isDarkMode ? Colors.white : Colors.black,
-              fontSize: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-              fontWeight: FontWeight.bold,
-            )),
         iconTheme: IconThemeData(
             color: isDarkMode ? Colors.white : Colors.black,
             size: MediaQuery.of(context).size.width < 800 ? 16 : 32),
@@ -366,11 +360,11 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(14.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 80),
+                SizedBox(height: 60),
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -395,7 +389,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _fetchData,
                   style: ElevatedButton.styleFrom(
@@ -407,7 +401,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                         color: isDarkMode ? Colors.black : Colors.white,
                       )),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 40),
                 _isLoading
                     ? Center(child: CircularProgressIndicator())
                     : deviceCategories.isNotEmpty
