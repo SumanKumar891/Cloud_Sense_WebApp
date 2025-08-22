@@ -219,12 +219,12 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    const Color.fromARGB(255, 45, 45, 46)!,
+                    const Color.fromARGB(255, 57, 57, 57)!,
                     const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
                     const Color.fromARGB(255, 126, 171, 166)!,
-                    const Color.fromARGB(255, 54, 58, 59)!,
+                    const Color.fromARGB(255, 76, 102, 108)!,
                   ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -406,28 +406,6 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                           ),
 
                           const SizedBox(height: 8),
-
-                          // AnimatedTextKit(
-                          //   onTap: () {
-                          //     Navigator.pushNamed(context, "/login");
-                          //   },
-                          //   repeatForever: true,
-                          //   pause: const Duration(milliseconds: 2000),
-                          //   animatedTexts: [
-                          //     TyperAnimatedText(
-                          //       'To see your device data, login/signup',
-                          //       textStyle: TextStyle(
-                          //         fontSize: 16, // font size
-                          //         color: isDarkMode
-                          //             ? Colors.deepOrange
-                          //             : Colors.deepOrange, // font color
-                          //         fontWeight: FontWeight.bold, // optional
-                          //       ),
-                          //     ),
-                          //   ],
-                          //   displayFullTextOnTap: true,
-                          //   stopPauseOnTap: true,
-                          // ),
                         ],
                       ),
                     ),

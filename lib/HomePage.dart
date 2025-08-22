@@ -340,8 +340,14 @@ class _HomePageState extends State<HomePage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: themeProvider.isDarkMode
-                      ? [Color(0xFFC0B9B9), Color(0xFF7B9FAE)]
-                      : [Color(0xFF7EABA6), Color(0xFF363A3B)],
+                      ? [
+                          const Color.fromARGB(255, 57, 57, 57)!,
+                          const Color.fromARGB(255, 2, 54, 76)!,
+                        ]
+                      : [
+                          const Color.fromARGB(255, 126, 171, 166)!,
+                          const Color.fromARGB(255, 76, 102, 108)!,
+                        ],
                 ),
               ),
             ),
@@ -361,8 +367,8 @@ class _HomePageState extends State<HomePage> {
                         fontSize: titleFont,
                         fontWeight: FontWeight.bold,
                         color: themeProvider.isDarkMode
-                            ? Colors.black87
-                            : Colors.white,
+                            ? Colors.white
+                            : Colors.black,
                         shadows: [
                           Shadow(
                             blurRadius: 4,
@@ -378,8 +384,8 @@ class _HomePageState extends State<HomePage> {
                       width: 160,
                       decoration: BoxDecoration(
                         color: themeProvider.isDarkMode
-                            ? Colors.black54
-                            : Colors.white70,
+                            ? Colors.white70
+                            : Colors.black54,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -390,8 +396,8 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: subtitleFont,
                           color: themeProvider.isDarkMode
-                              ? Colors.black
-                              : Colors.white,
+                              ? Colors.white
+                              : Colors.black,
                           fontWeight: FontWeight.w500,
                         ),
                         child: AnimatedTextKit(
@@ -416,8 +422,8 @@ class _HomePageState extends State<HomePage> {
                       textAlign: TextAlign.justify,
                       style: TextStyle(
                         color: themeProvider.isDarkMode
-                            ? Colors.black
-                            : Colors.white70,
+                            ? Colors.white
+                            : Colors.black,
                         fontSize: paragraphFont,
                       ),
                     ),
@@ -429,7 +435,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         _buildAnimatedStatCard(
                           statValue: _totalDevices.toString(),
-                          label: "My Devices",
+                          label: "Devices",
                           themeProvider: themeProvider,
                           context: context,
                         ),

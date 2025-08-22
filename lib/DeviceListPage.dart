@@ -228,12 +228,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    const Color.fromARGB(255, 45, 45, 46)!,
+                    const Color.fromARGB(255, 57, 57, 57)!,
                     const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
                     const Color.fromARGB(255, 126, 171, 166)!,
-                    const Color.fromARGB(255, 54, 58, 59)!,
+                    const Color.fromARGB(255, 76, 102, 108)!,
                   ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -256,22 +256,6 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    // TextButton.icon(
-                    //   onPressed: _handleLogout,
-                    //   icon: Icon(
-                    //     Icons.logout,
-                    //     color: isDarkMode ? Colors.white : Colors.black,
-                    //     size: MediaQuery.of(context).size.width < 800 ? 16 : 24,
-                    //   ),
-                    //   label: Text(
-                    //     'Log out',
-                    //     style: TextStyle(
-                    //       color: isDarkMode ? Colors.white : Colors.black,
-                    //       fontSize:
-                    //           MediaQuery.of(context).size.width < 800 ? 12 : 20,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -767,7 +751,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
 
   Color _getCardTextColor() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? Colors.black : Colors.black;
+    return isDarkMode ? Colors.white : Colors.black;
   }
 }
 
@@ -804,26 +788,68 @@ class _HoverableCardState extends State<_HoverableCard> {
         curve: Curves.easeOut,
         child: GestureDetector(
           onTap: widget.onTap,
-          child: Card(
-            elevation: _isHovering ? 10 : 4,
-            color: widget.getCardColor(widget.category),
-            shape: RoundedRectangleBorder(
+          child: Container(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                colors: widget.isDarkMode
+                    ? (_isHovering
+                        ? [const Color(0xFF3B6A7F), const Color(0xFF8C6C8E)]
+                        : [
+                            const Color.fromARGB(255, 59, 138, 171),
+                            const Color.fromARGB(228, 69, 59, 71)
+                          ])
+                    : (_isHovering
+                        ? [const Color(0xFF5BAA9D), const Color(0xFFA7DCA1)]
+                        : [
+                            const Color.fromARGB(255, 166, 222, 226),
+                            const Color.fromARGB(255, 165, 222, 167)
+                          ]),
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: _isHovering ? 10 : 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
             ),
             child: Center(
-              child: Text(
-                widget.category == "AddDevice"
-                    ? "➕ Add Device"
-                    : widget.category,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: widget.category == "AddDevice"
-                      ? (widget.isDarkMode ? Colors.black : Colors.black)
-                      : widget.getCardTextColor(),
-                ),
-              ),
+              child: widget.category == "AddDevice"
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: 24, // Adjust size as needed
+                          color:
+                              widget.isDarkMode ? Colors.white : Colors.black,
+                        ),
+                        const SizedBox(
+                            height: 8), // Space between icon and text
+                        Text(
+                          "Add Device",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                widget.isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      widget.category,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: widget.getCardTextColor(),
+                      ),
+                    ),
             ),
           ),
         ),
