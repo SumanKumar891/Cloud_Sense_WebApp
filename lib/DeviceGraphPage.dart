@@ -493,6 +493,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   Map<String, List<ChartData>> kdParametersData = {};
   Map<String, List<ChartData>> vdParametersData = {};
   Map<String, List<ChartData>> NARLParametersData = {};
+  Map<String, List<ChartData>> KJParametersData = {};
   Map<String, List<ChartData>> csParametersData = {};
   List<ChartData> cod2Data = [];
   List<ChartData> bod2Data = [];
@@ -676,6 +677,26 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         _chartKeys[param] = GlobalKey();
         _isParamHovering[param] = false;
       }
+    } else if (widget.deviceName.startsWith('KJ')) {
+      const params = [
+        'Temperature',
+        'Potassium',
+        'pH',
+        'Nitrogen',
+        'Salinity',
+        'ElectricalConductivity',
+        'Phosphorus',
+      ];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
+    } else if (widget.deviceName.startsWith('VD')) {
+      const params = ['Temperature', 'Humidity', 'Light Intensity', 'Rainfall'];
+      for (var param in params) {
+        _chartKeys[param] = GlobalKey();
+        _isParamHovering[param] = false;
+      }
     } else if (widget.deviceName.startsWith('CF') ||
         widget.deviceName.startsWith('CP')) {
       const params = [
@@ -794,6 +815,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   double _lastvdBattery = 0.0;
   double _lastkdBattery = 0.0;
   double _lastNARLBattery = 0.0;
+  double _lastKJBattery = 0.0;
   double _lastcsBattery = 0.0;
   double _lastsvBattery = 0.0;
   String _lastRSSI_Value = "";
@@ -855,6 +877,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       _lastvdBattery = 0.0;
       _lastkdBattery = 0.0;
       _lastNARLBattery = 0.0;
+      _lastKJBattery = 0.0;
 
       _lastcsBattery = 0.0;
       _lastsvBattery = 0.0;
@@ -943,6 +966,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     } else if (widget.deviceName.startsWith('NA')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/ssmetnarldata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('KJ')) {
+      apiUrl =
+          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/kjscedata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CP')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/campusdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -1306,6 +1332,69 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                 for (var key in NARLParametersData.keys) {
                   var value = NARLParametersData[key]!.length > i
                       ? NARLParametersData[key]![i].value
+                      : null;
+                  // ✅ Preserve 0, replace null with empty string
+                  row.add(value ?? '');
+                }
+                dataRows.add(row);
+              }
+
+              _csvRows = [headers, ...dataRows];
+            }
+
+            // Clear unrelated data
+            temperatureData = [];
+            humidityData = [];
+          });
+
+          // // ✅ Now trigger download
+          // downloadCSV(context);
+          await _fetchDeviceDetails();
+        } else if (widget.deviceName.startsWith('KJ')) {
+          setState(() {
+            KJParametersData.clear();
+            KJParametersData = _parseKJParametersData(data);
+
+            // Update last location data
+            if (data.isNotEmpty) {
+              for (var item in data.reversed) {
+                if (item['Latitude'] != null &&
+                    item['Latitude'] != 0 &&
+                    item['Longitude'] != null &&
+                    item['Longitude'] != 0) {
+                  _lastLatitude = item['Latitude'].toDouble();
+                  _lastLongitude = item['Longitude'].toDouble();
+                  _lastLocationTime = DateTime.parse(item['TimeStamp']);
+                  break;
+                }
+              }
+            }
+
+            if (KJParametersData.isEmpty) {
+              _csvRows = [
+                ['Timestamp', 'Message'],
+                ['', 'No data available']
+              ];
+            } else {
+              List<String> headers = ['Timestamp'];
+              headers.addAll(KJParametersData.keys);
+
+              List<List<dynamic>> dataRows = [];
+              int maxLength = KJParametersData.values
+                  .map((list) => list.length)
+                  .reduce((a, b) => a > b ? a : b);
+
+              for (int i = 0; i < maxLength; i++) {
+                List<dynamic> row = [
+                  KJParametersData.values.isNotEmpty &&
+                          KJParametersData.values.first.length > i
+                      ? formatter
+                          .format(KJParametersData.values.first[i].timestamp)
+                      : ''
+                ];
+                for (var key in KJParametersData.keys) {
+                  var value = KJParametersData[key]!.length > i
+                      ? KJParametersData[key]![i].value
                       : null;
                   // ✅ Preserve 0, replace null with empty string
                   row.add(value ?? '');
@@ -2642,6 +2731,62 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     for (var item in items.reversed) {
       if (item != null && item['BatteryVoltage'] != null) {
         _lastNARLBattery =
+            double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
+
+        break; // Exit after finding the latest non-null value
+      }
+    }
+
+    // Remove parameters with empty lists (i.e., all values were null)
+    parametersData.removeWhere((key, value) => value.isEmpty);
+
+    return parametersData;
+  }
+
+  Map<String, List<ChartData>> _parseKJParametersData(
+      Map<String, dynamic> data) {
+    final List<dynamic> items = data['items'] ?? [];
+    Map<String, List<ChartData>> parametersData = {};
+
+    if (items.isEmpty) {
+      return parametersData;
+    }
+
+    // Collect all possible parameter keys from the first item, excluding non-numeric fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      // Exclude non-numeric fields like TimeStamp, Topic, IMEINumber, DeviceId, Latitude, Longitude
+      return ![
+        'TimeStamp',
+        'Topic',
+        'IMEINumber',
+        'DeviceId',
+      ].contains(key);
+    }).toList();
+
+    // Initialize ChartData lists for each parameter
+    for (var key in parameterKeys) {
+      parametersData[key] = [];
+    }
+
+    // Parse data for each item
+    for (var item in items) {
+      if (item == null) continue;
+      DateTime timestamp = _parseKJDate(item['TimeStamp']);
+      for (var key in parameterKeys) {
+        if (item[key] != null) {
+          // Only include non-null values
+          double value = double.tryParse(item[key].toString()) ?? 0.0;
+          parametersData[key]!
+              .add(ChartData(timestamp: timestamp, value: value));
+        }
+      }
+    }
+
+    // Update _lastkdBattery with the latest BatteryVoltage (from the last item)
+    for (var item in items.reversed) {
+      if (item != null && item['BatteryVoltage'] != null) {
+        _lastKJBattery =
             double.tryParse(item['BatteryVoltage'].toString()) ?? 0.0;
 
         break; // Exit after finding the latest non-null value
@@ -4040,6 +4185,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     }
   }
 
+  DateTime _parseKJDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return DateTime.now();
+    }
+    try {
+      // Parse the timestamp format: YYYY-MM-DD HH:MM:SS (e.g., 2025-06-15 01:01:02)
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      return DateTime.now();
+    }
+  }
+
   DateTime _parsecsDate(String? dateStr) {
     if (dateStr == null || dateStr.isEmpty) {
       return DateTime.now();
@@ -4627,6 +4784,46 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: children,
       );
+    } else if (widget.deviceName.startsWith('KJ')) {
+      Map<String, String> parameterLabels = {
+        'CurrentTemperature': 'Temperature',
+        'CurrentHumidity': 'Humidity',
+        'Potassium': 'Potassium',
+        'pH': 'pH',
+        'Nitrogen': 'Nitrogen',
+        'Salinity': 'Salinity',
+        'ElectricalConductivity': 'Electrical Conductivity',
+        'Phosphorus': 'Phosphorus'
+      };
+      List<String> includedParameters = parameterLabels.keys.toList();
+
+      List<Widget> children = KJParametersData.entries
+          .where((entry) => includedParameters.contains(entry.key))
+          .map((entry) {
+        String label = parameterLabels[entry.key] ?? entry.key;
+        double? current =
+            entry.value.isNotEmpty ? entry.value.last.value : null;
+        String unit = '';
+        if (label == 'Temperature')
+          unit = '°C';
+        else if (label == 'Humidity')
+          unit = '%';
+        else if (label == 'Light Intensity')
+          unit = 'lux';
+        else if (label == 'Rainfall' || label == 'Rainfall Minutely')
+          unit = 'mm';
+        else if (label == 'Wind Speed')
+          unit = 'm/s';
+        else if (label == 'Atm Pressure')
+          unit = 'hpa';
+        else if (label == 'Wind Direction') unit = '°';
+        return _buildParamStat(label, current, null, null, unit, isDarkMode,
+            onTap: () => _scrollToChart(label));
+      }).toList();
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: children,
+      );
     } else if (widget.deviceName.startsWith('VD')) {
       Map<String, String> parameterLabels = {
         'CurrentTemperature': 'Temperature',
@@ -4781,6 +4978,11 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       'Radiation': Icons.wb_sunny,
       'DO Value': Icons.bubble_chart,
       'DO Percentage': Icons.percent,
+      'Potassium': Icons.bolt,
+      'Nitrogen': Icons.grass,
+      'Phosphorus': Icons.local_florist,
+      'Salinity': Icons.waves,
+      'Electrical Conductivity': Icons.electric_bolt,
     };
 
     final IconData icon = parameterIcons[label] ?? Icons.help;
@@ -5107,6 +5309,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           .startsWith('NA')) {
                                         paramData = NARLParametersData;
                                       } else if (widget.deviceName
+                                          .startsWith('KJ')) {
+                                        paramData = KJParametersData;
+                                      } else if (widget.deviceName
                                           .startsWith('CP')) {
                                         paramData = csParametersData;
                                       } else if (widget.deviceName
@@ -5354,6 +5559,36 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       [],
                                               'Rainfall': NARLParametersData[
                                                       'RainfallHourly'] ??
+                                                  [],
+                                            },
+                                          ),
+                                        if (widget.deviceName.startsWith('KJ'))
+                                          _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': KJParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': KJParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Potassium': KJParametersData[
+                                                      'Potassium'] ??
+                                                  [],
+                                              'pH':
+                                                  KJParametersData['pH'] ?? [],
+                                              'Nitrogen': KJParametersData[
+                                                      'Nitrogen'] ??
+                                                  [],
+                                              'Salinity': KJParametersData[
+                                                      'Salinity'] ??
+                                                  [],
+                                              'ElectricalConductivity':
+                                                  KJParametersData[
+                                                          'ElectricalConductivity'] ??
+                                                      [],
+                                              'Phosphorus': KJParametersData[
+                                                      'Phosphorus'] ??
                                                   [],
                                             },
                                           ),
@@ -6151,6 +6386,65 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                         }
                                         return const SizedBox.shrink();
                                       }).toList(),
+                                    if (widget.deviceName.startsWith('KJ'))
+                                      ...KJParametersData.entries.map((entry) {
+                                        String paramName = entry.key;
+                                        List<ChartData> data = entry.value;
+                                        List<String> excludedParams = [
+                                          'Longitude',
+                                          'Latitude',
+                                          'SignalStrength',
+                                          'BatteryVoltage',
+                                          'MaximumTemperature',
+                                          'MinimumTemperature',
+                                          'AverageTemperature',
+                                          'RainfallDaily',
+                                          'RainfallWeekly',
+                                          'RainfallHourly',
+                                          'RainfallMinutly',
+                                          'AverageHumidity',
+                                          'MinimumHumidity',
+                                          'MaximumHumidity',
+                                          'HumidityHourlyComulative',
+                                          'PressureHourlyComulative',
+                                          'LuxHourlyComulative',
+                                          'TemperatureHourlyComulative',
+                                          'AtmPressure',
+                                          'Light Intensity',
+                                          'Wind Direction',
+                                          'Wind Speed',
+                                          'Light Intensity',
+                                        ];
+                                        if (!excludedParams
+                                                .contains(paramName) &&
+                                            data.isNotEmpty) {
+                                          final displayInfo =
+                                              _getParameterDisplayInfo(
+                                                  paramName);
+                                          String displayName =
+                                              displayInfo['displayName'];
+                                          String unit = displayInfo['unit'];
+                                          String chartTitle;
+                                          if (paramName.toLowerCase() ==
+                                              'currenthumidity') {
+                                            chartTitle = '($unit)';
+                                          } else if (paramName.toLowerCase() ==
+                                              'currenttemperature') {
+                                            chartTitle = '($unit)';
+                                          } else {
+                                            chartTitle = unit.isNotEmpty
+                                                ? '($unit)'
+                                                : displayName;
+                                          }
+                                          return _buildChartContainer(
+                                              displayName,
+                                              data,
+                                              chartTitle,
+                                              ChartType.line,
+                                              isDarkMode);
+                                        }
+                                        return const SizedBox.shrink();
+                                      }).toList(),
                                     if (widget.deviceName.startsWith('CP'))
                                       ...csParametersData.entries.map((entry) {
                                         String paramName = entry.key;
@@ -6262,6 +6556,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                         !widget.deviceName.startsWith('VD') &&
                                         !widget.deviceName.startsWith('KD') &&
                                         !widget.deviceName.startsWith('NA') &&
+                                        !widget.deviceName.startsWith('KJ') &&
                                         !widget.deviceName.startsWith('CP') &&
                                         !widget.deviceName
                                             .startsWith('SV')) ...[
@@ -6691,6 +6986,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               paramData = kdParametersData;
                             } else if (widget.deviceName.startsWith('NA')) {
                               paramData = NARLParametersData;
+                            } else if (widget.deviceName.startsWith('KJ')) {
+                              paramData = KJParametersData;
                             } else if (widget.deviceName.startsWith('CP')) {
                               paramData = csParametersData;
                             } else if (widget.deviceName.startsWith('SV')) {
@@ -6924,6 +7221,36 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                 SizedBox(height: 2),
                                 Text(
                                   '${_lastNARLBattery.toStringAsFixed(2)} V',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (widget.deviceName.startsWith('KJ'))
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _getfsBatteryIcon(_lastKJBattery),
+                                  color: _getBatteryColor(_lastKJBattery),
+                                  size: 28,
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  '${_lastKJBattery.toStringAsFixed(2)} V',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -7641,6 +7968,70 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                               return const SizedBox.shrink();
                                             }).toList(),
                                           if (widget.deviceName
+                                              .startsWith('KJ'))
+                                            ...KJParametersData.entries
+                                                .map((entry) {
+                                              String paramName = entry.key;
+                                              List<ChartData> data =
+                                                  entry.value;
+                                              List<String> excludedParams = [
+                                                'Longitude',
+                                                'Latitude',
+                                                'SignalStrength',
+                                                'BatteryVoltage',
+                                                'MaximumTemperature',
+                                                'MinimumTemperature',
+                                                'AverageTemperature',
+                                                'RainfallDaily',
+                                                'RainfallWeekly',
+                                                'RainfallHourly',
+                                                'RainfallMinutly',
+                                                'AverageHumidity',
+                                                'MinimumHumidity',
+                                                'MaximumHumidity',
+                                                'HumidityHourlyComulative',
+                                                'PressureHourlyComulative',
+                                                'LuxHourlyComulative',
+                                                'TemperatureHourlyComulative',
+                                                'AtmPressure',
+                                                'Light Intensity',
+                                                'Wind Direction',
+                                                'Wind Speed',
+                                                'Light Intensity',
+                                              ];
+                                              if (!excludedParams
+                                                      .contains(paramName) &&
+                                                  data.isNotEmpty) {
+                                                final displayInfo =
+                                                    _getParameterDisplayInfo(
+                                                        paramName);
+                                                String displayName =
+                                                    displayInfo['displayName'];
+                                                String unit =
+                                                    displayInfo['unit'];
+                                                String chartTitle;
+                                                if (paramName.toLowerCase() ==
+                                                    'currenthumidity') {
+                                                  chartTitle = '($unit)';
+                                                } else if (paramName
+                                                        .toLowerCase() ==
+                                                    'currenttemperature') {
+                                                  chartTitle = '($unit)';
+                                                } else {
+                                                  chartTitle = unit.isNotEmpty
+                                                      ? '($unit)'
+                                                      : displayName;
+                                                }
+                                                return _buildChartContainer(
+                                                    displayName,
+                                                    data,
+                                                    chartTitle,
+                                                    ChartType.line,
+                                                    isDarkMode);
+                                              }
+                                              return const SizedBox.shrink();
+                                            }).toList(),
+                                          if (widget.deviceName
                                               .startsWith('CP'))
                                             ...csParametersData.entries
                                                 .map((entry) {
@@ -7766,6 +8157,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                   .startsWith('KD') &&
                                               !widget.deviceName
                                                   .startsWith('NA') &&
+                                              !widget.deviceName
+                                                  .startsWith('KJ') &&
                                               !widget.deviceName
                                                   .startsWith('CP') &&
                                               !widget.deviceName
