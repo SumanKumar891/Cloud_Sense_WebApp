@@ -232,8 +232,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                     const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
-                    const Color.fromARGB(255, 126, 171, 166)!,
-                    const Color.fromARGB(255, 76, 102, 108)!,
+                    const Color.fromARGB(255, 191, 242, 237)!,
+                    const Color.fromARGB(255, 79, 106, 112)!,
                   ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -437,8 +437,8 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                         const Color.fromARGB(255, 2, 54, 76)!,
                       ]
                     : [
-                        const Color.fromARGB(255, 126, 171, 166)!,
-                        const Color.fromARGB(255, 76, 102, 108)!,
+                        const Color.fromARGB(255, 191, 242, 237)!,
+                        const Color.fromARGB(255, 79, 106, 112)!,
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -809,8 +809,8 @@ class _HoverableCardState extends State<_HoverableCard> {
                     : (_isHovering
                         ? [const Color(0xFF5BAA9D), const Color(0xFFA7DCA1)]
                         : [
-                            const Color.fromARGB(255, 188, 215, 215),
-                            const Color.fromARGB(255, 158, 211, 212)
+                            const Color.fromARGB(255, 73, 117, 121),
+                            const Color(0xFF81C784)
                           ]),
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

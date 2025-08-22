@@ -210,8 +210,8 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                     const Color.fromARGB(255, 2, 54, 76)!,
                   ]
                 : [
-                    const Color.fromARGB(255, 126, 171, 166)!,
-                    const Color.fromARGB(255, 76, 102, 108)!,
+                    const Color.fromARGB(255, 191, 242, 237)!,
+                    const Color.fromARGB(255, 79, 106, 112)!,
                   ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -246,7 +246,7 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                   fontSize: 16,
                                   color: isDarkMode
                                       ? Colors.green
-                                      : const Color.fromARGB(255, 244, 225, 54),
+                                      : const Color.fromARGB(255, 3, 71, 5),
                                 ),
                               ),
                               Text(

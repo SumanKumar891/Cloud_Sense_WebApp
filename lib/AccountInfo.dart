@@ -351,8 +351,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                         const Color.fromARGB(255, 2, 54, 76)!,
                       ]
                     : [
-                        const Color.fromARGB(255, 126, 171, 166)!,
-                        const Color.fromARGB(255, 76, 102, 108)!,
+                        const Color.fromARGB(255, 191, 242, 237)!,
+                        const Color.fromARGB(255, 79, 106, 112)!,
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -441,8 +441,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                             255, 5, 35, 49)
                                                         : const Color.fromARGB(
                                                             255,
-                                                            122,
-                                                            174,
+                                                            129,
+                                                            173,
                                                             166)),
                                             columnSpacing: 20.0,
                                             columns: deviceCategories.keys
