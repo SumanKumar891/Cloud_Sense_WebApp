@@ -543,6 +543,41 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     return windDirection != null && windDirection != "-";
   }
 
+  List<PlotBand> _generateNoonPlotBands(List<ChartData> data, bool isDarkMode) {
+    if (data.isEmpty) return [];
+
+    // Get the date range from the data
+    final DateTime minDate =
+        data.first.timestamp; // Assuming ChartData.x is DateTime
+    final DateTime maxDate = data.last.timestamp;
+
+    // Generate one plot band per day at 12 noon
+    List<PlotBand> plotBands = [];
+    DateTime currentDate = DateTime(minDate.year, minDate.month, minDate.day);
+
+    while (currentDate.isBefore(maxDate) ||
+        currentDate.isAtSameMomentAs(maxDate)) {
+      DateTime noon = DateTime(
+          currentDate.year, currentDate.month, currentDate.day, 12, 0, 0);
+      plotBands.add(
+        PlotBand(
+          start: noon,
+          end: noon,
+          borderWidth: 1.0,
+          dashArray: [5, 5],
+          borderColor: isDarkMode
+              ? Color.fromARGB(255, 141, 144, 148)
+              : Color.fromARGB(255, 48, 48, 48),
+          verticalTextAlignment: TextAnchor.middle,
+          shouldRenderAboveSeries: false,
+        ),
+      );
+      currentDate = currentDate.add(Duration(days: 1));
+    }
+
+    return plotBands;
+  }
+
   bool iswinddirectionValid(String? direction) {
     if (direction == null || direction.isEmpty) {
       return false;
@@ -9536,15 +9571,40 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                       labelRotation: 70,
                                       edgeLabelPlacement:
                                           EdgeLabelPlacement.shift,
-                                      intervalType: DateTimeIntervalType.auto,
+                                      intervalType:
+                                          _lastSelectedRange == 'single'
+                                              ? DateTimeIntervalType.auto
+                                              : DateTimeIntervalType.days,
+                                      interval: _lastSelectedRange == 'single'
+                                          ? null
+                                          : 1.0, // One label per day
                                       enableAutoIntervalOnZooming: true,
-                                      majorGridLines: MajorGridLines(
-                                        width: 1.0,
-                                        dashArray: [5, 5],
+                                      majorGridLines: _lastSelectedRange ==
+                                              'single'
+                                          ? MajorGridLines(
+                                              width: 1.0,
+                                              dashArray: [5, 5],
+                                              color: isDarkMode
+                                                  ? Color.fromARGB(
+                                                      255, 141, 144, 148)
+                                                  : Color.fromARGB(
+                                                      255, 48, 48, 48),
+                                            )
+                                          : MajorGridLines(
+                                              width:
+                                                  0), // Hide default gridlines for non-single ranges
+                                      majorTickLines: MajorTickLines(
+                                        size: 6.0, // Adjust size as needed
+                                        width: 1.0, // Adjust width as needed
                                         color: isDarkMode
-                                            ? Color.fromARGB(255, 141, 144, 148)
-                                            : Color.fromARGB(255, 48, 48, 48),
+                                            ? Colors.white
+                                            : Colors
+                                                .black, // Customize tick mark color
                                       ),
+                                      plotBands: _lastSelectedRange == 'single'
+                                          ? []
+                                          : _generateNoonPlotBands(
+                                              data, isDarkMode),
                                     ),
                                     primaryYAxis: NumericAxis(
                                       title: AxisTitle(
