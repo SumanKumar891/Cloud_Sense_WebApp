@@ -30,6 +30,7 @@ class DeviceUtils {
     if (deviceId.startsWith('NA'))
       return 'National Atmospheric Research Labortary Sensor';
     if (deviceId.startsWith('KJ')) return 'KJ Somaiya College of Engineering';
+    if (deviceId.startsWith('MY')) return 'Mysuru NIE';
     if (deviceId.startsWith('CP')) return 'IIT Ropar Campus Sensor';
     return 'Rain Sensor';
   }
@@ -149,6 +150,7 @@ class DeviceUtils {
     'VD',
     'NA',
     'CP',
-    'KJ'
+    'KJ',
+    'MY',
   ];
 }
