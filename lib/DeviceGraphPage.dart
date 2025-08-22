@@ -5102,6 +5102,18 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
           unit = 'm/s';
         else if (label == 'Atm Pressure')
           unit = 'hpa';
+        else if (label == 'Salinity')
+          unit = 'mg/L'; // parts per thousand (common for salinity)
+        else if (label == 'Potassium')
+          unit = 'mg/kg';
+        else if (label == 'Nitrogen')
+          unit = 'mg/kg';
+        else if (label == 'Phosphorus')
+          unit = 'mg/kg';
+        else if (label == 'EC' || label == 'Electrical Conductivity')
+          unit = 'µS/cm';
+        else if (label == 'pH')
+          unit = ''; // dimensionless
         else if (label == 'Wind Direction') unit = '°';
         return _buildParamStat(label, current, null, null, unit, isDarkMode,
             onTap: () => _scrollToChart(label));
