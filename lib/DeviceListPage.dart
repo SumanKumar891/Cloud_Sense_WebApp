@@ -523,7 +523,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                             child: AnimatedContainer(
                               duration: Duration(milliseconds: 200),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(20),
                                 gradient: LinearGradient(
                                   colors: isDarkMode
                                       ? [Color(0xFF3B6A7F), Color(0xFF8C6C8E)]
@@ -790,7 +790,7 @@ class _HoverableCardState extends State<_HoverableCard> {
           onTap: widget.onTap,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
                 colors: widget.isDarkMode
                     ? (_isHovering
