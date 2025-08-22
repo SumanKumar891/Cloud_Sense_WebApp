@@ -393,12 +393,14 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                 ElevatedButton(
                   onPressed: _fetchData,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode ? Colors.white : Colors.black,
+                    backgroundColor: isDarkMode
+                        ? const Color.fromARGB(255, 6, 94, 138)
+                        : Colors.white,
                     foregroundColor: Colors.white,
                   ),
                   child: Text("Fetch Devices",
                       style: TextStyle(
-                        color: isDarkMode ? Colors.black : Colors.white,
+                        color: isDarkMode ? Colors.white : Colors.black,
                       )),
                 ),
                 SizedBox(height: 40),
@@ -413,8 +415,8 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
+                                            ? Colors.black
+                                            : Colors.white,
                                         width: 2.0,
                                       ),
                                     ),
@@ -429,13 +431,19 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                             headingRowColor:
                                                 MaterialStateProperty.all(
                                                     isDarkMode
-                                                        ? Colors.black
-                                                        : Colors.black),
+                                                        ? const Color.fromARGB(
+                                                            255, 6, 94, 138)
+                                                        : Colors.white),
                                             dataRowColor:
                                                 MaterialStateProperty.all(
                                                     isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.white),
+                                                        ? const Color.fromARGB(
+                                                            255, 5, 35, 49)
+                                                        : const Color.fromARGB(
+                                                            255,
+                                                            122,
+                                                            174,
+                                                            166)),
                                             columnSpacing: 20.0,
                                             columns: deviceCategories.keys
                                                 .map((sensorKey) => DataColumn(
@@ -448,7 +456,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                           style: TextStyle(
                                                             color: isDarkMode
                                                                 ? Colors.white
-                                                                : Colors.white,
+                                                                : Colors.black,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             fontSize: MediaQuery.of(
@@ -491,7 +499,7 @@ class _AccountInfoPageState extends State<AccountInfoPage> {
                                                           : '',
                                                       style: TextStyle(
                                                         color: isDarkMode
-                                                            ? Colors.black
+                                                            ? Colors.white
                                                             : Colors.black,
                                                         fontSize: MediaQuery.of(
                                                                         context)

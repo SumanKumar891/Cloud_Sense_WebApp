@@ -491,7 +491,7 @@ class _HomePageState extends State<HomePage> {
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: themeProvider.isDarkMode
-                                      ? Colors.black
+                                      ? const Color.fromARGB(255, 18, 16, 16)
                                       : Colors.white,
                                   foregroundColor: themeProvider.isDarkMode
                                       ? Colors.white
