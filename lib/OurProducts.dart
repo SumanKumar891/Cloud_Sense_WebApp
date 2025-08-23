@@ -34,189 +34,283 @@ class ProductPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // 🔹 Bada aur bold title jo tumne mangwaya tha
-        title: const Text(
-          "OUR PRODUCTS",
-          style: TextStyle(
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
-          ),
+        backgroundColor: const Color(0xFF083C4A), // theme color
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+          onPressed: () {
+            Navigator.pop(context); // 🔙 back to previous page
+          },
         ),
+        // title: const Text(
+        //   "OUR PRODUCTS",
+        //   style: TextStyle(
+        //     fontSize: 24,
+        //     fontWeight: FontWeight.bold,
+        //     color: Colors.white,
+        //   ),
+        // ),
         centerTitle: true,
+        elevation: 0,
       ),
-
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          bool isMobile = constraints.maxWidth < 600;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                isMobile
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              "assets/5.jpg",
-                              fit: BoxFit.cover,
-                              height: 200,
-                              width: double.infinity,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          _leftContent(),
-                        ],
-                      )
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 2, child: _leftContent()),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            flex: 1,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                "assets/5.jpg",
-                                fit: BoxFit.cover,
-                                height: 600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                const SizedBox(height: 40),
-                // ⚠ Footer has been moved to bottomNavigationBar so remove it from body
-              ],
-            ),
-          );
-        },
+      body: SingleChildScrollView(
+        child: Column(
+          children: const [
+            HeroSection(),
+            SizedBox(height: 40),
+            WhyChooseUsSection(),
+            SizedBox(height: 0),
+            PopularItemsSection(),
+            SizedBox(height: 0),
+            FooterSection(), // <-- footer now scrolls with content
+          ],
+        ),
       ),
+    );
+  }
+}
 
-      // ✅ Footer fixed to bottom of screen (sticky)
-      bottomNavigationBar: const FooterSection(),
+// ================= Hero Section =================
+class HeroSection extends StatelessWidget {
+  const HeroSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 450,
+      color: const Color(0xFF083C4A),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            bool isMobile = constraints.maxWidth < 700;
+            return isMobile
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _leftContent(),
+                      const SizedBox(height: 20),
+                      const RightImageHover(),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(child: Center(child: _leftContent())),
+                      const SizedBox(width: 30),
+                      const Expanded(child: RightImageHover()),
+                    ],
+                  );
+          },
+        ),
+      ),
     );
   }
 
-  // 🔹 Left side content extract kiya
   Widget _leftContent() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        HoverCard(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Advanced Weather Station",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  "A modern, automated system providing accurate real-time weather data. "
-                  "Equipped with AI-based forecasting and seamless connectivity, "
-                  "it helps monitor rainfall, temperature, humidity, wind speed, and direction.",
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment:
+          CrossAxisAlignment.start, // left alignment for all content
+      children: const [
+        Padding(
+          padding: EdgeInsets.only(left: 300), // left padding for title
+          child: Text(
+            "Advanced Weather Station",
+            style: TextStyle(
+              fontSize: 46,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
+            textAlign: TextAlign.left, // left align
           ),
         ),
-        const SizedBox(height: 16),
-
-        // Features & Benefits
-        HoverCard(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Features & Benefits",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                featureItem("Solar Powered",
-                    "Runs on solar energy for efficient, remote operation."),
-                featureItem("Wireless Connectivity",
-                    "GSM 4G with dual SIM ensures reliable, always-on data transfer."),
-                featureItem("Real-Time Monitoring",
-                    "Collects multi-sensor data for live climate insights."),
-                featureItem("Cloud Integration",
-                    "Supports MQTT, HTTP, FTP for AWS IoT, APIs, or govt. servers."),
-                featureItem("Low Power Backup",
-                    "30-day battery backup ensures uninterrupted operation."),
-                featureItem("Rugged IP67 Design",
-                    "Weatherproof, dustproof, impact-resistant for outdoor use."),
-                featureItem("Dual SIM & OTA Updates",
-                    "Enhanced connectivity with SMS-based firmware updates."),
-              ],
+        SizedBox(height: 16),
+        Padding(
+          padding: EdgeInsets.only(left: 300), // left padding for description
+          child: Text(
+            "The Advanced Weather Station is a modern, automated system that provides accurate, real-time weather data. "
+            "It efficiently monitors rainfall, temperature, humidity, wind speed, and wind direction, helping industries make better decisions and manage operations effectively.",
+            style: TextStyle(
+              fontSize: 23,
+              color: Colors.white70,
+              height: 1.5,
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Setup Components
-        HoverCard(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Setup Components",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                bulletItem("Tipping Bucket Rain Gauge"),
-                bulletItem(
-                    "Temperature, Humidity, LUX & Pressure Shield (BME680, VEML7700)"),
-                bulletItem("Data Logger with GSM, solar power & backup"),
-                bulletItem("Solar Panel"),
-                bulletItem("Wind Speed & Direction Sensors"),
-              ],
-            ),
+            textAlign: TextAlign.justify, // justified text
           ),
         ),
       ],
     );
   }
+}
 
-  // Feature item reusable widget
-  static Widget featureItem(String title, String description) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.check_circle, color: Colors.green, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              "$title – $description",
-              style: const TextStyle(fontSize: 15),
+// ================= Hoverable Right Image =================
+class RightImageHover extends StatefulWidget {
+  const RightImageHover({super.key});
+
+  @override
+  State<RightImageHover> createState() => _RightImageHoverState();
+}
+
+class _RightImageHoverState extends State<RightImageHover> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: AnimatedScale(
+          scale: _isHovered ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          child: ClipPath(
+            // clipper: RightCurveClipper(),
+            child: Container(
+              height: 1000,
+              // decoration: BoxDecoration(
+              //   boxShadow: [
+              //     BoxShadow(
+              //       // color: Colors.black.withOpacity(0.3),
+              //       blurRadius: 20,
+              //       spreadRadius: 2,
+              //       offset: const Offset(10, 10),
+              //     ),
+              //   ],
+              // ),
+              child: Image.asset(
+                "assets/bgremover.png",
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
+}
 
-  // Bullet item reusable widget
-  static Widget bulletItem(String text) {
+// ================= Right Curve Clipper =================
+// class RightCurveClipper extends CustomClipper<Path> {
+//   @override
+//   Path getClip(Size size) {
+//     Path path = Path();
+//     path.lineTo(size.width * 0.7, 0);
+//     path.quadraticBezierTo(
+//       size.width, size.height / 2,
+//       size.width * 0.7, size.height,
+//     );
+//     path.lineTo(0, size.height);
+//     path.close();
+//     return path;
+//   }
+
+//   @override
+//   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+// }
+
+// ================= Why Choose Us Section =================
+class WhyChooseUsSection extends StatelessWidget {
+  const WhyChooseUsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> features = [
+      {
+        "icon": Icons.solar_power,
+        "title": "Solar Powered",
+        "desc": "Runs on solar energy for efficient, remote operation."
+      },
+      {
+        "icon": Icons.wifi,
+        "title": "Wireless Connectivity",
+        "desc":
+            "GSM 4G with dual SIM ensures reliable, always-on data transfer."
+      },
+      {
+        "icon": Icons.access_time,
+        "title": "Real-Time Monitoring",
+        "desc": "Collects multi-sensor data for live climate insights."
+      },
+      {
+        "icon": Icons.cloud,
+        "title": "Cloud Integration",
+        "desc": "Supports MQTT, HTTP, FTP for AWS IoT, APIs, or govt. servers."
+      },
+      {
+        "icon": Icons.shield,
+        "title": "Rugged IP67 Design",
+        "desc": "Weatherproof, dustproof, impact-resistant for outdoor use."
+      },
+      {
+        "icon": Icons.system_update,
+        "title": "Dual SIM & OTA Updates",
+        "desc": "Enhanced connectivity with SMS-based firmware updates."
+      },
+    ];
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 400, vertical: 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text("• ", style: TextStyle(fontSize: 16)),
-          Expanded(
-            child: Text(text, style: const TextStyle(fontSize: 15)),
+          const Text(
+            "Why Choose US?",
+            style: TextStyle(
+              fontSize: 35,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 50),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              bool isMobile = constraints.maxWidth < 800;
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isMobile ? 1 : 3,
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
+                  childAspectRatio: isMobile ? 2.5 : 1.8,
+                ),
+                itemCount: features.length,
+                itemBuilder: (context, index) {
+                  final f = features[index];
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(f["icon"] as IconData, size: 40, color: Colors.blue),
+                      const SizedBox(height: 16),
+                      Text(
+                        f["title"] as String,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        f["desc"] as String,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black54,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
         ],
       ),
@@ -224,9 +318,109 @@ class ProductPage extends StatelessWidget {
   }
 }
 
+// ================= Popular Items Section =================
+class PopularItemsSection extends StatelessWidget {
+  const PopularItemsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> products = [
+      {
+        "image": "assets/weather_station.jpg",
+        "title": "Advanced Weather Station",
+        "sku": "AWS001",
+        "desc":
+            "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
+        "features": [
+          "Real-time weather monitoring",
+          "Solar-powered autonomous operation",
+          "Supports multiple sensors"
+        ]
+      },
+      {
+        "image": "assets/Rain Gauge.jpg",
+        "title": "Tipping Bucket Rain Gauge",
+        "sku": "RBG-TB",
+        "desc":
+            "Measures rainfall intensity and total amount with high accuracy.",
+        "features": [
+          "Durable ABS construction",
+          "Resolution: 0.2 mm or 0.5 mm",
+          "Collection areas: 200 cm² or 314 cm²"
+        ]
+      },
+      {
+        "image": "assets/Radiation Shield.jpg",
+        "title": "Radiation Shield",
+        "sku": "RS-12",
+        "desc":
+            "Protects sensors from direct sunlight and rain while allowing airflow.",
+        "features": [
+          "Durable ABS material",
+          "Ventilated multi-plate design",
+          "Houses temperature, humidity, and light sensors"
+        ]
+      },
+      {
+        "image": "assets/DataLoggerGateway.jpg",
+        "title": "Data Logger / Gateway",
+        "sku": "DLG-01",
+        "desc":
+            "Wireless device for sensor data collection, logging, and cloud transmission.",
+        "features": [
+          "Bluetooth-enabled long-range communication",
+          "Solar or battery powered",
+          "Real-time data transmission to cloud/server"
+        ]
+      },
+    ];
+
+    return Container(
+      color: Colors.grey[100],
+      padding: const EdgeInsets.symmetric(
+          horizontal: 300, vertical: 30), // <- changed
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            "Our Products",
+            style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 20),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              bool isMobile = constraints.maxWidth < 800;
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isMobile ? 1 : 4,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 0.6, // <- changed
+                ),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return HoverCard(product: product); // <- updated hover
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ================= Hover Card =================
 class HoverCard extends StatefulWidget {
-  final Widget child;
-  const HoverCard({super.key, required this.child});
+  final Map<String, dynamic> product;
+  const HoverCard({super.key, required this.product});
 
   @override
   State<HoverCard> createState() => _HoverCardState();
@@ -241,78 +435,122 @@ class _HoverCardState extends State<HoverCard> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedScale(
-        scale: _isHovered ? 1.02 : 1.0,
+        scale: _isHovered ? 1.05 : 1.0,
         duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        child: Card(
-          elevation: _isHovered ? 10 : 4,
-          shadowColor: Colors.blue.withOpacity(0.4),
-          clipBehavior: Clip.antiAlias,
-          child: widget.child,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: _isHovered ? Colors.black26 : Colors.black12,
+                blurRadius: 6,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 1.3,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    widget.product["image"],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "${widget.product["title"]} ${widget.product["sku"]}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                widget.product["desc"],
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: (widget.product["features"] as List<String>)
+                    .map((feature) => Row(
+                          children: [
+                            const Icon(Icons.check,
+                                size: 16, color: Colors.green),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                feature,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.black87),
+                              ),
+                            ),
+                          ],
+                        ))
+                    .toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// 🔹 FooterSection widget: centered vertical list (Email, Phone, Address)
-//    Use this as bottomNavigationBar: bottomNavigationBar: const FooterSection()
+// ================= Footer Section =================
 class FooterSection extends StatelessWidget {
   const FooterSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      // SafeArea ensures footer stays above system nav (on mobile)
       child: Container(
         width: double.infinity,
-        color: const Color(0xFF263238), // dark background
+        color: const Color(0xFF263238),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
-          mainAxisSize: MainAxisSize.min, // only as tall as content
-          crossAxisAlignment: CrossAxisAlignment.center, // center horizontally
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Email (centered)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
                 Icon(Icons.email, color: Colors.white70, size: 18),
                 SizedBox(width: 8),
-                Text(
-                  "iot.aihub@gmail.com",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
+                Text("iot.aihub@gmail.com",
+                    style: TextStyle(color: Colors.white70, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 8),
-
-            // Phone (centered)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
                 Icon(Icons.phone, color: Colors.white70, size: 18),
                 SizedBox(width: 8),
-                Text(
-                  "+91 9876543210",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
+                Text("+91 9876543210",
+                    style: TextStyle(color: Colors.white70, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 8),
-
-            // Address (centered)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
                 Icon(Icons.location_on, color: Colors.white70, size: 18),
                 SizedBox(width: 8),
-                Text(
-                  "IIT Ropar, Punjab, India",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
+                Text("IIT Ropar, Punjab, India",
+                    style: TextStyle(color: Colors.white70, fontSize: 14)),
               ],
             ),
-            const SizedBox(height: 6),
           ],
         ),
       ),
