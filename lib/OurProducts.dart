@@ -365,7 +365,7 @@ class PopularItemsSection extends StatelessWidget {
         ]
       },
       {
-        "image": "assets/Data Logger-Gateway.jpg",
+        "image": "assets/DataLoggerGateway.jpg",
         "title": "Data Logger / Gateway",
         "sku": "DLG-01",
         "desc": "Wireless device for sensor data collection, logging, and cloud transmission.",
