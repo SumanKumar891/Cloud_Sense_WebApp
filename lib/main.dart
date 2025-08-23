@@ -3,6 +3,7 @@ import 'package:cloud_sense_webapp/AccountInfo.dart';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
+import 'package:cloud_sense_webapp/OurProducts.dart';
 
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
@@ -529,6 +530,7 @@ class MyApp extends StatelessWidget {
         '/deviceinfo': (context) => MapPage(),
         '/devicelist': (context) => DataDisplayPage(),
         '/devicelocationinfo': (context) => DeviceActivityPage(),
+        '/products': (context) => ProductPage(),
         '/devicemapinfo': (context) => DeviceMapScreen(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',
