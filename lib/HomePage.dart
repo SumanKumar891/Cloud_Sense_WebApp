@@ -236,6 +236,17 @@ class _HomePageState extends State<HomePage> {
                             icon: _buildUserIcon(),
                             onPressed: () => _showLoginPopup(context),
                           ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(
+                        Icons.shopping_cart,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/products');
+                      },
+                      tooltip: 'Our Products',
+                    ),
                   ],
                 ),
             ],
@@ -253,6 +264,17 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                     ),
+                  ),
+                  SizedBox(width: 8),
+                  IconButton(
+                    icon: Icon(
+                      Icons.shopping_cart,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/products');
+                    },
+                    tooltip: 'Our Products',
                   ),
                 ]
               : [],
