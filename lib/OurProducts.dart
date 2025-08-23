@@ -1,4 +1,7 @@
+
+import 'package:cloud_sense_webapp/HomePage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Assuming ThemeProvider uses provider package
 
 void main() {
   runApp(const MyApp());
@@ -32,33 +35,29 @@ class ProductPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF083C4A), // theme color
+        backgroundColor: Colors.transparent, // theme color
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+          icon: Icon(Icons.arrow_back,  color: isDarkMode ? Colors.white : Colors.black, size: 28),
           onPressed: () {
             Navigator.pop(context); // 🔙 back to previous page
           },
         ),
-        // title: const Text(
-        // "OUR PRODUCTS",
-        // style: TextStyle(
-        // fontSize: 24,
-        // fontWeight: FontWeight.bold,
-        // color: Colors.white,
-        // ),
-        // ),
+       
         centerTitle: true,
         elevation: 0,
       ),
+      extendBodyBehindAppBar: true,  // ✅ lets HeroSection draw behind AppBar
       body: SingleChildScrollView(
         child: Column(
           children: const [
             HeroSection(),
             SizedBox(height: 40),
             WhyChooseUsSection(),
-            SizedBox(height: 0),
+            SizedBox(height: 0), // Reduced from any potential default spacing
             PopularItemsSection(),
             SizedBox(height: 0),
             FooterSection(), // <-- footer now scrolls with content
@@ -69,37 +68,49 @@ class ProductPage extends StatelessWidget {
   }
 }
 
-
 // ================= Hero Section =================
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Container(
-      // height sirf desktop pe fix, mobile pe auto
       height: MediaQuery.of(context).size.width > 800 ? 450 : null,
-      color: const Color(0xFF083C4A),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: themeProvider.isDarkMode
+              ? [
+                  const Color.fromARGB(255, 57, 57, 57),
+                  const Color.fromARGB(255, 2, 54, 76),
+                ]
+              : [
+                  const Color.fromARGB(255, 191, 242, 237),
+                  const Color.fromARGB(255, 79, 106, 112),
+                ],
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            bool isMobile = constraints.maxWidth < 800;
+            bool isSmallScreen = MediaQuery.of(context).size.width < 800;
 
-            return isMobile
-                // 📱 Mobile: Heading → Image → Paragraph
+            return isSmallScreen
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      _title(isMobile: true),
+                      _title(context),
                       const SizedBox(height: 16),
-                      const RightImageHover(isMobile: true),
+                      RightImageHover(),
                       const SizedBox(height: 16),
-                      _paragraph(isMobile: true),
+                      _paragraph(context),
                     ],
                   )
-                // 💻 Web: Left text → Right image (same as pehle)
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,15 +121,15 @@ class HeroSection extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _title(isMobile: false),
+                              _title(context),
                               const SizedBox(height: 16),
-                              _paragraph(isMobile: false),
+                              _paragraph(context),
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(width: 30),
-                      const Expanded(child: RightImageHover(isMobile: false)),
+                      Expanded(child: RightImageHover()),
                     ],
                   );
           },
@@ -126,36 +137,39 @@ class HeroSection extends StatelessWidget {
       ),
     );
   }
+  Widget _title(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-  // ✅ Title
-  Widget _title({required bool isMobile}) {
+    bool isSmallScreen = MediaQuery.of(context).size.width < 800;
     return Padding(
-      padding: EdgeInsets.only(left: isMobile ? 0 : 300),
+      padding: EdgeInsets.only(left: isSmallScreen ? 0 : 250),
       child: Text(
         "Advanced Weather Station",
         style: TextStyle(
-          fontSize: isMobile ? 28 : 46,
+          fontSize: isSmallScreen ? 28 : 38, // Smaller font for < 800, larger for ≥ 800
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color:  isDarkMode ? Colors.white : Colors.black,
         ),
-        textAlign: isMobile ? TextAlign.center : TextAlign.left,
+        textAlign: isSmallScreen ? TextAlign.center : TextAlign.left,
       ),
     );
   }
 
-  // ✅ Paragraph
-  Widget _paragraph({required bool isMobile}) {
+  Widget _paragraph(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    bool isSmallScreen = MediaQuery.of(context).size.width < 800;
     return Padding(
-      padding: EdgeInsets.only(left: isMobile ? 0 : 300),
+      padding: EdgeInsets.only(left: isSmallScreen ? 0 : 250),
       child: Text(
         "The Advanced Weather Station is a modern, automated system that provides accurate, real-time weather data. "
         "It efficiently monitors rainfall, temperature, humidity, wind speed, and wind direction, helping industries make better decisions and manage operations effectively.",
         style: TextStyle(
-          fontSize: isMobile ? 16 : 23,
-          color: Colors.white70,
+          fontSize: isSmallScreen ? 16 : 20, // Smaller font for < 800, larger for ≥ 800
+          color:  isDarkMode ? Colors.white : Colors.black,
           height: 1.5,
         ),
-        textAlign: isMobile ? TextAlign.center : TextAlign.justify,
+        textAlign: isSmallScreen ? TextAlign.center : TextAlign.justify,
       ),
     );
   }
@@ -163,8 +177,7 @@ class HeroSection extends StatelessWidget {
 
 // ================= Hoverable Right Image =================
 class RightImageHover extends StatefulWidget {
-  final bool isMobile;
-  const RightImageHover({super.key, required this.isMobile});
+  const RightImageHover({super.key});
 
   @override
   State<RightImageHover> createState() => _RightImageHoverState();
@@ -175,7 +188,8 @@ class _RightImageHoverState extends State<RightImageHover> {
 
   @override
   Widget build(BuildContext context) {
-    double imgHeight = widget.isMobile ? 250 : 1000;
+    bool isSmallScreen = MediaQuery.of(context).size.width < 800;
+    double imgHeight = isSmallScreen ? 250 : 1000; // Smaller height for < 800, larger for ≥ 800
 
     return Align(
       alignment: Alignment.topCenter,
@@ -183,7 +197,7 @@ class _RightImageHoverState extends State<RightImageHover> {
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
         child: AnimatedScale(
-          scale: _isHovered && !widget.isMobile ? 1.05 : 1.0,
+          scale: _isHovered && !isSmallScreen ? 1.05 : 1.0,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
           child: SizedBox(
@@ -200,24 +214,7 @@ class _RightImageHoverState extends State<RightImageHover> {
   }
 }
 
-// ================= Right Curve Clipper =================
-// class RightCurveClipper extends CustomClipper<Path> {
-// @override
-// Path getClip(Size size) {
-// Path path = Path();
-// path.lineTo(size.width * 0.7, 0);
-// path.quadraticBezierTo(
-// size.width, size.height / 2,
-// size.width * 0.7, size.height,
-// );
-// path.lineTo(0, size.height);
-// path.close();
-// return path;
-// }
 
-// @override
-// bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-// }
 
 // ================= Why Choose Us Section =================
 class WhyChooseUsSection extends StatelessWidget {
@@ -225,6 +222,8 @@ class WhyChooseUsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     final List<Map<String, dynamic>> features = [
       {
         "icon": Icons.solar_power,
@@ -258,68 +257,111 @@ class WhyChooseUsSection extends StatelessWidget {
       },
     ];
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 400, vertical: 40),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            "Why Choose US?",
-            style: TextStyle(
-              fontSize: 35,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.center,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+        bool isMobile = constraints.maxWidth < 800;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : 100, // smaller padding on mobile
+            vertical: 20, // Reduced from 40 to 20
           ),
-          const SizedBox(height: 50),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              bool isMobile = constraints.maxWidth < 800;
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isMobile ? 1 : 3,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: isMobile ? 2.5 : 1.8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "Why Choose Us?",
+                style: TextStyle(
+                  fontSize: isMobile ? 26 : 35, // responsive font size
+                  fontWeight: FontWeight.bold,
+                  color:  isDarkMode ? Colors.white : Colors.black,
                 ),
-                itemCount: features.length,
-                itemBuilder: (context, index) {
-                  final f = features[index];
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(f["icon"] as IconData, size: 40, color: Colors.blue),
-                      const SizedBox(height: 16),
-                      Text(
-                        f["title"] as String,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                        textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+
+              // Features
+              isMobile
+                  ? Column(
+                      children: features.map((f) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(f["icon"] as IconData,
+                                  size: 50, color: Colors.blue),
+                              const SizedBox(height: 12),
+                              Text(
+                                f["title"] as String,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                f["desc"] as String,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black54,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 25,
+                        mainAxisSpacing: 25,
+                        childAspectRatio: 1.4,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        f["desc"] as String,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black54,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
+                      itemCount: features.length,
+                      itemBuilder: (context, index) {
+                        final f = features[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(f["icon"] as IconData,
+                                size: 50, color: Colors.blue),
+                            const SizedBox(height: 12),
+                            Text(
+                              f["title"] as String,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color:  isDarkMode ? Colors.white : Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              f["desc"] as String,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -335,7 +377,8 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/weather_station.jpg",
         "title": "Advanced Weather Station",
         "sku": "AWS001",
-        "desc": "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
+        "desc":
+            "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
         "features": [
           "Real-time weather monitoring",
           "Solar-powered autonomous operation",
@@ -346,7 +389,8 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/RainGauge.jpg",
         "title": "Tipping Bucket Rain Gauge",
         "sku": "RBG-TB",
-        "desc": "Measures rainfall intensity and total amount with high accuracy.",
+        "desc":
+            "Measures rainfall intensity and total amount with high accuracy.",
         "features": [
           "Durable ABS construction",
           "Resolution: 0.2 mm or 0.5 mm",
@@ -357,7 +401,8 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/RadiationShield.jpg",
         "title": "Radiation Shield",
         "sku": "RS-12",
-        "desc": "Protects sensors from direct sunlight and rain while allowing airflow.",
+        "desc":
+            "Protects sensors from direct sunlight and rain while allowing airflow.",
         "features": [
           "Durable ABS material",
           "Ventilated multi-plate design",
@@ -368,7 +413,8 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/DataLoggerGateway.jpg",
         "title": "Data Logger / Gateway",
         "sku": "DLG-01",
-        "desc": "Wireless device for sensor data collection, logging, and cloud transmission.",
+        "desc":
+            "Wireless device for sensor data collection, logging, and cloud transmission.",
         "features": [
           "Bluetooth-enabled long-range communication",
           "Solar or battery powered",
@@ -377,43 +423,58 @@ class PopularItemsSection extends StatelessWidget {
       },
     ];
 
-    return Container(
-      color: Colors.grey[100],
-      padding: const EdgeInsets.symmetric(horizontal: 300, vertical: 30), // <- changed
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            "Our Products",
-            style: TextStyle(
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+        bool isMobile = constraints.maxWidth < 600;
+        bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1300; // Extended to include 1280
+
+        int crossAxisCount = 4;
+        if (isMobile) {
+          crossAxisCount = 1;
+        } else if (isTablet) {
+          crossAxisCount = 2; // Increased to 3 for better tablet layout at 1280
+        }
+
+        return Container(
+          color: Colors.grey[100],
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 20 : (isTablet ? 60 : 120),
+            vertical: 40,
           ),
-          const SizedBox(height: 20),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              bool isMobile = constraints.maxWidth < 800;
-              return GridView.builder(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "Our Products",
+                style: TextStyle(
+                  fontSize: isMobile ? 28 : (isTablet ? 32 : 40), // Adjusted for tablet
+                  fontWeight: FontWeight.bold,
+                  color:   Colors.black ,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isMobile ? 1 : 4,
+                  crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
-                  childAspectRatio: 0.6, // <- changed
+                  childAspectRatio: isMobile ? 0.9 : (isTablet ? 0.8 : 0.65), // Adjusted for tablet
                 ),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
                   final product = products[index];
-                  return HoverCard(product: product); // <- updated hover
+                  return HoverCard(product: product, isMobile: isMobile, isTablet: isTablet);
                 },
-              );
-            },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -421,7 +482,9 @@ class PopularItemsSection extends StatelessWidget {
 // ================= Hover Card =================
 class HoverCard extends StatefulWidget {
   final Map<String, dynamic> product;
-  const HoverCard({super.key, required this.product});
+  final bool isMobile;
+  final bool isTablet;
+  const HoverCard({super.key, required this.product, required this.isMobile, required this.isTablet});
 
   @override
   State<HoverCard> createState() => _HoverCardState();
@@ -450,12 +513,12 @@ class _HoverCardState extends State<HoverCard> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(widget.isMobile ? 6 : (widget.isTablet ? 8 : 12)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AspectRatio(
-                aspectRatio: 1.3,
+                aspectRatio: widget.isMobile ? 1.8 : (widget.isTablet ? 1.5 : 1.3), // Adjusted for tablet
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
@@ -464,37 +527,42 @@ class _HoverCardState extends State<HoverCard> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 "${widget.product["title"]} ${widget.product["sku"]}",
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: widget.isMobile ? 14 : (widget.isTablet ? 15 : 16), // Adjusted for tablet
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 widget.product["desc"],
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: widget.isMobile ? 12 : (widget.isTablet ? 13 : 14), // Adjusted for tablet
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: (widget.product["features"] as List<String>)
                     .map((feature) => Row(
                           children: [
-                            const Icon(Icons.check,
-                                size: 16, color: Colors.green),
-                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.check,
+                              size: widget.isMobile ? 14 : (widget.isTablet ? 15 : 16), // Adjusted for tablet
+                              color: Colors.green,
+                            ),
+                            const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 feature,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black87),
+                                style: TextStyle(
+                                  fontSize: widget.isMobile ? 12 : (widget.isTablet ? 13 : 14), // Adjusted for tablet
+                                  color: Colors.black87,
+                                ),
                               ),
                             ),
                           ],
@@ -509,47 +577,66 @@ class _HoverCardState extends State<HoverCard> {
   }
 }
 
+
 // ================= Footer Section =================
 class FooterSection extends StatelessWidget {
   const FooterSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+
     return SafeArea(
       child: Container(
         width: double.infinity,
-        color: const Color(0xFF263238),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: themeProvider.isDarkMode
+                ? [
+                    const Color.fromARGB(255, 57, 57, 57),
+                    const Color.fromARGB(255, 2, 54, 76),
+                  ]
+                : [
+                    const Color.fromARGB(255, 191, 242, 237),
+                    const Color.fromARGB(255, 79, 106, 112),
+                  ],
+          ),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.email, color: Colors.white70, size: 18),
-                SizedBox(width: 8),
+              children: [
+                Icon(Icons.email, color:  isDarkMode ? Colors.white : Colors.black, size: 18),
+                const SizedBox(width: 8),
                 Text("iot.aihub@gmail.com",
-                    style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    style: TextStyle(color:  isDarkMode ? Colors.white : Colors.black, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.phone, color: Colors.white70, size: 18),
-                SizedBox(width: 8),
+              children: [
+                Icon(Icons.phone, color:  isDarkMode ? Colors.white : Colors.black, size: 18),
+                const SizedBox(width: 8),
                 Text("+91 9876543210",
-                    style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    style: TextStyle(color:  isDarkMode ? Colors.white : Colors.black, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.location_on, color: Colors.white70, size: 18),
-                SizedBox(width: 8),
+              children: [
+                Icon(Icons.location_on, color:  isDarkMode ? Colors.white : Colors.black, size: 18),
+                const SizedBox(width: 8),
                 Text("IIT Ropar, Punjab, India",
-                    style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    style: TextStyle(color: isDarkMode ? Colors.white : Colors.black, fontSize: 14)),
               ],
             ),
           ],
