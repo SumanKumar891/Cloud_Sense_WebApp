@@ -169,7 +169,7 @@ class HeroSection extends StatelessWidget {
           color:  isDarkMode ? Colors.white : Colors.black,
           height: 1.5,
         ),
-        textAlign: isSmallScreen ? TextAlign.center : TextAlign.justify,
+        textAlign: isSmallScreen ? TextAlign.justify : TextAlign.justify,
       ),
     );
   }
@@ -296,19 +296,19 @@ class WhyChooseUsSection extends StatelessWidget {
                               const SizedBox(height: 12),
                               Text(
                                 f["title"] as String,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 f["desc"] as String,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.black54,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -348,9 +348,9 @@ class WhyChooseUsSection extends StatelessWidget {
                             const SizedBox(height: 6),
                             Text(
                               f["desc"] as String,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black54,
+                                color: isDarkMode ? Colors.white : Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
