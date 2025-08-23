@@ -123,6 +123,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
    
+    
     - assets/weather.png
     - assets/signin.png
     - assets/signup3.png
@@ -135,15 +136,16 @@ flutter:
     - assets/buffalo_.jpg
     - assets/cow.jpg
     - assets/applogo.jpg
+    - assets/weatherforecasting.png
     - assets/5.jpg
     - assets/25.jpg
     - assets/28.jpg
     - assets/weatherforecasting.png
     - assets/DataLoggerGateway.jpg
     - assets/weather_station.jpg
-    - assets/Radiation Shield.jpg
+    - assets/RadiationShield.jpg
     - assets/bgremover.png
-    - assets/Rain Gauge.jpg
+    - assets/RainGauge.jpg
    
    
     

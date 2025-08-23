@@ -338,7 +338,7 @@ class PopularItemsSection extends StatelessWidget {
         ]
       },
       {
-        "image": "assets/Rain Gauge.jpg",
+        "image": "assets/RainGauge.jpg",
         "title": "Tipping Bucket Rain Gauge",
         "sku": "RBG-TB",
         "desc":
@@ -350,7 +350,7 @@ class PopularItemsSection extends StatelessWidget {
         ]
       },
       {
-        "image": "assets/Radiation Shield.jpg",
+        "image": "assets/RadiationShield.jpg",
         "title": "Radiation Shield",
         "sku": "RS-12",
         "desc":
