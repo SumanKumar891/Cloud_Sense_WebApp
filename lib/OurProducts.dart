@@ -42,12 +42,12 @@ class ProductPage extends StatelessWidget {
           },
         ),
         // title: const Text(
-        //   "OUR PRODUCTS",
-        //   style: TextStyle(
-        //     fontSize: 24,
-        //     fontWeight: FontWeight.bold,
-        //     color: Colors.white,
-        //   ),
+        // "OUR PRODUCTS",
+        // style: TextStyle(
+        // fontSize: 24,
+        // fontWeight: FontWeight.bold,
+        // color: Colors.white,
+        // ),
         // ),
         centerTitle: true,
         elevation: 0,
@@ -69,6 +69,7 @@ class ProductPage extends StatelessWidget {
   }
 }
 
+
 // ================= Hero Section =================
 class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
@@ -76,29 +77,48 @@ class HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 450,
+      // height sirf desktop pe fix, mobile pe auto
+      height: MediaQuery.of(context).size.width > 800 ? 450 : null,
       color: const Color(0xFF083C4A),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            bool isMobile = constraints.maxWidth < 700;
+            bool isMobile = constraints.maxWidth < 800;
+
             return isMobile
+                // 📱 Mobile: Heading → Image → Paragraph
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      _leftContent(),
-                      const SizedBox(height: 20),
-                      const RightImageHover(),
+                      _title(isMobile: true),
+                      const SizedBox(height: 16),
+                      const RightImageHover(isMobile: true),
+                      const SizedBox(height: 16),
+                      _paragraph(isMobile: true),
                     ],
                   )
+                // 💻 Web: Left text → Right image (same as pehle)
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Expanded(child: Center(child: _leftContent())),
+                      Expanded(
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _title(isMobile: false),
+                              const SizedBox(height: 16),
+                              _paragraph(isMobile: false),
+                            ],
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 30),
-                      const Expanded(child: RightImageHover()),
+                      const Expanded(child: RightImageHover(isMobile: false)),
                     ],
                   );
           },
@@ -107,46 +127,44 @@ class HeroSection extends StatelessWidget {
     );
   }
 
-  Widget _leftContent() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment:
-          CrossAxisAlignment.start, // left alignment for all content
-      children: const [
-        Padding(
-          padding: EdgeInsets.only(left: 300), // left padding for title
-          child: Text(
-            "Advanced Weather Station",
-            style: TextStyle(
-              fontSize: 46,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.left, // left align
-          ),
+  // ✅ Title
+  Widget _title({required bool isMobile}) {
+    return Padding(
+      padding: EdgeInsets.only(left: isMobile ? 0 : 300),
+      child: Text(
+        "Advanced Weather Station",
+        style: TextStyle(
+          fontSize: isMobile ? 28 : 46,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
-        SizedBox(height: 16),
-        Padding(
-          padding: EdgeInsets.only(left: 300), // left padding for description
-          child: Text(
-            "The Advanced Weather Station is a modern, automated system that provides accurate, real-time weather data. "
-            "It efficiently monitors rainfall, temperature, humidity, wind speed, and wind direction, helping industries make better decisions and manage operations effectively.",
-            style: TextStyle(
-              fontSize: 23,
-              color: Colors.white70,
-              height: 1.5,
-            ),
-            textAlign: TextAlign.justify, // justified text
-          ),
+        textAlign: isMobile ? TextAlign.center : TextAlign.left,
+      ),
+    );
+  }
+
+  // ✅ Paragraph
+  Widget _paragraph({required bool isMobile}) {
+    return Padding(
+      padding: EdgeInsets.only(left: isMobile ? 0 : 300),
+      child: Text(
+        "The Advanced Weather Station is a modern, automated system that provides accurate, real-time weather data. "
+        "It efficiently monitors rainfall, temperature, humidity, wind speed, and wind direction, helping industries make better decisions and manage operations effectively.",
+        style: TextStyle(
+          fontSize: isMobile ? 16 : 23,
+          color: Colors.white70,
+          height: 1.5,
         ),
-      ],
+        textAlign: isMobile ? TextAlign.center : TextAlign.justify,
+      ),
     );
   }
 }
 
 // ================= Hoverable Right Image =================
 class RightImageHover extends StatefulWidget {
-  const RightImageHover({super.key});
+  final bool isMobile;
+  const RightImageHover({super.key, required this.isMobile});
 
   @override
   State<RightImageHover> createState() => _RightImageHoverState();
@@ -157,34 +175,23 @@ class _RightImageHoverState extends State<RightImageHover> {
 
   @override
   Widget build(BuildContext context) {
+    double imgHeight = widget.isMobile ? 250 : 1000;
+
     return Align(
       alignment: Alignment.topCenter,
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
         child: AnimatedScale(
-          scale: _isHovered ? 1.05 : 1.0,
+          scale: _isHovered && !widget.isMobile ? 1.05 : 1.0,
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
-          child: ClipPath(
-            // clipper: RightCurveClipper(),
-            child: Container(
-              height: 1000,
-              // decoration: BoxDecoration(
-              //   boxShadow: [
-              //     BoxShadow(
-              //       // color: Colors.black.withOpacity(0.3),
-              //       blurRadius: 20,
-              //       spreadRadius: 2,
-              //       offset: const Offset(10, 10),
-              //     ),
-              //   ],
-              // ),
-              child: Image.asset(
-                "assets/bgremover.png",
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-              ),
+          child: SizedBox(
+            height: imgHeight,
+            child: Image.asset(
+              "assets/bgremover.png",
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
             ),
           ),
         ),
@@ -195,21 +202,21 @@ class _RightImageHoverState extends State<RightImageHover> {
 
 // ================= Right Curve Clipper =================
 // class RightCurveClipper extends CustomClipper<Path> {
-//   @override
-//   Path getClip(Size size) {
-//     Path path = Path();
-//     path.lineTo(size.width * 0.7, 0);
-//     path.quadraticBezierTo(
-//       size.width, size.height / 2,
-//       size.width * 0.7, size.height,
-//     );
-//     path.lineTo(0, size.height);
-//     path.close();
-//     return path;
-//   }
+// @override
+// Path getClip(Size size) {
+// Path path = Path();
+// path.lineTo(size.width * 0.7, 0);
+// path.quadraticBezierTo(
+// size.width, size.height / 2,
+// size.width * 0.7, size.height,
+// );
+// path.lineTo(0, size.height);
+// path.close();
+// return path;
+// }
 
-//   @override
-//   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+// @override
+// bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 // }
 
 // ================= Why Choose Us Section =================
@@ -227,8 +234,7 @@ class WhyChooseUsSection extends StatelessWidget {
       {
         "icon": Icons.wifi,
         "title": "Wireless Connectivity",
-        "desc":
-            "GSM 4G with dual SIM ensures reliable, always-on data transfer."
+        "desc": "GSM 4G with dual SIM ensures reliable, always-on data transfer."
       },
       {
         "icon": Icons.access_time,
@@ -329,8 +335,7 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/weather_station.jpg",
         "title": "Advanced Weather Station",
         "sku": "AWS001",
-        "desc":
-            "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
+        "desc": "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
         "features": [
           "Real-time weather monitoring",
           "Solar-powered autonomous operation",
@@ -341,8 +346,7 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/RainGauge.jpg",
         "title": "Tipping Bucket Rain Gauge",
         "sku": "RBG-TB",
-        "desc":
-            "Measures rainfall intensity and total amount with high accuracy.",
+        "desc": "Measures rainfall intensity and total amount with high accuracy.",
         "features": [
           "Durable ABS construction",
           "Resolution: 0.2 mm or 0.5 mm",
@@ -353,8 +357,7 @@ class PopularItemsSection extends StatelessWidget {
         "image": "assets/RadiationShield.jpg",
         "title": "Radiation Shield",
         "sku": "RS-12",
-        "desc":
-            "Protects sensors from direct sunlight and rain while allowing airflow.",
+        "desc": "Protects sensors from direct sunlight and rain while allowing airflow.",
         "features": [
           "Durable ABS material",
           "Ventilated multi-plate design",
@@ -362,11 +365,10 @@ class PopularItemsSection extends StatelessWidget {
         ]
       },
       {
-        "image": "assets/DataLoggerGateway.jpg",
+        "image": "assets/Data Logger-Gateway.jpg",
         "title": "Data Logger / Gateway",
         "sku": "DLG-01",
-        "desc":
-            "Wireless device for sensor data collection, logging, and cloud transmission.",
+        "desc": "Wireless device for sensor data collection, logging, and cloud transmission.",
         "features": [
           "Bluetooth-enabled long-range communication",
           "Solar or battery powered",
@@ -377,8 +379,7 @@ class PopularItemsSection extends StatelessWidget {
 
     return Container(
       color: Colors.grey[100],
-      padding: const EdgeInsets.symmetric(
-          horizontal: 300, vertical: 30), // <- changed
+      padding: const EdgeInsets.symmetric(horizontal: 300, vertical: 30), // <- changed
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

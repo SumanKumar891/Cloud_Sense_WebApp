@@ -136,6 +136,23 @@ class CompassBackgroundPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+// DeviceStatus class to hold device data
+class DeviceStatus {
+  final String deviceId;
+  final String lastReceivedTime;
+  final double? latitude;
+  final double? longitude;
+  final String activityType; // e.g., chloritrone, WS, weather, water, Awadh_Jio
+
+  DeviceStatus({
+    required this.deviceId,
+    required this.lastReceivedTime,
+    this.latitude,
+    this.longitude,
+    required this.activityType,
+  });
+}
+
 class DeviceGraphPage extends StatefulWidget {
   final String deviceName;
   final sequentialName;
@@ -200,13 +217,20 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     );
   }
 
-// Build the drawer widget
-  Widget _buildDrawer(bool isDarkMode, BuildContext context) {
+Widget _buildDrawer(bool isDarkMode, BuildContext context) {
+    final String prefix = _getPrefix(widget.deviceName);
+    final String idStr = widget.deviceName.substring(prefix.length);
+    final int? targetIdNum = int.tryParse(idStr);
+    final filteredDevices = _deviceStatuses
+        .where((device) {
+          final int? deviceIdNum = int.tryParse(device.deviceId);
+          return device.activityType == prefix && deviceIdNum == targetIdNum;
+        })
+        .toList();
+
     return Drawer(
       child: Container(
-        color: isDarkMode
-            ? Colors.blueGrey[900]
-            : Colors.grey[200], // Entire background
+        color: isDarkMode ? Colors.blueGrey[900] : Colors.grey[200],
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -214,11 +238,83 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
               decoration: BoxDecoration(
                 color: isDarkMode ? Colors.grey[200] : Colors.blueGrey[900],
               ),
-              child: Text(
-                'Select Time Period',
-                style: TextStyle(
-                    color: isDarkMode ? Colors.black : Colors.white,
-                    fontSize: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  if (_isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else if (_errorMessage != null)
+                    Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.red[300] : Colors.red[700],
+                        fontSize: 14,
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      height: 80,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: filteredDevices.length,
+                        itemBuilder: (context, index) {
+                          final device = filteredDevices[index];
+                          final bool hasValidCoordinates = device.latitude != null &&
+                              device.longitude != null &&
+                              device.latitude != 0 &&
+                              device.longitude != 0;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 4.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Last Active: ${device.lastReceivedTime}',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.black87
+                                        : Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                if (hasValidCoordinates) ...[
+                                  Text(
+                                    'Latitude: ${device.latitude!.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.black87
+                                          : Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Longitude: ${device.longitude!.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.black87
+                                          : Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Select Time Period',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.black : Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
             _buildMobileMenuButton(
@@ -228,10 +324,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
               isDarkMode,
               context,
               onPressed: () async {
-                await _selectDate(); // same as sidebar button
+                await _selectDate();
                 _reloadData(range: '1day');
                 setState(() => _activeButton = 'date');
-                Navigator.pop(context); // close drawer
+                Navigator.pop(context);
               },
             ),
             _buildMobileMenuButton(
@@ -285,7 +381,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                 setState(() => _activeButton = '1year');
                 Navigator.pop(context);
               },
-            ), // Min/Max Values of Parameters
+            ),
             Padding(
               padding: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height * 0.07),
@@ -413,7 +509,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       ),
     );
   }
-
   DateTime _selectedDay = DateTime.now();
   List<ChartData> temperatureData = [];
   List<ChartData> humidityData = [];
@@ -499,6 +594,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   List<ChartData> cod2Data = [];
   List<ChartData> bod2Data = [];
   List<ChartData> temp2Data = [];
+  String _currentStatus = 'Unknown';
+  bool _isLoading = false;
+  String? _errorMessage;
+  late final String activityType;
 
   double? _lastLatitude;
   double? _lastLongitude;
@@ -537,7 +636,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   String _currentChlorineValue = '0.00';
   String _currentrfdValue = '0.00';
   String _currentAmmoniaValue = '0.00';
-  bool _isLoading = false;
+  List<DeviceStatus> _deviceStatuses = [];
+
   String _lastSelectedRange = 'single'; // Default to single
   bool isWindDirectionValid(String? windDirection) {
     return windDirection != null && windDirection != "-";
@@ -832,28 +932,170 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   }
 
   Future<void> _fetchDeviceDetails() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _deviceStatuses = [];
+    });
+
     try {
-      final response = await http.get(Uri.parse(
-          'https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function'));
+      final response = await http.get(
+        Uri.parse(
+          'https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final devices = data['chloritrone_data'] ?? data['weather_data'] ?? [];
-        final selectedDevice = devices.firstWhere(
-            (device) => device['DeviceId'] == _selectedDeviceId.toString(),
-            orElse: () => null);
+        final data = json.decode(response.body) as Map<String, dynamic>;
 
-        if (selectedDevice != null) {
-          setState(() {});
+        List<DeviceStatus> deviceStatuses = [];
+
+        final activityTypes = [
+          {'key': 'chloritrone_Device_Activity', 'type': 'chloritrone'},
+          {'key': 'WS_Device_Activity', 'type': 'WS'},
+          {'key': 'weather_Device_Activity', 'type': 'weather'},
+          {'key': 'water_Device_Activity', 'type': 'water'},
+          {'key': 'Awadh_Jio_Device_Activity', 'type': 'Awadh_Jio'},
+        ];
+
+        for (var activity in activityTypes) {
+          final devices = data[activity['key']] as List<dynamic>? ?? [];
+          for (var device in devices) {
+            final deviceData = device as Map<String, dynamic>;
+            final lat = deviceData['LastKnownLatitude'] is num &&
+                    deviceData['LastKnownLatitude'] != 0
+                ? deviceData['LastKnownLatitude'] as double?
+                : null;
+            final lon = deviceData['LastKnownLongitude'] is num &&
+                    deviceData['LastKnownLongitude'] != 0
+                ? deviceData['LastKnownLongitude'] as double?
+                : null;
+
+            deviceStatuses.add(DeviceStatus(
+              deviceId: deviceData['DeviceId'].toString(),
+              lastReceivedTime: parseTime(deviceData['lastReceivedTime']),
+              latitude: lat,
+              longitude: lon,
+              activityType:
+                  _mapActivityToPrefix(activity['type']!, deviceData['Topic']),
+            ));
+          }
         }
+
+        deviceStatuses.sort((a, b) {
+          final aTime = DateTime.tryParse(a.lastReceivedTime) ?? DateTime(1970);
+          final bTime = DateTime.tryParse(b.lastReceivedTime) ?? DateTime(1970);
+          return bTime.compareTo(aTime);
+        });
+
+        setState(() {
+          _deviceStatuses = deviceStatuses;
+        });
       } else {
-        throw Exception('Failed to load device details');
+        setState(() {
+          _errorMessage =
+              'Failed to load device details: HTTP ${response.statusCode}';
+        });
       }
     } catch (e) {
-      print('Error fetching device details: $e');
+      setState(() {
+        _errorMessage = 'Error fetching device details: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
+  String parseTime(String? time) {
+    if (time == null) return 'Unknown';
+    try {
+      final compactRegex = RegExp(r'^\d{8}T\d{6}$');
+      if (compactRegex.hasMatch(time)) {
+        final year = int.parse(time.substring(0, 4));
+        final month = int.parse(time.substring(4, 6));
+        final day = int.parse(time.substring(6, 8));
+        final hour = int.parse(time.substring(9, 11));
+        final minute = int.parse(time.substring(11, 13));
+        final second = int.parse(time.substring(13, 15));
+        return DateFormat('dd-MM-yyyy HH:mm:ss').format(
+          DateTime(year, month, day, hour, minute, second),
+        );
+      }
+
+      final dmyRegex = RegExp(r'^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$');
+      if (dmyRegex.hasMatch(time)) {
+        final parts = time.split(' ');
+        final dateParts = parts[0].split('-');
+        final timeParts = parts[1].split(':');
+        final day = int.parse(dateParts[0]);
+        final month = int.parse(dateParts[1]);
+        final year = int.parse(dateParts[2]);
+        final hour = int.parse(timeParts[0]);
+        final minute = int.parse(timeParts[1]);
+        final second = int.parse(timeParts[2]);
+        return DateFormat('dd-MM-yyyy HH:mm:ss').format(
+          DateTime(year, month, day, hour, minute, second),
+        );
+      }
+
+      final amPmRegex = RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2} (AM|PM)$');
+      if (amPmRegex.hasMatch(time)) {
+        final isPm = time.endsWith('PM');
+        final base = time.replaceAll(RegExp(r' (AM|PM)$'), '');
+        final dateTimeParts = base.split(' ');
+        final date = dateTimeParts[0];
+        final timeStr = dateTimeParts[1];
+        final dateParts = date.split('-');
+        final timeParts = timeStr.split(':');
+        int hour = int.parse(timeParts[0]);
+        if (isPm && hour < 12) hour += 12;
+        if (!isPm && hour == 12) hour = 0;
+        return DateFormat('dd-MM-yyyy HH:mm:ss').format(
+          DateTime(
+            int.parse(dateParts[0]),
+            int.parse(dateParts[1]),
+            int.parse(dateParts[2]),
+            hour,
+            int.parse(timeParts[1]),
+          ),
+        );
+      }
+
+      final parsed = DateTime.tryParse(time.replaceAll('  ', ' '));
+      return parsed != null
+          ? DateFormat('dd-MM-yyyy HH:mm:ss').format(parsed)
+          : time;
+    } catch (e) {
+      return time;
+    }
+  }
+
+String _mapActivityToPrefix(String activityType, String? topic) {
+    if (activityType == 'chloritrone') return 'CB';
+    if (activityType == 'water') return 'WQ';
+    if (activityType == 'weather') return 'weather';
+    if (activityType == 'Awadh_Jio') return 'FS'; // Map Awadh_Jio to FS
+    if (activityType == 'WS') {
+      if (topic == null) return 'FS'; // Default to FS if topic is null
+      if (topic.contains('SSMET')) return 'SM';
+      if (topic.contains('NARL')) return 'NA';
+      if (topic.contains('WS/Campus')) return 'CP';
+      if (topic.contains('KJSCE')) return 'KJ';
+      if (topic.contains('SVPU')) return 'SV';
+      if (topic.contains('Mysuru')) return 'MY';
+      if (topic.contains('CF')) return 'CF'; // Adjust if topic pattern for CF is known
+      return 'FS'; // Default to FS for other WS topics
+    }
+    return activityType;
+  }
+  String _getPrefix(String deviceName) {
+    if (deviceName.startsWith('Awadh_Jio')) return 'Awadh_Jio';
+    if (deviceName.startsWith('weather')) return 'weather'; // Adjust if weather has a specific prefix
+    return deviceName.substring(0, 2);
+  }
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
   String _lastwinddirection = "";
@@ -5662,69 +5904,99 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           : Colors.black,
                                     ),
                                   ),
-                                  TextSpan(
-                                    text: () {
-                                      // Get Lat & Long
-                                      Map<String, List<ChartData>>? paramData;
-                                      if (widget.deviceName.startsWith('SM')) {
-                                        paramData = smParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('CF')) {
-                                        paramData = cfParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('VD')) {
-                                        paramData = vdParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('KD')) {
-                                        paramData = kdParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('NA')) {
-                                        paramData = NARLParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('KJ')) {
-                                        paramData = KJParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('MY')) {
-                                        paramData = MYParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('CP')) {
-                                        paramData = csParametersData;
-                                      } else if (widget.deviceName
-                                          .startsWith('SV')) {
-                                        paramData = svParametersData;
-                                      }
-
-                                      double? latitude;
-                                      double? longitude;
-                                      if (paramData != null) {
-                                        final latData = paramData['Latitude'];
-                                        final longData = paramData['Longitude'];
-                                        latitude = latData?.isNotEmpty == true
-                                            ? latData!.last.value
-                                            : null;
-                                        longitude = longData?.isNotEmpty == true
-                                            ? longData!.last.value
-                                            : null;
-                                      }
-
-                                      return "Latitude : ${latitude?.toStringAsFixed(2) ?? ""}\n"
-                                          "Longitude : ${longitude?.toStringAsFixed(2) ?? ""}";
-                                    }(),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDarkMode
-                                          ? Colors.white70
-                                          : Colors.black87,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+    TextSpan(
+              text: () {
+                // Get Lat & Long from _deviceStatuses
+                final String prefix = _getPrefix(widget.deviceName);
+                final String idStr = widget.deviceName.substring(prefix.length);
+                final int? targetIdNum = int.tryParse(idStr);
+                final filteredDevices = _deviceStatuses
+                    .where((device) {
+                      final int? deviceIdNum = int.tryParse(device.deviceId);
+                      return device.activityType == prefix && deviceIdNum == targetIdNum;
+                    })
+                    .toList();
+                if (filteredDevices.isNotEmpty) {
+                  final device = filteredDevices.first;
+                  final bool hasValidCoordinates = device.latitude != null &&
+                      device.longitude != null &&
+                      device.latitude != 0 &&
+                      device.longitude != 0;
+                  if (hasValidCoordinates) {
+                    return "Latitude: ${device.latitude!.toStringAsFixed(2)}\n"
+                        "Longitude: ${device.longitude!.toStringAsFixed(2)}\n";
+                  }
+                }
+                return "";
+              }(),
+              style: TextStyle(
+                fontSize: 12,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+),
+                            
+// Device Active Time
+const SizedBox(height: 8),
+if (_isLoading)
+  const Center(child: CircularProgressIndicator())
+else if (_errorMessage != null)
+  Text(
+    _errorMessage!,
+    style: TextStyle(
+      color: isDarkMode ? Colors.red[300] : Colors.red[700],
+      fontSize: 14,
+    ),
+  )
+else
+  Builder(
+    builder: (context) {
+      // Define filteredDevices based on prefix and device ID
+      final String prefix = _getPrefix(widget.deviceName);
+      final String idStr = widget.deviceName.substring(prefix.length);
+      final int? targetIdNum = int.tryParse(idStr);
+      final filteredDevices = _deviceStatuses
+          .where((device) {
+            final int? deviceIdNum = int.tryParse(device.deviceId);
+            return device.activityType == prefix && deviceIdNum == targetIdNum;
+          })
+          .toList();
+      return SizedBox(
+        height: 60,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: filteredDevices.length,
+          itemBuilder: (context, index) {
+            final device = filteredDevices[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 0.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 38.0), // Move text to the right
+                    child: Text(
+                      'Last Active: ${device.lastReceivedTime}',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        fontSize: 16,
                       ),
-
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    },
+  ),
                       // Time Period Selection
                       Container(
                         height: 64,
@@ -7487,59 +7759,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                       children: [
                         TextSpan(
                           text:
-                              "(${widget.deviceName})\n", // Device name + extra space
+                              "(${widget.deviceName})", // Device name + extra space
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
-                        TextSpan(
-                          text: () {
-                            // Get Lat & Long
-                            Map<String, List<ChartData>>? paramData;
-                            if (widget.deviceName.startsWith('SM')) {
-                              paramData = smParametersData;
-                            } else if (widget.deviceName.startsWith('CF')) {
-                              paramData = cfParametersData;
-                            } else if (widget.deviceName.startsWith('VD')) {
-                              paramData = vdParametersData;
-                            } else if (widget.deviceName.startsWith('KD')) {
-                              paramData = kdParametersData;
-                            } else if (widget.deviceName.startsWith('NA')) {
-                              paramData = NARLParametersData;
-                            } else if (widget.deviceName.startsWith('KJ')) {
-                              paramData = KJParametersData;
-                            } else if (widget.deviceName.startsWith('MY')) {
-                              paramData = MYParametersData;
-                            } else if (widget.deviceName.startsWith('CP')) {
-                              paramData = csParametersData;
-                            } else if (widget.deviceName.startsWith('SV')) {
-                              paramData = svParametersData;
-                            }
-
-                            double? latitude;
-                            double? longitude;
-                            if (paramData != null) {
-                              final latData = paramData['Latitude'];
-                              final longData = paramData['Longitude'];
-                              latitude = latData?.isNotEmpty == true
-                                  ? latData!.last.value
-                                  : null;
-                              longitude = longData?.isNotEmpty == true
-                                  ? longData!.last.value
-                                  : null;
-                            }
-
-                            return "Lat : ${latitude?.toStringAsFixed(2) ?? ""} "
-                                "Long : ${longitude?.toStringAsFixed(2) ?? ""}";
-                          }(),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode ? Colors.white70 : Colors.black87,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
+                 
                       ],
                     ),
                   ),
