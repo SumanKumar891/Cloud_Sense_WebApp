@@ -501,6 +501,68 @@ Widget _buildDrawer(bool isDarkMode, BuildContext context) {
                             cfParametersData['WindDirection'] ?? [],
                       },
                     ),
+
+                     if (widget.deviceName.startsWith('KJ'))
+                    _buildMinMaxTable(
+                                            isDarkMode,
+                                            {
+                                              'Temperature': KJParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': KJParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Potassium': KJParametersData[
+                                                      'Potassium'] ??
+                                                  [],
+                                              'pH':
+                                                  KJParametersData['pH'] ?? [],
+                                              'Nitrogen': KJParametersData[
+                                                      'Nitrogen'] ??
+                                                  [],
+                                              'Salinity': KJParametersData[
+                                                      'Salinity'] ??
+                                                  [],
+                                              'ElectricalConductivity':
+                                                  KJParametersData[
+                                                          'ElectricalConductivity'] ??
+                                                      [],
+                                              'Phosphorus': KJParametersData[
+                                                      'Phosphorus'] ??
+                                                  [],
+                                            },
+                                          ),
+
+                     if (widget.deviceName.startsWith('MY'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                       'Temperature': MYParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              'Humidity': MYParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              'Light Intensity':
+                                                  MYParametersData[
+                                                          'LightIntensity'] ??
+                                                      [],
+                                              'Wind Speed': MYParametersData[
+                                                      'WindSpeed'] ??
+                                                  [],
+                                              'Atm Pressure': MYParametersData[
+                                                      'AtmPressure'] ??
+                                                  [],
+                                              'Wind Direction':
+                                                  MYParametersData[
+                                                          'WindDirection'] ??
+                                                      [],
+                                              'Rainfall': MYParametersData[
+                                                      'RainfallHourly'] ??
+                                                  [],
+                      },
+                    ),
+                    
                 ],
               ),
             ),
@@ -5076,6 +5138,14 @@ String _mapActivityToPrefix(String activityType, String? topic) {
         'unit': 'hPa',
       };
     }
+
+    // Handle pH explicitly to preserve "pH"
+  if (paramName.toLowerCase().contains('ph')) {
+    return {
+      'displayName': 'pH',
+      'unit': 'pH',
+    };
+  }
     String normalized = paramName
         .replaceAll('Current', '')
         .replaceAll('Hourly', '')
@@ -5121,7 +5191,12 @@ String _mapActivityToPrefix(String activityType, String? topic) {
       displayName = 'Hypochlorous';
     } else if (displayName.toLowerCase().contains('residualchlor')) {
       displayName = 'Chlorine';
+      
+    }else if (displayName.toLowerCase().contains('pH')) {
+      displayName = 'pH';
+      
     }
+    
 
     String unit = '';
 
@@ -5145,6 +5220,18 @@ String _mapActivityToPrefix(String activityType, String? topic) {
       unit = 'm/s';
     else if (paramName.contains('WindDirection'))
       unit = '°';
+       else if (paramName.contains('Potassium'))
+      unit = 'mg/Kg';
+       else if (paramName.contains('Nitrogen'))
+      unit = 'mg/Kg';
+       else if (paramName.contains('Salinity'))
+      unit = 'mg/L';
+       else if (paramName.contains('ElectricalConductivity'))
+      unit = 'µS/cm';
+       else if (paramName.contains('Phosphorus'))
+      unit = 'mg/Kg';
+       else if (paramName.contains('pH'))
+      unit = 'pH';
     else if (paramName.contains('Irradiance') ||
         paramName.contains('Radiation'))
       unit = 'W/m²';
@@ -5356,7 +5443,7 @@ String _mapActivityToPrefix(String activityType, String? topic) {
         'Nitrogen': 'Nitrogen',
         'Salinity': 'Salinity',
         'ElectricalConductivity': 'Electrical Conductivity',
-        'Phosphorus': 'Phosphorus'
+        'Phosphorus': 'Phosphorus',
       };
       List<String> includedParameters = parameterLabels.keys.toList();
 
@@ -9777,62 +9864,55 @@ else
                                     plotAreaBackgroundColor: isDarkMode
                                         ? Color.fromARGB(100, 0, 0, 0)
                                         : Color.fromARGB(189, 222, 218, 218),
-                                    primaryXAxis: DateTimeAxis(
-                                      dateFormat: _lastSelectedRange == 'single'
-                                          ? DateFormat('MM/dd hh:mm a')
-                                          : DateFormat('MM/dd'),
-                                      title: AxisTitle(
-                                        text: 'Time',
-                                        textStyle: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                      labelStyle: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                      labelRotation: 70,
-                                      edgeLabelPlacement:
-                                          EdgeLabelPlacement.shift,
-                                      intervalType:
-                                          _lastSelectedRange == 'single'
-                                              ? DateTimeIntervalType.auto
-                                              : DateTimeIntervalType.days,
-                                      interval: _lastSelectedRange == 'single'
-                                          ? null
-                                          : 1.0, // One label per day
-                                      enableAutoIntervalOnZooming: true,
-                                      majorGridLines: _lastSelectedRange ==
-                                              'single'
-                                          ? MajorGridLines(
-                                              width: 1.0,
-                                              dashArray: [5, 5],
-                                              color: isDarkMode
-                                                  ? Color.fromARGB(
-                                                      255, 141, 144, 148)
-                                                  : Color.fromARGB(
-                                                      255, 48, 48, 48),
-                                            )
-                                          : MajorGridLines(
-                                              width:
-                                                  0), // Hide default gridlines for non-single ranges
-                                      majorTickLines: MajorTickLines(
-                                        size: 6.0, // Adjust size as needed
-                                        width: 1.0, // Adjust width as needed
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors
-                                                .black, // Customize tick mark color
-                                      ),
-                                      plotBands: _lastSelectedRange == 'single'
-                                          ? []
-                                          : _generateNoonPlotBands(
-                                              data, isDarkMode),
-                                    ),
+                                   primaryXAxis: DateTimeAxis(
+  dateFormat: _lastSelectedRange == 'single'
+      ? DateFormat('MM/dd hh:mm a')
+      : (_lastSelectedRange == '3months' || _lastSelectedRange == '1year'
+          ? DateFormat('MM/dd')
+          : DateFormat('MM/dd')),
+  title: AxisTitle(
+    text: 'Time',
+    textStyle: TextStyle(
+      fontWeight: FontWeight.bold,
+      color: isDarkMode ? Colors.white : Colors.black,
+    ),
+  ),
+  labelStyle: TextStyle(
+    color: isDarkMode ? Colors.white : Colors.black,
+  ),
+  labelRotation: 70,
+  edgeLabelPlacement: EdgeLabelPlacement.shift,
+  intervalType: _lastSelectedRange == 'single' ||
+          _lastSelectedRange == '3months' ||
+          _lastSelectedRange == '1year'
+      ? DateTimeIntervalType.auto
+      : DateTimeIntervalType.days,
+  interval: _lastSelectedRange == 'single' ||
+          _lastSelectedRange == '3months' ||
+          _lastSelectedRange == '1year'
+      ? null
+      : 1.0,
+  enableAutoIntervalOnZooming: true,
+  majorGridLines: _lastSelectedRange == 'single' ||
+          _lastSelectedRange == '3months' ||
+          _lastSelectedRange == '1year'
+      ? MajorGridLines(
+          width: 1.0,
+          dashArray: [5, 5],
+          color: isDarkMode ? Color.fromARGB(255, 141, 144, 148) : Color.fromARGB(255, 48, 48, 48),
+        )
+      : MajorGridLines(width: 0),
+  majorTickLines: MajorTickLines(
+    size: 6.0,
+    width: 1.0,
+    color: isDarkMode ? Colors.white : Colors.black,
+  ),
+  plotBands: _lastSelectedRange == 'single' ||
+          _lastSelectedRange == '3months' ||
+          _lastSelectedRange == '1year'
+      ? []
+      : _generateNoonPlotBands(data, isDarkMode),
+),
                                     primaryYAxis: NumericAxis(
                                       title: AxisTitle(
                                         text: yAxisTitle,
