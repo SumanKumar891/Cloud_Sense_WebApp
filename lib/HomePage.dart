@@ -44,6 +44,8 @@ class _HomePageState extends State<HomePage> {
   Color _devicemapinfoColor = const Color.fromARGB(255, 235, 232, 232);
   int _totalDevices = 0;
   bool _isHovered = false;
+  bool _isHoveredMyDevicesButton = false;
+  bool _isPressedMyDevicesButton = false;
 
   @override
   void initState() {
@@ -470,9 +472,81 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 60),
-                    Row(
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        MouseRegion(
+                          onEnter: (_) =>
+                              setState(() => _isHoveredMyDevicesButton = true),
+                          onExit: (_) =>
+                              setState(() => _isHoveredMyDevicesButton = false),
+                          child: GestureDetector(
+                            onTapDown: (_) => setState(
+                                () => _isPressedMyDevicesButton = true),
+                            onTapUp: (_) => setState(
+                                () => _isPressedMyDevicesButton = false),
+                            onTapCancel: () => setState(
+                                () => _isPressedMyDevicesButton = false),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              transform: Matrix4.identity()
+                                ..scale(_isPressedMyDevicesButton
+                                    ? 0.95
+                                    : (_isHoveredMyDevicesButton ? 1.05 : 1.0)),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _isHoveredMyDevicesButton
+                                        ? Colors.black.withOpacity(0.4)
+                                        : Colors.black.withOpacity(0.2),
+                                    blurRadius:
+                                        _isHoveredMyDevicesButton ? 12 : 6,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _handleDeviceNavigation();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: themeProvider.isDarkMode
+                                      ? const Color.fromARGB(255, 18, 16, 16)
+                                      : Colors.white,
+                                  foregroundColor: themeProvider.isDarkMode
+                                      ? Colors.white
+                                      : Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 18,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "My Devices",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: paragraphFont,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      size: paragraphFont + 2,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20), // Space between buttons
                         MouseRegion(
                           onEnter: (_) =>
                               setState(() => _isHoveredbutton = true),
@@ -530,7 +604,7 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      "Explore Devices",
+                                      "Total Devices",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: paragraphFont,
@@ -548,7 +622,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
