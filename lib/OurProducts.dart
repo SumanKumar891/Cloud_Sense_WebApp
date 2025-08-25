@@ -507,9 +507,9 @@ class PopularItemsSection extends StatelessWidget {
       builder: (context, constraints) {
         final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-        bool isMobile = constraints.maxWidth < 600;
-        bool isTablet = constraints.maxWidth >= 600 &&
-            constraints.maxWidth < 1300; // Extended to include 1280
+        bool isMobile = constraints.maxWidth < 800;
+        bool isTablet = constraints.maxWidth >= 800 &&
+            constraints.maxWidth < 1200; // Extended to include 1280
 
         int crossAxisCount = 4;
         if (isMobile) {
