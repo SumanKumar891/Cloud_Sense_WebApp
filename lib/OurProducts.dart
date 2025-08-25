@@ -1,4 +1,6 @@
 import 'package:cloud_sense_webapp/HomePage.dart';
+import 'package:cloud_sense_webapp/dataLogger.dart';
+import 'package:cloud_sense_webapp/windSensors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Assuming ThemeProvider uses provider package
 
@@ -56,10 +58,9 @@ class ProductPage extends StatelessWidget {
           children: const [
             HeroSection(),
             SizedBox(height: 40),
-            WhyChooseUsSection(),
             SizedBox(height: 0), // Reduced from any potential default spacing
             PopularItemsSection(),
-            SizedBox(height: 0),
+            SizedBox(height:0),
             FooterSection(), // <-- footer now scrolls with content
           ],
         ),
@@ -179,7 +180,7 @@ class HeroSection extends StatelessWidget {
             : (isTabletScreen ? 100 : 250), // Reduced padding for tablets
       ),
       child: Text(
-        "The Advanced Weather Station is a modern, automated system that provides accurate, real-time weather data. "
+        "A modern, automated system that provides accurate, real-time weather data. "
         "It efficiently monitors rainfall, temperature, humidity, wind speed, and wind direction, helping industries make better decisions and manage operations effectively.",
         style: TextStyle(
           fontSize: isSmallScreen
@@ -237,215 +238,6 @@ class _RightImageHoverState extends State<RightImageHover> {
   }
 }
 
-// ================= Why Choose Us Section =================
-class WhyChooseUsSection extends StatelessWidget {
-  const WhyChooseUsSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    final List<Map<String, dynamic>> features = [
-      {
-        "icon": Icons.solar_power,
-        "title": "Solar Powered",
-        "desc": "Runs on solar energy for efficient, remote operation."
-      },
-      {
-        "icon": Icons.wifi,
-        "title": "Wireless Connectivity",
-        "desc":
-            "GSM 4G with dual SIM ensures reliable, always-on data transfer."
-      },
-      {
-        "icon": Icons.access_time,
-        "title": "Real-Time Monitoring",
-        "desc": "Collects multi-sensor data for live climate insights."
-      },
-      {
-        "icon": Icons.cloud,
-        "title": "Cloud Integration",
-        "desc": "Supports MQTT, HTTP, FTP for AWS IoT, APIs, or govt. servers."
-      },
-      {
-        "icon": Icons.shield,
-        "title": "Rugged IP67 Design",
-        "desc": "Weatherproof, dustproof, impact-resistant for outdoor use."
-      },
-      {
-        "icon": Icons.system_update,
-        "title": "Dual SIM & OTA Updates",
-        "desc": "Enhanced connectivity with SMS-based firmware updates."
-      },
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-        bool isMobile = constraints.maxWidth < 800;
-        bool isTablet =
-            constraints.maxWidth >= 800 && constraints.maxWidth < 1200;
-
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile
-                ? 20
-                : (isTablet ? 50 : 100), // Adjusted padding for tablet
-            vertical: 20,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "Why Choose Us?",
-                style: TextStyle(
-                  fontSize: isMobile
-                      ? 26
-                      : (isTablet ? 30 : 35), // Adjusted for tablet
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-
-              // Features
-              isMobile
-                  ? Column(
-                      children: features.map((f) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(f["icon"] as IconData,
-                                  size: 50, color: Colors.blue),
-                              const SizedBox(height: 12),
-                              Text(
-                                f["title"] as String,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                f["desc"] as String,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    )
-                  : (isTablet
-                      ? GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // 2 columns for tablet
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                            childAspectRatio: 1.5, // Adjusted for tablet
-                          ),
-                          itemCount: features.length,
-                          itemBuilder: (context, index) {
-                            final f = features[index];
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(f["icon"] as IconData,
-                                    size: 50, color: Colors.blue),
-                                const SizedBox(height: 12),
-                                Text(
-                                  f["title"] as String,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  f["desc"] as String,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            );
-                          },
-                        )
-                      : GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 25,
-                            mainAxisSpacing: 25,
-                            childAspectRatio: 1.4,
-                          ),
-                          itemCount: features.length,
-                          itemBuilder: (context, index) {
-                            final f = features[index];
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(f["icon"] as IconData,
-                                    size: 50, color: Colors.blue),
-                                const SizedBox(height: 12),
-                                Text(
-                                  f["title"] as String,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  f["desc"] as String,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            );
-                          },
-                        )),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
 // ================= Popular Items Section =================
 class PopularItemsSection extends StatelessWidget {
   const PopularItemsSection({super.key});
@@ -454,23 +246,24 @@ class PopularItemsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> products = [
       {
-        "image": "assets/weather_station.jpg",
-        "title": "Advanced Weather Station",
+        "image": "assets/RainGauge.jpg",
+        "title": "ARTH Sensor",
         "sku": "",
-        "desc":
-            "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
-        "features": [
-          "Real-time weather monitoring",
-          "Solar-powered autonomous operation",
-          "Supports multiple sensors"
-        ]
+        "desc": "",
+        "features": ["", "", ""]
       },
       {
         "image": "assets/RainGauge.jpg",
-        "title": "Tipping Bucket Rain Gauge",
+        "title": "ARTH Sensor Probe",
         "sku": "",
-        "desc":
-            "Measures rainfall intensity and total amount with high accuracy.",
+        "desc": "",
+        "features": ["", "", ""]
+      },
+      {
+        "image": "assets/RainGauge.jpg",
+        "title": "Rain Gauge",
+        "sku": "",
+        "desc": "Measures rainfall intensity and total amount with high accuracy.",
         "features": [
           "Durable ABS construction",
           "Resolution: 0.2 mm or 0.5 mm",
@@ -479,10 +272,9 @@ class PopularItemsSection extends StatelessWidget {
       },
       {
         "image": "assets/RadiationShield.jpg",
-        "title": "Radiation Shield",
+        "title": "Wind Speed",
         "sku": "",
-        "desc":
-            "Protects sensors from direct sunlight and rain while allowing airflow.",
+        "desc": "Protects sensors from direct sunlight and rain while allowing airflow.",
         "features": [
           "Durable ABS material",
           "Ventilated multi-plate design",
@@ -491,37 +283,49 @@ class PopularItemsSection extends StatelessWidget {
       },
       {
         "image": "assets/DataLoggerGateway.jpg",
-        "title": "Data Logger / Gateway",
+        "title": "Data Logger",
         "sku": "",
-        "desc":
-            "Wireless device for sensor data collection, logging, and cloud transmission.",
+        "desc": "Wireless device for sensor data collection, logging, and cloud transmission.",
         "features": [
           "Bluetooth-enabled long-range communication",
           "Solar or battery powered",
           "Real-time data transmission to cloud/server"
         ]
       },
+      {
+        "image": "assets/weather_station.jpg",
+        "title": "Gateway",
+        "sku": "",
+        "desc":
+            "",
+        "features": [
+          "Real-time weather monitoring",
+          "Solar-powered autonomous operation",
+          "Supports multiple sensors"
+        ]
+      },
     ];
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        bool isMobile = constraints.maxWidth < 600;
+        bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1300;
 
-        bool isMobile = constraints.maxWidth < 800;
-        bool isTablet = constraints.maxWidth >= 800 &&
-            constraints.maxWidth < 1200; // Extended to include 1280
+        int crossAxisCount = constraints.maxWidth < 800 ? 2 : 3;
 
-        int crossAxisCount = 4;
-        if (isMobile) {
-          crossAxisCount = 1;
-        } else if (isTablet) {
-          crossAxisCount = 2; // Increased to 3 for better tablet layout at 1280
+        double childAspectRatio;
+        if (constraints.maxWidth < 800) {
+          childAspectRatio = 0.40;
+        } else if (constraints.maxWidth < 1200) {
+          childAspectRatio = 0.75;
+        } else {
+          childAspectRatio = 0.65;
         }
 
         return Container(
           color: Colors.grey[100],
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : (isTablet ? 60 : 120),
+            horizontal: isMobile ? 20 : (isTablet ? 60 : 300),
             vertical: 40,
           ),
           child: Column(
@@ -530,9 +334,7 @@ class PopularItemsSection extends StatelessWidget {
               Text(
                 "Our Products",
                 style: TextStyle(
-                  fontSize: isMobile
-                      ? 28
-                      : (isTablet ? 32 : 40), // Adjusted for tablet
+                  fontSize: isMobile ? 28 : (isTablet ? 32 : 40),
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -546,9 +348,7 @@ class PopularItemsSection extends StatelessWidget {
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
-                  childAspectRatio: isMobile
-                      ? 0.9
-                      : (isTablet ? 0.8 : 0.65), // Adjusted for tablet
+                  childAspectRatio: childAspectRatio,
                 ),
                 itemCount: products.length,
                 itemBuilder: (context, index) {
@@ -565,7 +365,8 @@ class PopularItemsSection extends StatelessWidget {
   }
 }
 
-// ================= Hover Card =================
+
+// ================= Hover Card with Slide Down Details =================
 class HoverCard extends StatefulWidget {
   final Map<String, dynamic> product;
   final bool isMobile;
@@ -588,100 +389,132 @@ class _HoverCardState extends State<HoverCard> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedScale(
-        scale: _isHovered ? 1.05 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: _isHovered ? Colors.black26 : Colors.black12,
-                blurRadius: 6,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          padding:
-              EdgeInsets.all(widget.isMobile ? 6 : (widget.isTablet ? 8 : 12)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AspectRatio(
-                aspectRatio: widget.isMobile
-                    ? 1.8
-                    : (widget.isTablet ? 1.5 : 1.3), // Adjusted for tablet
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    widget.product["image"],
-                    fit: BoxFit.cover,
-                  ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered ? Colors.black26 : Colors.black12,
+              blurRadius: 6,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(widget.isMobile ? 4 : (widget.isTablet ? 6 : 6)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image with animated size
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: _isHovered
+                  ? (widget.isMobile ? 120.0 : (widget.isTablet ? 150.0 : 180.0))
+                  : (widget.isMobile ? 150.0 : (widget.isTablet ? 180.0 : 200.0)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Image.asset(
+                        widget.product["image"],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 8,
+                      right: 8,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 28),
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(Colors.black54),
+                          shape: WidgetStateProperty.all(const CircleBorder()),
+                        ),
+                        onPressed: () {
+                          if (widget.product["title"] == "Data Logger") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const DataLoggerPage()),
+                            );
+                          } else if (widget.product["title"] == "Wind Speed") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const UltrasonicSensorPage()),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                "${widget.product["title"]} ${widget.product["sku"]}",
-                style: TextStyle(
-                  fontSize: widget.isMobile
-                      ? 14
-                      : (widget.isTablet ? 15 : 16), // Adjusted for tablet
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                widget.product["desc"],
-                style: TextStyle(
-                  fontSize: widget.isMobile
-                      ? 12
-                      : (widget.isTablet ? 13 : 14), // Adjusted for tablet
-                  color: Colors.black54,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Column(
+            ),
+            // Text details always visible
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: (widget.product["features"] as List<String>)
-                    .map((feature) => Row(
-                          children: [
-                            Icon(
-                              Icons.check,
-                              size: widget.isMobile
-                                  ? 14
-                                  : (widget.isTablet
-                                      ? 15
-                                      : 16), // Adjusted for tablet
-                              color: Colors.green,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                feature,
-                                style: TextStyle(
-                                  fontSize: widget.isMobile
-                                      ? 12
-                                      : (widget.isTablet
-                                          ? 13
-                                          : 14), // Adjusted for tablet
-                                  color: Colors.black87,
+                children: [
+                  Text(
+                    "${widget.product["title"]} ${widget.product["sku"]}",
+                    style: TextStyle(
+                      fontSize: widget.isMobile
+                          ? 14
+                          : (widget.isTablet ? 15 : 16),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.product["desc"],
+                    style: TextStyle(
+                      fontSize: widget.isMobile
+                          ? 12
+                          : (widget.isTablet ? 13 : 14),
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: (widget.product["features"] as List<String>)
+                        .map((feature) => Row(
+                              children: [
+                                Icon(
+                                  Icons.check,
+                                  size: widget.isMobile
+                                      ? 14
+                                      : (widget.isTablet ? 15 : 16),
+                                  color: Colors.green,
                                 ),
-                              ),
-                            ),
-                          ],
-                        ))
-                    .toList(),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    feature,
+                                    style: TextStyle(
+                                      fontSize: widget.isMobile
+                                          ? 12
+                                          : (widget.isTablet ? 13 : 14),
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ))
+                        .toList(),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 // ================= Footer Section =================
 class FooterSection extends StatelessWidget {
   const FooterSection({super.key});
