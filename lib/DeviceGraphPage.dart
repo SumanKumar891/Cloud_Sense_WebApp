@@ -217,16 +217,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     );
   }
 
-Widget _buildDrawer(bool isDarkMode, BuildContext context) {
+  Widget _buildDrawer(bool isDarkMode, BuildContext context) {
     final String prefix = _getPrefix(widget.deviceName);
     final String idStr = widget.deviceName.substring(prefix.length);
     final int? targetIdNum = int.tryParse(idStr);
-    final filteredDevices = _deviceStatuses
-        .where((device) {
-          final int? deviceIdNum = int.tryParse(device.deviceId);
-          return device.activityType == prefix && deviceIdNum == targetIdNum;
-        })
-        .toList();
+    final filteredDevices = _deviceStatuses.where((device) {
+      final int? deviceIdNum = int.tryParse(device.deviceId);
+      return device.activityType == prefix && deviceIdNum == targetIdNum;
+    }).toList();
 
     return Drawer(
       child: Container(
@@ -261,10 +259,11 @@ Widget _buildDrawer(bool isDarkMode, BuildContext context) {
                         itemCount: filteredDevices.length,
                         itemBuilder: (context, index) {
                           final device = filteredDevices[index];
-                          final bool hasValidCoordinates = device.latitude != null &&
-                              device.longitude != null &&
-                              device.latitude != 0 &&
-                              device.longitude != 0;
+                          final bool hasValidCoordinates =
+                              device.latitude != null &&
+                                  device.longitude != null &&
+                                  device.latitude != 0 &&
+                                  device.longitude != 0;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 4.0),
                             child: Column(
@@ -501,68 +500,117 @@ Widget _buildDrawer(bool isDarkMode, BuildContext context) {
                             cfParametersData['WindDirection'] ?? [],
                       },
                     ),
-
-                     if (widget.deviceName.startsWith('KJ'))
-                    _buildMinMaxTable(
-                                            isDarkMode,
-                                            {
-                                              'Temperature': KJParametersData[
-                                                      'CurrentTemperature'] ??
-                                                  [],
-                                              'Humidity': KJParametersData[
-                                                      'CurrentHumidity'] ??
-                                                  [],
-                                              'Potassium': KJParametersData[
-                                                      'Potassium'] ??
-                                                  [],
-                                              'pH':
-                                                  KJParametersData['pH'] ?? [],
-                                              'Nitrogen': KJParametersData[
-                                                      'Nitrogen'] ??
-                                                  [],
-                                              'Salinity': KJParametersData[
-                                                      'Salinity'] ??
-                                                  [],
-                                              'ElectricalConductivity':
-                                                  KJParametersData[
-                                                          'ElectricalConductivity'] ??
-                                                      [],
-                                              'Phosphorus': KJParametersData[
-                                                      'Phosphorus'] ??
-                                                  [],
-                                            },
-                                          ),
-
-                     if (widget.deviceName.startsWith('MY'))
+                  if (widget.deviceName.startsWith('KJ'))
                     _buildMinMaxTable(
                       isDarkMode,
                       {
-                       'Temperature': MYParametersData[
-                                                      'CurrentTemperature'] ??
-                                                  [],
-                                              'Humidity': MYParametersData[
-                                                      'CurrentHumidity'] ??
-                                                  [],
-                                              'Light Intensity':
-                                                  MYParametersData[
-                                                          'LightIntensity'] ??
-                                                      [],
-                                              'Wind Speed': MYParametersData[
-                                                      'WindSpeed'] ??
-                                                  [],
-                                              'Atm Pressure': MYParametersData[
-                                                      'AtmPressure'] ??
-                                                  [],
-                                              'Wind Direction':
-                                                  MYParametersData[
-                                                          'WindDirection'] ??
-                                                      [],
-                                              'Rainfall': MYParametersData[
-                                                      'RainfallHourly'] ??
-                                                  [],
+                        'Temperature':
+                            KJParametersData['CurrentTemperature'] ?? [],
+                        'Humidity': KJParametersData['CurrentHumidity'] ?? [],
+                        'Potassium': KJParametersData['Potassium'] ?? [],
+                        'pH': KJParametersData['pH'] ?? [],
+                        'Nitrogen': KJParametersData['Nitrogen'] ?? [],
+                        'Salinity': KJParametersData['Salinity'] ?? [],
+                        'ElectricalConductivity':
+                            KJParametersData['ElectricalConductivity'] ?? [],
+                        'Phosphorus': KJParametersData['Phosphorus'] ?? [],
                       },
                     ),
-                    
+                  if (widget.deviceName.startsWith('MY'))
+                    _buildMinMaxTable(
+                      isDarkMode,
+                      {
+                        'Temperature':
+                            MYParametersData['CurrentTemperature'] ?? [],
+                        'Humidity': MYParametersData['CurrentHumidity'] ?? [],
+                        'Light Intensity':
+                            MYParametersData['LightIntensity'] ?? [],
+                        'Wind Speed': MYParametersData['WindSpeed'] ?? [],
+                        'Atm Pressure': MYParametersData['AtmPressure'] ?? [],
+                        'Wind Direction':
+                            MYParametersData['WindDirection'] ?? [],
+                        'Rainfall': MYParametersData['RainfallHourly'] ?? [],
+                      },
+                    ),
+
+                  // Add Total Rainfall display here
+                  Builder(
+                    builder: (context) {
+                      double totalRainfall = 0.0;
+                      bool showTotalRainfall = false;
+
+                      if (widget.deviceName.startsWith('FS') &&
+                          fsrainData.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = fsrainData.fold(
+                            0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if (widget.deviceName.startsWith('NA') &&
+                          NARLParametersData['RainfallHourly'] != null &&
+                          NARLParametersData['RainfallHourly']!.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = NARLParametersData['RainfallHourly']!
+                            .fold(
+                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if (widget.deviceName.startsWith('MY') &&
+                          MYParametersData['RainfallHourly'] != null &&
+                          MYParametersData['RainfallHourly']!.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = MYParametersData['RainfallHourly']!
+                            .fold(
+                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if (widget.deviceName.startsWith('VD') &&
+                          vdParametersData['RainfallHourly'] != null &&
+                          vdParametersData['RainfallHourly']!.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = vdParametersData['RainfallHourly']!
+                            .fold(
+                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if (widget.deviceName.startsWith('CF') &&
+                          cfParametersData['RainfallHourly'] != null &&
+                          cfParametersData['RainfallHourly']!.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = cfParametersData['RainfallHourly']!
+                            .fold(
+                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if (widget.deviceName.startsWith('CP') &&
+                          csParametersData['RainfallHourly'] != null &&
+                          csParametersData['RainfallHourly']!.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = csParametersData['RainfallHourly']!
+                            .fold(
+                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if (widget.deviceName.startsWith('IT') &&
+                          itrainData.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = itrainData.fold(
+                            0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      } else if ((widget.deviceName.startsWith('WD211') ||
+                              widget.deviceName.startsWith('WD511')) &&
+                          wfrainfallData.isNotEmpty) {
+                        showTotalRainfall = true;
+                        totalRainfall = wfrainfallData.fold(
+                            0.0, (sum, data) => sum + (data.value ?? 0.0));
+                      }
+
+                      if (showTotalRainfall &&
+                          !_isLoading &&
+                          _errorMessage == null) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 16.0, left: 36),
+                          child: Text(
+                            'Total Rainfall: ${totalRainfall.toStringAsFixed(2)} mm',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -571,6 +619,7 @@ Widget _buildDrawer(bool isDarkMode, BuildContext context) {
       ),
     );
   }
+
   DateTime _selectedDay = DateTime.now();
   List<ChartData> temperatureData = [];
   List<ChartData> humidityData = [];
@@ -1135,7 +1184,7 @@ Widget _buildDrawer(bool isDarkMode, BuildContext context) {
     }
   }
 
-String _mapActivityToPrefix(String activityType, String? topic) {
+  String _mapActivityToPrefix(String activityType, String? topic) {
     if (activityType == 'chloritrone') return 'CB';
     if (activityType == 'water') return 'WQ';
     if (activityType == 'weather') return 'weather';
@@ -1148,16 +1197,20 @@ String _mapActivityToPrefix(String activityType, String? topic) {
       if (topic.contains('KJSCE')) return 'KJ';
       if (topic.contains('SVPU')) return 'SV';
       if (topic.contains('Mysuru')) return 'MY';
-      if (topic.contains('CF')) return 'CF'; // Adjust if topic pattern for CF is known
+      if (topic.contains('CF'))
+        return 'CF'; // Adjust if topic pattern for CF is known
       return 'FS'; // Default to FS for other WS topics
     }
     return activityType;
   }
+
   String _getPrefix(String deviceName) {
     if (deviceName.startsWith('Awadh_Jio')) return 'Awadh_Jio';
-    if (deviceName.startsWith('weather')) return 'weather'; // Adjust if weather has a specific prefix
+    if (deviceName.startsWith('weather'))
+      return 'weather'; // Adjust if weather has a specific prefix
     return deviceName.substring(0, 2);
   }
+
   List<List<dynamic>> _csvRows = [];
   String _lastWindDirection = "";
   String _lastwinddirection = "";
@@ -5140,12 +5193,12 @@ String _mapActivityToPrefix(String activityType, String? topic) {
     }
 
     // Handle pH explicitly to preserve "pH"
-  if (paramName.toLowerCase().contains('ph')) {
-    return {
-      'displayName': 'pH',
-      'unit': 'pH',
-    };
-  }
+    if (paramName.toLowerCase().contains('ph')) {
+      return {
+        'displayName': 'pH',
+        'unit': 'pH',
+      };
+    }
     String normalized = paramName
         .replaceAll('Current', '')
         .replaceAll('Hourly', '')
@@ -5191,12 +5244,9 @@ String _mapActivityToPrefix(String activityType, String? topic) {
       displayName = 'Hypochlorous';
     } else if (displayName.toLowerCase().contains('residualchlor')) {
       displayName = 'Chlorine';
-      
-    }else if (displayName.toLowerCase().contains('pH')) {
+    } else if (displayName.toLowerCase().contains('pH')) {
       displayName = 'pH';
-      
     }
-    
 
     String unit = '';
 
@@ -5220,17 +5270,17 @@ String _mapActivityToPrefix(String activityType, String? topic) {
       unit = 'm/s';
     else if (paramName.contains('WindDirection'))
       unit = '°';
-       else if (paramName.contains('Potassium'))
+    else if (paramName.contains('Potassium'))
       unit = 'mg/Kg';
-       else if (paramName.contains('Nitrogen'))
+    else if (paramName.contains('Nitrogen'))
       unit = 'mg/Kg';
-       else if (paramName.contains('Salinity'))
+    else if (paramName.contains('Salinity'))
       unit = 'mg/L';
-       else if (paramName.contains('ElectricalConductivity'))
+    else if (paramName.contains('ElectricalConductivity'))
       unit = 'µS/cm';
-       else if (paramName.contains('Phosphorus'))
+    else if (paramName.contains('Phosphorus'))
       unit = 'mg/Kg';
-       else if (paramName.contains('pH'))
+    else if (paramName.contains('pH'))
       unit = 'pH';
     else if (paramName.contains('Irradiance') ||
         paramName.contains('Radiation'))
@@ -5991,99 +6041,114 @@ String _mapActivityToPrefix(String activityType, String? topic) {
                                           : Colors.black,
                                     ),
                                   ),
-    TextSpan(
-              text: () {
-                // Get Lat & Long from _deviceStatuses
-                final String prefix = _getPrefix(widget.deviceName);
-                final String idStr = widget.deviceName.substring(prefix.length);
-                final int? targetIdNum = int.tryParse(idStr);
-                final filteredDevices = _deviceStatuses
-                    .where((device) {
-                      final int? deviceIdNum = int.tryParse(device.deviceId);
-                      return device.activityType == prefix && deviceIdNum == targetIdNum;
-                    })
-                    .toList();
-                if (filteredDevices.isNotEmpty) {
-                  final device = filteredDevices.first;
-                  final bool hasValidCoordinates = device.latitude != null &&
-                      device.longitude != null &&
-                      device.latitude != 0 &&
-                      device.longitude != 0;
-                  if (hasValidCoordinates) {
-                    return "Latitude: ${device.latitude!.toStringAsFixed(2)}\n"
-                        "Longitude: ${device.longitude!.toStringAsFixed(2)}\n";
-                  }
-                }
-                return "";
-              }(),
-              style: TextStyle(
-                fontSize: 12,
-                color: isDarkMode ? Colors.white70 : Colors.black87,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  ),
-),
-                            
-// Device Active Time
-const SizedBox(height: 8),
-if (_isLoading)
-  const Center(child: CircularProgressIndicator())
-else if (_errorMessage != null)
-  Text(
-    _errorMessage!,
-    style: TextStyle(
-      color: isDarkMode ? Colors.red[300] : Colors.red[700],
-      fontSize: 14,
-    ),
-  )
-else
-  Builder(
-    builder: (context) {
-      // Define filteredDevices based on prefix and device ID
-      final String prefix = _getPrefix(widget.deviceName);
-      final String idStr = widget.deviceName.substring(prefix.length);
-      final int? targetIdNum = int.tryParse(idStr);
-      final filteredDevices = _deviceStatuses
-          .where((device) {
-            final int? deviceIdNum = int.tryParse(device.deviceId);
-            return device.activityType == prefix && deviceIdNum == targetIdNum;
-          })
-          .toList();
-      return SizedBox(
-        height: 60,
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: filteredDevices.length,
-          itemBuilder: (context, index) {
-            final device = filteredDevices[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 0.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 38.0), // Move text to the right
-                    child: Text(
-                      'Last Active: ${device.lastReceivedTime}',
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        fontSize: 16,
+                                  TextSpan(
+                                    text: () {
+                                      // Get Lat & Long from _deviceStatuses
+                                      final String prefix =
+                                          _getPrefix(widget.deviceName);
+                                      final String idStr = widget.deviceName
+                                          .substring(prefix.length);
+                                      final int? targetIdNum =
+                                          int.tryParse(idStr);
+                                      final filteredDevices =
+                                          _deviceStatuses.where((device) {
+                                        final int? deviceIdNum =
+                                            int.tryParse(device.deviceId);
+                                        return device.activityType == prefix &&
+                                            deviceIdNum == targetIdNum;
+                                      }).toList();
+                                      if (filteredDevices.isNotEmpty) {
+                                        final device = filteredDevices.first;
+                                        final bool hasValidCoordinates =
+                                            device.latitude != null &&
+                                                device.longitude != null &&
+                                                device.latitude != 0 &&
+                                                device.longitude != 0;
+                                        if (hasValidCoordinates) {
+                                          return "Latitude: ${device.latitude!.toStringAsFixed(2)}\n"
+                                              "Longitude: ${device.longitude!.toStringAsFixed(2)}\n";
+                                        }
+                                      }
+                                      return "";
+                                    }(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDarkMode
+                                          ? Colors.white70
+                                          : Colors.black87,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      );
-    },
-  ),
+
+// Device Active Time
+                      const SizedBox(height: 8),
+                      if (_isLoading)
+                        const Center(child: CircularProgressIndicator())
+                      else if (_errorMessage != null)
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color:
+                                isDarkMode ? Colors.red[300] : Colors.red[700],
+                            fontSize: 14,
+                          ),
+                        )
+                      else
+                        Builder(
+                          builder: (context) {
+                            // Define filteredDevices based on prefix and device ID
+                            final String prefix = _getPrefix(widget.deviceName);
+                            final String idStr =
+                                widget.deviceName.substring(prefix.length);
+                            final int? targetIdNum = int.tryParse(idStr);
+                            final filteredDevices =
+                                _deviceStatuses.where((device) {
+                              final int? deviceIdNum =
+                                  int.tryParse(device.deviceId);
+                              return device.activityType == prefix &&
+                                  deviceIdNum == targetIdNum;
+                            }).toList();
+                            return SizedBox(
+                              height: 60,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: filteredDevices.length,
+                                itemBuilder: (context, index) {
+                                  final device = filteredDevices[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 0.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left:
+                                                  38.0), // Move text to the right
+                                          child: Text(
+                                            'Last Active: ${device.lastReceivedTime}',
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
                       // Time Period Selection
                       Container(
                         height: 64,
@@ -6432,6 +6497,135 @@ else
                                                       [],
                                             },
                                           ),
+
+                                        // Add Total Rainfall display here
+                                        Builder(
+                                          builder: (context) {
+                                            double totalRainfall = 0.0;
+                                            bool showTotalRainfall = false;
+
+                                            if (widget.deviceName.startsWith('FS') &&
+                                                fsrainData.isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall = fsrainData.fold(
+                                                  0.0,
+                                                  (sum, data) =>
+                                                      sum +
+                                                      (data.value ?? 0.0));
+                                            } else if (widget.deviceName.startsWith('NA') &&
+                                                NARLParametersData['RainfallHourly'] !=
+                                                    null &&
+                                                NARLParametersData['RainfallHourly']!
+                                                    .isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall =
+                                                  NARLParametersData[
+                                                          'RainfallHourly']!
+                                                      .fold(
+                                                          0.0,
+                                                          (sum, data) =>
+                                                              sum +
+                                                              (data.value ??
+                                                                  0.0));
+                                            } else if (widget.deviceName.startsWith('MY') &&
+                                                MYParametersData['RainfallHourly'] !=
+                                                    null &&
+                                                MYParametersData['RainfallHourly']!
+                                                    .isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall = MYParametersData[
+                                                      'RainfallHourly']!
+                                                  .fold(
+                                                      0.0,
+                                                      (sum, data) =>
+                                                          sum +
+                                                          (data.value ?? 0.0));
+                                            } else if (widget.deviceName.startsWith('VD') &&
+                                                vdParametersData['RainfallHourly'] !=
+                                                    null &&
+                                                vdParametersData['RainfallHourly']!
+                                                    .isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall = vdParametersData[
+                                                      'RainfallHourly']!
+                                                  .fold(
+                                                      0.0,
+                                                      (sum, data) =>
+                                                          sum +
+                                                          (data.value ?? 0.0));
+                                            } else if (widget.deviceName
+                                                    .startsWith('CF') &&
+                                                cfParametersData['RainfallHourly'] !=
+                                                    null &&
+                                                cfParametersData['RainfallHourly']!
+                                                    .isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall = cfParametersData[
+                                                      'RainfallHourly']!
+                                                  .fold(
+                                                      0.0,
+                                                      (sum, data) =>
+                                                          sum +
+                                                          (data.value ?? 0.0));
+                                            } else if (widget.deviceName
+                                                    .startsWith('CP') &&
+                                                csParametersData['RainfallHourly'] !=
+                                                    null &&
+                                                csParametersData['RainfallHourly']!
+                                                    .isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall = csParametersData[
+                                                      'RainfallHourly']!
+                                                  .fold(
+                                                      0.0,
+                                                      (sum, data) =>
+                                                          sum +
+                                                          (data.value ?? 0.0));
+                                            } else if (widget.deviceName
+                                                    .startsWith('IT') &&
+                                                itrainData.isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall = itrainData.fold(
+                                                  0.0,
+                                                  (sum, data) =>
+                                                      sum +
+                                                      (data.value ?? 0.0));
+                                            } else if ((widget.deviceName
+                                                        .startsWith('WD211') ||
+                                                    widget.deviceName
+                                                        .startsWith('WD511')) &&
+                                                wfrainfallData.isNotEmpty) {
+                                              showTotalRainfall = true;
+                                              totalRainfall =
+                                                  wfrainfallData.fold(
+                                                      0.0,
+                                                      (sum, data) =>
+                                                          sum +
+                                                          (data.value ?? 0.0));
+                                            }
+
+                                            if (showTotalRainfall &&
+                                                !_isLoading &&
+                                                _errorMessage == null) {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 16.0, left: 16),
+                                                child: Text(
+                                                  'Total Rainfall: ${totalRainfall.toStringAsFixed(2)} mm',
+                                                  style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          },
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -7853,7 +8047,6 @@ else
                             color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
-                 
                       ],
                     ),
                   ),
@@ -9864,55 +10057,72 @@ else
                                     plotAreaBackgroundColor: isDarkMode
                                         ? Color.fromARGB(100, 0, 0, 0)
                                         : Color.fromARGB(189, 222, 218, 218),
-                                   primaryXAxis: DateTimeAxis(
-  dateFormat: _lastSelectedRange == 'single'
-      ? DateFormat('MM/dd hh:mm a')
-      : (_lastSelectedRange == '3months' || _lastSelectedRange == '1year'
-          ? DateFormat('MM/dd')
-          : DateFormat('MM/dd')),
-  title: AxisTitle(
-    text: 'Time',
-    textStyle: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: isDarkMode ? Colors.white : Colors.black,
-    ),
-  ),
-  labelStyle: TextStyle(
-    color: isDarkMode ? Colors.white : Colors.black,
-  ),
-  labelRotation: 70,
-  edgeLabelPlacement: EdgeLabelPlacement.shift,
-  intervalType: _lastSelectedRange == 'single' ||
-          _lastSelectedRange == '3months' ||
-          _lastSelectedRange == '1year'
-      ? DateTimeIntervalType.auto
-      : DateTimeIntervalType.days,
-  interval: _lastSelectedRange == 'single' ||
-          _lastSelectedRange == '3months' ||
-          _lastSelectedRange == '1year'
-      ? null
-      : 1.0,
-  enableAutoIntervalOnZooming: true,
-  majorGridLines: _lastSelectedRange == 'single' ||
-          _lastSelectedRange == '3months' ||
-          _lastSelectedRange == '1year'
-      ? MajorGridLines(
-          width: 1.0,
-          dashArray: [5, 5],
-          color: isDarkMode ? Color.fromARGB(255, 141, 144, 148) : Color.fromARGB(255, 48, 48, 48),
-        )
-      : MajorGridLines(width: 0),
-  majorTickLines: MajorTickLines(
-    size: 6.0,
-    width: 1.0,
-    color: isDarkMode ? Colors.white : Colors.black,
-  ),
-  plotBands: _lastSelectedRange == 'single' ||
-          _lastSelectedRange == '3months' ||
-          _lastSelectedRange == '1year'
-      ? []
-      : _generateNoonPlotBands(data, isDarkMode),
-),
+                                    primaryXAxis: DateTimeAxis(
+                                      dateFormat: _lastSelectedRange == 'single'
+                                          ? DateFormat('MM/dd hh:mm a')
+                                          : (_lastSelectedRange == '3months' ||
+                                                  _lastSelectedRange == '1year'
+                                              ? DateFormat('MM/dd')
+                                              : DateFormat('MM/dd')),
+                                      title: AxisTitle(
+                                        text: 'Time',
+                                        textStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      labelRotation: 70,
+                                      edgeLabelPlacement:
+                                          EdgeLabelPlacement.shift,
+                                      intervalType: _lastSelectedRange ==
+                                                  'single' ||
+                                              _lastSelectedRange == '3months' ||
+                                              _lastSelectedRange == '1year'
+                                          ? DateTimeIntervalType.auto
+                                          : DateTimeIntervalType.days,
+                                      interval: _lastSelectedRange ==
+                                                  'single' ||
+                                              _lastSelectedRange == '3months' ||
+                                              _lastSelectedRange == '1year'
+                                          ? null
+                                          : 1.0,
+                                      enableAutoIntervalOnZooming: true,
+                                      majorGridLines: _lastSelectedRange ==
+                                                  'single' ||
+                                              _lastSelectedRange == '3months' ||
+                                              _lastSelectedRange == '1year'
+                                          ? MajorGridLines(
+                                              width: 1.0,
+                                              dashArray: [5, 5],
+                                              color: isDarkMode
+                                                  ? Color.fromARGB(
+                                                      255, 141, 144, 148)
+                                                  : Color.fromARGB(
+                                                      255, 48, 48, 48),
+                                            )
+                                          : MajorGridLines(width: 0),
+                                      majorTickLines: MajorTickLines(
+                                        size: 6.0,
+                                        width: 1.0,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      plotBands: _lastSelectedRange ==
+                                                  'single' ||
+                                              _lastSelectedRange == '3months' ||
+                                              _lastSelectedRange == '1year'
+                                          ? []
+                                          : _generateNoonPlotBands(
+                                              data, isDarkMode),
+                                    ),
                                     primaryYAxis: NumericAxis(
                                       title: AxisTitle(
                                         text: yAxisTitle,
