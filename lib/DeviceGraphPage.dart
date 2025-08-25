@@ -533,7 +533,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                       },
                     ),
 
-                  // Add Total Rainfall display here
+                  // Modified Builder widget for total rainfall display within the sidebar
                   Builder(
                     builder: (context) {
                       double totalRainfall = 0.0;
@@ -542,61 +542,53 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                       if (widget.deviceName.startsWith('FS') &&
                           fsrainData.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = fsrainData.fold(
-                            0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(fsrainData);
                       } else if (widget.deviceName.startsWith('NA') &&
                           NARLParametersData['RainfallHourly'] != null &&
                           NARLParametersData['RainfallHourly']!.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = NARLParametersData['RainfallHourly']!
-                            .fold(
-                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(
+                            NARLParametersData['RainfallHourly']!);
                       } else if (widget.deviceName.startsWith('MY') &&
                           MYParametersData['RainfallHourly'] != null &&
                           MYParametersData['RainfallHourly']!.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = MYParametersData['RainfallHourly']!
-                            .fold(
-                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(
+                            MYParametersData['RainfallHourly']!);
                       } else if (widget.deviceName.startsWith('VD') &&
                           vdParametersData['RainfallHourly'] != null &&
                           vdParametersData['RainfallHourly']!.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = vdParametersData['RainfallHourly']!
-                            .fold(
-                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(
+                            vdParametersData['RainfallHourly']!);
                       } else if (widget.deviceName.startsWith('CF') &&
                           cfParametersData['RainfallHourly'] != null &&
                           cfParametersData['RainfallHourly']!.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = cfParametersData['RainfallHourly']!
-                            .fold(
-                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(
+                            cfParametersData['RainfallHourly']!);
                       } else if (widget.deviceName.startsWith('CP') &&
                           csParametersData['RainfallHourly'] != null &&
                           csParametersData['RainfallHourly']!.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = csParametersData['RainfallHourly']!
-                            .fold(
-                                0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(
+                            csParametersData['RainfallHourly']!);
                       } else if (widget.deviceName.startsWith('IT') &&
                           itrainData.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = itrainData.fold(
-                            0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(itrainData);
                       } else if ((widget.deviceName.startsWith('WD211') ||
                               widget.deviceName.startsWith('WD511')) &&
                           wfrainfallData.isNotEmpty) {
                         showTotalRainfall = true;
-                        totalRainfall = wfrainfallData.fold(
-                            0.0, (sum, data) => sum + (data.value ?? 0.0));
+                        totalRainfall = _calculateTotalRainfall(wfrainfallData);
                       }
 
                       if (showTotalRainfall &&
                           !_isLoading &&
                           _errorMessage == null) {
                         return Padding(
-                          padding: const EdgeInsets.only(top: 16.0, left: 36),
+                          padding: const EdgeInsets.only(top: 16.0, left: 16),
                           child: Text(
                             'Total Rainfall: ${totalRainfall.toStringAsFixed(2)} mm',
                             style: TextStyle(
@@ -709,6 +701,104 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   bool _isLoading = false;
   String? _errorMessage;
   late final String activityType;
+
+// Helper function to calculate total rainfall (unchanged)
+double _calculateTotalRainfall(List<ChartData> rainData) {
+  if (rainData.isEmpty) return 0.0;
+
+  final Map<DateTime, double> hourlyTotals = {};
+
+  for (var data in rainData) {
+    DateTime hourEnd = DateTime(
+      data.timestamp.year,
+      data.timestamp.month,
+      data.timestamp.day,
+      data.timestamp.hour,
+      0,
+    );
+    if (data.timestamp.minute > 0) {
+      hourEnd = DateTime(
+        data.timestamp.year,
+        data.timestamp.month,
+        data.timestamp.day,
+        data.timestamp.hour + 1,
+        0,
+      );
+    }
+
+    if (data.timestamp.isAtSameMomentAs(hourEnd) || data.timestamp.isBefore(hourEnd)) {
+      hourlyTotals[hourEnd] = data.value;
+    }
+  }
+
+  return hourlyTotals.values.fold(0.0, (sum, total) => sum + total);
+}
+
+// Helper function to transform cumulative rainfall to incremental rainfall
+List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
+  if (rainData.isEmpty) return [];
+
+  // Sort data by timestamp to ensure chronological order
+  final sortedData = List<ChartData>.from(rainData)
+    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+  List<ChartData> incrementalData = [];
+  double previousValue = 0.0;
+  DateTime? previousTimestamp;
+
+  for (var data in sortedData) {
+    double incrementalValue;
+
+    if (previousTimestamp == null) {
+      // First data point: treat as incremental (no previous value)
+      incrementalValue = data.value;
+    } else {
+      // Determine the hour start for the current and previous timestamps
+      DateTime currentHourStart = DateTime(
+        data.timestamp.year,
+        data.timestamp.month,
+        data.timestamp.day,
+        data.timestamp.hour,
+        data.timestamp.minute >= 1 ? data.timestamp.hour : data.timestamp.hour - 1,
+      );
+      DateTime previousHourStart = DateTime(
+        previousTimestamp.year,
+        previousTimestamp.month,
+        previousTimestamp.day,
+        previousTimestamp.hour,
+        previousTimestamp.minute >= 1 ? previousTimestamp.hour : previousTimestamp.hour - 1,
+      );
+
+      bool isEndOfHour = data.timestamp.minute == 0 && data.timestamp.second == 0;
+      bool isReset = data.timestamp.minute == 1 && data.timestamp.second == 0;
+      bool isNewHour = currentHourStart.isAfter(previousHourStart);
+
+      if (isEndOfHour) {
+        // At XX:00, use the full value as the incremental total for the hour
+        incrementalValue = data.value;
+      } else if (isReset || isNewHour) {
+        // At XX:01 or after a new hour boundary, the value is the incremental amount (reset occurred)
+        incrementalValue = data.value;
+      } else {
+        // Within the same hour, calculate the difference from the previous value
+        incrementalValue = data.value - previousValue;
+        // Ensure incremental value is non-negative (in case of anomalies)
+        incrementalValue = incrementalValue >= 0 ? incrementalValue : 0.0;
+      }
+    }
+
+    incrementalData.add(ChartData(
+      timestamp: data.timestamp,
+      value: incrementalValue,
+    ));
+
+    // Update previousValue after calculating the incremental value
+    previousValue = data.value;
+    previousTimestamp = data.timestamp;
+  }
+
+  return incrementalData;
+}
 
   double? _lastLatitude;
   double? _lastLongitude;
@@ -6497,8 +6587,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                       [],
                                             },
                                           ),
-
-                                        // Add Total Rainfall display here
+// Modified Builder widget for total rainfall display within the sidebar
                                         Builder(
                                           builder: (context) {
                                             double totalRainfall = 0.0;
@@ -6507,11 +6596,9 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             if (widget.deviceName.startsWith('FS') &&
                                                 fsrainData.isNotEmpty) {
                                               showTotalRainfall = true;
-                                              totalRainfall = fsrainData.fold(
-                                                  0.0,
-                                                  (sum, data) =>
-                                                      sum +
-                                                      (data.value ?? 0.0));
+                                              totalRainfall =
+                                                  _calculateTotalRainfall(
+                                                      fsrainData);
                                             } else if (widget.deviceName.startsWith('NA') &&
                                                 NARLParametersData['RainfallHourly'] !=
                                                     null &&
@@ -6519,40 +6606,29 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                     .isNotEmpty) {
                                               showTotalRainfall = true;
                                               totalRainfall =
-                                                  NARLParametersData[
-                                                          'RainfallHourly']!
-                                                      .fold(
-                                                          0.0,
-                                                          (sum, data) =>
-                                                              sum +
-                                                              (data.value ??
-                                                                  0.0));
+                                                  _calculateTotalRainfall(
+                                                      NARLParametersData[
+                                                          'RainfallHourly']!);
                                             } else if (widget.deviceName.startsWith('MY') &&
                                                 MYParametersData['RainfallHourly'] !=
                                                     null &&
                                                 MYParametersData['RainfallHourly']!
                                                     .isNotEmpty) {
                                               showTotalRainfall = true;
-                                              totalRainfall = MYParametersData[
-                                                      'RainfallHourly']!
-                                                  .fold(
-                                                      0.0,
-                                                      (sum, data) =>
-                                                          sum +
-                                                          (data.value ?? 0.0));
+                                              totalRainfall =
+                                                  _calculateTotalRainfall(
+                                                      MYParametersData[
+                                                          'RainfallHourly']!);
                                             } else if (widget.deviceName.startsWith('VD') &&
                                                 vdParametersData['RainfallHourly'] !=
                                                     null &&
                                                 vdParametersData['RainfallHourly']!
                                                     .isNotEmpty) {
                                               showTotalRainfall = true;
-                                              totalRainfall = vdParametersData[
-                                                      'RainfallHourly']!
-                                                  .fold(
-                                                      0.0,
-                                                      (sum, data) =>
-                                                          sum +
-                                                          (data.value ?? 0.0));
+                                              totalRainfall =
+                                                  _calculateTotalRainfall(
+                                                      vdParametersData[
+                                                          'RainfallHourly']!);
                                             } else if (widget.deviceName
                                                     .startsWith('CF') &&
                                                 cfParametersData['RainfallHourly'] !=
@@ -6560,13 +6636,10 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 cfParametersData['RainfallHourly']!
                                                     .isNotEmpty) {
                                               showTotalRainfall = true;
-                                              totalRainfall = cfParametersData[
-                                                      'RainfallHourly']!
-                                                  .fold(
-                                                      0.0,
-                                                      (sum, data) =>
-                                                          sum +
-                                                          (data.value ?? 0.0));
+                                              totalRainfall =
+                                                  _calculateTotalRainfall(
+                                                      cfParametersData[
+                                                          'RainfallHourly']!);
                                             } else if (widget.deviceName
                                                     .startsWith('CP') &&
                                                 csParametersData['RainfallHourly'] !=
@@ -6574,22 +6647,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 csParametersData['RainfallHourly']!
                                                     .isNotEmpty) {
                                               showTotalRainfall = true;
-                                              totalRainfall = csParametersData[
-                                                      'RainfallHourly']!
-                                                  .fold(
-                                                      0.0,
-                                                      (sum, data) =>
-                                                          sum +
-                                                          (data.value ?? 0.0));
+                                              totalRainfall =
+                                                  _calculateTotalRainfall(
+                                                      csParametersData[
+                                                          'RainfallHourly']!);
                                             } else if (widget.deviceName
                                                     .startsWith('IT') &&
                                                 itrainData.isNotEmpty) {
                                               showTotalRainfall = true;
-                                              totalRainfall = itrainData.fold(
-                                                  0.0,
-                                                  (sum, data) =>
-                                                      sum +
-                                                      (data.value ?? 0.0));
+                                              totalRainfall =
+                                                  _calculateTotalRainfall(
+                                                      itrainData);
                                             } else if ((widget.deviceName
                                                         .startsWith('WD211') ||
                                                     widget.deviceName
@@ -6597,11 +6665,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 wfrainfallData.isNotEmpty) {
                                               showTotalRainfall = true;
                                               totalRainfall =
-                                                  wfrainfallData.fold(
-                                                      0.0,
-                                                      (sum, data) =>
-                                                          sum +
-                                                          (data.value ?? 0.0));
+                                                  _calculateTotalRainfall(
+                                                      wfrainfallData);
                                             }
 
                                             if (showTotalRainfall &&
@@ -7248,6 +7313,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 ? '($unit)'
                                                 : displayName;
                                           }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          }
                                           return _buildChartContainer(
                                               displayName,
                                               data,
@@ -7344,6 +7418,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 ? '$displayName ($unit)'
                                                 : displayName;
                                           }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          }
                                           return _buildChartContainer(
                                               displayName,
                                               data,
@@ -7397,6 +7480,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             chartTitle = unit.isNotEmpty
                                                 ? '($unit)'
                                                 : displayName;
+                                          }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
                                           }
                                           return _buildChartContainer(
                                               displayName,
@@ -7457,6 +7549,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 ? '($unit)'
                                                 : displayName;
                                           }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          }
                                           return _buildChartContainer(
                                               displayName,
                                               data,
@@ -7509,6 +7610,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             chartTitle = unit.isNotEmpty
                                                 ? '($unit)'
                                                 : displayName;
+                                          }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
                                           }
                                           return _buildChartContainer(
                                               displayName,
@@ -7563,6 +7673,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 ? '($unit)'
                                                 : displayName;
                                           }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          }
                                           return _buildChartContainer(
                                               displayName,
                                               data,
@@ -7615,6 +7734,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                             chartTitle = unit.isNotEmpty
                                                 ? '($unit)'
                                                 : displayName;
+                                          }
+                                          if (paramName == 'RainfallHourly') {
+                                            return _buildChartContainer(
+                                                displayName,
+                                                _transformToIncrementalRainfall(
+                                                    data),
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
                                           }
                                           return _buildChartContainer(
                                               displayName,
