@@ -26,6 +26,8 @@ class _MapPageState extends State<MapPage> {
   double zoomLevel = 5.0;
   late MapController mapController;
   bool isLoading = false;
+  final TextEditingController startController = TextEditingController();
+  final TextEditingController endController = TextEditingController();
 
   List<Map<String, dynamic>> deviceLocations = [];
   TextEditingController searchController = TextEditingController();
@@ -33,7 +35,12 @@ class _MapPageState extends State<MapPage> {
   List<Map<String, dynamic>> filteredDevices = [];
   List<Map<String, dynamic>> suggestions = [];
   Marker? searchPin;
-
+  String? selectedDeviceIdr;
+  DateTime? startDater;
+  DateTime? endDater;
+  bool isLoadingr = false;
+  bool showCard = false;
+  List<dynamic> filteredData = [];
   List<String> deviceIds = [];
   String? selectedDeviceId;
   DateTime? startDate;
@@ -741,6 +748,214 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  Future<void> fetchDistanceData() async {
+    if (startDater == null || endDater == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select start and end dates")),
+      );
+      return;
+    }
+
+    if (selectedDeviceIdr == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a device from the map")),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoadingr = true;
+      filteredData = [];
+    });
+
+    final formattedStart =
+        "${startDater!.day.toString().padLeft(2, '0')}-${startDater!.month.toString().padLeft(2, '0')}-${startDater!.year}";
+    final formattedEnd =
+        "${endDater!.day.toString().padLeft(2, '0')}-${endDater!.month.toString().padLeft(2, '0')}-${endDater!.year}";
+
+    // remove "Device: " prefix if exists
+    final cleanDeviceId =
+        selectedDeviceIdr!.replaceFirst("Device: ", "").trim();
+
+    final url =
+        "https://nv9spsjdpe.execute-api.us-east-1.amazonaws.com/default/GPS_API_Data_func?Device_id=$cleanDeviceId&startdate=$formattedStart&enddate=$formattedEnd";
+
+    try {
+      print("API URL: $url");
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+
+        final filtered = data.where((item) {
+          final dist = (item["Distance_Meters"] ?? 0).toDouble();
+          return dist > 100;
+        }).toList();
+
+        setState(() {
+          filteredData = filtered;
+        });
+      } else {
+        setState(() {
+          filteredData = [];
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${response.statusCode}")),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        filteredData = [];
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+
+    setState(() => isLoadingr = false);
+  }
+
+  Future<void> pickStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      initialDate: startDater ?? DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        startDater = picked;
+        startController.text = formatDate(picked);
+      });
+    }
+  }
+
+  Future<void> pickEndDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      initialDate: endDater ?? DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        endDater = picked;
+        endController.text = formatDate(picked);
+      });
+    }
+  }
+
+  String formatDate(DateTime? date) {
+    if (date == null) return "";
+    return "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
+  }
+
+  Widget buildDateField(
+      String label, TextEditingController controller, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AbsorbPointer(
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: const OutlineInputBorder(),
+            suffixIcon: const Icon(Icons.calendar_today),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildMovementsList() {
+    if (filteredData.isEmpty) {
+      return const Text("No movements > 100m found");
+    }
+    return ListView.builder(
+      itemCount: filteredData.length,
+      itemBuilder: (context, index) {
+        final item = filteredData[index];
+        final distance = (item["Distance_Meters"] ?? 0).toDouble();
+        final timestamp = item["Timestamp"];
+        return Card(
+          child: ListTile(
+            title: Text(
+              "Moved ${distance.toStringAsFixed(2)}m",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text("at $timestamp"),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildMovementCard() {
+    return Center(
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 350,
+              maxHeight: 450,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Check Movements",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                buildDateField("Start Date", startController, pickStartDate),
+                const SizedBox(height: 10),
+                buildDateField("End Date", endController, pickEndDate),
+                ElevatedButton(
+                  onPressed: isLoadingr ? null : fetchDistanceData,
+                  child: isLoadingr
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("Check Data"),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: SizedBox(
+                    height: 200,
+                    child: buildMovementsList(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        showCard = false;
+                        startDater = null;
+                        endDater = null;
+                        startController.clear();
+                        endController.clear();
+                        filteredData = [];
+                        isLoadingr = false;
+                      });
+                    },
+                    child: const Text("Close"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showDeviceInfoDialog(
     BuildContext context,
     String name,
@@ -811,6 +1026,15 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  showCard = true;
+                });
+              },
+              child: const Text("Check Movements"),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -906,6 +1130,9 @@ class _MapPageState extends State<MapPage> {
                         height: 80.0,
                         child: GestureDetector(
                           onTap: () {
+                            setState(() {
+                              selectedDeviceIdr = device['name'];
+                            });
                             _showDeviceInfoDialog(
                               context,
                               device['name'],
@@ -1213,6 +1440,7 @@ class _MapPageState extends State<MapPage> {
                 ],
               ),
             ),
+            if (showCard) buildMovementCard(),
           ],
         ),
       ),
