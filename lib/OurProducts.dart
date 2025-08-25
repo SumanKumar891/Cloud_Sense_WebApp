@@ -456,7 +456,7 @@ class PopularItemsSection extends StatelessWidget {
       {
         "image": "assets/weather_station.jpg",
         "title": "Advanced Weather Station",
-        "sku": "AWS001",
+        "sku": "",
         "desc":
             "Autonomous weather station for educational, agricultural, and environmental monitoring. Collects real-time data on rainfall, temperature, humidity, and solar radiation, powered by solar energy.",
         "features": [
@@ -468,7 +468,7 @@ class PopularItemsSection extends StatelessWidget {
       {
         "image": "assets/RainGauge.jpg",
         "title": "Tipping Bucket Rain Gauge",
-        "sku": "RBG-TB",
+        "sku": "",
         "desc":
             "Measures rainfall intensity and total amount with high accuracy.",
         "features": [
@@ -480,7 +480,7 @@ class PopularItemsSection extends StatelessWidget {
       {
         "image": "assets/RadiationShield.jpg",
         "title": "Radiation Shield",
-        "sku": "RS-12",
+        "sku": "",
         "desc":
             "Protects sensors from direct sunlight and rain while allowing airflow.",
         "features": [
@@ -492,7 +492,7 @@ class PopularItemsSection extends StatelessWidget {
       {
         "image": "assets/DataLoggerGateway.jpg",
         "title": "Data Logger / Gateway",
-        "sku": "DLG-01",
+        "sku": "",
         "desc":
             "Wireless device for sensor data collection, logging, and cloud transmission.",
         "features": [
