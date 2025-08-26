@@ -28,7 +28,7 @@ class ProductPage extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/RainGaugeBg.jpg",
+                      "assets/raingaugebg.jpg",
                       height: isWideScreen ? 450 : 350,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -185,7 +185,7 @@ class ProductPage extends StatelessWidget {
                                     height: 250,
                                     child: FittedBox(
                                       fit: BoxFit.contain,
-                                      child: Image.asset("assets/Rbase01.png"),
+                                      child: Image.asset("assets/rbase.png"),
                                     ),
                                   ),
                                 ),
@@ -196,7 +196,7 @@ class ProductPage extends StatelessWidget {
                                     height: 300,
                                     child: FittedBox(
                                       fit: BoxFit.contain,
-                                      child: Image.asset("assets/Raingauge02.jpg"),
+                                      child: Image.asset("assets/raingaugecylindrical.jpg"),
                                     ),
                                   ),
                                 ),
@@ -230,7 +230,7 @@ class ProductPage extends StatelessWidget {
                                   height: 160,
                                   child: FittedBox(
                                     fit: BoxFit.contain,
-                                    child: Image.asset("assets/Rbase01.png"),
+                                    child: Image.asset("assets/rbase.png"),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -238,7 +238,7 @@ class ProductPage extends StatelessWidget {
                                   height: 160,
                                   child: FittedBox(
                                     fit: BoxFit.contain,
-                                    child: Image.asset("assets/Raingauge02.jpg"),
+                                    child: Image.asset("assets/raingaugecylindrical.jpg"),
                                   ),
                                 ),
                                 const SizedBox(height: 12),

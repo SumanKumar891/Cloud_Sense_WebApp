@@ -143,14 +143,17 @@ flutter:
     - assets/28.jpg
     - assets/weatherforecasting.png
     - assets/DataLoggerGateway.jpg
-    - assets/weather_station.jpg
     - assets/RadiationShield.jpg
     - assets/bgremover.png
     - assets/RainGauge.jpg
-    - assets/RainGaugeBg.jpg
+    - assets/raingaugebg.jpg
     - assets/atrh.jpg
-    - assets/dataLoggerbg.jpg
+    - assets/datalogger.jpg
     - assets/windsensor.jpg
+    - assets/weatherstation.jpg
+    - assets/raingaugecylindrical.jpg
+    - assets/rbase.png
+
    
    
     
