@@ -471,12 +471,6 @@ class _HomePageState extends State<HomePage> {
                               onPressed: () => _showLoginPopup(context),
                               child: Row(
                                 children: [
-                                  Icon(Icons.arrow_drop_down,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                      size: isTablet ? 18 : 20),
-                                  SizedBox(width: 4),
                                   Text(
                                     'Login/Signup',
                                     style: TextStyle(
@@ -487,6 +481,11 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: isTablet ? 14 : 16,
                                     ),
                                   ),
+                                  Icon(Icons.arrow_drop_down,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                      size: isTablet ? 18 : 20),
                                 ],
                               ),
                             ),
