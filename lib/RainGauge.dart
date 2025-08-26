@@ -28,7 +28,7 @@ class ProductPage extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/Rain_GaugeBg.jpg",
+                      "assets/RainGaugeBg.jpg",
                       height: isWideScreen ? 450 : 350,
                       width: double.infinity,
                       fit: BoxFit.cover,

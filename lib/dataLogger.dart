@@ -28,7 +28,7 @@ class DataLoggerPage extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/dataLoggerBg.jpg",
+                      "assets/dataLoggerbg.jpg",
                       height: isWideScreen ? 450 : 400,
                       width: double.infinity,
                       fit: BoxFit.cover,
