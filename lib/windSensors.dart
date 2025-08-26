@@ -25,20 +25,17 @@ class UltrasonicSensorPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-             
                 Stack(
                   children: [
-                  
                     Image.asset(
                       "assets/tree.jpg",
-                      height: isWideScreen ? 400 : 300,
+                      height: isWideScreen ? 450 : 350,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      alignment: Alignment.centerRight,
                     ),
-
-                 
                     Container(
-                      height: isWideScreen ? 400 : 300,
+                      height: isWideScreen ? 450 : 350,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -50,100 +47,113 @@ class UltrasonicSensorPage extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                   
-                    Positioned(
-                      top: 12,
-                      left: 12,
-                      child: IconButton(
-                        constraints: const BoxConstraints(), 
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 22),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
-
-                  
                     Positioned.fill(
                       child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 20),
-                          child: SizedBox(
-                            width: isWideScreen ? 600 : double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                               
-                                Column(
+                        alignment: Alignment.topLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12, left: 8),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white, size: 22),
+                                onPressed: () {
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context)
+                                        .pushReplacementNamed("/");
+                                  }
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isWideScreen ? 84 : 16,
+                                vertical: isWideScreen ? 20 : 12,
+                              ),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      isWideScreen ? 600 : double.infinity,
+                                ),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "WindSensors",
-                                      style: TextStyle(
-                                        fontSize: isWideScreen ? 48 : 32,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    const SizedBox(height: 12),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "Wind",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.lightBlueAccent,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "Sensors",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color.fromARGB(
+                                                  255, 219, 80, 145),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
                                       margin: const EdgeInsets.only(
                                           top: 6, bottom: 16),
-                                      height: 4,
-                                      width: (isWideScreen ? 270 : 190),
+                                      height: 3,
+                                      width: isWideScreen ? 270 : 150,
                                       color: Colors.lightBlueAccent,
+                                    ),
+                                    Text(
+                                      "High quality, general purpose, ultrasonic wind sensors",
+                                      style: TextStyle(
+                                        fontSize: isWideScreen ? 20 : 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: const [
+                                        BannerPoint(
+                                            "High accuracy, low cost wind measurement"),
+                                        BannerPoint(
+                                            "Excellent reliability, low maintenance"),
+                                        BannerPoint(
+                                            "Models and outputs to suit varied applications"),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        _buildBannerButton(
+                                            "ENQUIRE", Colors.lightBlue),
+                                        _buildBannerButton(
+                                            "DATASHEETS", Colors.teal),
+                                      ],
                                     ),
                                   ],
                                 ),
-
-                               
-                                Text(
-                                  "High quality, general purpose, ultrasonic wind sensors",
-                                  style: TextStyle(
-                                    fontSize: isWideScreen ? 20 : 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-
-                               
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    BannerPoint(
-                                        "High accuracy, low cost wind measurement"),
-                                    BannerPoint(
-                                        "Excellent reliability, low maintenance"),
-                                    BannerPoint(
-                                        "Models and outputs to suit varied applications"),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-
-                              
-                                Wrap(
-                                  spacing: 12,
-                                  children: [
-                                    _buildBannerButton(
-                                        "ENQUIRE", Colors.lightBlue),
-                                    _buildBannerButton(
-                                        "DATASHEETS", Colors.teal),
-                                  ],
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
-
-           
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: isWideScreen
@@ -163,6 +173,99 @@ class UltrasonicSensorPage extends StatelessWidget {
                           ],
                         ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    color: Colors.teal.shade50,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: isWideScreen
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Center(
+                                    child: Image.asset(
+                                      "assets/ultrasonic.jpg",
+                                      height: 300,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 50),
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Technical Overview",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                          )),
+                                      const SizedBox(height: 12),
+                                      featureItem(
+                                          "Wind speed: 0–60 m/s", isDarkMode),
+                                      featureItem(
+                                          "Wind direction: 0–360°", isDarkMode),
+                                      featureItem(
+                                          "Output: NMEA & others", isDarkMode),
+                                      featureItem(
+                                          "Material: Corrosion free polycarbonate",
+                                          isDarkMode),
+                                      featureItem(
+                                          "Weight: 0.5 kg, Colors: Black/White",
+                                          isDarkMode),
+                                      const SizedBox(height: 16),
+                                      _buildBannerButton(
+                                          "DOWNLOAD DATASHEET", Colors.teal),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                Image.asset(
+                                  "assets/ultrasonic.jpg",
+                                  height: 160,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(height: 12),
+                                Text("Technical Overview",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    )),
+                                const SizedBox(height: 10),
+                                featureItem("Wind speed: 0–60 m/s (216 km/h)",
+                                    isDarkMode),
+                                featureItem(
+                                    "Wind direction: 0–360°", isDarkMode),
+                                featureItem("Output: NMEA", isDarkMode),
+                                featureItem("Polycarbonate Body", isDarkMode),
+                                featureItem("Weight: 0.5 kg", isDarkMode),
+                                const SizedBox(height: 16),
+                                _buildBannerButton(
+                                    "DOWNLOAD DATASHEET", Colors.teal),
+                              ],
+                            ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -170,7 +273,6 @@ class UltrasonicSensorPage extends StatelessWidget {
       ),
     );
   }
-
 
   static Widget _buildBannerButton(String label, Color color) {
     return ElevatedButton.icon(
@@ -189,9 +291,9 @@ class UltrasonicSensorPage extends StatelessWidget {
     );
   }
 
-
   Widget _buildFeaturesCard(bool isDarkMode) {
     return Card(
+      color: Colors.teal.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
       child: Padding(
@@ -203,23 +305,24 @@ class UltrasonicSensorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Measurements up to 60m/s (216 km/h)", isDarkMode),
-            featureItem("Models up to 75m/s (270 km/h)", isDarkMode),
-            featureItem("WMO-compliant gust calculation", isDarkMode),
-            featureItem("Unheated and heated models available", isDarkMode),
-            featureItem("Maintenance-free, low cost", isDarkMode),
+            featureItem("Measures up to 60m/s wind speed", isDarkMode),
+            featureItem(
+                "Supports gust calculation (WMO compliant)", isDarkMode),
+            featureItem("Both heated & unheated models", isDarkMode),
+            featureItem("Completely maintenance-free", isDarkMode),
+            featureItem("Compact & lightweight design", isDarkMode),
           ],
         ),
       ),
     );
   }
 
-
   Widget _buildApplicationsCard(bool isDarkMode) {
     return Card(
+      color: Colors.blue.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
       child: Padding(
@@ -227,39 +330,37 @@ class UltrasonicSensorPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Typical Applications",
+            Text("Applications",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                  color: Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Wind speed & direction observation", isDarkMode),
-            featureItem("Pollution plume monitoring", isDarkMode),
+            featureItem("Weather monitoring & observation", isDarkMode),
+            featureItem("Pollution monitoring systems", isDarkMode),
             featureItem("Solar plant asset protection", isDarkMode),
-            featureItem("Tunnel & industrial ventilation", isDarkMode),
-            featureItem("IoT, smart city applications", isDarkMode),
-            featureItem("Integration into weather systems", isDarkMode),
+            featureItem("Smart cities & IoT projects", isDarkMode),
+            featureItem("Industrial & tunnel ventilation", isDarkMode),
           ],
         ),
       ),
     );
   }
 
-
   Widget featureItem(String text, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          const Icon(Icons.check, color: Colors.teal, size: 20),
+          const Icon(Icons.check_circle, color: Colors.teal, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
                 fontSize: 15,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: isDarkMode ? Colors.black87 : Colors.black87,
               ),
             ),
           ),
@@ -278,7 +379,6 @@ class BannerPoint extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Icon(Icons.circle, size: 8, color: Colors.white),
           const SizedBox(width: 6),

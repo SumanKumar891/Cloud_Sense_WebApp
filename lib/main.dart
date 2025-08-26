@@ -3,7 +3,8 @@ import 'package:cloud_sense_webapp/AccountInfo.dart';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
-import 'package:cloud_sense_webapp/OurProducts.dart';
+import 'package:cloud_sense_webapp/dataLogger.dart';
+import 'package:cloud_sense_webapp/raingauge.dart';
 
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
@@ -11,6 +12,7 @@ import 'package:cloud_sense_webapp/devicelocationinfo.dart';
 import 'package:cloud_sense_webapp/GPS.dart';
 
 import 'package:cloud_sense_webapp/devicemap.dart';
+import 'package:cloud_sense_webapp/windSensors.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -528,9 +530,11 @@ class MyApp extends StatelessWidget {
         '/login': (context) => SignInSignUpScreen(),
         '/accountinfo': (context) => AccountInfoPage(),
         '/deviceinfo': (context) => MapPage(),
+        '/raingauge': (context) => ProductPage(),
+        '/windsensor': (context) => UltrasonicSensorPage(),
+        '/datalogger': (context) => DataLoggerPage(),
         '/devicelist': (context) => DataDisplayPage(),
         '/devicelocationinfo': (context) => DeviceActivityPage(),
-        '/products': (context) => ProductPage(),
         '/devicemapinfo': (context) => DeviceMapScreen(),
         '/devicegraph': (context) => DeviceGraphPage(
               deviceName: '',

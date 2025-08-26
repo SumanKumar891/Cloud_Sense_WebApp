@@ -46,6 +46,9 @@ class _HomePageState extends State<HomePage> {
   bool _isHovered = false;
   bool _isHoveredMyDevicesButton = false;
   bool _isPressedMyDevicesButton = false;
+  bool _isHoveredbutton = false;
+  bool _isPressed = false;
+  bool _isProductsExpanded = false; // For mobile drawer products expansion
 
   @override
   void initState() {
@@ -148,6 +151,186 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _showSensorPopup(BuildContext context, {GlobalKey? buttonKey}) async {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    RelativeRect position;
+
+    if (buttonKey != null) {
+      final RenderBox button =
+          buttonKey.currentContext!.findRenderObject() as RenderBox;
+      final buttonPosition =
+          button.localToGlobal(Offset.zero, ancestor: overlay);
+
+      position = RelativeRect.fromLTRB(
+        buttonPosition.dx,
+        buttonPosition.dy + button.size.height,
+        buttonPosition.dx + 200,
+        0,
+      );
+    } else {
+      position = RelativeRect.fromLTRB(
+        overlay.size.width - 200,
+        kToolbarHeight,
+        0,
+        0,
+      );
+    }
+
+    bool isAtrhExpanded = false;
+
+    final selected = await showMenu<String>(
+      context: context,
+      position: position,
+      color: isDarkMode ? Colors.grey[800] : Colors.white,
+      items: [
+        // ATRH Sensor with expandable sub-items
+        PopupMenuItem<String>(
+          value: 'atrh_sensor',
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isAtrhExpanded = !isAtrhExpanded;
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.thermostat,
+                            color: isDarkMode ? Colors.white : Colors.black),
+                        SizedBox(width: 8),
+                        Text('ATRH Sensor'),
+                        SizedBox(width: 8),
+                        Icon(
+                          isAtrhExpanded
+                              ? Icons.arrow_drop_up
+                              : Icons.arrow_drop_down,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isAtrhExpanded) ...[
+                    Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/atrh');
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.thermostat,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black),
+                              SizedBox(width: 8),
+                              Text('ATRH'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/atrh_lux_pressure');
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.thermostat,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black),
+                              SizedBox(width: 8),
+                              Text('ATRH Lux Pressure Sensor'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+        ),
+        // Wind Speed
+        PopupMenuItem(
+          value: 'wind_speed',
+          child: Row(
+            children: [
+              Icon(Icons.air, color: isDarkMode ? Colors.white : Colors.black),
+              SizedBox(width: 8),
+              Text('Wind Speed'),
+            ],
+          ),
+        ),
+        // Rain Gauge
+        PopupMenuItem(
+          value: 'rain_gauge',
+          child: Row(
+            children: [
+              Icon(Icons.water_drop,
+                  color: isDarkMode ? Colors.white : Colors.black),
+              SizedBox(width: 8),
+              Text('Rain Gauge'),
+            ],
+          ),
+        ),
+        // Data Logger
+        PopupMenuItem(
+          value: 'data_logger',
+          child: Row(
+            children: [
+              Icon(Icons.storage,
+                  color: isDarkMode ? Colors.white : Colors.black),
+              SizedBox(width: 8),
+              Text('Data Logger'),
+            ],
+          ),
+        ),
+        // Gateway
+        PopupMenuItem(
+          value: 'gateway',
+          child: Row(
+            children: [
+              Icon(Icons.router,
+                  color: isDarkMode ? Colors.white : Colors.black),
+              SizedBox(width: 8),
+              Text('Gateway'),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (selected != null && selected != 'atrh_sensor') {
+      switch (selected) {
+        case 'wind_speed':
+          Navigator.pushNamed(context, '/windsensor');
+          break;
+        case 'rain_gauge':
+          Navigator.pushNamed(context, '/raingauge');
+          break;
+        case 'data_logger':
+          Navigator.pushNamed(context, '/datalogger');
+          break;
+        case 'gateway':
+          Navigator.pushNamed(context, '/gateway');
+          break;
+      }
+    }
+  }
+
   Widget _buildUserIcon() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final userProvider = Provider.of<UserProvider>(context);
@@ -180,6 +363,10 @@ class _HomePageState extends State<HomePage> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
 
+    // GlobalKeys for positioning dropdowns
+    final GlobalKey productsButtonKey = GlobalKey();
+    final GlobalKey userButtonKey = GlobalKey();
+
     double titleFont = screenWidth < 800
         ? 28
         : screenWidth < 1024
@@ -210,6 +397,13 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
           title: Row(
             children: [
+              SizedBox(
+                width: screenWidth < 600
+                    ? 0
+                    : screenWidth <= 1024
+                        ? 200
+                        : 260,
+              ),
               Icon(Icons.cloud,
                   color: isDarkMode ? Colors.white : Colors.black),
               SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
@@ -218,38 +412,86 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                   color: isDarkMode ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,
-                  fontSize: isMobile ? 20 : (isTablet ? 26 : 32),
+                  fontSize: screenWidth < 600
+                      ? 20
+                      : screenWidth <= 1024
+                          ? 26
+                          : 32,
                 ),
               ),
               Spacer(),
               if (!isMobile)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    userProvider.userEmail != null
-                        ? Row(
-                            children: [
-                              _buildUserIcon(),
-                              SizedBox(width: 8),
-                              _buildUserDropdown(isDarkMode, isTablet),
-                            ],
-                          )
-                        : IconButton(
-                            icon: _buildUserIcon(),
-                            onPressed: () => _showLoginPopup(context),
-                          ),
-                    SizedBox(width: 8),
-                    IconButton(
-                      icon: Icon(
-                        Icons.shopping_cart,
-                        color: isDarkMode ? Colors.white : Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                    right: screenWidth < 600
+                        ? 20
+                        : screenWidth <= 1024
+                            ? 200
+                            : 260,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        key: productsButtonKey,
+                        onPressed: () => _showSensorPopup(context,
+                            buttonKey: productsButtonKey),
+                        child: Row(
+                          children: [
+                            SizedBox(width: 4),
+                            Text(
+                              'Products',
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: isTablet ? 14 : 16,
+                              ),
+                            ),
+                            Icon(Icons.arrow_drop_down,
+                                color: isDarkMode ? Colors.white : Colors.black,
+                                size: isTablet ? 18 : 20),
+                          ],
+                        ),
                       ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/products');
-                      },
-                      tooltip: 'Our Products',
-                    ),
-                  ],
+                      SizedBox(
+                        width: screenWidth <= 1024 ? 12 : 24,
+                      ),
+                      userProvider.userEmail != null
+                          ? Row(
+                              key: userButtonKey,
+                              children: [
+                                _buildUserIcon(),
+                                SizedBox(width: 8),
+                                _buildUserDropdown(
+                                    isDarkMode, isTablet, userButtonKey),
+                              ],
+                            )
+                          : TextButton(
+                              key: userButtonKey,
+                              onPressed: () => _showLoginPopup(context),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.arrow_drop_down,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                      size: isTablet ? 18 : 20),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Login/Signup',
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: isTablet ? 14 : 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -257,101 +499,230 @@ class _HomePageState extends State<HomePage> {
               ? [
                   Builder(
                     builder: (context) => IconButton(
-                      icon: _buildUserIcon(),
+                      icon: Icon(
+                        Icons.menu,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
                       onPressed: () {
-                        if (userProvider.userEmail == null) {
-                          _showLoginPopup(context);
-                        } else {
-                          Scaffold.of(context).openEndDrawer();
-                        }
+                        Scaffold.of(context).openEndDrawer();
                       },
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  IconButton(
-                    icon: Icon(
-                      Icons.shopping_cart,
-                      color: isDarkMode ? Colors.white : Colors.black,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/products');
-                    },
-                    tooltip: 'Our Products',
                   ),
                 ]
               : [],
         ),
-        endDrawer: isMobile && userProvider.userEmail != null
+        endDrawer: isMobile
             ? Drawer(
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
                     DrawerHeader(
-                      decoration: BoxDecoration(color: Colors.grey[900]),
+                      decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? Colors.blueGrey[900]
+                            : Colors.grey[200],
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(height: 8),
                           Row(
                             children: [
-                              userProvider.userEmail == null
-                                  ? Icon(
-                                      Icons.person,
-                                      color: Colors.white70,
-                                    )
-                                  : CircleAvatar(
-                                      radius: 14,
-                                      backgroundColor: Colors.white,
-                                      child: Text(
-                                        userProvider.userEmail![0]
-                                            .toUpperCase(),
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
+                              _buildUserIcon(),
                               SizedBox(width: 8),
                               Text(
-                                userProvider.userEmail ?? 'Guest',
+                                userProvider.userEmail ?? 'Guest User',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
+                          SizedBox(height: 8),
+                          Text(
+                            userProvider.userEmail != null
+                                ? 'Welcome back!'
+                                : 'Please login to access all features',
+                            style: TextStyle(
+                              color:
+                                  isDarkMode ? Colors.white70 : Colors.black54,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    ListTile(
-                      leading: Icon(Icons.devices),
-                      title: Text('My Devices'),
-                      onTap: _handleDeviceNavigation,
-                    ),
-                    if (userProvider.userEmail?.trim().toLowerCase() !=
-                        '05agriculture.05@gmail.com')
+                    if (userProvider.userEmail != null) ...[
                       ListTile(
-                        leading: Icon(Icons.account_circle),
-                        title: Text('Account Info'),
+                        leading: Icon(Icons.devices),
+                        title: Text('My Devices'),
                         onTap: () {
-                          Navigator.pushNamed(context, '/accountinfo');
+                          Navigator.pop(context);
+                          _handleDeviceNavigation();
                         },
                       ),
+                      if (userProvider.userEmail?.trim().toLowerCase() !=
+                          '05agriculture.05@gmail.com')
+                        ListTile(
+                          leading: Icon(Icons.account_circle),
+                          title: Text('Account Info'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pushNamed(context, '/accountinfo');
+                          },
+                        ),
+                      ListTile(
+                        leading: Icon(themeProvider.isDarkMode
+                            ? Icons.light_mode
+                            : Icons.dark_mode),
+                        title: Text('Theme'),
+                        onTap: () {
+                          themeProvider.toggleTheme();
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.logout),
+                        title: Text('Logout'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _handleLogout();
+                        },
+                      ),
+                      Divider(),
+                    ],
                     ListTile(
-                      leading: Icon(themeProvider.isDarkMode
-                          ? Icons.light_mode
-                          : Icons.dark_mode),
-                      title: Text('Theme'),
-                      onTap: () => themeProvider.toggleTheme(),
+                      leading: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.inventory,
+                              color: isDarkMode ? Colors.white : Colors.black),
+                          SizedBox(width: 8),
+                          Icon(
+                              _isProductsExpanded
+                                  ? Icons.arrow_drop_up
+                                  : Icons.arrow_drop_down,
+                              color: isDarkMode ? Colors.white : Colors.black),
+                        ],
+                      ),
+                      title: Text('Products'),
+                      subtitle: Text('Browse our sensor products'),
+                      onTap: () {
+                        setState(() {
+                          _isProductsExpanded = !_isProductsExpanded;
+                        });
+                      },
                     ),
-                    ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text('Logout'),
-                      onTap: _handleLogout,
-                    ),
+                    if (_isProductsExpanded)
+                      Padding(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.thermostat, size: 20),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_drop_down, size: 20),
+                                ],
+                              ),
+                              title: Text('ATRH Sensor',
+                                  style: TextStyle(fontSize: 14)),
+                              onTap: () {
+                                setState(() {
+                                  _isProductsExpanded = true;
+                                });
+                              },
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 16),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: Icon(Icons.thermostat, size: 18),
+                                    title: Text('ATRH',
+                                        style: TextStyle(fontSize: 12)),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Navigator.pushNamed(context, '/atrh');
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: Icon(Icons.thermostat, size: 18),
+                                    title: Text('ATRH Lux Pressure Sensor',
+                                        style: TextStyle(fontSize: 12)),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      Navigator.pushNamed(
+                                          context, '/atrh_lux_pressure');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.air, size: 20),
+                              title: Text('Wind Speed',
+                                  style: TextStyle(fontSize: 14)),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/windsensor');
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.water_drop, size: 20),
+                              title: Text('Rain Gauge',
+                                  style: TextStyle(fontSize: 14)),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/raingauge');
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.storage, size: 20),
+                              title: Text('Data Logger',
+                                  style: TextStyle(fontSize: 14)),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/datalogger');
+                              },
+                            ),
+                            ListTile(
+                              leading: Icon(Icons.router, size: 20),
+                              title: Text('Gateway',
+                                  style: TextStyle(fontSize: 14)),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/gateway');
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (userProvider.userEmail == null) ...[
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.login),
+                        title: Text('Login/Signup'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _showLoginPopup(context);
+                        },
+                      ),
+                      ListTile(
+                        leading: Icon(themeProvider.isDarkMode
+                            ? Icons.light_mode
+                            : Icons.dark_mode),
+                        title: Text('Theme'),
+                        onTap: () {
+                          themeProvider.toggleTheme();
+                        },
+                      ),
+                    ],
                   ],
                 ),
               )
@@ -378,7 +749,11 @@ class _HomePageState extends State<HomePage> {
             SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth < 600 ? 20 : 80,
+                  horizontal: screenWidth < 600
+                      ? 20
+                      : screenWidth <= 1024
+                          ? 260
+                          : 260,
                   vertical: 40,
                 ),
                 child: Column(
@@ -546,7 +921,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20), // Space between buttons
+                        const SizedBox(height: 20),
                         MouseRegion(
                           onEnter: (_) =>
                               setState(() => _isHoveredbutton = true),
@@ -674,7 +1049,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildUserDropdown(bool isDarkMode, bool isTablet) {
+  Widget _buildUserDropdown(
+      bool isDarkMode, bool isTablet, GlobalKey userButtonKey) {
     final userProvider = Provider.of<UserProvider>(context);
     final isAdmin = userProvider.userEmail?.trim().toLowerCase() ==
         '05agriculture.05@gmail.com';
@@ -684,13 +1060,17 @@ class _HomePageState extends State<HomePage> {
       onTap: () async {
         final RenderBox overlay =
             Overlay.of(context).context.findRenderObject() as RenderBox;
+        final RenderBox button =
+            userButtonKey.currentContext!.findRenderObject() as RenderBox;
+        final buttonPosition =
+            button.localToGlobal(Offset.zero, ancestor: overlay);
 
         final selected = await showMenu<String>(
           context: context,
           position: RelativeRect.fromLTRB(
-            overlay.size.width, // 👈 align to right edge
-            kToolbarHeight, // 👈 just below AppBar
-            0,
+            buttonPosition.dx,
+            buttonPosition.dy + button.size.height,
+            buttonPosition.dx + 200,
             0,
           ),
           color: isDarkMode ? Colors.grey[800] : Colors.white,
@@ -775,9 +1155,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  bool _isHoveredbutton = false;
-  bool _isPressed = false;
 
   Widget _buildAnimatedStatCard({
     required String statValue,
