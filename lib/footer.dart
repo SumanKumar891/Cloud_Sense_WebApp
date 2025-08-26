@@ -12,7 +12,7 @@ class Footer extends StatelessWidget {
     return Container(
       color: isDarkMode ? Colors.grey.shade900 : Colors.teal.shade50,
       padding: EdgeInsets.symmetric(
-        vertical: isWideScreen ? 32 : 24,
+        vertical: isWideScreen ? 16 : 12, // Reduced from 32/24 to 16/12
         horizontal: isWideScreen ? 84 : 16,
       ),
       child: Center(
@@ -29,21 +29,21 @@ class Footer extends StatelessWidget {
                 color: isDarkMode ? Colors.white : Colors.teal.shade800,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8), // Reduced from 16 to 8
             _buildContactItem(
               icon: Icons.location_on,
               text: 'IIT Ropar',
               isDarkMode: isDarkMode,
               isWideScreen: isWideScreen,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6), // Reduced from 12 to 6
             _buildContactItem(
               icon: Icons.email,
               text: 'iot.aihub@gmail.com',
               isDarkMode: isDarkMode,
               isWideScreen: isWideScreen,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6), // Reduced from 12 to 6
             _buildContactItem(
               icon: Icons.phone,
               text: '+91 8124660891',
@@ -73,7 +73,7 @@ class Footer extends StatelessWidget {
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min, // Minimize row size to fit content
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icon,
