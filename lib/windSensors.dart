@@ -29,13 +29,13 @@ class UltrasonicSensorPage extends StatelessWidget {
                   children: [
                     Image.asset(
                       "assets/tree.jpg",
-                      height: isWideScreen ? 450 : 350,
+                      height: isWideScreen ? 450 : 400,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       alignment: Alignment.centerRight,
                     ),
                     Container(
-                      height: isWideScreen ? 450 : 350,
+                      height: isWideScreen ? 450 : 400,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -190,7 +190,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                                   flex: 1,
                                   child: Center(
                                     child: Image.asset(
-                                      "assets/ultrasonic.jpg",
+                                      "assets/windsensor.jpg",
                                       height: 300,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
@@ -236,7 +236,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                           : Column(
                               children: [
                                 Image.asset(
-                                  "assets/ultrasonic.jpg",
+                                  "assets/windsensor.jpg",
                                   height: 160,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
@@ -274,22 +274,39 @@ class UltrasonicSensorPage extends StatelessWidget {
     );
   }
 
-  static Widget _buildBannerButton(String label, Color color) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      ),
-      onPressed: () {},
-      icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-      label: Text(
-        label,
-        style: const TextStyle(
-            color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
+ static Widget _buildBannerButton(String label, Color color) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isWideScreen = screenWidth > 800;
+
+      return ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: EdgeInsets.symmetric(
+            horizontal: isWideScreen ? 20 : 12,
+            vertical: isWideScreen ? 14 : 10,
+          ),
+          minimumSize: Size(isWideScreen ? 140 : 100, 40),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        onPressed: () {},
+        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: isWideScreen ? 15 : 12, // responsive text
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   Widget _buildFeaturesCard(bool isDarkMode) {
     return Card(
@@ -376,6 +393,9 @@ class BannerPoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 800;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -385,9 +405,9 @@ class BannerPoint extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: isWideScreen ? 16 : 13, // responsive size
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
@@ -398,3 +418,4 @@ class BannerPoint extends StatelessWidget {
     );
   }
 }
+
