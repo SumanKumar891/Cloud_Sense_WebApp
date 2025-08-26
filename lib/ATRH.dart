@@ -28,7 +28,7 @@ class ATRHSensorPage extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/tree.jpg",
+                      "assets/arthbg.png",
                       height: isWideScreen ? 450 : 400,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -191,7 +191,7 @@ class ATRHSensorPage extends StatelessWidget {
                                   flex: 1,
                                   child: Center(
                                     child: Image.asset(
-                                      "assets/atrh.jpg",
+                                      "assets/arth.jpg",
                                       height: 300,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
@@ -237,7 +237,7 @@ class ATRHSensorPage extends StatelessWidget {
                           : Column(
                               children: [
                                 Image.asset(
-                                  "assets/atrh.jpg",
+                                  "assets/arth.jpg",
                                   height: 160,
                                   width: double.infinity,
                                   fit: BoxFit.cover,

@@ -5,6 +5,7 @@ import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/dataLogger.dart';
+import 'package:cloud_sense_webapp/gateway.dart';
 import 'package:cloud_sense_webapp/raingauge.dart';
 
 import 'package:cloud_sense_webapp/buffalodata.dart';
@@ -533,6 +534,8 @@ class MyApp extends StatelessWidget {
         '/deviceinfo': (context) => MapPage(),
         '/raingauge': (context) => ProductPage(),
         '/windsensor': (context) => UltrasonicSensorPage(),
+          '/gateway': (context) => GatewayPage(),
+        '/probe': (context) => ProbePage(),
         '/datalogger': (context) => DataLoggerPage(),
         '/atrh': (context) => ATRHSensorPage(),
         '/devicelist': (context) => DataDisplayPage(),

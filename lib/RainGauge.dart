@@ -214,7 +214,7 @@ class ProductPage extends StatelessWidget {
                                           )),
                                       const SizedBox(height: 12),
                                       featureItem("Rainwater is collected by a funnel and directed into a balanced tipping bucket mechanism.", isDarkMode),
-                                      featureItem("When a bucket fills to a preset volume (e.g., 0.2 mm of rainfall)", isDarkMode),
+                                      featureItem("When a bucket fills to a preset volume (e.g., 0.2 mm of rainfall", isDarkMode),
                                       featureItem("Each tip is detected by a reed switch or magnetic sensor.", isDarkMode),
                                       featureItem("Pulses are recorded and converted into total rainfall measurement.", isDarkMode),
                                       const SizedBox(height: 16),

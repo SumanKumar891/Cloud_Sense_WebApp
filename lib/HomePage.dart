@@ -648,7 +648,7 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(fontSize: 12)),
                                     onTap: () {
                                       Navigator.pop(context);
-                                      Navigator.pushNamed(context, '/atrhp');
+                                      Navigator.pushNamed(context, '/probe');
                                     },
                                   ),
                                   ListTile(

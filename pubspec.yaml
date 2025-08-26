@@ -147,12 +147,13 @@ flutter:
     - assets/bgremover.png
     - assets/RainGauge.jpg
     - assets/raingaugebg.jpg
-    - assets/atrh.jpg
+    - assets/arth.jpg
     - assets/datalogger.jpg
     - assets/windsensor.jpg
     - assets/weatherstation.jpg
     - assets/raingaugecylindrical.jpg
     - assets/rbase.png
+    - assets/arthbg.png
 
    
    
