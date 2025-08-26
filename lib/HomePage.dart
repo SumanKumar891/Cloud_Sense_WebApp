@@ -270,7 +270,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Icon(Icons.air, color: isDarkMode ? Colors.white : Colors.black),
               SizedBox(width: 8),
-              Text('Wind Speed'),
+              Text('Wind Sensor'),
             ],
           ),
         ),
@@ -665,7 +665,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             ListTile(
                               leading: Icon(Icons.air, size: 20),
-                              title: Text('Wind Speed',
+                              title: Text('Wind Sensor',
                                   style: TextStyle(fontSize: 14)),
                               onTap: () {
                                 Navigator.pop(context);
