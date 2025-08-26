@@ -15,8 +15,8 @@ class DataLoggerPage extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isDarkMode
-                  ? [const Color(0xFF757F9A), const Color(0xFFD7DDE8)]
-                  : [const Color.fromARGB(255, 124, 165, 163), const Color.fromARGB(255, 102, 136, 143)],
+                  ? [const Color(0xFFC0B9B9), const Color(0xFF7B9FAE)]
+                  : [const Color(0xFF7EABA6), const Color(0xFF363A3B)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -25,17 +25,18 @@ class DataLoggerPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-             
+              
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/weather_station.jpg",
-                      height: isWideScreen ? 400 : 300,
+                      "assets/dataLoggerBg.jpg",
+                      height: isWideScreen ? 450 : 350,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      alignment: Alignment.centerRight,
                     ),
                     Container(
-                      height: isWideScreen ? 400 : 300,
+                      height: isWideScreen ? 450 : 350,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -47,89 +48,215 @@ class DataLoggerPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Positioned(
-                      top: 12,
-                      left: 12,
-                      child: IconButton(
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.arrow_back,
-                            color: Colors.white, size: 22),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                       
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Data Logger / Gateway",
-                                    style: TextStyle(
-                                      fontSize: isWideScreen ? 42 : 30,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 6, bottom: 16),
-                                    height: 4,
-                                  
-                                    width: (isWideScreen ? 450 : 250),
-                                    color: Colors.orangeAccent,
-                                  ),
-                                  Text(
-                                    "Compact wireless device for data logging & real-time monitoring",
-                                    style: TextStyle(
-                                      fontSize: isWideScreen ? 18 : 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Wrap(
-                                    spacing: 12,
-                                    children: [
-                                      _buildBannerButton(
-                                          "ENQUIRE", Colors.deepOrange),
-                                      _buildBannerButton(
-                                          "DOWNLOAD BROCHURE", Colors.blue),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
 
-                            const SizedBox(width: 20),
+          
+Positioned.fill(
+  child: Align(
+    alignment: Alignment.topLeft,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+      
+        Padding(
+          padding: const EdgeInsets.only(top: 12, left: 8), 
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back,
+                color: Colors.white, size: 22),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed("/");
+              }
+            },
+          ),
+        ),
 
-                          ],
+     
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: isWideScreen ? 84 : 16,
+            vertical: isWideScreen ? 20 : 12,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isWideScreen ? 600 : double.infinity,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 12),
+
+           
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Data",
+                        style: TextStyle(
+                          fontSize: isWideScreen ? 48 : 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.lightBlueAccent,
                         ),
                       ),
-                    ),
+                      TextSpan(
+                        text: "Logger",
+                        style: TextStyle(
+                          fontSize: isWideScreen ? 48 : 28,
+                          fontWeight: FontWeight.bold,
+                          color: const Color.fromARGB(255, 219, 80, 145),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  margin: const EdgeInsets.only(top: 6, bottom: 16),
+                  height: 3,
+                  width: isWideScreen ? 270 : 150,
+                  color: Colors.lightBlueAccent,
+                ),
+
+                Text(
+                  "Reliable Data Logging & Seamless Connectivity",
+                  style: TextStyle(
+                    fontSize: isWideScreen ? 20 : 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    BannerPoint("30-day Data Backup with GPS"),
+                    BannerPoint("4G Dual SIM with Multi-Protocol Support"),
+                    BannerPoint("Rugged IP66 Weatherproof Design"),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildBannerButton("ENQUIRE", Colors.lightBlue),
+                    _buildBannerButton("DATASHEETS", Colors.teal),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+)
+
                   ],
                 ),
 
-           
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      _buildDescriptionCard(isDarkMode),
-                      const SizedBox(height: 16),
-                      _buildSpecificationsCard(isDarkMode),
-                      const SizedBox(height: 16),
-                      _buildUseCaseCard(isDarkMode),
-                    ],
+                  child: isWideScreen
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildFeaturesCard(isDarkMode)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildApplicationsCard(isDarkMode)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            _buildFeaturesCard(isDarkMode),
+                            const SizedBox(height: 16),
+                            _buildApplicationsCard(isDarkMode),
+                          ],
+                        ),
+                ),
+
+          
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+  color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  elevation: 6,
+  child: Padding(
+    padding: const EdgeInsets.all(16),
+    child:isWideScreen
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Center(
+                                    child: Image.asset(
+                                      "assets/weather_station.jpg",
+                                      height: 300,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 50),
+                                Expanded(
+                                  flex: 1,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Technical Overview",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                          )),
+                                      const SizedBox(height: 12),
+                                       featureItem("Connectivity: 4G Dual SIM with GNSS", isDarkMode),
+                                      featureItem("Data Support: HTTP, HTTPS, MQTT, FTP", isDarkMode),
+                                      featureItem("Interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
+                                      featureItem("Enclosure: IP66, waterproof & dustproof", isDarkMode),
+                                      featureItem("Backup: 30-day onboard data storage", isDarkMode),
+                                      featureItem("Power Options: Battery / Solar", isDarkMode),
+                                      const SizedBox(height: 16),
+                                      _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                Image.asset(
+                                  "assets/weather_station.jpg",
+                                  height: 160,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(height: 12),
+                                Text("Technical Overview",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode ? Colors.white : Colors.black,
+                                    )),
+                                const SizedBox(height: 10),
+                           featureItem("Connectivity: 4G Dual SIM with GNSS", isDarkMode),
+                                      featureItem("Data Support: HTTP, HTTPS, MQTT, FTP", isDarkMode),
+                                      featureItem("Interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
+                                      featureItem("Enclosure: IP66, waterproof & dustproof", isDarkMode),
+                                      featureItem("Backup: 30-day onboard data storage", isDarkMode),
+                                      featureItem("Power Options: Battery / Solar", isDarkMode),
+                                        
+                                const SizedBox(height: 16),
+                                _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                              ],
+                            ),
+                    ),
                   ),
                 ),
               ],
@@ -140,7 +267,8 @@ class DataLoggerPage extends StatelessWidget {
     );
   }
 
- 
+
+
   static Widget _buildBannerButton(String label, Color color) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
@@ -158,103 +286,108 @@ class DataLoggerPage extends StatelessWidget {
     );
   }
 
- 
-  Widget _buildDescriptionCard(bool isDarkMode) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          "The Gateway is a compact wireless device that collects data from weather sensors "
-          "over long distances using Bluetooth technology. It features built-in data logging "
-          "to store readings locally and supports real-time monitoring. Powered by battery or solar, "
-          "it is ideal for remote and outdoor weather stations.",
-          style: TextStyle(
-            fontSize: 15,
-            height: 1.5,
-            color: isDarkMode ? Colors.white70 : Colors.black87,
-          ),
-        ),
+  Widget _buildFeaturesCard(bool isDarkMode) {
+  return Card(
+    color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Key Features",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.teal.shade800,
+              )),
+          const SizedBox(height: 10),
+          featureItem("4G Dual SIM, GNSS enabled for reliable connectivity", isDarkMode),
+          featureItem("Built-in 30-day data backup with GPS support", isDarkMode),
+          featureItem("Multiple interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
+          featureItem("Supports modern protocols (HTTP, HTTPS, MQTT, FTP)", isDarkMode),
+          featureItem("Rugged IP66 enclosure for harsh outdoor environments", isDarkMode),
+          featureItem("Solar and battery-powered option for remote sites", isDarkMode),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-
-  Widget _buildSpecificationsCard(bool isDarkMode) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                )),
-            const SizedBox(height: 10),
-            featureItem("Material: ABS", isDarkMode),
-            featureItem(
-                "Function: Sends sensor data to the cloud via mobile network (Internet or SMS)",
-                isDarkMode),
-            featureItem(
-                "Antenna: External SMA or PCB antenna for strong signal reception",
-                isDarkMode),
-            featureItem(
-                "Use Case: Ideal for remote locations without Wi-Fi, enables real-time data transmission to cloud/server",
-                isDarkMode),
-          ],
-        ),
+Widget _buildApplicationsCard(bool isDarkMode) {
+  return Card(
+    color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50, 
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Applications",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.blue.shade800, 
+              )),
+          const SizedBox(height: 10),
+          featureItem("Remote weather monitoring stations", isDarkMode),
+          featureItem("Smart agriculture & irrigation management", isDarkMode),
+          featureItem("Disaster management and early warning systems", isDarkMode),
+          featureItem("Industrial & environmental monitoring", isDarkMode),
+          featureItem("Smart cities & IoT projects", isDarkMode),
+            featureItem("Government & policy-based data reporting", isDarkMode),
+        ],
       ),
-    );
-  }
-
-
-  Widget _buildUseCaseCard(bool isDarkMode) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Highlights / Use Cases",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black,
-                )),
-            const SizedBox(height: 10),
-            featureItem("Works in extreme weather conditions", isDarkMode),
-            featureItem("Battery or solar powered for remote sites",
-                isDarkMode),
-            featureItem("Supports multiple sensors simultaneously", isDarkMode),
-            featureItem("Easy integration with cloud platforms", isDarkMode),
-          ],
-        ),
-      ),
-    );
-  }
+    ),
+  );
+}
 
 
   Widget featureItem(String text, bool isDarkMode) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Icon(Icons.check_circle, 
+            color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 15,
+              color: isDarkMode ? Colors.white : Colors.black87, 
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+}
+
+class BannerPoint extends StatelessWidget {
+  final String text;
+  const BannerPoint(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          const Icon(Icons.check_circle, color: Colors.orange, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
+          const Icon(Icons.circle, size: 8, color: Colors.white),
+          const SizedBox(width: 6),
+          Flexible(
             child: Text(
               text,
-              style: TextStyle(
-                fontSize: 15,
-                color: isDarkMode ? Colors.white : Colors.black,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
               ),
             ),
           ),
@@ -263,6 +396,3 @@ class DataLoggerPage extends StatelessWidget {
     );
   }
 }
-
-
-
