@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> {
                                   color:
                                       isDarkMode ? Colors.white : Colors.black),
                               SizedBox(width: 8),
-                              Text('ATRH'),
+                              Text('Temperature and Humidity\nProbe'),
                             ],
                           ),
                         ),
@@ -241,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                       padding: EdgeInsets.only(left: 16.0),
                       child: InkWell(
                         onTap: () {
-                          Navigator.pushNamed(context, '/atrh_lux_pressure');
+                          Navigator.pushNamed(context, '/atrh');
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -643,11 +643,12 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   ListTile(
                                     leading: Icon(Icons.thermostat, size: 18),
-                                    title: Text('ATRH',
+                                    title: Text(
+                                        'Temperature and Humidity\nProbe',
                                         style: TextStyle(fontSize: 12)),
                                     onTap: () {
                                       Navigator.pop(context);
-                                      Navigator.pushNamed(context, '/atrh');
+                                      Navigator.pushNamed(context, '/atrhp');
                                     },
                                   ),
                                   ListTile(
@@ -656,8 +657,7 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(fontSize: 12)),
                                     onTap: () {
                                       Navigator.pop(context);
-                                      Navigator.pushNamed(
-                                          context, '/atrh_lux_pressure');
+                                      Navigator.pushNamed(context, '/atrh');
                                     },
                                   ),
                                 ],

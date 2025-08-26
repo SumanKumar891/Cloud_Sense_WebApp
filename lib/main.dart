@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_sense_webapp/ATRH.dart';
 import 'package:cloud_sense_webapp/AccountInfo.dart';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
@@ -533,6 +534,7 @@ class MyApp extends StatelessWidget {
         '/raingauge': (context) => ProductPage(),
         '/windsensor': (context) => UltrasonicSensorPage(),
         '/datalogger': (context) => DataLoggerPage(),
+        '/atrh': (context) => ATRHSensorPage(),
         '/devicelist': (context) => DataDisplayPage(),
         '/devicelocationinfo': (context) => DeviceActivityPage(),
         '/devicemapinfo': (context) => DeviceMapScreen(),
