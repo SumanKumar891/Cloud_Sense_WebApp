@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
 class ProductPage extends StatelessWidget {
@@ -260,7 +261,7 @@ class ProductPage extends StatelessWidget {
                     ),
                   ),
                 ),
-
+    const Footer(), // Add the Footer widget here
               ],
             ),
           ),

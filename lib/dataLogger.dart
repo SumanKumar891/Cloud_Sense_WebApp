@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
 class DataLoggerPage extends StatelessWidget {
@@ -256,6 +257,7 @@ Positioned.fill(
                     ),
                   ),
                 ),
+                    const Footer(), // Add the Footer widget here
               ],
             ),
           ),

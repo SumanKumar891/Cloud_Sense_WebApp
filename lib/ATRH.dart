@@ -1,4 +1,6 @@
+import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
+import 'footer.dart'; // Import the Footer widget
 
 class ATRHSensorPage extends StatelessWidget {
   const ATRHSensorPage({super.key});
@@ -131,7 +133,6 @@ class ATRHSensorPage extends StatelessWidget {
                                             "Robust design for long-term reliability and minimal maintenance"),
                                         BannerPoint(
                                             "Flexible models and outputs tailored to diverse applications"),
-                                       
                                       ],
                                     ),
                                     const SizedBox(height: 20),
@@ -267,6 +268,7 @@ class ATRHSensorPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const Footer(), // Add the Footer widget here
               ],
             ),
           ),
@@ -275,39 +277,38 @@ class ATRHSensorPage extends StatelessWidget {
     );
   }
 
- static Widget _buildBannerButton(String label, Color color) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      final isWideScreen = screenWidth > 800;
+  static Widget _buildBannerButton(String label, Color color) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isWideScreen = screenWidth > 800;
 
-      return ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: EdgeInsets.symmetric(
-            horizontal: isWideScreen ? 20 : 12,
-            vertical: isWideScreen ? 14 : 10,
+        return ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            padding: EdgeInsets.symmetric(
+              horizontal: isWideScreen ? 20 : 12,
+              vertical: isWideScreen ? 14 : 10,
+            ),
+            minimumSize: Size(isWideScreen ? 140 : 100, 40),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
           ),
-          minimumSize: Size(isWideScreen ? 140 : 100, 40),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
+          onPressed: () {},
+          icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+          label: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: isWideScreen ? 15 : 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        onPressed: () {},
-        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-        label: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: isWideScreen ? 15 : 12, // responsive text
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   Widget _buildFeaturesCard(bool isDarkMode) {
     return Card(
@@ -420,7 +421,7 @@ class BannerPoint extends StatelessWidget {
               text,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isWideScreen ? 16 : 13, // responsive size
+                fontSize: isWideScreen ? 16 : 13,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
@@ -429,4 +430,5 @@ class BannerPoint extends StatelessWidget {
         ],
       ),
     );
-  }}
+  }
+}

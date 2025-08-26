@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
 class UltrasonicSensorPage extends StatelessWidget {
@@ -266,6 +267,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                    const Footer(), // Add the Footer widget here
               ],
             ),
           ),
