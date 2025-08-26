@@ -131,8 +131,7 @@ class ATRHSensorPage extends StatelessWidget {
                                             "Robust design for long-term reliability and minimal maintenance"),
                                         BannerPoint(
                                             "Flexible models and outputs tailored to diverse applications"),
-                                        BannerPoint(
-                                            "Seamless integration with modern monitoring systems"),
+                                       
                                       ],
                                     ),
                                     const SizedBox(height: 20),
