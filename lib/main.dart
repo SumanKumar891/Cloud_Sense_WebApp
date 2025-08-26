@@ -6,6 +6,7 @@ import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/dataLogger.dart';
 import 'package:cloud_sense_webapp/gateway.dart';
+import 'package:cloud_sense_webapp/probe.dart';
 import 'package:cloud_sense_webapp/raingauge.dart';
 
 import 'package:cloud_sense_webapp/buffalodata.dart';
