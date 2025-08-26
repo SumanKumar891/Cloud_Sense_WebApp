@@ -69,7 +69,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "74e776d67f89f92ad34388b08bbe100d
 "favicon.png": "352a05256273593e3e2b5d173d54cf60",
 "firebase-messaging-sw.js": "17c44fff535ffea2671fce491d6dd458",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
-"flutter_bootstrap.js": "96a3aa1011d5c75b067b3c6813d67f78",
+"flutter_bootstrap.js": "8a8297e4f59d9a965bf3a8195f25555b",
 "icons/Icon-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
 "icons/Icon-512.png": "76feaf63bcbf28ae35c368fa70d14ce7",
 "icons/Icon-maskable-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
@@ -81,7 +81,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "74e776d67f89f92ad34388b08bbe100d
 "maskable": "d41d8cd98f00b204e9800998ecf8427e",
 "mobile-app.png": "c2b1747bda9c67c734ff806e5bf0e684",
 "smartphone.png": "07c28484887d1e8f958e7975763a2d2b",
-"vercel.json": "cec8404a2bcf91c9a170c9398e0aa3d2",
+"vercel.json": "af5c9a62a01d43903b69be83782f6859",
 "version.json": "452b6a0bcd57f5a3ccfc35e85bb3a0d5"};
 // The application shell files that are downloaded before a service worker can
 // start.
