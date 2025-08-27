@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_sense_webapp/footer.dart';
 
 class GatewayPage extends StatelessWidget {
   const GatewayPage({super.key});
@@ -28,7 +29,7 @@ class GatewayPage extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/datalogger.jpg",
+                      "assets/gatewaybg.jpg",
                       height: isWideScreen ? 450 : 400,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -40,7 +41,7 @@ class GatewayPage extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             Colors.black.withOpacity(0.6),
-                            Colors.black.withOpacity(0.3)
+                            Colors.black.withOpacity(0.6)
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -89,7 +90,7 @@ Positioned.fill(
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Data",
+                        text: "Gate",
                         style: TextStyle(
                           fontSize: isWideScreen ? 48 : 28,
                           fontWeight: FontWeight.bold,
@@ -97,7 +98,7 @@ Positioned.fill(
                         ),
                       ),
                       TextSpan(
-                        text: "Logger",
+                        text: "way",
                         style: TextStyle(
                           fontSize: isWideScreen ? 48 : 28,
                           fontWeight: FontWeight.bold,
@@ -116,7 +117,7 @@ Positioned.fill(
                 ),
 
                 Text(
-                  "Reliable Data Logging & Seamless Connectivity",
+                  "Next-Gen BLE Gateway for Industrial IoT Applications",
                   style: TextStyle(
                     fontSize: isWideScreen ? 20 : 14,
                     fontWeight: FontWeight.bold,
@@ -128,9 +129,9 @@ Positioned.fill(
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    BannerPoint("30-day Data Backup with GPS"),
-                    BannerPoint("4G Dual SIM with Multi-Protocol Support"),
-                    BannerPoint("Rugged IP66 Weatherproof Design"),
+                    BannerPoint("Seamless IoT Data Aggregation"),
+                    BannerPoint("Reliable Long-Range BLE Connectivity"),
+                    BannerPoint("Scalable Gateway for 100+ Sensor Nodes"),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -191,8 +192,8 @@ Positioned.fill(
                                   flex: 1,
                                   child: Center(
                                     child: Image.asset(
-                                      "assets/weatherstation.jpg",
-                                      height: 300,
+                                      "assets/gateway.jpg",
+                                      height: 400,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
                                     ),
@@ -213,12 +214,26 @@ Positioned.fill(
                                                 : Colors.black,
                                           )),
                                       const SizedBox(height: 12),
-                                       featureItem("Connectivity: 4G Dual SIM with GNSS", isDarkMode),
-                                      featureItem("Data Support: HTTP, HTTPS, MQTT, FTP", isDarkMode),
-                                      featureItem("Interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
-                                      featureItem("Enclosure: IP66, waterproof & dustproof", isDarkMode),
-                                      featureItem("Backup: 30-day onboard data storage", isDarkMode),
-                                      featureItem("Power Options: Battery / Solar", isDarkMode),
+                                    
+
+    featureItem("Core Processing Unit: Nordic nRF5340 Dual-Core SoC", isDarkMode),
+    subFeatureItem("Application Core: Arm Cortex-M33 @128 MHz", isDarkMode),
+    subFeatureItem("Network Core: Arm Cortex-M33 @64 MHz", isDarkMode),
+
+    featureItem("Memory: 1 MB Flash, 512 KB RAM", isDarkMode),
+
+    featureItem("Radio Subsystem", isDarkMode),
+    subFeatureItem("Bluetooth 5.3 compliant", isDarkMode),
+    subFeatureItem("Frequency: 2.4 GHz ISM band (GFSK modulation)", isDarkMode),
+    subFeatureItem("Transmit Power: Up to +8 dBm", isDarkMode),
+    subFeatureItem("Receiver Sensitivity: -95 dBm", isDarkMode),
+
+    featureItem("Connectivity Options: LAN, Wi-Fi, 4G", isDarkMode),
+    featureItem("Scalability: Connects 100+ BLE sensor nodes", isDarkMode),
+    featureItem("Design: IP67-rated, compact industrial PCB with low power consumption", isDarkMode),
+  
+
+
                                       const SizedBox(height: 16),
                                       _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
                                     ],
@@ -229,8 +244,8 @@ Positioned.fill(
                           : Column(
                               children: [
                                 Image.asset(
-                                  "assets/weatherstation.jpg",
-                                  height: 160,
+                                  "assets/gateway.jpg",
+                                  height: 260,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
@@ -242,12 +257,21 @@ Positioned.fill(
                                       color: isDarkMode ? Colors.white : Colors.black,
                                     )),
                                 const SizedBox(height: 10),
-                           featureItem("Connectivity: 4G Dual SIM with GNSS", isDarkMode),
-                                      featureItem("Data Support: HTTP, HTTPS, MQTT, FTP", isDarkMode),
-                                      featureItem("Interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
-                                      featureItem("Enclosure: IP66, waterproof & dustproof", isDarkMode),
-                                      featureItem("Backup: 30-day onboard data storage", isDarkMode),
-                                      featureItem("Power Options: Battery / Solar", isDarkMode),
+                            featureItem("Core Processing Unit: Nordic nRF5340 Dual-Core SoC", isDarkMode),
+    subFeatureItem("Application Core: Arm Cortex-M33 @128 MHz", isDarkMode),
+    subFeatureItem("Network Core: Arm Cortex-M33 @64 MHz", isDarkMode),
+
+    featureItem("Memory: 1 MB Flash, 512 KB RAM", isDarkMode),
+
+    featureItem("Radio Subsystem", isDarkMode),
+    subFeatureItem("Bluetooth 5.3 compliant", isDarkMode),
+    subFeatureItem("Frequency: 2.4 GHz ISM band (GFSK modulation)", isDarkMode),
+    subFeatureItem("Transmit Power: Up to +8 dBm", isDarkMode),
+    subFeatureItem("Receiver Sensitivity: -95 dBm", isDarkMode),
+
+    featureItem("Connectivity Options: LAN, Wi-Fi, 4G", isDarkMode),
+    featureItem("Scalability: Connects 100+ BLE sensor nodes", isDarkMode),
+    featureItem("Design: IP67-rated, compact industrial PCB with low power consumption", isDarkMode),
                                         
                                 const SizedBox(height: 16),
                                 _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
@@ -256,6 +280,7 @@ Positioned.fill(
                     ),
                   ),
                 ),
+                const Footer(),
               ],
             ),
           ),
@@ -316,12 +341,12 @@ static Widget _buildBannerButton(String label, Color color) {
                 color: isDarkMode ? Colors.white : Colors.teal.shade800,
               )),
           const SizedBox(height: 10),
-          featureItem("4G Dual SIM, GNSS enabled for reliable connectivity", isDarkMode),
-          featureItem("Built-in 30-day data backup with GPS support", isDarkMode),
-          featureItem("Multiple interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
-          featureItem("Supports modern protocols (HTTP, HTTPS, MQTT, FTP)", isDarkMode),
-          featureItem("Rugged IP66 enclosure for harsh outdoor environments", isDarkMode),
-          featureItem("Solar and battery-powered option for remote sites", isDarkMode),
+           featureItem("Dual-Core nRF5340 SoC for optimized processing", isDarkMode),
+    featureItem("Bluetooth 5.3 with configurable +8 dBm transmit power", isDarkMode),
+    featureItem("Real-time monitoring with up to 1 KM range", isDarkMode),
+    featureItem("Supports 100+ connected BLE sensor nodes", isDarkMode),
+    featureItem("Firmware Over-the-Air (FOTA) support", isDarkMode),
+    featureItem("Rugged IP67 compact design for industrial environments", isDarkMode),
         ],
       ),
     ),
@@ -345,12 +370,12 @@ Widget _buildApplicationsCard(bool isDarkMode) {
                 color: isDarkMode ? Colors.white : Colors.blue.shade800, 
               )),
           const SizedBox(height: 10),
-          featureItem("Remote weather monitoring stations", isDarkMode),
-          featureItem("Smart agriculture & irrigation management", isDarkMode),
-          featureItem("Disaster management and early warning systems", isDarkMode),
-          featureItem("Industrial & environmental monitoring", isDarkMode),
-          featureItem("Smart cities & IoT projects", isDarkMode),
-            featureItem("Government & policy-based data reporting", isDarkMode),
+           featureItem("Smart agriculture & precision farming", isDarkMode),
+    featureItem("Industrial equipment health monitoring", isDarkMode),
+    featureItem("Environmental and air quality sensing", isDarkMode),
+    featureItem("Smart building automation & energy management", isDarkMode),
+    featureItem("Logistics and asset tracking", isDarkMode),
+    featureItem("Healthcare wearable data collection", isDarkMode),
         ],
       ),
     ),
@@ -379,6 +404,27 @@ Widget _buildApplicationsCard(bool isDarkMode) {
     ),
   );
 }
+}
+Widget subFeatureItem(String text, bool isDarkMode) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 32, top: 2, bottom: 2),
+    child: Row(
+      children: [
+        Icon(Icons.circle,
+            size: 10, color: isDarkMode ? Colors.tealAccent : Colors.teal),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class BannerPoint extends StatelessWidget {
