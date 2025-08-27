@@ -192,7 +192,7 @@ Positioned.fill(
                                   flex: 1,
                                   child: Center(
                                     child: Image.asset(
-                                      "assets/weatherstation.jpg",
+                                      "assets/dataloggerrender.png",
                                       height: 300,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
@@ -230,7 +230,7 @@ Positioned.fill(
                           : Column(
                               children: [
                                 Image.asset(
-                                  "assets/weatherstation.jpg",
+                                  "assets/dataloggerrender.png",
                                   height: 160,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
