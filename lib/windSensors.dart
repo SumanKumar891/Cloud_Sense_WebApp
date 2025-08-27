@@ -16,8 +16,14 @@ class UltrasonicSensorPage extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isDarkMode
-                  ? [const Color(0xFFC0B9B9), const Color(0xFF7B9FAE)]
-                  : [const Color(0xFF7EABA6), const Color(0xFF363A3B)],
+                  ? [
+                      const Color.fromARGB(255, 57, 57, 57),
+                      const Color.fromARGB(255, 2, 54, 76),
+                    ]
+                  : [
+                      const Color.fromARGB(255, 191, 242, 237),
+                      const Color.fromARGB(255, 79, 106, 112),
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -177,7 +183,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Card(
-                    color: Colors.teal.shade50,
+                     color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
                     elevation: 6,
@@ -312,7 +318,7 @@ class UltrasonicSensorPage extends StatelessWidget {
 
   Widget _buildFeaturesCard(bool isDarkMode) {
     return Card(
-      color: Colors.teal.shade50,
+     color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
       child: Padding(
@@ -324,7 +330,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.teal.shade800,
+                   color: isDarkMode ? Colors.white : Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
             featureItem("Measures up to 60m/s wind speed", isDarkMode),
@@ -341,7 +347,7 @@ class UltrasonicSensorPage extends StatelessWidget {
 
   Widget _buildApplicationsCard(bool isDarkMode) {
     return Card(
-      color: Colors.blue.shade50,
+       color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
       child: Padding(
@@ -353,8 +359,8 @@ class UltrasonicSensorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade800,
-                )),
+                color: isDarkMode ? Colors.white : Colors.blue.shade800, 
+              )),
             const SizedBox(height: 10),
             featureItem("Weather monitoring & observation", isDarkMode),
             featureItem("Pollution monitoring systems", isDarkMode),
@@ -372,14 +378,15 @@ class UltrasonicSensorPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          const Icon(Icons.check_circle, color: Colors.teal, size: 20),
+         Icon(Icons.check_circle, 
+            color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
                 fontSize: 15,
-                color: isDarkMode ? Colors.black87 : Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
           ),

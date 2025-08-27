@@ -15,9 +15,15 @@ class DataLoggerPage extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: isDarkMode
-                  ? [const Color(0xFFC0B9B9), const Color(0xFF7B9FAE)]
-                  : [const Color(0xFF7EABA6), const Color(0xFF363A3B)],
+             colors: isDarkMode
+                  ? [
+                      const Color.fromARGB(255, 57, 57, 57),
+                      const Color.fromARGB(255, 2, 54, 76),
+                    ]
+                  : [
+                      const Color.fromARGB(255, 191, 242, 237),
+                      const Color.fromARGB(255, 79, 106, 112),
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

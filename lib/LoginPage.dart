@@ -886,7 +886,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                         ),
                       ),
                       Text(
-                        'Sign In',
+                        'Sign Up',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: isDarkMode ? Colors.blue : Colors.blue,
