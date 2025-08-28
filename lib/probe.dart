@@ -6,6 +6,7 @@ class ProbePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+   
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
@@ -15,6 +16,7 @@ class ProbePage extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
+             
               colors: isDarkMode
                   ? [
                       const Color.fromARGB(255, 57, 57, 57),
@@ -35,14 +37,14 @@ class ProbePage extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      "assets/datalogger.jpg",
-                      height: isWideScreen ? 450 : 400,
+                      "assets/probebg.jpg",
+                      height: isWideScreen ? 450 : 350,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       alignment: Alignment.centerRight,
                     ),
                     Container(
-                      height: isWideScreen ? 450 : 400,
+                      height: isWideScreen ? 450 : 350,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -53,111 +55,103 @@ class ProbePage extends StatelessWidget {
                           end: Alignment.bottomCenter,
                         ),
                       ),
-                    ),      
-Positioned.fill(
-  child: Align(
-    alignment: Alignment.topLeft,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-      
-        Padding(
-          padding: const EdgeInsets.only(top: 12, left: 8), 
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back,
-                color: Colors.white, size: 22),
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else {
-                Navigator.of(context).pushReplacementNamed("/");
-              }
-            },
-          ),
-        ),
-
-     
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isWideScreen ? 84 : 16,
-            vertical: isWideScreen ? 20 : 12,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: isWideScreen ? 600 : double.infinity,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-
-           
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Data",
-                        style: TextStyle(
-                          fontSize: isWideScreen ? 48 : 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.lightBlueAccent,
+                    ),
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12, left: 8),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white, size: 22),
+                                onPressed: () {
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context).pushReplacementNamed("/");
+                                  }
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isWideScreen ? 84 : 16,
+                                vertical: isWideScreen ? 20 : 12,
+                              ),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: isWideScreen ? 600 : double.infinity,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "ATRH ",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.lightBlueAccent,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "Sensor",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color.fromARGB(255, 219, 80, 145),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 6, bottom: 16),
+                                      height: 3,
+                                      width: isWideScreen ? 270 : 150,
+                                      color: Colors.lightBlueAccent,
+                                    ),
+                                    Text(
+                                      "Type: ATRH Sensor (PT100 + SHT45 based)",
+                                      style: TextStyle(
+                                        fontSize: isWideScreen ? 20 : 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: const [
+                                        BannerPoint("Measures temperature with PT100 RTD (high accuracy)"),
+                                        BannerPoint("Detects humidity & temperature digitally via SHT45"),
+                                        BannerPoint("Provides both analog (0–1000 mV) and digital (RS485/Modbus) outputs"),
+                                        BannerPoint("Reliable, industrial-grade monitoring with CRC-validated communication"),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        _buildBannerButton("ENQUIRE", Colors.lightBlue),
+                                        _buildBannerButton("DATASHEETS", Colors.teal),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      TextSpan(
-                        text: "Logger",
-                        style: TextStyle(
-                          fontSize: isWideScreen ? 48 : 28,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(255, 219, 80, 145),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Container(
-                  margin: const EdgeInsets.only(top: 6, bottom: 16),
-                  height: 3,
-                  width: isWideScreen ? 270 : 150,
-                  color: Colors.lightBlueAccent,
-                ),
-
-                Text(
-                  "Reliable Data Logging & Seamless Connectivity",
-                  style: TextStyle(
-                    fontSize: isWideScreen ? 20 : 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    BannerPoint("30-day Data Backup with GPS"),
-                    BannerPoint("4G Dual SIM with Multi-Protocol Support"),
-                    BannerPoint("Rugged IP66 Weatherproof Design"),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildBannerButton("ENQUIRE", Colors.lightBlue),
-                    _buildBannerButton("DATASHEETS", Colors.teal),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  ),
-)
-
+                    ),
                   ],
                 ),
 
@@ -180,28 +174,27 @@ Positioned.fill(
                           ],
                         ),
                 ),
-
-          
+                
+                // 👇 Updated Technical Overview with only ONE image
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Card(
-  color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  elevation: 6,
-  child: Padding(
-    padding: const EdgeInsets.all(16),
-    child:isWideScreen
+                    color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: isWideScreen
                           ? Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Expanded(
                                   flex: 1,
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/weatherstation.jpg",
-                                      height: 300,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
+                                  child: SizedBox(
+                                    height: 300,
+                                    child: FittedBox(
+                                      fit: BoxFit.contain,
+                                      // child: Image.asset(" "), // 👈 only one image
                                     ),
                                   ),
                                 ),
@@ -215,17 +208,16 @@ Positioned.fill(
                                           style: TextStyle(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
+                                            color: isDarkMode ? Colors.white : Colors.black,
                                           )),
                                       const SizedBox(height: 12),
-                                       featureItem("Connectivity: 4G Dual SIM with GNSS", isDarkMode),
-                                      featureItem("Data Support: HTTP, HTTPS, MQTT, FTP", isDarkMode),
-                                      featureItem("Interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
-                                      featureItem("Enclosure: IP66, waterproof & dustproof", isDarkMode),
-                                      featureItem("Backup: 30-day onboard data storage", isDarkMode),
-                                      featureItem("Power Options: Battery / Solar", isDarkMode),
+                                      featureItem("Constructed around nRF52833 MCU (ARM Cortex-M4F, BLE + multiple interfaces)", isDarkMode),
+                                      featureItem("PT100 sensor interfaced through MAX31865 (SPI-based RTD converter)", isDarkMode),
+                                      featureItem("SHT45 digital sensor provides ±1.0% RH, ±0.1 °C accuracy via I²C", isDarkMode),
+                                      featureItem("Two MCP4725 DACs convert digital readings into analog voltage outputs", isDarkMode),
+                                      featureItem("RS485 transceiver enables long-distance Modbus RTU communication", isDarkMode),
+                                      featureItem("Sensor data scaled into engineering units and mapped to 12-bit DAC outputs", isDarkMode),
+                                      featureItem("Output Format: Digital (RS485 Modbus) + Analog (0–1000 mV)", isDarkMode),
                                       const SizedBox(height: 16),
                                       _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
                                     ],
@@ -235,11 +227,12 @@ Positioned.fill(
                             )
                           : Column(
                               children: [
-                                Image.asset(
-                                  "assets/weatherstation.jpg",
-                                  height: 160,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
+                                SizedBox(
+                                  height: 200,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    // child: Image.asset(" "), // 👈 only one image
+                                  ),
                                 ),
                                 const SizedBox(height: 12),
                                 Text("Technical Overview",
@@ -249,13 +242,13 @@ Positioned.fill(
                                       color: isDarkMode ? Colors.white : Colors.black,
                                     )),
                                 const SizedBox(height: 10),
-                           featureItem("Connectivity: 4G Dual SIM with GNSS", isDarkMode),
-                                      featureItem("Data Support: HTTP, HTTPS, MQTT, FTP", isDarkMode),
-                                      featureItem("Interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
-                                      featureItem("Enclosure: IP66, waterproof & dustproof", isDarkMode),
-                                      featureItem("Backup: 30-day onboard data storage", isDarkMode),
-                                      featureItem("Power Options: Battery / Solar", isDarkMode),
-                                        
+                                featureItem("Constructed around nRF52833 MCU (ARM Cortex-M4F, BLE + multiple interfaces)", isDarkMode),
+                                featureItem("PT100 sensor interfaced through MAX31865 (SPI-based RTD converter)", isDarkMode),
+                                featureItem("SHT45 digital sensor provides ±1.0% RH, ±0.1 °C accuracy via I²C", isDarkMode),
+                                featureItem("Two MCP4725 DACs convert digital readings into analog voltage outputs", isDarkMode),
+                                featureItem("RS485 transceiver enables long-distance Modbus RTU communication", isDarkMode),
+                                featureItem("Sensor data scaled into engineering units and mapped to 12-bit DAC outputs", isDarkMode),
+                                featureItem("Output Format: Digital (RS485 Modbus) + Analog (0–1000 mV)", isDarkMode),
                                 const SizedBox(height: 16),
                                 _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
                               ],
@@ -263,7 +256,7 @@ Positioned.fill(
                     ),
                   ),
                 ),
-                    const Footer(), // Add the Footer widget here
+const Footer(),
               ],
             ),
           ),
@@ -272,121 +265,102 @@ Positioned.fill(
     );
   }
 
-
-static Widget _buildBannerButton(String label, Color color) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      final isWideScreen = screenWidth > 800;
-
-      return ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: EdgeInsets.symmetric(
-            horizontal: isWideScreen ? 20 : 12,
-            vertical: isWideScreen ? 14 : 10,
-          ),
-          minimumSize: Size(isWideScreen ? 140 : 100, 40),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        onPressed: () {},
-        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-        label: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: isWideScreen ? 15 : 12, // responsive text
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    },
-  );
-}
-
+  static Widget _buildBannerButton(String label, Color color) {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      ),
+      onPressed: () {},
+      icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+      label: Text(
+        label,
+        style: const TextStyle(
+            color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
 
   Widget _buildFeaturesCard(bool isDarkMode) {
-  return Card(
-    color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    elevation: 4,
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Key Features",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.teal.shade800,
-              )),
-          const SizedBox(height: 10),
-          featureItem("4G Dual SIM, GNSS enabled for reliable connectivity", isDarkMode),
-          featureItem("Built-in 30-day data backup with GPS support", isDarkMode),
-          featureItem("Multiple interfaces: ADC, UART, I2C, SPI, RS232, CAN", isDarkMode),
-          featureItem("Supports modern protocols (HTTP, HTTPS, MQTT, FTP)", isDarkMode),
-          featureItem("Rugged IP66 enclosure for harsh outdoor environments", isDarkMode),
-          featureItem("Solar and battery-powered option for remote sites", isDarkMode),
-        ],
+    return Card(
+      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Key Features",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.teal.shade800,
+                )),
+            const SizedBox(height: 10),
+            featureItem("High-precision temperature sensing using PT100 RTD (via MAX31865 converter)", isDarkMode),
+            featureItem("Digital humidity and temperature measurement with SHT45 sensor", isDarkMode),
+            featureItem("Dual MCP4725 DAC outputs provide analog voltage signals (0–1000 mV)", isDarkMode),
+            featureItem("Robust RS485/Modbus-RTU communication for industrial use", isDarkMode),
+            featureItem("Compact, low-power design suitable for embedded and IoT applications", isDarkMode),
+            featureItem("Built-in CRC16 validation ensures reliable and error-free data transfer", isDarkMode),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildApplicationsCard(bool isDarkMode) {
-  return Card(
-    color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50, 
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    elevation: 4,
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Applications",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.blue.shade800, 
-              )),
-          const SizedBox(height: 10),
-          featureItem("Remote weather monitoring stations", isDarkMode),
-          featureItem("Smart agriculture & irrigation management", isDarkMode),
-          featureItem("Disaster management and early warning systems", isDarkMode),
-          featureItem("Industrial & environmental monitoring", isDarkMode),
-          featureItem("Smart cities & IoT projects", isDarkMode),
-            featureItem("Government & policy-based data reporting", isDarkMode),
-        ],
+  Widget _buildApplicationsCard(bool isDarkMode) {
+    return Card(
+      color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Applications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                )),
+            const SizedBox(height: 10),
+            featureItem("Industrial process monitoring (manufacturing, HVAC, food processing)", isDarkMode),
+            featureItem("Environmental monitoring (greenhouses, warehouses, cold storage)", isDarkMode),
+            featureItem("Agriculture and smart irrigation systems", isDarkMode),
+            featureItem("IoT gateways & cloud-connected monitoring systems", isDarkMode),
+            featureItem("Research labs and calibration setups for temp-humidity validation", isDarkMode),
+            featureItem("Legacy system integration using analog outputs", isDarkMode),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget featureItem(String text, bool isDarkMode) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      children: [
-        Icon(Icons.check_circle, 
-            color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 15,
-              color: isDarkMode ? Colors.white : Colors.black87, 
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle,
+              color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }
 
 class BannerPoint extends StatelessWidget {
@@ -395,9 +369,6 @@ class BannerPoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -407,9 +378,9 @@ class BannerPoint extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
-                fontSize: isWideScreen ? 16 : 13, // responsive size
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
@@ -420,4 +391,3 @@ class BannerPoint extends StatelessWidget {
     );
   }
 }
-

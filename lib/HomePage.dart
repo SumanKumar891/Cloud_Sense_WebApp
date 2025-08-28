@@ -221,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                       padding: EdgeInsets.only(left: 16.0),
                       child: InkWell(
                         onTap: () {
-                          Navigator.pushNamed(context, '/atrh');
+                          Navigator.pushNamed(context, '/probe');
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.0),
