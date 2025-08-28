@@ -384,7 +384,7 @@ Widget _build3DSpecsCard(bool isDarkMode) {
               children: [
                 Center(
                   child: Image.asset(
-                    "assets/wind3d_2.jpg",
+                    "assets/wind3d2.jpg",
                     height: 160,
                     fit: BoxFit.contain,
                   ),
