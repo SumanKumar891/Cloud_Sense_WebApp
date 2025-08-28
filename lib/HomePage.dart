@@ -390,126 +390,149 @@ class _HomePageState extends State<HomePage> {
 
       return Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          iconTheme: IconThemeData(
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-          backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
-          title: Row(
-            children: [
-              SizedBox(
-                width: screenWidth < 600
-                    ? 0
+       appBar: AppBar(
+  iconTheme: IconThemeData(
+    color: isDarkMode ? Colors.white : Colors.black,
+  ),
+  backgroundColor: isDarkMode ? Colors.blueGrey[900] : Colors.white,
+   toolbarHeight: 70,
+  title: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns children to left and right
+    children: [
+      // Left-aligned title with slight offset
+      Padding(
+        padding: EdgeInsets.only(left: screenWidth < 600 ? 8 : 26), // Adjust left offset
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+           Icon(
+    Icons.cloud,
+    color: isDarkMode ? Colors.white : Colors.black,
+    size: screenWidth < 600
+        ? 24
+        : screenWidth <= 1024
+            ? 32
+            : 46, // adjust sizes as needed
+  ),
+            SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
+            Text(
+              'Cloud Sense Vis',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: screenWidth < 600
+                    ? 20
                     : screenWidth <= 1024
-                        ? 200
-                        : 260,
+                        ? 26
+                        : 46,
               ),
-              Icon(Icons.cloud,
-                  color: isDarkMode ? Colors.white : Colors.black),
-              SizedBox(width: isMobile ? 10 : (isTablet ? 15 : 20)),
-              Text(
-                'Cloud Sense Vis',
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: screenWidth < 600
-                      ? 20
-                      : screenWidth <= 1024
-                          ? 26
-                          : 32,
+            ),
+          ],
+        ),
+      ),
+      // Right-aligned buttons with slight offset
+      if (!isMobile)
+        Padding(
+          padding: EdgeInsets.only(right: screenWidth < 600 ? 8 : 26), // Adjust right offset
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                key: productsButtonKey,
+                onPressed: () => _showSensorPopup(context, buttonKey: productsButtonKey),
+                child: Row(
+                  children: [
+                    SizedBox(width: 4),
+                    Text(
+                      'Products',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: isTablet ? 14 : 16,
+                      ),
+                    ),
+                    Icon(Icons.arrow_drop_down,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        size: isTablet ? 18 : 20),
+                  ],
                 ),
               ),
-              Spacer(),
-              if (!isMobile)
-                Padding(
-                  padding: EdgeInsets.only(
-                    right: screenWidth < 600
-                        ? 20
-                        : screenWidth <= 1024
-                            ? 200
-                            : 260,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextButton(
-                        key: productsButtonKey,
-                        onPressed: () => _showSensorPopup(context,
-                            buttonKey: productsButtonKey),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 4),
-                            Text(
-                              'Products',
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: isTablet ? 14 : 16,
-                              ),
+             
+              SizedBox(width: screenWidth <= 1024 ? 12 : 24),
+              userProvider.userEmail != null
+                  ? Row(
+                      key: userButtonKey,
+                      children: [
+                        _buildUserIcon(),
+                        SizedBox(width: 8),
+                        _buildUserDropdown(isDarkMode, isTablet, userButtonKey),
+                      ],
+                    )
+                  : TextButton(
+                      key: userButtonKey,
+                      onPressed: () => _showLoginPopup(context),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Login/Signup',
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isTablet ? 14 : 16,
                             ),
-                            Icon(Icons.arrow_drop_down,
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                size: isTablet ? 18 : 20),
-                          ],
-                        ),
+                          ),
+                          Icon(Icons.arrow_drop_down,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                              size: isTablet ? 18 : 20),
+                        ],
                       ),
-                      SizedBox(
-                        width: screenWidth <= 1024 ? 12 : 24,
+                    ),
+                     SizedBox(width: screenWidth <= 1024 ? 12 : 24),
+              // Theme Toggle Button
+              TextButton(
+                onPressed: () {
+                  themeProvider.toggleTheme();
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                      size: isTablet ? 18 : 20,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Theme',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: isTablet ? 14 : 16,
                       ),
-                      userProvider.userEmail != null
-                          ? Row(
-                              key: userButtonKey,
-                              children: [
-                                _buildUserIcon(),
-                                SizedBox(width: 8),
-                                _buildUserDropdown(
-                                    isDarkMode, isTablet, userButtonKey),
-                              ],
-                            )
-                          : TextButton(
-                              key: userButtonKey,
-                              onPressed: () => _showLoginPopup(context),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Login/Signup',
-                                    style: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: isTablet ? 14 : 16,
-                                    ),
-                                  ),
-                                  Icon(Icons.arrow_drop_down,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                      size: isTablet ? 18 : 20),
-                                ],
-                              ),
-                            ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
             ],
           ),
-          actions: isMobile
-              ? [
-                  Builder(
-                    builder: (context) => IconButton(
-                      icon: Icon(
-                        Icons.menu,
-                        color: isDarkMode ? Colors.white : Colors.black,
-                      ),
-                      onPressed: () {
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                    ),
-                  ),
-                ]
-              : [],
         ),
+    ],
+  ),
+  actions: isMobile
+      ? [
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+            ),
+          ),
+        ]
+      : [],
+),
         endDrawer: isMobile
             ? Drawer(
                 child: ListView(
@@ -753,7 +776,7 @@ class _HomePageState extends State<HomePage> {
                       : screenWidth <= 1024
                           ? 260
                           : 260,
-                  vertical: 40,
+                  vertical: 20,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -811,7 +834,8 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 30),
+                    
                     Text(
                       "Explore the sensors and dive into the live data they capture. "
                       "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
@@ -824,6 +848,63 @@ class _HomePageState extends State<HomePage> {
                             : Colors.black,
                         fontSize: paragraphFont,
                       ),
+                    ),
+                    const SizedBox(height: 30),
+                    Text(
+                      "Our Products",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: screenWidth < 600 ? 1 : 3,
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 40,
+                      childAspectRatio: 1.5,
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      children: [
+                        _buildSensorCard(
+                          imageAsset: "assets/probebg.jpg",
+                          title: "Temperature and Humidity Probe",
+                          description: "Accurate measurements for temperature and humidity.",
+                          onReadMore: () => Navigator.pushNamed(context, '/probe'),
+                        ),
+                        _buildSensorCard(
+                          imageAsset: "assets/arth.jpg",
+                          title: "ATRH Lux Pressure Sensor",
+                          description: "Multi-sensor for ATRH, lux, and pressure.",
+                          onReadMore: () => Navigator.pushNamed(context, '/atrh'),
+                        ),
+                        _buildSensorCard(
+                          imageAsset: "assets/windsensor.jpg",
+                          title: "Wind Sensor",
+                          description: "Ultrasonic wind sensors for precise wind data.",
+                          onReadMore: () => Navigator.pushNamed(context, '/windsensor'),
+                        ),
+                        _buildSensorCard(
+                          imageAsset: "assets/rbase.png",
+                          title: "Rain Gauge",
+                          description: "Reliable rainfall measurement.",
+                          onReadMore: () => Navigator.pushNamed(context, '/raingauge'),
+                        ),
+                        _buildSensorCard(
+                          imageAsset: "assets/dataloggerrender.png",
+                          title: "Data Logger",
+                          description: "Logs data from multiple sensors.",
+                          onReadMore: () => Navigator.pushNamed(context, '/datalogger'),
+                        ),
+                        _buildSensorCard(
+                          imageAsset: "assets/gateway.jpg",
+                          title: "Gateway",
+                          description: "Connects devices to the cloud.",
+                          onReadMore: () => Navigator.pushNamed(context, '/gateway'),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 60),
                     Wrap(
@@ -1049,112 +1130,109 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildUserDropdown(
-      bool isDarkMode, bool isTablet, GlobalKey userButtonKey) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final isAdmin = userProvider.userEmail?.trim().toLowerCase() ==
-        '05agriculture.05@gmail.com';
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    bool isDarkMode, bool isTablet, GlobalKey userButtonKey) {
+  final userProvider = Provider.of<UserProvider>(context);
+  final isAdmin = userProvider.userEmail?.trim().toLowerCase() ==
+      '05agriculture.05@gmail.com';
 
-    return GestureDetector(
-      onTap: () async {
-        final RenderBox overlay =
-            Overlay.of(context).context.findRenderObject() as RenderBox;
-        final RenderBox button =
-            userButtonKey.currentContext!.findRenderObject() as RenderBox;
-        final buttonPosition =
-            button.localToGlobal(Offset.zero, ancestor: overlay);
+  return GestureDetector(
+    onTap: () async {
+      final RenderBox overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
+      final RenderBox button =
+          userButtonKey.currentContext!.findRenderObject() as RenderBox;
+      final buttonPosition =
+          button.localToGlobal(Offset.zero, ancestor: overlay);
 
-        final selected = await showMenu<String>(
-          context: context,
-          position: RelativeRect.fromLTRB(
-            buttonPosition.dx,
-            buttonPosition.dy + button.size.height,
-            buttonPosition.dx + 200,
-            0,
-          ),
-          color: isDarkMode ? Colors.grey[800] : Colors.white,
-          items: [
-            PopupMenuItem(
-              value: 'devices',
-              child: Row(
-                children: [
-                  Icon(Icons.devices,
-                      color: isDarkMode ? Colors.white : Colors.black),
-                  SizedBox(width: 8),
-                  Text('My Devices'),
-                ],
-              ),
-            ),
-            if (!isAdmin)
-              PopupMenuItem(
-                value: 'account',
-                child: Row(
-                  children: [
-                    Icon(Icons.account_circle,
-                        color: isDarkMode ? Colors.white : Colors.black),
-                    SizedBox(width: 8),
-                    Text('Account Info'),
-                  ],
-                ),
-              ),
-            PopupMenuItem(
-              value: 'theme',
-              child: Row(
-                children: [
-                  Icon(
-                    themeProvider.isDarkMode
-                        ? Icons.light_mode
-                        : Icons.dark_mode,
-                    color: isDarkMode ? Colors.white : Colors.black,
+      final selected = await showMenu<String>(
+        context: context,
+        position: RelativeRect.fromLTRB(
+          buttonPosition.dx,
+          buttonPosition.dy + button.size.height,
+          buttonPosition.dx + 200,
+          0,
+        ),
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
+        items: userProvider.userEmail != null
+            ? [
+                PopupMenuItem(
+                  value: 'devices',
+                  child: Row(
+                    children: [
+                      Icon(Icons.devices,
+                          color: isDarkMode ? Colors.white : Colors.black),
+                      SizedBox(width: 8),
+                      Text('My Devices'),
+                    ],
                   ),
-                  SizedBox(width: 8),
-                  Text('Theme'),
-                ],
-              ),
-            ),
-            PopupMenuItem(
-              value: 'logout',
-              child: Row(
-                children: [
-                  Icon(Icons.logout,
-                      color: isDarkMode ? Colors.white : Colors.black),
-                  SizedBox(width: 8),
-                  Text('Logout'),
-                ],
-              ),
-            ),
-          ],
-        );
+                ),
+                if (!isAdmin)
+                  PopupMenuItem(
+                    value: 'account',
+                    child: Row(
+                      children: [
+                        Icon(Icons.account_circle,
+                            color: isDarkMode ? Colors.white : Colors.black),
+                        SizedBox(width: 8),
+                        Text('Account Info'),
+                      ],
+                    ),
+                  ),
+                PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout,
+                          color: isDarkMode ? Colors.white : Colors.black),
+                      SizedBox(width: 8),
+                      Text('Logout'),
+                    ],
+                  ),
+                ),
+              ]
+            : [
+                PopupMenuItem(
+                  value: 'login',
+                  child: Row(
+                    children: [
+                      Icon(Icons.login,
+                          color: isDarkMode ? Colors.white : Colors.black),
+                      SizedBox(width: 8),
+                      Text('Login/Signup'),
+                    ],
+                  ),
+                ),
+              ],
+      );
 
-        if (selected == 'devices') {
-          _handleDeviceNavigation();
-        } else if (selected == 'account' && !isAdmin) {
-          Navigator.pushNamed(context, '/accountinfo');
-        } else if (selected == 'theme') {
-          themeProvider.toggleTheme();
-        } else if (selected == 'logout') {
-          _handleLogout();
-        }
-      },
-      child: Row(
-        children: [
-          Text(
-            userProvider.userEmail ?? 'Guest',
-            style: TextStyle(
-              fontSize: isTablet ? 14 : 16,
-              color: isDarkMode ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Icon(
-            Icons.arrow_drop_down,
+      if (selected == 'devices') {
+        _handleDeviceNavigation();
+      } else if (selected == 'account' && !isAdmin) {
+        Navigator.pushNamed(context, '/accountinfo');
+      } else if (selected == 'logout') {
+        _handleLogout();
+      } else if (selected == 'login') {
+        _showLoginPopup(context);
+      }
+    },
+    child: Row(
+      children: [
+        Text(
+          userProvider.userEmail ?? 'Guest',
+          style: TextStyle(
+            fontSize: isTablet ? 14 : 16,
             color: isDarkMode ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
-    );
-  }
-
+        ),
+        Icon(
+          Icons.arrow_drop_down,
+          color: isDarkMode ? Colors.white : Colors.black,
+        ),
+      ],
+    ),
+  );
+}
   Widget _buildAnimatedStatCard({
     required String statValue,
     required String label,
@@ -1254,6 +1332,71 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSensorCard({
+    required String imageAsset,
+    required String title,
+    required String description,
+    required VoidCallback onReadMore,
+  }) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            imageAsset,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(color: Colors.grey);
+            },
+          ),
+          Container(
+            color: Colors.black.withOpacity(0.6), // Increased opacity for darker background
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                  const SizedBox(height: 12),
+                 ElevatedButton(
+  onPressed: onReadMore,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.cyan,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(4), // smaller radius → less rounded
+    ),
+  ),
+  child: const Text("READ MORE >"),
+),
+
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

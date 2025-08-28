@@ -364,15 +364,79 @@ class ProductPage extends StatelessWidget {
                                                 ),
                                               ),
                                               const SizedBox(height: 12),
-                                              featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
-                                              featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
-                                              featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
-                                              featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
-                                              featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
-                                              featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
-                                              featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
-                                              const SizedBox(height: 16),
-                                              _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                          DefaultTabController(
+  length: 3,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const TabBar(
+        labelColor: Colors.teal,
+        unselectedLabelColor: Colors.grey,
+        indicatorColor: Colors.teal,
+        tabs: [
+          Tab(text: "Cylinder"),
+          Tab(text: "See-Saw"),
+          Tab(text: "Base"),
+        ],
+      ),
+      SizedBox(
+        height: 280, // fixed height for content
+        child: TabBarView(
+          children: [
+            // Cylinder Tab
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  featureItem("Overall height: 301.50 mm", isDarkMode),
+                  featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
+                  featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
+                  featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
+                  featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
+                  featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
+                ],
+              ),
+            ),
+
+            // See-Saw Tab
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
+                  featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
+                  featureItem("Block height: ≈34.00 mm", isDarkMode),
+                  featureItem("Block width: ≈24.76 mm", isDarkMode),
+                  featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
+                  featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
+                ],
+              ),
+            ),
+
+            // Base Tab
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
+                  featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
+                  featureItem("Post height: 52.00 mm", isDarkMode),
+                  featureItem("Fillet radius on ribs: R10.00", isDarkMode),
+                  featureItem("Feature span across base: 96.10 mm", isDarkMode),
+                  featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
+                  featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
+                  featureItem("Lower platform width: 113.75 mm", isDarkMode),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+),
+
+                                            
                                             ],
                                           ),
                                         ),
@@ -416,15 +480,59 @@ class ProductPage extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(height: 10),
-                                      featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
-                                      featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
-                                      featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
-                                      featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
-                                      featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
-                                      featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
-                                      featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
-                                      const SizedBox(height: 16),
-                                      _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                     Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    ExpansionTile(
+      title: Text("Cylinder (Collector Body)",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          )),
+      children: [
+        featureItem("Overall height: 301.50 mm", isDarkMode),
+        featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
+        featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
+        featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
+        featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
+        featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
+      ],
+    ),
+    ExpansionTile(
+      title: Text("See-Saw (Tipping Bucket Assembly)",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          )),
+      children: [
+        featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
+        featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
+        featureItem("Block height: ≈34.00 mm", isDarkMode),
+        featureItem("Block width: ≈24.76 mm", isDarkMode),
+        featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
+        featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
+      ],
+    ),
+    ExpansionTile(
+      title: Text("Base (Electronics/Mechanism Mount)",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black,
+          )),
+      children: [
+        featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
+        featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
+        featureItem("Post height: 52.00 mm", isDarkMode),
+        featureItem("Fillet radius on ribs: R10.00", isDarkMode),
+        featureItem("Feature span across base: 96.10 mm", isDarkMode),
+        featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
+        featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
+        featureItem("Lower platform width: 113.75 mm", isDarkMode),
+      ],
+    ),
+  ],
+)
+
                                     ],
                                   ),
                           ),
