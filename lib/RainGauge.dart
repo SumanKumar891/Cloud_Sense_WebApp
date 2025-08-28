@@ -1,4 +1,3 @@
-import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
 class ProductPage extends StatelessWidget {
@@ -15,7 +14,7 @@ class ProductPage extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-             colors: isDarkMode
+              colors: isDarkMode
                   ? [
                       const Color.fromARGB(255, 57, 57, 57),
                       const Color.fromARGB(255, 2, 54, 76),
@@ -118,7 +117,7 @@ class ProductPage extends StatelessWidget {
                                     Text(
                                       "Type: Tipping Bucket Rain Gauge",
                                       style: TextStyle(
-                                        fontSize: isWideScreen ? 20 : 14,
+                                        fontSize: isWideScreen ? 20 : 10,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
@@ -174,52 +173,106 @@ class ProductPage extends StatelessWidget {
                 ),
 
                 // 👇 Updated Technical Overview with 2 images
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 6,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: isWideScreen
-                          ? Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: SizedBox(
-                                    height: 250,
-                                    child: FittedBox(
-                                      fit: BoxFit.contain,
-                                      child: Image.asset("assets/rbase.png"),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  flex: 1,
-                                  child: SizedBox(
-                                    height: 300,
-                                    child: FittedBox(
-                                      fit: BoxFit.contain,
-                                      child: Image.asset("assets/rain.jpg"),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 50),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Card(
+                          color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 6,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: isWideScreen
+                                ? Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
+                                      // 👇 Images grouped together
+                                      // 👇 Images grouped together (right aligned)
+                                      Flexible(
+                                        flex: 1,
+                                        fit: FlexFit.tight,
+                                        child: Align(
+                                          alignment: Alignment.center, // 👈 right align
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min, // 👈 images jitna space utna hi lenge
+                                            children: [
+                                              SizedBox(
+                                                height: 260,
+                                                child: FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Image.asset("assets/rbase.png"),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8), // 👈 optional: dono images ke beech thoda gap
+                                              SizedBox(
+                                                height: 260,
+                                                child: FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Image.asset("assets/rain.jpg"),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      // 👇 Text Section (bilkul chipka diya)
+                                      Flexible(
+                                        flex: 1,
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Technical Overview",
+                                              style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: isDarkMode ? Colors.white : Colors.black,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
+                                            featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
+                                            featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
+                                            featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
+                                            featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
+                                            featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
+                                            featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
+                                            const SizedBox(height: 16),
+                                            _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
+
+                                // 👇 Mobile layout
+                                : Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 160,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Image.asset("assets/rbase.png"),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        height: 160,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Image.asset("assets/rain.jpg"),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
                                       Text("Technical Overview",
                                           style: TextStyle(
-                                            fontSize: 22,
+                                            fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: isDarkMode ? Colors.white : Colors.black,
                                           )),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: 10),
                                       featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
                                       featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
                                       featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
@@ -231,49 +284,152 @@ class ProductPage extends StatelessWidget {
                                       _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
                                     ],
                                   ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                SizedBox(
-                                  height: 160,
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Image.asset("assets/rbase.png"),
+                          ),
+                        ),
+                      ),
+                              // 👇 Updated Technical Overview with 3 images
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Card(
+                          color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 6,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: isWideScreen
+                                ? Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      // 👇 Images grouped together (3 images - no overflow)
+                                      Flexible(
+                                        flex: 1,
+                                        fit: FlexFit.tight,
+                                        child: Align(
+                                          alignment: Alignment.centerRight, // 👈 thoda right aligned
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Flexible(
+                                                child: SizedBox(
+                                                  height: 260,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.contain,
+                                                    child: Image.asset("assets/RainGaugeCylinder.jpg"),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: SizedBox(
+                                                  height: 260,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.contain,
+                                                    child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: SizedBox(
+                                                  height: 260,
+                                                  child: FittedBox(
+                                                    fit: BoxFit.contain,
+                                                    child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+
+                                      // 👇 Text Section
+                                      Flexible(
+                                        flex: 1,
+                                        fit: FlexFit.tight,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 15), // 👈 left side se 24px push
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "3D Specifications",
+                                                style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isDarkMode ? Colors.white : Colors.black,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                              featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
+                                              featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
+                                              featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
+                                              featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
+                                              featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
+                                              featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
+                                              featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
+                                              const SizedBox(height: 16),
+                                              _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+
+                                // 👇 Mobile layout with 3 images
+                                : Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 160,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Image.asset("assets/RainGaugeCylinder.jpg"),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        height: 160,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SizedBox(
+                                        height: 160,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        "3D Specifications",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDarkMode ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
+                                      featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
+                                      featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
+                                      featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
+                                      featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
+                                      featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
+                                      featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
+                                      const SizedBox(height: 16),
+                                      _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                SizedBox(
-                                  height: 160,
-                                  child: FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: Image.asset("assets/rain.jpg"),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text("Technical Overview",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDarkMode ? Colors.white : Colors.black,
-                                    )),
-                                const SizedBox(height: 10),
-                                featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
-                                featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
-                                featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
-                                featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
-                                featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
-                                featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
-                                featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
-                                const SizedBox(height: 16),
-                                _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
-                              ],
-                            ),
-                    ),
-                  ),
-                ),
-const Footer(),
+                          ),
+                        ),
+                      ),
+
               ],
             ),
           ),

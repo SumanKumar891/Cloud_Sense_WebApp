@@ -133,11 +133,11 @@ class UltrasonicSensorPage extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: const [
                                         BannerPoint(
-                                            "High accuracy, low cost wind measurement"),
+                                            "Accurate & Maintenance-Free Wind Monitoring"),
                                         BannerPoint(
-                                            "Excellent reliability, low maintenance"),
+                                            "Real-Time Speed & Direction Measurement"),
                                         BannerPoint(
-                                            "Models and outputs to suit varied applications"),
+                                            "Rugged, Solid-State Design for All Environments"),
                                       ],
                                     ),
                                     const SizedBox(height: 20),
@@ -220,18 +220,13 @@ class UltrasonicSensorPage extends StatelessWidget {
                                                 : Colors.black,
                                           )),
                                       const SizedBox(height: 12),
-                                      featureItem(
-                                          "Wind speed: 0–60 m/s", isDarkMode),
-                                      featureItem(
-                                          "Wind direction: 0–360°", isDarkMode),
-                                      featureItem(
-                                          "Output: NMEA & others", isDarkMode),
-                                      featureItem(
-                                          "Material: Corrosion free polycarbonate",
-                                          isDarkMode),
-                                      featureItem(
-                                          "Weight: 0.5 kg, Colors: Black/White",
-                                          isDarkMode),
+                                   // Technical Overview
+featureItem("Working Principle: Measures wind speed & direction via ultrasonic time-of-flight (ΔToF)", isDarkMode),
+featureItem("Transducers: 200 kHz air-coupled piezoelectric, 2–10 cm effective distance", isDarkMode),
+featureItem("Electronics: MSP430FR6043 MCU with USS subsystem, 12-bit ADC & TDC", isDarkMode),
+featureItem("Power: 3.3–5 V supply, ~50–80 mW active, ultra-low-power sleep modes", isDarkMode),
+featureItem("Software: TI USS library for calibration, ADC capture & UART data output", isDarkMode),
+
                                       const SizedBox(height: 16),
                                       _buildBannerButton(
                                           "DOWNLOAD DATASHEET", Colors.teal),
@@ -258,13 +253,11 @@ class UltrasonicSensorPage extends StatelessWidget {
                                           : Colors.black,
                                     )),
                                 const SizedBox(height: 10),
-                                featureItem("Wind speed: 0–60 m/s (216 km/h)",
-                                    isDarkMode),
-                                featureItem(
-                                    "Wind direction: 0–360°", isDarkMode),
-                                featureItem("Output: NMEA", isDarkMode),
-                                featureItem("Polycarbonate Body", isDarkMode),
-                                featureItem("Weight: 0.5 kg", isDarkMode),
+                                featureItem("Working Principle: Measures wind speed & direction via ultrasonic time-of-flight (ΔToF)", isDarkMode),
+featureItem("Transducers: 200 kHz air-coupled piezoelectric, 2–10 cm effective distance", isDarkMode),
+featureItem("Electronics: MSP430FR6043 MCU with USS subsystem, 12-bit ADC & TDC", isDarkMode),
+featureItem("Power: 3.3–5 V supply, ~50–80 mW active, ultra-low-power sleep modes", isDarkMode),
+featureItem("Software: TI USS library for calibration, ADC capture & UART data output", isDarkMode),
                                 const SizedBox(height: 16),
                                 _buildBannerButton(
                                     "DOWNLOAD DATASHEET", Colors.teal),
@@ -273,6 +266,9 @@ class UltrasonicSensorPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                 const SizedBox(height: 16),
+                _build3DSpecsCard(isDarkMode),
+                const SizedBox(height: 16),
                     const Footer(), // Add the Footer widget here
               ],
             ),
@@ -316,6 +312,111 @@ class UltrasonicSensorPage extends StatelessWidget {
 }
 
 
+Widget _build3DSpecsCard(bool isDarkMode) {
+  return Card(
+    color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          bool isWideScreen = constraints.maxWidth > 600; // breakpoint
+
+          if (isWideScreen) {
+            // 💻 Laptop/Desktop Layout (Two Images)
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              Expanded(
+  flex: 1,
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Flexible(
+        child: Image.asset(
+          "assets/wind3d.jpg",
+          height: 300,
+          fit: BoxFit.contain,
+        ),
+      ),
+      const SizedBox(width: 20),
+      Flexible(
+        child: Image.asset(
+          "assets/wind3d2.jpg",
+          height: 300,
+          fit: BoxFit.contain,
+        ),
+      ),
+    ],
+  ),
+),
+
+                const SizedBox(width: 40),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("3D Specifications",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.teal.shade800,
+                          )),
+                      const SizedBox(height: 12),
+                      featureItem("Overall Height: 150 mm", isDarkMode),
+                      featureItem("Top Plate Diameter: 144.69 mm", isDarkMode),
+                      featureItem("Middle Plate Diameter: 121.20 mm", isDarkMode),
+                      featureItem("Mounting Hole Circle Diameter: 52 mm", isDarkMode),
+                      featureItem("Inner Mounting Slot Diameter: 46 mm", isDarkMode),
+                      featureItem("Support Rod Curvature: R11.50 mm", isDarkMode),
+                      featureItem("Cylindrical Base Diameter: 52 mm", isDarkMode),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          } else {
+            // 📱 Mobile Layout (One Image)
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Image.asset(
+                    "assets/wind3d_2.jpg",
+                    height: 160,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text("3D Specifications",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.teal.shade800,
+                    )),
+                const SizedBox(height: 10),
+                featureItem("Overall Height: 150 mm", isDarkMode),
+                featureItem("Top Plate Diameter: 144.69 mm", isDarkMode),
+                featureItem("Middle Plate Diameter: 121.20 mm", isDarkMode),
+                featureItem("Mounting Hole Circle Diameter: 52 mm", isDarkMode),
+                featureItem("Inner Mounting Slot Diameter: 46 mm", isDarkMode),
+                featureItem("Support Rod Curvature: R11.50 mm", isDarkMode),
+                featureItem("Cylindrical Base Diameter: 52 mm", isDarkMode),
+              ],
+            );
+          }
+        },
+      ),
+    ),
+  );
+}
+
+
+
+
+
   Widget _buildFeaturesCard(bool isDarkMode) {
     return Card(
      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
@@ -333,12 +434,11 @@ class UltrasonicSensorPage extends StatelessWidget {
                    color: isDarkMode ? Colors.white : Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Measures up to 60m/s wind speed", isDarkMode),
-            featureItem(
-                "Supports gust calculation (WMO compliant)", isDarkMode),
-            featureItem("Both heated & unheated models", isDarkMode),
-            featureItem("Completely maintenance-free", isDarkMode),
-            featureItem("Compact & lightweight design", isDarkMode),
+            featureItem("Non-contact ultrasonic TOF measurement (no moving parts)", isDarkMode),
+featureItem("High accuracy ±0.1–0.3 m/s with fast response time", isDarkMode),
+featureItem("360° wind direction coverage with 1° resolution", isDarkMode),
+featureItem("Low power consumption (50–80 mW) with UART output", isDarkMode),
+featureItem("Rugged, solid-state design for all-weather durability", isDarkMode),
           ],
         ),
       ),
@@ -362,12 +462,11 @@ class UltrasonicSensorPage extends StatelessWidget {
                 color: isDarkMode ? Colors.white : Colors.blue.shade800, 
               )),
             const SizedBox(height: 10),
-            featureItem("Weather monitoring & observation", isDarkMode),
-            featureItem("Pollution monitoring systems", isDarkMode),
-            featureItem("Solar plant asset protection", isDarkMode),
-            featureItem("Smart cities & IoT projects", isDarkMode),
-            featureItem("Industrial & tunnel ventilation", isDarkMode),
-          ],
+       featureItem("Weather monitoring stations", isDarkMode),
+featureItem("Smart agriculture & precision farming", isDarkMode),
+featureItem("IoT-based environmental and air quality sensing", isDarkMode),
+featureItem("UAVs & drones for in-flight wind analysis", isDarkMode),
+featureItem("Industrial airflow and HVAC monitoring", isDarkMode),]
         ),
       ),
     );
