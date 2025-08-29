@@ -1384,13 +1384,13 @@ Widget _buildSensorCard({
   required double screenWidth,
 }) {
   // Responsive font sizes
-  double titleFontSize = screenWidth < 850 ? 16 : (screenWidth < 1300 ? 14 : 16);
+  double titleFontSize = screenWidth < 850 ? 16 : (screenWidth < 1300 ? 12 : 16);
   double descriptionFontSize = screenWidth < 850 ? 12 : (screenWidth < 1300 ? 10 : 14);
-  double buttonFontSize = screenWidth < 850 ? 8 : 8;
+  double buttonFontSize = screenWidth < 850 ? 8.0 : (screenWidth < 1300 ? 8.0 : 12.0);
   
   // Responsive padding
   EdgeInsets cardPadding = EdgeInsets.only(
-    top: screenWidth < 850 ? 16.0 : (screenWidth < 1300 ? 10.0 : 20.0),
+    top: screenWidth < 850 ? 16.0 : (screenWidth < 1300 ? 8.0 : 20.0),
     left: screenWidth < 850 ? 12.0 : 16.0,
     right: screenWidth < 850 ? 12.0 : 16.0,
     bottom: screenWidth < 850 ? 12.0 : 14.0,
@@ -1452,8 +1452,9 @@ Widget _buildSensorCard({
               ),
               // Button with responsive size
               SizedBox(
-                width: screenWidth < 850 ? 80 : 110, // Smaller button on mobile
-                height: screenWidth < 850 ? 25 : 28,
+                // width: screenWidth < 850 ? 80 : 90, // Smaller button on mobile
+                width: screenWidth < 850 ? 80: (screenWidth < 1300 ? 90 : 120.0),
+                height: screenWidth < 850 ? 25 : 24,
                 child: ElevatedButton(
                   onPressed: onReadMore,
                   style: ElevatedButton.styleFrom(

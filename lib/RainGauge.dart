@@ -303,256 +303,256 @@ class ProductPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                              // 👇 Updated Technical Overview with 3 images
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Card(
-                          color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 6,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: isWideScreen
-                                ? Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      // 👇 Images grouped together (3 images - no overflow)
-                                      Flexible(
-                                        flex: 1,
-                                        fit: FlexFit.tight,
-                                        child: Align(
-                                          alignment: Alignment.centerRight, // 👈 thoda right aligned
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Flexible(
-                                                child: SizedBox(
-                                                  height: 260,
-                                                  child: FittedBox(
-                                                    fit: BoxFit.contain,
-                                                    child: Image.asset("assets/RainGaugeCylinder.jpg"),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Flexible(
-                                                child: SizedBox(
-                                                  height: 260,
-                                                  child: FittedBox(
-                                                    fit: BoxFit.contain,
-                                                    child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Flexible(
-                                                child: SizedBox(
-                                                  height: 260,
-                                                  child: FittedBox(
-                                                    fit: BoxFit.contain,
-                                                    child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
+//                               // 👇 Updated Technical Overview with 3 images
+//                       Padding(
+//                         padding: const EdgeInsets.all(16.0),
+//                         child: Card(
+//                           color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
+//                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+//                           elevation: 6,
+//                           child: Padding(
+//                             padding: const EdgeInsets.all(16),
+//                             child: isWideScreen
+//                                 ? Row(
+//                                     crossAxisAlignment: CrossAxisAlignment.center,
+//                                     children: [
+//                                       // 👇 Images grouped together (3 images - no overflow)
+//                                       Flexible(
+//                                         flex: 1,
+//                                         fit: FlexFit.tight,
+//                                         child: Align(
+//                                           alignment: Alignment.centerRight, // 👈 thoda right aligned
+//                                           child: Row(
+//                                             mainAxisSize: MainAxisSize.min,
+//                                             children: [
+//                                               Flexible(
+//                                                 child: SizedBox(
+//                                                   height: 260,
+//                                                   child: FittedBox(
+//                                                     fit: BoxFit.contain,
+//                                                     child: Image.asset("assets/RainGaugeCylinder.jpg"),
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                               const SizedBox(width: 8),
+//                                               Flexible(
+//                                                 child: SizedBox(
+//                                                   height: 260,
+//                                                   child: FittedBox(
+//                                                     fit: BoxFit.contain,
+//                                                     child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                               const SizedBox(width: 8),
+//                                               Flexible(
+//                                                 child: SizedBox(
+//                                                   height: 260,
+//                                                   child: FittedBox(
+//                                                     fit: BoxFit.contain,
+//                                                     child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                             ],
+//                                           ),
+//                                         ),
+//                                       ),
 
 
-                                      // 👇 Text Section
-                                      Flexible(
-                                        flex: 1,
-                                        fit: FlexFit.tight,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 15), // 👈 left side se 24px push
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "3D Specifications",
-                                                style: TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: isDarkMode ? Colors.white : Colors.black,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 12),
-                                          DefaultTabController(
-  length: 3,
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const TabBar(
-        labelColor: Colors.teal,
-        unselectedLabelColor: Colors.grey,
-        indicatorColor: Colors.teal,
-        tabs: [
-          Tab(text: "Cylinder"),
-          Tab(text: "See-Saw"),
-          Tab(text: "Base"),
-        ],
-      ),
-      SizedBox(
-        height: 280, // fixed height for content
-        child: TabBarView(
-          children: [
-            // Cylinder Tab
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  featureItem("Overall height: 301.50 mm", isDarkMode),
-                  featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
-                  featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
-                  featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
-                  featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
-                  featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
-                ],
-              ),
-            ),
+//                                       // 👇 Text Section
+//                                       Flexible(
+//                                         flex: 1,
+//                                         fit: FlexFit.tight,
+//                                         child: Padding(
+//                                           padding: const EdgeInsets.only(left: 15), // 👈 left side se 24px push
+//                                           child: Column(
+//                                             crossAxisAlignment: CrossAxisAlignment.start,
+//                                             mainAxisAlignment: MainAxisAlignment.start,
+//                                             children: [
+//                                               Text(
+//                                                 "3D Specifications",
+//                                                 style: TextStyle(
+//                                                   fontSize: 22,
+//                                                   fontWeight: FontWeight.bold,
+//                                                   color: isDarkMode ? Colors.white : Colors.black,
+//                                                 ),
+//                                               ),
+//                                               const SizedBox(height: 12),
+//                                           DefaultTabController(
+//   length: 3,
+//   child: Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       const TabBar(
+//         labelColor: Colors.teal,
+//         unselectedLabelColor: Colors.grey,
+//         indicatorColor: Colors.teal,
+//         tabs: [
+//           Tab(text: "Cylinder"),
+//           Tab(text: "See-Saw"),
+//           Tab(text: "Base"),
+//         ],
+//       ),
+//       SizedBox(
+//         height: 280, // fixed height for content
+//         child: TabBarView(
+//           children: [
+//             // Cylinder Tab
+//             SingleChildScrollView(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   featureItem("Overall height: 301.50 mm", isDarkMode),
+//                   featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
+//                   featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
+//                   featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
+//                   featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
+//                   featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
+//                 ],
+//               ),
+//             ),
 
-            // See-Saw Tab
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
-                  featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
-                  featureItem("Block height: ≈34.00 mm", isDarkMode),
-                  featureItem("Block width: ≈24.76 mm", isDarkMode),
-                  featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
-                  featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
-                ],
-              ),
-            ),
+//             // See-Saw Tab
+//             SingleChildScrollView(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
+//                   featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
+//                   featureItem("Block height: ≈34.00 mm", isDarkMode),
+//                   featureItem("Block width: ≈24.76 mm", isDarkMode),
+//                   featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
+//                   featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
+//                 ],
+//               ),
+//             ),
 
-            // Base Tab
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
-                  featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
-                  featureItem("Post height: 52.00 mm", isDarkMode),
-                  featureItem("Fillet radius on ribs: R10.00", isDarkMode),
-                  featureItem("Feature span across base: 96.10 mm", isDarkMode),
-                  featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
-                  featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
-                  featureItem("Lower platform width: 113.75 mm", isDarkMode),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  ),
-),
+//             // Base Tab
+//             SingleChildScrollView(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
+//                   featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
+//                   featureItem("Post height: 52.00 mm", isDarkMode),
+//                   featureItem("Fillet radius on ribs: R10.00", isDarkMode),
+//                   featureItem("Feature span across base: 96.10 mm", isDarkMode),
+//                   featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
+//                   featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
+//                   featureItem("Lower platform width: 113.75 mm", isDarkMode),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     ],
+//   ),
+// ),
 
                                             
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
+//                                             ],
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ],
+//                                   )
 
-                                // 👇 Mobile layout with 3 images
-                                : Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 160,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Image.asset("assets/RainGaugeCylinder.jpg"),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      SizedBox(
-                                        height: 160,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      SizedBox(
-                                        height: 160,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        "3D Specifications",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: isDarkMode ? Colors.white : Colors.black,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                     Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    ExpansionTile(
-      title: Text("Cylinder (Collector Body)",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          )),
-      children: [
-        featureItem("Overall height: 301.50 mm", isDarkMode),
-        featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
-        featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
-        featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
-        featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
-        featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
-      ],
-    ),
-    ExpansionTile(
-      title: Text("See-Saw (Tipping Bucket Assembly)",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          )),
-      children: [
-        featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
-        featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
-        featureItem("Block height: ≈34.00 mm", isDarkMode),
-        featureItem("Block width: ≈24.76 mm", isDarkMode),
-        featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
-        featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
-      ],
-    ),
-    ExpansionTile(
-      title: Text("Base (Electronics/Mechanism Mount)",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? Colors.white : Colors.black,
-          )),
-      children: [
-        featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
-        featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
-        featureItem("Post height: 52.00 mm", isDarkMode),
-        featureItem("Fillet radius on ribs: R10.00", isDarkMode),
-        featureItem("Feature span across base: 96.10 mm", isDarkMode),
-        featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
-        featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
-        featureItem("Lower platform width: 113.75 mm", isDarkMode),
-      ],
-    ),
-  ],
-)
+//                                 // 👇 Mobile layout with 3 images
+//                                 : Column(
+//                                     children: [
+//                                       SizedBox(
+//                                         height: 160,
+//                                         child: FittedBox(
+//                                           fit: BoxFit.contain,
+//                                           child: Image.asset("assets/RainGaugeCylinder.jpg"),
+//                                         ),
+//                                       ),
+//                                       const SizedBox(height: 8),
+//                                       SizedBox(
+//                                         height: 160,
+//                                         child: FittedBox(
+//                                           fit: BoxFit.contain,
+//                                           child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
+//                                         ),
+//                                       ),
+//                                       const SizedBox(height: 8),
+//                                       SizedBox(
+//                                         height: 160,
+//                                         child: FittedBox(
+//                                           fit: BoxFit.contain,
+//                                           child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
+//                                         ),
+//                                       ),
+//                                       const SizedBox(height: 12),
+//                                       Text(
+//                                         "3D Specifications",
+//                                         style: TextStyle(
+//                                           fontSize: 20,
+//                                           fontWeight: FontWeight.bold,
+//                                           color: isDarkMode ? Colors.white : Colors.black,
+//                                         ),
+//                                       ),
+//                                       const SizedBox(height: 10),
+//                                      Column(
+//   crossAxisAlignment: CrossAxisAlignment.start,
+//   children: [
+//     ExpansionTile(
+//       title: Text("Cylinder (Collector Body)",
+//           style: TextStyle(
+//             fontWeight: FontWeight.bold,
+//             color: isDarkMode ? Colors.white : Colors.black,
+//           )),
+//       children: [
+//         featureItem("Overall height: 301.50 mm", isDarkMode),
+//         featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
+//         featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
+//         featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
+//         featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
+//         featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
+//       ],
+//     ),
+//     ExpansionTile(
+//       title: Text("See-Saw (Tipping Bucket Assembly)",
+//           style: TextStyle(
+//             fontWeight: FontWeight.bold,
+//             color: isDarkMode ? Colors.white : Colors.black,
+//           )),
+//       children: [
+//         featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
+//         featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
+//         featureItem("Block height: ≈34.00 mm", isDarkMode),
+//         featureItem("Block width: ≈24.76 mm", isDarkMode),
+//         featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
+//         featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
+//       ],
+//     ),
+//     ExpansionTile(
+//       title: Text("Base (Electronics/Mechanism Mount)",
+//           style: TextStyle(
+//             fontWeight: FontWeight.bold,
+//             color: isDarkMode ? Colors.white : Colors.black,
+//           )),
+//       children: [
+//         featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
+//         featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
+//         featureItem("Post height: 52.00 mm", isDarkMode),
+//         featureItem("Fillet radius on ribs: R10.00", isDarkMode),
+//         featureItem("Feature span across base: 96.10 mm", isDarkMode),
+//         featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
+//         featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
+//         featureItem("Lower platform width: 113.75 mm", isDarkMode),
+//       ],
+//     ),
+//   ],
+// )
 
-                                    ],
-                                  ),
-                          ),
-                        ),
-                      ),
+                      //               ],
+                      //             ),
+                      //     ),
+                      //   ),
+                      // ),
 const Footer(),
               ],
             ),
