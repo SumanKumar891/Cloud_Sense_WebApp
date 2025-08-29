@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
 
   // Calculate responsive values based on screen width
 int getCrossAxisCount(double screenWidth) {
-  if (screenWidth < 800) {
+  if (screenWidth < 950) {
     return 1; // Mobile: 1 card per row
   } else if (screenWidth < 1300) {
     return 2; // Tablet: 2 cards per row
@@ -62,17 +62,17 @@ int getCrossAxisCount(double screenWidth) {
 }
 
 double getCardAspectRatio(double screenWidth) {
-  if (screenWidth < 800) {
-    return 1.2; // Mobile: slightly taller cards
+  if (screenWidth < 870) {
+    return 1.6; // Mobile: slightly taller cards
   } else if (screenWidth < 1300) {
-    return 1.3; // Tablet: balanced aspect ratio
+    return 1.4; // Tablet: balanced aspect ratio
   } else {
     return 1.5; // Desktop: original aspect ratio
   }
 }
 
 double getHorizontalPadding(double screenWidth) {
-  if (screenWidth < 800) {
+  if (screenWidth < 850) {
     return 10; // Mobile: minimal padding
   } else if (screenWidth < 1300) {
     return 40; // Tablet: moderate padding
@@ -896,8 +896,8 @@ GridView.count(
   shrinkWrap: true,
   physics: const NeverScrollableScrollPhysics(),
   crossAxisCount: getCrossAxisCount(screenWidth),
-  crossAxisSpacing: screenWidth < 800 ? 10 : 12,
-  mainAxisSpacing: screenWidth < 800 ? 20 : 40,
+  crossAxisSpacing: screenWidth < 850 ? 10 : 12,
+  mainAxisSpacing: screenWidth < 850 ? 20 : 40,
   childAspectRatio: getCardAspectRatio(screenWidth),
   padding: EdgeInsets.symmetric(horizontal: getHorizontalPadding(screenWidth)),
   children: [
@@ -1281,7 +1281,7 @@ GridView.count(
     double screenWidth = MediaQuery.of(context).size.width;
     double cardSize = screenWidth < 500
         ? 80
-        : screenWidth < 800
+        : screenWidth < 850
             ? 150
             : 180;
     double valueFontSize = cardSize * 0.12;
@@ -1384,20 +1384,20 @@ Widget _buildSensorCard({
   required double screenWidth,
 }) {
   // Responsive font sizes
-  double titleFontSize = screenWidth < 800 ? 16 : (screenWidth < 1300 ? 14 : 20);
-  double descriptionFontSize = screenWidth < 800 ? 12 : (screenWidth < 1300 ? 10 : 16);
-  double buttonFontSize = screenWidth < 800 ? 10 : 12;
+  double titleFontSize = screenWidth < 850 ? 16 : (screenWidth < 1300 ? 14 : 16);
+  double descriptionFontSize = screenWidth < 850 ? 12 : (screenWidth < 1300 ? 10 : 14);
+  double buttonFontSize = screenWidth < 850 ? 8 : 8;
   
   // Responsive padding
   EdgeInsets cardPadding = EdgeInsets.only(
-    top: screenWidth < 800 ? 16.0 : (screenWidth < 1300 ? 20.0 : 40.0),
-    left: screenWidth < 800 ? 12.0 : 16.0,
-    right: screenWidth < 800 ? 12.0 : 16.0,
-    bottom: screenWidth < 800 ? 12.0 : 16.0,
+    top: screenWidth < 850 ? 16.0 : (screenWidth < 1300 ? 10.0 : 20.0),
+    left: screenWidth < 850 ? 12.0 : 16.0,
+    right: screenWidth < 850 ? 12.0 : 16.0,
+    bottom: screenWidth < 850 ? 12.0 : 14.0,
   );
   
   // Responsive spacing
-  double titleDescriptionSpacing = screenWidth < 800 ? 4 : 6;
+  double titleDescriptionSpacing = screenWidth < 850 ? 3 : 4;
   
   return Card(
     elevation: 4,
@@ -1452,8 +1452,8 @@ Widget _buildSensorCard({
               ),
               // Button with responsive size
               SizedBox(
-                width: screenWidth < 800 ? 110 : 130, // Smaller button on mobile
-                height: screenWidth < 800 ? 28 : 32,
+                width: screenWidth < 850 ? 80 : 110, // Smaller button on mobile
+                height: screenWidth < 850 ? 25 : 28,
                 child: ElevatedButton(
                   onPressed: onReadMore,
                   style: ElevatedButton.styleFrom(
@@ -1463,8 +1463,8 @@ Widget _buildSensorCard({
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth < 800 ? 8 : 12,
-                      vertical: screenWidth < 800 ? 4 : 6,
+                      horizontal: screenWidth < 850 ? 6 : 10,
+                      vertical: screenWidth < 850 ? 3 : 6,
                     ),
                   ),
                   child: Text(
