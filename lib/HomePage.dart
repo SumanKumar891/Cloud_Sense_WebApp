@@ -50,6 +50,38 @@ class _HomePageState extends State<HomePage> {
   bool _isPressed = false;
   bool _isProductsExpanded = false; // For mobile drawer products expansion
 
+  // Calculate responsive values based on screen width
+int getCrossAxisCount(double screenWidth) {
+  if (screenWidth < 800) {
+    return 1; // Mobile: 1 card per row
+  } else if (screenWidth < 1300) {
+    return 2; // Tablet: 2 cards per row
+  } else {
+    return 3; // Desktop: 3 cards per row
+  }
+}
+
+double getCardAspectRatio(double screenWidth) {
+  if (screenWidth < 800) {
+    return 1.2; // Mobile: slightly taller cards
+  } else if (screenWidth < 1300) {
+    return 1.3; // Tablet: balanced aspect ratio
+  } else {
+    return 1.5; // Desktop: original aspect ratio
+  }
+}
+
+double getHorizontalPadding(double screenWidth) {
+  if (screenWidth < 800) {
+    return 10; // Mobile: minimal padding
+  } else if (screenWidth < 1300) {
+    return 40; // Tablet: moderate padding
+  } else {
+    return 0; // Desktop: no extra padding (uses main container padding)
+  }
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -372,12 +404,12 @@ class _HomePageState extends State<HomePage> {
         : screenWidth < 1024
             ? 48
             : 60;
-    double subtitleFont = screenWidth < 600
+    double subtitleFont = screenWidth < 800
         ? 18
         : screenWidth < 1024
             ? 22
             : 30;
-    double paragraphFont = screenWidth < 600
+    double paragraphFont = screenWidth < 800
         ? 14
         : screenWidth < 1024
             ? 18
@@ -401,14 +433,14 @@ class _HomePageState extends State<HomePage> {
     children: [
       // Left-aligned title with slight offset
       Padding(
-        padding: EdgeInsets.only(left: screenWidth < 600 ? 8 : 26), // Adjust left offset
+        padding: EdgeInsets.only(left: screenWidth < 800 ? 8 : 26), // Adjust left offset
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
            Icon(
     Icons.cloud,
     color: isDarkMode ? Colors.white : Colors.black,
-    size: screenWidth < 600
+    size: screenWidth < 800
         ? 24
         : screenWidth <= 1024
             ? 32
@@ -420,7 +452,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(
                 color: isDarkMode ? Colors.white : Colors.black,
                 fontWeight: FontWeight.bold,
-                fontSize: screenWidth < 600
+                fontSize: screenWidth < 800
                     ? 20
                     : screenWidth <= 1024
                         ? 26
@@ -433,7 +465,7 @@ class _HomePageState extends State<HomePage> {
       // Right-aligned buttons with slight offset
       if (!isMobile)
         Padding(
-          padding: EdgeInsets.only(right: screenWidth < 600 ? 8 : 26), // Adjust right offset
+          padding: EdgeInsets.only(right: screenWidth < 800 ? 8 : 26), // Adjust right offset
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -771,7 +803,7 @@ class _HomePageState extends State<HomePage> {
             SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth < 600
+                  horizontal: screenWidth < 800
                       ? 20
                       : screenWidth <= 1024
                           ? 260
@@ -859,50 +891,57 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                   GridView.count(
+                 // Replace your existing GridView.count section with this:
+GridView.count(
   shrinkWrap: true,
   physics: const NeverScrollableScrollPhysics(),
-  crossAxisCount: screenWidth < 600 ? 1 : 3,
-  crossAxisSpacing: 5,
-  mainAxisSpacing: 40,
-  childAspectRatio: 1.5, // Maintain a consistent aspect ratio for all cards
-  padding: const EdgeInsets.symmetric(horizontal: 0),
+  crossAxisCount: getCrossAxisCount(screenWidth),
+  crossAxisSpacing: screenWidth < 800 ? 10 : 12,
+  mainAxisSpacing: screenWidth < 800 ? 20 : 40,
+  childAspectRatio: getCardAspectRatio(screenWidth),
+  padding: EdgeInsets.symmetric(horizontal: getHorizontalPadding(screenWidth)),
   children: [
     _buildSensorCard(
       imageAsset: "assets/probebg.jpg",
       title: "ATRH Probe",
       description: "Accurate measurements for temperature and humidity.",
       onReadMore: () => Navigator.pushNamed(context, '/probe'),
+      screenWidth: screenWidth,
     ),
     _buildSensorCard(
       imageAsset: "assets/arth.jpg",
       title: "ATRH Lux Pressure Sensor",
       description: "Multi-sensor for ATRH, lux, and pressure.",
       onReadMore: () => Navigator.pushNamed(context, '/atrh'),
+      screenWidth: screenWidth,
     ),
     _buildSensorCard(
       imageAsset: "assets/windsensor.jpg",
       title: "Wind Sensor",
       description: "Ultrasonic wind sensors for precise wind data.",
       onReadMore: () => Navigator.pushNamed(context, '/windsensor'),
+      screenWidth: screenWidth,
     ),
     _buildSensorCard(
       imageAsset: "assets/rbase.png",
       title: "Rain Gauge",
       description: "Reliable rainfall measurement.",
       onReadMore: () => Navigator.pushNamed(context, '/raingauge'),
+      screenWidth: screenWidth,
     ),
     _buildSensorCard(
       imageAsset: "assets/dataloggerrender.png",
       title: "Data Logger",
       description: "Logs data from multiple sensors.",
       onReadMore: () => Navigator.pushNamed(context, '/datalogger'),
+      screenWidth: screenWidth,
     ),
     _buildSensorCard(
       imageAsset: "assets/gateway.jpg",
       title: "Gateway",
       description: "Connects devices to the cloud.",
       onReadMore: () => Navigator.pushNamed(context, '/gateway'),
+      screenWidth: screenWidth,
     ),
   ],
 ),
@@ -1336,12 +1375,29 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+// Updated _buildSensorCard method with responsive design:
 Widget _buildSensorCard({
   required String imageAsset,
   required String title,
   required String description,
   required VoidCallback onReadMore,
+  required double screenWidth,
 }) {
+  // Responsive font sizes
+  double titleFontSize = screenWidth < 800 ? 16 : (screenWidth < 1300 ? 14 : 20);
+  double descriptionFontSize = screenWidth < 800 ? 12 : (screenWidth < 1300 ? 10 : 16);
+  double buttonFontSize = screenWidth < 800 ? 10 : 12;
+  
+  // Responsive padding
+  EdgeInsets cardPadding = EdgeInsets.only(
+    top: screenWidth < 800 ? 16.0 : (screenWidth < 1300 ? 20.0 : 40.0),
+    left: screenWidth < 800 ? 12.0 : 16.0,
+    right: screenWidth < 800 ? 12.0 : 16.0,
+    bottom: screenWidth < 800 ? 12.0 : 16.0,
+  );
+  
+  // Responsive spacing
+  double titleDescriptionSpacing = screenWidth < 800 ? 4 : 6;
   
   return Card(
     elevation: 4,
@@ -1361,12 +1417,12 @@ Widget _buildSensorCard({
         Container(
           color: Colors.black.withOpacity(0.65),
         ),
-        // Text and button layout with fixed positioning
-       Padding(
-          padding: const EdgeInsets.only(top: 40.0, left: 16.0, right: 16.0, bottom: 16.0),// Consistent padding around all sides
+        // Text and button layout with responsive positioning
+        Padding(
+          padding: cardPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distributes space evenly
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Title and description section
               Column(
@@ -1374,29 +1430,30 @@ Widget _buildSensorCard({
                 children: [
                   Text(
                     title.toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 2, // Allow up to 2 lines for longer titles
+                    maxLines: screenWidth < 800 ? 1 : 2, // Single line on mobile for space
                   ),
-                  const SizedBox(height: 6), // Fixed spacing between title and description
+                  SizedBox(height: titleDescriptionSpacing),
                   Text(
                     description,
-                    style: const TextStyle(color: Colors.white70, fontSize: 16),
+                    style: TextStyle(
+                      color: Colors.white70, 
+                      fontSize: descriptionFontSize,
+                    ),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 2, // Limit to 2 lines to maintain consistency
+                    maxLines: screenWidth < 800 ? 2 : 3, // More lines allowed on larger screens
                   ),
                 ],
               ),
-              // Spacer to push button to the bottom
-              // const Spacer(),
-              // Button with consistent size and position
+              // Button with responsive size
               SizedBox(
-                // width: 130, // Increased width to ensure text fits on one line
-                // height: 30, // Fixed height for the button
+                width: screenWidth < 800 ? 110 : 130, // Smaller button on mobile
+                height: screenWidth < 800 ? 28 : 32,
                 child: ElevatedButton(
                   onPressed: onReadMore,
                   style: ElevatedButton.styleFrom(
@@ -1405,11 +1462,18 @@ Widget _buildSensorCard({
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth < 800 ? 8 : 12,
+                      vertical: screenWidth < 800 ? 4 : 6,
+                    ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "READ MORE >",
-                    style: TextStyle(fontSize: 12), // Ensure text fits without wrapping
-                    overflow: TextOverflow.ellipsis, // Prevent text wrapping
+                    style: TextStyle(
+                      fontSize: buttonFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -1420,4 +1484,5 @@ Widget _buildSensorCard({
     ),
   );
 }
+
 }
