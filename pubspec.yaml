@@ -165,9 +165,9 @@ flutter:
     - assets/RainGaugeSeeSaw.jpg
     - assets/RainGaugeCylinder.jpg
     - assets/raingaugerender.jpg
-    - assets/manuals/dataLogger.pdf
-    - assets/manuals/rainGauge.pdf
-    - assets/manuals/windSensor.pdf
+    - assets/dataLogger.pdf
+    - assets/rainGauge.pdf
+    - assets/windSensor.pdf
 
    
    
