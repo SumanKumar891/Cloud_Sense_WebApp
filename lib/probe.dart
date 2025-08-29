@@ -93,7 +93,7 @@ class ProbePage extends StatelessWidget {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: "ATRH ",
+                                            text: "Temperature and Humidity ",
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 48 : 28,
                                               fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class ProbePage extends StatelessWidget {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: "Sensor",
+                                            text: "Probe",
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 48 : 28,
                                               fontWeight: FontWeight.bold,
@@ -118,7 +118,7 @@ class ProbePage extends StatelessWidget {
                                       color: Colors.lightBlueAccent,
                                     ),
                                     Text(
-                                      "Type: ATRH Sensor (PT100 + SHT45 based)",
+                                      "Accurate measurements for temperature and humidity.",
                                       style: TextStyle(
                                         fontSize: isWideScreen ? 20 : 14,
                                         fontWeight: FontWeight.bold,
@@ -129,8 +129,8 @@ class ProbePage extends StatelessWidget {
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: const [
-                                        BannerPoint("Measures temperature with PT100 RTD (high accuracy)"),
-                                        BannerPoint("Detects humidity & temperature digitally via SHT45"),
+                                        BannerPoint("Measures temperature and humidity with high accuracy"),
+                                  
                                         BannerPoint("Provides both analog (0–1000 mV) and digital (RS485/Modbus) outputs"),
                                         BannerPoint("Reliable, industrial-grade monitoring with CRC-validated communication"),
                                       ],
@@ -299,7 +299,7 @@ const Footer(),
                   color: isDarkMode ? Colors.white : Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("High-precision temperature sensing using PT100 RTD (via MAX31865 converter)", isDarkMode),
+            featureItem("High-precision temperature and humidity sensing probe", isDarkMode),
             featureItem("Digital humidity and temperature measurement with SHT45 sensor", isDarkMode),
             featureItem("Dual MCP4725 DAC outputs provide analog voltage signals (0–1000 mV)", isDarkMode),
             featureItem("Robust RS485/Modbus-RTU communication for industrial use", isDarkMode),
