@@ -281,7 +281,7 @@ double getHorizontalPadding(double screenWidth) {
                                   color:
                                       isDarkMode ? Colors.white : Colors.black),
                               SizedBox(width: 8),
-                              Text('ATRH Lux Pressure Sensor'),
+                              Text('THPL Shield'),
                             ],
                           ),
                         ),
@@ -299,7 +299,7 @@ double getHorizontalPadding(double screenWidth) {
             children: [
               Icon(Icons.air, color: isDarkMode ? Colors.white : Colors.black),
               SizedBox(width: 8),
-              Text('Wind Sensor'),
+              Text('Ultrasonic Anemometer'),
             ],
           ),
         ),
@@ -332,7 +332,7 @@ double getHorizontalPadding(double screenWidth) {
               Icon(Icons.router,
                   color: isDarkMode ? Colors.white : Colors.black),
               SizedBox(width: 8),
-              Text('Gateway'),
+              Text('BLE Gateway'),
             ],
           ),
         ),
