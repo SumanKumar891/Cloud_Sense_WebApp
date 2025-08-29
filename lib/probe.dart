@@ -43,14 +43,14 @@ class ProbePage extends StatelessWidget {
                         Expanded(
                           flex: 1,
                           child: Container(
-                            height: isWideScreen ? 450 : 400,
+                            height: isWideScreen ? 450 : 450,
                             color: Colors.grey.shade600,
                           ),
                         ),
                         Expanded(
                           flex: 1,
                           child: Container(
-                            height: isWideScreen ? 450 : 400,
+                            height: isWideScreen ? 450 : 450,
                             child: Image.asset(
                               "assets/probebg.jpg",
                               fit: BoxFit.cover,
@@ -64,7 +64,7 @@ class ProbePage extends StatelessWidget {
                       ],
                     ),
                     Container(
-                      height: isWideScreen ? 450 : 400,
+                      height: isWideScreen ? 450 : 450,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -306,71 +306,86 @@ class ProbePage extends StatelessWidget {
 
   // ---------- Specifications Card ----------
   Widget _buildSpecificationsCard(bool isDarkMode) {
-    final List<String> specItems = [
-      "Supply Voltage : 5-12 V DC",
-      "Range of Temperature : -40 to +60 °C",
-      "Range of humidity : 0-100%",
-      "Communications Protocol : RS485 & 0-1V (ADC)",
-      "Temperature Accuracy : ±0.1°C",
-      "Humidity Accuracy:±1.0% RH ",
-     
-      
-      
-    ];
+  final List<String> specItems = [
+    "Supply Voltage : 5-12 V DC",
+    "Range of Temperature : -40 to +60 °C",
+    "Range of humidity : 0-100%",
+    "Communications Protocol : RS485 & 0-1V (ADC)",
+    "Temperature Accuracy : ±0.1°C",
+    "Humidity Accuracy: ±1.0% RH",
+  ];
 
-    final int splitIndex = (specItems.length / 2).ceil();
-    final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-    final List<String> rightColumnItems = specItems.sublist(splitIndex);
-
-    return HoverCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Text(
-                "Technical Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                ),
+  return HoverCard(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: Text(
+              "Technical Specifications",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.blue.shade800,
               ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: leftColumnItems
-                        .map((item) => featureItem(item, isDarkMode))
-                        .toList(),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: rightColumnItems
-                        .map((item) => featureItem(item, isDarkMode))
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            Center(
-              child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+          const SizedBox(height: 20),
+          // Use a LayoutBuilder to determine screen width and adjust layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isWideScreen = screenWidth > 800;
 
+              if (isWideScreen) {
+                // Two-column layout for wide screens
+                final int splitIndex = (specItems.length / 2).ceil();
+                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+                final List<String> rightColumnItems = specItems.sublist(splitIndex);
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: leftColumnItems
+                            .map((item) => featureItem(item, isDarkMode))
+                            .toList(),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: rightColumnItems
+                            .map((item) => featureItem(item, isDarkMode))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                // Single-column layout for mobile
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: specItems
+                      .map((item) => featureItem(item, isDarkMode))
+                      .toList(),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 40),
+          Center(
+            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
+          ),
+        ],
+      ),
+    ),
+  );
+}
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
       child: Padding(

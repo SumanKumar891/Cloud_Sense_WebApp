@@ -1275,7 +1275,7 @@ double getHorizontalPadding(double screenWidth) {
                     imageAsset: "assets/windsensor.jpg",
                     title: "Ultrasonic Anemometer",
                     description:
-                        "Ultrasonic Anemometer for precise wind speed and wind directiona.",
+                        "Ultrasonic Anemometer for precise wind speed and wind direction.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/windsensor'),
                     screenWidth: screenWidth,
@@ -1578,22 +1578,22 @@ double getHorizontalPadding(double screenWidth) {
   }) {
     double titleFontSize = screenWidth < 600
         ? 16
-        : (screenWidth < 1300 ? 20 : 24);
+        : (screenWidth < 1300 ? 16 : 24);
     double descriptionFontSize = screenWidth < 600
-        ? 12
-        : (screenWidth < 1300 ? 16 : 18);
+        ? 10
+        : (screenWidth < 1300 ? 12 : 18);
     double buttonFontSize = screenWidth < 600
         ? 8.0
-        : (screenWidth < 1300 ? 10.0 : 14.0);
+        : (screenWidth < 1300 ? 9.0 : 14.0);
 
     EdgeInsets cardPadding = EdgeInsets.only(
-      top: screenWidth < 600 ? 16.0 : (screenWidth < 1300 ? 18.0 : 30.0),
+      top: screenWidth < 600 ? 16.0 : (screenWidth < 1300 ? 14.0 : 30.0),
       left: screenWidth < 600 ? 12.0 : 16.0,
       right: screenWidth < 600 ? 12.0 : 16.0,
       bottom: screenWidth < 600 ? 12.0 : 14.0,
     );
 
-    double titleDescriptionSpacing = screenWidth < 600 ? 3 : 8;
+    double titleDescriptionSpacing = screenWidth < 600 ? 3 : 7;
 
     return Card(
       elevation: 4,
@@ -1628,7 +1628,7 @@ double getHorizontalPadding(double screenWidth) {
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
-                      maxLines: screenWidth < 800 ? 1 : 2,
+                      maxLines: screenWidth < 800 ? 2 : 2,
                     ),
                     SizedBox(height: titleDescriptionSpacing),
                     Text(
@@ -1638,7 +1638,7 @@ double getHorizontalPadding(double screenWidth) {
                         fontSize: descriptionFontSize,
                       ),
                       overflow: TextOverflow.ellipsis,
-                      maxLines: screenWidth < 800 ? 2 : 3,
+                      maxLines: screenWidth < 800 ? 3 : 3,
                     ),
                   ],
                 ),

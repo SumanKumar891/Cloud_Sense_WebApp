@@ -336,38 +336,60 @@ class UltrasonicSensorPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: leftColumnItems
-                        .map((item) => featureItem(item, isDarkMode))
-                        .toList(),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: rightColumnItems
-                        .map((item) => featureItem(item, isDarkMode))
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            Center(
-              child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          // Use a LayoutBuilder to determine screen width and adjust layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final screenWidth = MediaQuery.of(context).size.width;
+              final isWideScreen = screenWidth > 800;
 
+              if (isWideScreen) {
+                // Two-column layout for wide screens
+                final int splitIndex = (specItems.length / 2).ceil();
+                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+                final List<String> rightColumnItems = specItems.sublist(splitIndex);
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: leftColumnItems
+                            .map((item) => featureItem(item, isDarkMode))
+                            .toList(),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: rightColumnItems
+                            .map((item) => featureItem(item, isDarkMode))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                // Single-column layout for mobile
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: specItems
+                      .map((item) => featureItem(item, isDarkMode))
+                      .toList(),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 40),
+          Center(
+            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
+          ),
+        ],
+      ),
+    ),
+  );
+}
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
       child: Padding(
