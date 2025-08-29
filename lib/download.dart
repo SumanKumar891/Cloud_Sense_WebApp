@@ -8,28 +8,28 @@ import 'package:flutter/services.dart' show rootBundle;
 class DownloadManager {
   static final Map<String, Map<String, String>> sensorFiles = {
     "WindSensor": {
-      "manual": "assets/windSensor.pdf",
+      "manual": "assets/assets/windSensor.pdf",
       "datasheet": "assets/manuals/windSensor_datasheet.pdf",
     },
 
      "ARTH": {
-      "manual": "assets/windSensor.pdf",
+      "manual": "assets/assets/windSensor.pdf",
       "datasheet": "assets/manuals/windSensor_datasheet.pdf",
   },
   "RainGauge": {
-      "manual": "assets/rainGauge.pdf",
+      "manual": "assets/assets/rainGauge.pdf",
       "datasheet": "assets/manuals/windSensor_datasheet.pdf",
   },
   "Gateway": {
-        "manual": "assets/windSensor.pdf",
+        "manual": "assets/assets/windSensor.pdf",
       "datasheet": "assets/manuals/windSensor_datasheet.pdf",
   },
   "TempHumidityProbe": {  
-     "manual": "assets/windSensor.pdf",
+     "manual": "assets/assets/windSensor.pdf",
       "datasheet": "assets/manuals/windSensor_datasheet.pdf",},
 
   "DataLogger": {
-      "manual": "assets/dataLogger.pdf",
+      "manual": "assets/assets/dataLogger.pdf",
       "datasheet": "assets/manuals/windSensor_datasheet.pdf",
   },
 };
