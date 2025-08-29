@@ -38,13 +38,13 @@ class ProbePage extends StatelessWidget {
                   children: [
                     Image.asset(
                       "assets/probebg.jpg",
-                      height: isWideScreen ? 450 : 350,
+                      height: isWideScreen ? 450 : 450,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       alignment: Alignment.centerRight,
                     ),
                     Container(
-                      height: isWideScreen ? 450 : 350,
+                      height: isWideScreen ? 450 : 450,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -125,7 +125,7 @@ class ProbePage extends StatelessWidget {
                                         color: Colors.white,
                                       ),
                                     ),
-                                    const SizedBox(height: 16),
+                                    const SizedBox(height: 10),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: const [

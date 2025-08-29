@@ -173,7 +173,7 @@ class ProductPage extends StatelessWidget {
                         ),
                 ),
 
-                // 👇 Updated Technical Overview with 2 images
+                // 👇 Updated Technical Overview
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Card(
@@ -197,18 +197,13 @@ class ProductPage extends StatelessWidget {
                                             mainAxisSize: MainAxisSize.min, // 👈 images jitna space utna hi lenge
                                             children: [
                                               SizedBox(
-                                                height: 260,
+                                                height: 300,
                                                 child: FittedBox(
                                                   fit: BoxFit.contain,
-                                                  child: Image.asset("assets/rbase.png"),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8), // 👈 optional: dono images ke beech thoda gap
-                                              SizedBox(
-                                                height: 260,
-                                                child: FittedBox(
-                                                  fit: BoxFit.contain,
-                                                  child: Image.asset("assets/rain.jpg"),
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(20), // 👈 round edges
+                                                    child: Image.asset("assets/raingaugerender.jpg"),
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -255,15 +250,7 @@ class ProductPage extends StatelessWidget {
                                         height: 160,
                                         child: FittedBox(
                                           fit: BoxFit.contain,
-                                          child: Image.asset("assets/rbase.png"),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      SizedBox(
-                                        height: 160,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Image.asset("assets/rain.jpg"),
+                                          child: Image.asset("assets/raingaugerender.jpg"),
                                         ),
                                       ),
                                       const SizedBox(height: 12),
