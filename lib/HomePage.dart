@@ -1264,18 +1264,18 @@ double getHorizontalPadding(double screenWidth) {
                   ),
                   _buildSensorCard(
                     imageAsset: "assets/arth.jpg",
-                    title: "ATRH Lux Pressure Sensor",
+                    title: "THPL shield",
                     description:
-                        "Multi-sensor for ATRH, lux, and pressure.",
+                        "Compact environmental sensing unit for precise measurements.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/atrh'),
                     screenWidth: screenWidth,
                   ),
                   _buildSensorCard(
                     imageAsset: "assets/windsensor.jpg",
-                    title: "Wind Sensor",
+                    title: "Ultrasonic Anemometer",
                     description:
-                        "Ultrasonic wind sensors for precise wind data.",
+                        "Ultrasonic Anemometer for precise wind speed and wind directiona.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/windsensor'),
                     screenWidth: screenWidth,
@@ -1283,7 +1283,7 @@ double getHorizontalPadding(double screenWidth) {
                   _buildSensorCard(
                     imageAsset: "assets/rbase.png",
                     title: "Rain Gauge",
-                    description: "Reliable rainfall measurement.",
+                    description: "Tipping Bucket Rain Gauge.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/raingauge'),
                     screenWidth: screenWidth,
@@ -1292,15 +1292,15 @@ double getHorizontalPadding(double screenWidth) {
                     imageAsset: "assets/dataloggerrender.png",
                     title: "Data Logger",
                     description:
-                        "Logs data from multiple sensors.",
+                        "Reliable Data Logging & seamless Connectivity.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/datalogger'),
                     screenWidth: screenWidth,
                   ),
                   _buildSensorCard(
                     imageAsset: "assets/gateway.jpg",
-                    title: "Gateway",
-                    description: "Connects devices to the cloud.",
+                    title: "BLE Gateway",
+                    description: "BLE Gateway For industrial IOT Applications.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/gateway'),
                     screenWidth: screenWidth,

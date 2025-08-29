@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
+
 
 class GatewayPage extends StatelessWidget {
   const GatewayPage({super.key});
@@ -9,13 +13,14 @@ class GatewayPage extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
+    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
 
     return Scaffold(
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-             colors: isDarkMode
+              colors: isDarkMode
                   ? [
                       const Color.fromARGB(255, 57, 57, 57),
                       const Color.fromARGB(255, 2, 54, 76),
@@ -32,14 +37,33 @@ class GatewayPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // ---------- Banner Section ----------
                 Stack(
                   children: [
-                    Image.asset(
-                      "assets/gatewaybg.jpg",
-                      height: isWideScreen ? 450 : 400,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.centerRight,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: isWideScreen ? 450 : 400,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: isWideScreen ? 450 : 400,
+                            child: Image.asset(
+                              "assets/gateway.jpg",
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                            ).animate().fadeIn(duration: 1600.ms).scale(
+                                  duration: 1800.ms,
+                                  curve: Curves.easeOutBack,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                     Container(
                       height: isWideScreen ? 450 : 400,
@@ -47,245 +71,172 @@ class GatewayPage extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             Colors.black.withOpacity(0.6),
-                            Colors.black.withOpacity(0.6)
+                            Colors.black.withOpacity(0.3)
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
                       ),
-                    ),      
-Positioned.fill(
-  child: Align(
-    alignment: Alignment.topLeft,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-      
-        Padding(
-          padding: const EdgeInsets.only(top: 12, left: 8), 
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back,
-                color: Colors.white, size: 22),
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else {
-                Navigator.of(context).pushReplacementNamed("/");
-              }
-            },
-          ),
-        ),
-
-     
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isWideScreen ? 84 : 16,
-            vertical: isWideScreen ? 20 : 12,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: isWideScreen ? 600 : double.infinity,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-
-           
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Gate",
-                        style: TextStyle(
-                          fontSize: isWideScreen ? 48 : 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.lightBlueAccent,
+                    ),
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12, left: 8),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white, size: 22),
+                                onPressed: () {
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context)
+                                        .pushReplacementNamed("/");
+                                  }
+                                },
+                              ).animate().fadeIn(duration: 1500.ms),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isWideScreen ? 84 : 16,
+                                vertical: isWideScreen ? 20 : 12,
+                              ),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: isWideScreen ? 600 : double.infinity,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "BLE ",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.lightBlueAccent,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "Gateway",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color.fromARGB(
+                                                  255, 219, 80, 145),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
+                                    Container(
+                                      margin: const EdgeInsets.only(
+                                          top: 6, bottom: 16),
+                                      height: 3,
+                                      width: isWideScreen ? 270 : 150,
+                                      color: Colors.lightBlueAccent,
+                                    ).animate().scaleX(
+                                          duration: 1800.ms,
+                                          curve: Curves.easeOut,
+                                        ),
+                                    Text(
+                                      "BLE Gateway For industrial IOT Applications",
+                                      style: TextStyle(
+                                        fontSize: isWideScreen ? 20 : 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ).animate().fadeIn(duration: 1900.ms),
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: const [
+                                        BannerPoint(
+                                            "Multi-Industry IoT Gateway Solution"),
+                                        BannerPoint(
+                                            "Real-Time Data Aggregation"),
+                                        BannerPoint(
+                                            "Scalable Gateway for 100+ nodes"),
+                                      ],
+                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
+                                    const SizedBox(height: 20),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        _buildBannerButton(
+                                          "Enquire",
+                                          Colors.blue,
+                                          () {},
+                                        ),
+                                        _buildBannerButton(
+                                          "Download Manual",
+                                          Colors.teal,
+                                          () {
+                                            DownloadManager.downloadFile(
+                                              context: context,
+                                              sensorKey: "Gateway",
+                                              fileType: "manual",
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ).animate().fadeIn(duration: 11000.ms),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      TextSpan(
-                        text: "way",
-                        style: TextStyle(
-                          fontSize: isWideScreen ? 48 : 28,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(255, 219, 80, 145),
-                        ),
+                    ),
+                  ],
+                ),
+
+                // ---------- Features & Applications ----------
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: isWideScreen
+                      ? _buildIpadLayout(isDarkMode)
+                      : 
+                         Column(
+                              children: [
+                                _buildFeaturesCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
+                                const SizedBox(height: 16),
+                                _buildApplicationsCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
+                              ],
+                            ),
+                ),
+
+                // ---------- Specs ----------
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                    ],
-                  ),
-                ),
-
-                Container(
-                  margin: const EdgeInsets.only(top: 6, bottom: 16),
-                  height: 3,
-                  width: isWideScreen ? 270 : 150,
-                  color: Colors.lightBlueAccent,
-                ),
-
-                Text(
-                  "Next-Gen BLE Gateway for Industrial IoT Applications",
-                  style: TextStyle(
-                    fontSize: isWideScreen ? 20 : 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                      child: _buildSpecificationsCard(isDarkMode)
+                          .animate()
+                          .fadeIn()
+                          .slideY(begin: 0.2),
+                    ),
                   ),
                 ),
 
                 const SizedBox(height: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    BannerPoint("Seamless IoT Data Aggregation"),
-                    BannerPoint("Reliable Long-Range BLE Connectivity"),
-                    BannerPoint("Scalable Gateway for 100+ Sensor Nodes"),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildBannerButton("ENQUIRE", Colors.lightBlue),
-                    _buildBannerButton("DATASHEETS", Colors.teal),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  ),
-)
-
-                  ],
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildFeaturesCard(isDarkMode)),
-                            const SizedBox(width: 16),
-                            Expanded(child: _buildApplicationsCard(isDarkMode)),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _buildFeaturesCard(isDarkMode),
-                            const SizedBox(height: 16),
-                            _buildApplicationsCard(isDarkMode),
-                          ],
-                        ),
-                ),
-
-          
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-  color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  elevation: 6,
-  child: Padding(
-    padding: const EdgeInsets.all(16),
-    child:isWideScreen
-                          ? Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/gateway.jpg",
-                                      height: 400,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 50),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Technical Overview",
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
-                                          )),
-                                      const SizedBox(height: 12),
-                                    
-
-    featureItem("Core Processing Unit: Nordic nRF5340 Dual-Core SoC", isDarkMode),
-    subFeatureItem("Application Core: Arm Cortex-M33 @128 MHz", isDarkMode),
-    subFeatureItem("Network Core: Arm Cortex-M33 @64 MHz", isDarkMode),
-
-    featureItem("Memory: 1 MB Flash, 512 KB RAM", isDarkMode),
-
-    featureItem("Radio Subsystem", isDarkMode),
-    subFeatureItem("Bluetooth 5.3 compliant", isDarkMode),
-    subFeatureItem("Frequency: 2.4 GHz ISM band (GFSK modulation)", isDarkMode),
-    subFeatureItem("Transmit Power: Up to +8 dBm", isDarkMode),
-    subFeatureItem("Receiver Sensitivity: -95 dBm", isDarkMode),
-
-    featureItem("Connectivity Options: LAN, Wi-Fi, 4G", isDarkMode),
-    featureItem("Scalability: Connects 100+ BLE sensor nodes", isDarkMode),
-    featureItem("Design: IP67-rated, compact industrial PCB with low power consumption", isDarkMode),
-  
-
-
-                                      const SizedBox(height: 16),
-                                      _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                Image.asset(
-                                  "assets/gateway.jpg",
-                                  height: 260,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                                const SizedBox(height: 12),
-                                Text("Technical Overview",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDarkMode ? Colors.white : Colors.black,
-                                    )),
-                                const SizedBox(height: 10),
-                            featureItem("Core Processing Unit: Nordic nRF5340 Dual-Core SoC", isDarkMode),
-    subFeatureItem("Application Core: Arm Cortex-M33 @128 MHz", isDarkMode),
-    subFeatureItem("Network Core: Arm Cortex-M33 @64 MHz", isDarkMode),
-
-    featureItem("Memory: 1 MB Flash, 512 KB RAM", isDarkMode),
-
-    featureItem("Radio Subsystem", isDarkMode),
-    subFeatureItem("Bluetooth 5.3 compliant", isDarkMode),
-    subFeatureItem("Frequency: 2.4 GHz ISM band (GFSK modulation)", isDarkMode),
-    subFeatureItem("Transmit Power: Up to +8 dBm", isDarkMode),
-    subFeatureItem("Receiver Sensitivity: -95 dBm", isDarkMode),
-
-    featureItem("Connectivity Options: LAN, Wi-Fi, 4G", isDarkMode),
-    featureItem("Scalability: Connects 100+ BLE sensor nodes", isDarkMode),
-    featureItem("Design: IP67-rated, compact industrial PCB with low power consumption", isDarkMode),
-                                        
-                                const SizedBox(height: 16),
-                                _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
-                              ],
-                            ),
-                    ),
-                  ),
-                ),
                 const Footer(),
               ],
             ),
@@ -295,142 +246,293 @@ Positioned.fill(
     );
   }
 
+  // ---------- iPad Layout for Card Alignment ----------
+  Widget _buildIpadLayout(bool isDarkMode) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final featuresCard = _buildFeaturesCard(isDarkMode)
+            .animate()
+            .slideX(begin: -0.3)
+            .fadeIn();
+        final applicationsCard = _buildApplicationsCard(isDarkMode)
+            .animate()
+            .slideX(begin: 0.3)
+            .fadeIn();
 
-static Widget _buildBannerButton(String label, Color color) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      final isWideScreen = screenWidth > 800;
+        // Get the height of both cards
+        final featuresKey = GlobalKey();
+        final applicationsKey = GlobalKey();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          if (featuresBox != null && applicationsBox != null) {
+            final featuresHeight = featuresBox.size.height;
+            final applicationsHeight = applicationsBox.size.height;
+            if (featuresHeight != applicationsHeight) {
+              // If heights differ, adjust the smaller card to be centered
+              final maxHeight = featuresHeight > applicationsHeight
+                  ? featuresHeight
+                  : applicationsHeight;
+              featuresBox.size = Size(featuresBox.size.width, maxHeight);
+              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+            }
+          }
+        });
 
-      return ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: EdgeInsets.symmetric(
-            horizontal: isWideScreen ? 20 : 12,
-            vertical: isWideScreen ? 14 : 10,
-          ),
-          minimumSize: Size(isWideScreen ? 140 : 100, 40),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: featuresKey,
+                  child: featuresCard,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: applicationsKey,
+                  child: applicationsCard,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ---------- Specifications Card ----------
+  Widget _buildSpecificationsCard(bool isDarkMode) {
+    final List<String> specItems = [
+"Input Voltage Range : 5 - 30 v",
+"On board led indications for networking , cloud and BLE connectivity.",
+"On board flash memory, sd card slot, MIC , sim card, gsm and BLE Antenna.",
+"Support Multiple Communications protocol such as SPI,I2C,I2S,UART etc.",
+"Integrated with both battery and solar panel.",
+"Processor : Dual- Core Arm Cortex-M33.",
+"Controller used is nrf5340.",
+"Bluetooth version: BLE 5.4",
+"512KB RAM +1MB Flash",
+
+    ];
+
+    final int splitIndex = (specItems.length/2 ).ceil();
+    final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+    final List<String> rightColumnItems = specItems.sublist(splitIndex);
+
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                "Technical Specifications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: leftColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: rightColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
+            ),
+          ],
         ),
-        onPressed: () {},
-        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-        label: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: isWideScreen ? 15 : 12, // responsive text
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    },
-  );
-}
-
+      ),
+    );
+  }
 
   Widget _buildFeaturesCard(bool isDarkMode) {
-  return Card(
-    color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50, 
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    elevation: 4,
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Key Features",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.teal.shade800,
-              )),
-          const SizedBox(height: 10),
-           featureItem("Dual-Core nRF5340 SoC for optimized processing", isDarkMode),
-    featureItem("Bluetooth 5.3 with configurable +8 dBm transmit power", isDarkMode),
-    featureItem("Real-time monitoring with up to 1 KM range", isDarkMode),
-    featureItem("Supports 100+ connected BLE sensor nodes", isDarkMode),
-    featureItem("Firmware Over-the-Air (FOTA) support", isDarkMode),
-    featureItem("Rugged IP67 compact design for industrial environments", isDarkMode),
-        ],
-      ),
-    ),
-  );
-}
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Key Features",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.teal.shade800,
+                )),
+            const SizedBox(height: 10),
+          featureItem("Real Time Monitoring with low power consumptions", isDarkMode),
+featureItem("FOTA (Firmware Over the Air)", isDarkMode),
+featureItem("100+ Connected at a time", isDarkMode),
+featureItem("BLE Range up to 1km at line of sight (LOS)", isDarkMode),
+featureItem("IP66 & Compact design", isDarkMode),
+featureItem("Connectivity option: 4G, WIFI, LAN", isDarkMode),
 
-Widget _buildApplicationsCard(bool isDarkMode) {
-  return Card(
-    color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50, 
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    elevation: 4,
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Applications",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.blue.shade800, 
-              )),
-          const SizedBox(height: 10),
-           featureItem("Smart agriculture & precision farming", isDarkMode),
-    featureItem("Industrial equipment health monitoring", isDarkMode),
-    featureItem("Environmental and air quality sensing", isDarkMode),
-    featureItem("Smart building automation & energy management", isDarkMode),
-    featureItem("Logistics and asset tracking", isDarkMode),
-    featureItem("Healthcare wearable data collection", isDarkMode),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
+  Widget _buildApplicationsCard(bool isDarkMode) {
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Applications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                )),
+            const SizedBox(height: 10),
+          featureItem("Smart Agriculture & Precision farming", isDarkMode),
+featureItem("Logistics and asset tracking", isDarkMode),
+featureItem("Industrial equipment and health monitoring", isDarkMode),
+featureItem("Healthcare wearable data collections", isDarkMode),
+featureItem("Home Automations and energy management", isDarkMode),
+
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _buildBannerButton(
+      String label, Color color, VoidCallback onPressed) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isWideScreen = screenWidth > 800;
+
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: color,
+              padding: EdgeInsets.symmetric(
+                horizontal: isWideScreen ? 20 : 12,
+                vertical: isWideScreen ? 14 : 10,
+              ),
+              minimumSize: Size(isWideScreen ? 160 : 100, 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              elevation: 4,
+            ),
+            onPressed: onPressed,
+            icon: const Icon(Icons.arrow_forward,
+                size: 18, color: Colors.white),
+            label: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isWideScreen ? 15 : 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
+                duration: 1200.ms, curve: Curves.easeInOut),
+        );
+      },
+    );
+  }
 
   Widget featureItem(String text, bool isDarkMode) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      children: [
-        Icon(Icons.check_circle, 
-            color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 15,
-              color: isDarkMode ? Colors.white : Colors.black87, 
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle,
+              color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ).animate().fadeIn(duration: 400.ms),
+    );
+  }
 }
+
+class HoverCard extends StatefulWidget {
+  final Widget child;
+  const HoverCard({super.key, required this.child});
+
+  @override
+  State<HoverCard> createState() => _HoverCardState();
 }
-Widget subFeatureItem(String text, bool isDarkMode) {
-  return Padding(
-    padding: const EdgeInsets.only(left: 32, top: 2, bottom: 2),
-    child: Row(
-      children: [
-        Icon(Icons.circle,
-            size: 10, color: isDarkMode ? Colors.tealAccent : Colors.teal),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 14,
-              color: isDarkMode ? Colors.white70 : Colors.black87,
-            ),
-          ),
+
+class _HoverCardState extends State<HoverCard> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        transform: _hovering
+            ? (Matrix4.identity()..scale(1.01)) 
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: _hovering
+              ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)
+              : (isDarkMode ? Colors.grey.shade900 : Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            if (_hovering)
+              BoxShadow(
+                color: isDarkMode ? Colors.black54 : Colors.black26,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+          ],
         ),
-      ],
-    ),
-  );
+        child: widget.child,
+      ),
+    );
+  }
 }
 
 class BannerPoint extends StatelessWidget {
@@ -453,7 +555,7 @@ class BannerPoint extends StatelessWidget {
               text,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isWideScreen ? 16 : 13, // responsive size
+                fontSize: isWideScreen ? 16 : 13,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
@@ -464,4 +566,3 @@ class BannerPoint extends StatelessWidget {
     );
   }
 }
-

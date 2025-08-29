@@ -1,6 +1,9 @@
 import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
+
 
 class UltrasonicSensorPage extends StatelessWidget {
   const UltrasonicSensorPage({super.key});
@@ -10,6 +13,7 @@ class UltrasonicSensorPage extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
+    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
 
     return Scaffold(
       body: SafeArea(
@@ -38,7 +42,6 @@ class UltrasonicSensorPage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        // 🔹 Left half: Solid grey background
                         Expanded(
                           flex: 1,
                           child: Container(
@@ -46,7 +49,6 @@ class UltrasonicSensorPage extends StatelessWidget {
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        // 🔹 Right half: Wind sensor image
                         Expanded(
                           flex: 1,
                           child: Container(
@@ -55,7 +57,10 @@ class UltrasonicSensorPage extends StatelessWidget {
                               "assets/windsensor.jpg",
                               fit: BoxFit.cover,
                               alignment: Alignment.center,
-                            ),
+                            ).animate().fadeIn(duration: 1600.ms).scale(
+                                  duration: 1800.ms,
+                                  curve: Curves.easeOutBack,
+                                ),
                           ),
                         ),
                       ],
@@ -74,162 +79,161 @@ class UltrasonicSensorPage extends StatelessWidget {
                       ),
                     ),
                     Positioned.fill(
-                      child: Row(
-                        children: [
-                          // 🔹 Left side text
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 12, left: 8),
-                                  child: IconButton(
-                                    icon: const Icon(Icons.arrow_back,
-                                        color: Colors.white, size: 22),
-                                    onPressed: () {
-                                      if (Navigator.of(context).canPop()) {
-                                        Navigator.of(context).pop();
-                                      } else {
-                                        Navigator.of(context)
-                                            .pushReplacementNamed("/");
-                                      }
-                                    },
-                                  ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12, left: 8),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white, size: 22),
+                                onPressed: () {
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context)
+                                        .pushReplacementNamed("/");
+                                  }
+                                },
+                              ).animate().fadeIn(duration: 1500.ms),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isWideScreen ? 84 : 16,
+                                vertical: isWideScreen ? 20 : 12,
+                              ),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: isWideScreen ? 600 : double.infinity,
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isWideScreen ? 84 : 16,
-                                    vertical: isWideScreen ? 20 : 12,
-                                  ),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          isWideScreen ? 600 : double.infinity,
-                                    ),
-                                    child: Column(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "Ultrasonic ",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.lightBlueAccent,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "Anemometer",
+                                            style: TextStyle(
+                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color.fromARGB(
+                                                  255, 219, 80, 145),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
+                                    Container(
+                                      margin: const EdgeInsets.only(
+                                          top: 6, bottom: 16),
+                                      height: 3,
+                                      width: isWideScreen ? 270 : 150,
+                                      color: Colors.lightBlueAccent,
+                                    ).animate().scaleX(
+                                          duration: 1800.ms,
+                                          curve: Curves.easeOut,
+                                        ),
+                                    Text(
+                                      "Ultrasonic Anemometer for precise wind speed and wind direction",
+                                      style: TextStyle(
+                                        fontSize: isWideScreen ? 20 : 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ).animate().fadeIn(duration: 1900.ms),
+                                    const SizedBox(height: 16),
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
+                                      children: const [
+                                        BannerPoint(
+                                            "Accurate wind monitoring"),
+                                        BannerPoint(
+                                            "Real time speed and direction measurement"),
+                                        BannerPoint(
+                                            "Robust and compact design"),
+                                      ],
+                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
+                                    const SizedBox(height: 20),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
                                       children: [
-                                        const SizedBox(height: 12),
-                                        RichText(
-                                          text: TextSpan(
-                                            children: [
-                                              TextSpan(
-                                                text: "Wind",
-                                                style: TextStyle(
-                                                  fontSize:
-                                                      isWideScreen ? 48 : 28,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.lightBlueAccent,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: "Sensors",
-                                                style: TextStyle(
-                                                  fontSize:
-                                                      isWideScreen ? 48 : 28,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: const Color.fromARGB(
-                                                      255, 219, 80, 145),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        _buildBannerButton(
+                                          "Enquire",
+                                          Colors.blue,
+                                          () {},
                                         ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 6, bottom: 16),
-                                          height: 3,
-                                          width: isWideScreen ? 270 : 150,
-                                          color: Colors.lightBlueAccent,
-                                        ),
-                                        Text(
-                                          "High quality, general purpose, ultrasonic wind sensors",
-                                          style: TextStyle(
-                                            fontSize:
-                                                isWideScreen ? 20 : 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: const [
-                                            BannerPoint(
-                                                "Accurate & Maintenance-Free Wind Monitoring"),
-                                            BannerPoint(
-                                                "Real-Time Speed & Direction Measurement"),
-                                            BannerPoint(
-                                                "Rugged, Solid-State Design for All Environments"),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 20),
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          children: [
-                                            _buildBannerButton(
-                                              "Enquire",
-                                              Colors.blue,
-                                              () {},
-                                            ),
-                                            _buildBannerButton(
-                                              "Download Manual",
-                                              Colors.teal,
-                                              () {
-                                                DownloadManager.downloadFile(
-                                                  context: context,
-                                                  sensorKey: "WindSensor",
-                                                  fileType: "manual",
-                                                );
-                                              },
-                                            ),
-                                          ],
+                                        _buildBannerButton(
+                                          "Download Manual",
+                                          Colors.teal,
+                                          () {
+                                            DownloadManager.downloadFile(
+                                              context: context,
+                                              sensorKey: "WindSensor",
+                                              fileType: "manual",
+                                            );
+                                          },
                                         ),
                                       ],
-                                    ),
-                                  ),
+                                    ).animate().fadeIn(duration: 11000.ms),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                          // 🔹 Remove the separate image section for wide screens
-                          if (isWideScreen) const Spacer(flex: 1),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
 
+                // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: isWideScreen
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildFeaturesCard(isDarkMode)),
-                            const SizedBox(width: 16),
-                            Expanded(child: _buildApplicationsCard(isDarkMode)),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _buildFeaturesCard(isDarkMode),
-                            const SizedBox(height: 16),
-                            _buildApplicationsCard(isDarkMode),
-                          ],
-                        ),
+                      ? _buildIpadLayout(isDarkMode)
+                      : 
+                         Column(
+                              children: [
+                                _buildFeaturesCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
+                                const SizedBox(height: 16),
+                                _buildApplicationsCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
+                              ],
+                            ),
                 ),
 
+                // ---------- Specs ----------
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
-                      ? _buildTabbedSpecs(isDarkMode) 
-                      : _buildAccordionSpecs(isDarkMode), 
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isWideScreen ? 1000 : double.infinity,
+                      ),
+                      child: _buildSpecificationsCard(isDarkMode)
+                          .animate()
+                          .fadeIn()
+                          .slideY(begin: 0.2),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 16),
@@ -242,46 +246,130 @@ class UltrasonicSensorPage extends StatelessWidget {
     );
   }
 
-  // ---------- Reusable Widgets ----------
-  static Widget _buildBannerButton(
-      String label, Color color, VoidCallback onPressed) {
+  // ---------- iPad Layout for Card Alignment ----------
+  Widget _buildIpadLayout(bool isDarkMode) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isWideScreen = screenWidth > 800;
+        final featuresCard = _buildFeaturesCard(isDarkMode)
+            .animate()
+            .slideX(begin: -0.3)
+            .fadeIn();
+        final applicationsCard = _buildApplicationsCard(isDarkMode)
+            .animate()
+            .slideX(begin: 0.3)
+            .fadeIn();
 
-        return ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            padding: EdgeInsets.symmetric(
-              horizontal: isWideScreen ? 20 : 12,
-              vertical: isWideScreen ? 14 : 10,
+        // Get the height of both cards
+        final featuresKey = GlobalKey();
+        final applicationsKey = GlobalKey();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          if (featuresBox != null && applicationsBox != null) {
+            final featuresHeight = featuresBox.size.height;
+            final applicationsHeight = applicationsBox.size.height;
+            if (featuresHeight != applicationsHeight) {
+              // If heights differ, adjust the smaller card to be centered
+              final maxHeight = featuresHeight > applicationsHeight
+                  ? featuresHeight
+                  : applicationsHeight;
+              featuresBox.size = Size(featuresBox.size.width, maxHeight);
+              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+            }
+          }
+        });
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: featuresKey,
+                  child: featuresCard,
+                ),
+              ),
             ),
-            minimumSize: Size(isWideScreen ? 140 : 100, 40),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: applicationsKey,
+                  child: applicationsCard,
+                ),
+              ),
             ),
-          ),
-          onPressed: onPressed,
-          icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-          label: Text(
-            label,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: isWideScreen ? 15 : 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          ],
         );
       },
     );
   }
 
+  // ---------- Specifications Card ----------
+  Widget _buildSpecificationsCard(bool isDarkMode) {
+    final List<String> specItems = [
+  "Input Supply voltage: 2V - 16V",
+"Measure wind speed and wind direction via Delta Time of Flight",
+"Communication protocols: RS232 or RS485 (Modbus)",
+"Ultra low power sleep mode.",
+
+    ];
+
+    final int splitIndex = (specItems.length/2 ).ceil();
+    final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+    final List<String> rightColumnItems = specItems.sublist(splitIndex);
+
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                "Technical Specifications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: leftColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: rightColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFeaturesCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+    return HoverCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -291,20 +379,14 @@ class UltrasonicSensorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ?  Colors.white : Colors.blue.shade800,
+                  color: isDarkMode ? Colors.white : Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem(
-                "Non-contact ultrasonic TOF measurement (no moving parts)",
-                isDarkMode),
-            featureItem("High accuracy ±0.1–0.3 m/s with fast response time",
-                isDarkMode),
-            featureItem(
-                "360° wind direction coverage with 1° resolution", isDarkMode),
-            featureItem("Low power consumption (50–80 mW) with UART output",
-                isDarkMode),
-            featureItem("Rugged, solid-state design for all-weather durability",
-                isDarkMode),
+           featureItem("High accuracy with fast response time", isDarkMode),
+featureItem("0°-360° wind direction coverage with 1° resolution", isDarkMode),
+featureItem("Low power consumption", isDarkMode),
+featureItem("Robust design for all weather conditions", isDarkMode),
+featureItem("Wide input voltage range", isDarkMode),
           ],
         ),
       ),
@@ -312,10 +394,7 @@ class UltrasonicSensorPage extends StatelessWidget {
   }
 
   Widget _buildApplicationsCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+    return HoverCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -328,233 +407,55 @@ class UltrasonicSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Weather monitoring stations", isDarkMode),
-            featureItem("Smart agriculture & precision farming", isDarkMode),
-            featureItem(
-                "IoT-based environmental and air quality sensing", isDarkMode),
-            featureItem("UAVs & drones for in-flight wind analysis", isDarkMode),
-            featureItem("Industrial airflow and HVAC monitoring", isDarkMode),
+           featureItem("Weather monitoring stations", isDarkMode),
+featureItem("Smart agriculture and precision farming", isDarkMode),
+featureItem("Ports and harbours", isDarkMode),
+featureItem("Small airports and helipads", isDarkMode),
+
           ],
         ),
       ),
     );
   }
 
-  // ---------- Wide Screen Tabs ----------
-  Widget _buildTabbedSpecs(bool isDarkMode) {
-    return DefaultTabController(
-      length: 3,
-      child: Builder(
-        builder: (context) {
-          final TabController tabController = DefaultTabController.of(context);
+  static Widget _buildBannerButton(
+      String label, Color color, VoidCallback onPressed) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isWideScreen = screenWidth > 800;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "WindSensor Technical Information",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                ),
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: color,
+              padding: EdgeInsets.symmetric(
+                horizontal: isWideScreen ? 20 : 12,
+                vertical: isWideScreen ? 14 : 10,
               ),
-              const SizedBox(height: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TabBar(
-                  controller: tabController,
-                  indicator: BoxDecoration(
-                    color: isDarkMode
-                        ? Colors.teal.shade800.withOpacity(0.3)
-                        : Colors.teal.shade200.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  labelColor:
-                      isDarkMode ? Colors.teal.shade200 : Colors.teal.shade700,
-                  unselectedLabelColor:
-                      isDarkMode ? Colors.white70 : Colors.black87,
-                  tabs: const [
-                    Tab(text: "WORKING"),
-                    Tab(text: "3D SPECS"),
-                    Tab(text: "HARDWARE"),
-                  ],
-                ),
+              minimumSize: Size(isWideScreen ? 160 : 100, 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
               ),
-              const SizedBox(height: 12),
-              AnimatedBuilder(
-                animation: tabController,
-                builder: (context, _) {
-                  switch (tabController.index) {
-                    case 0:
-                      return _buildWorkingCard(isDarkMode);
-                    case 1:
-                      return _build3DSpecsCard(isDarkMode);
-                    case 2:
-                      return _buildHardwareCard(isDarkMode);
-                    default:
-                      return Container();
-                  }
-                },
+              elevation: 4,
+            ),
+            onPressed: onPressed,
+            icon: const Icon(Icons.arrow_forward,
+                size: 18, color: Colors.white),
+            label: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isWideScreen ? 15 : 12,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  // ---------- Small Screen Accordion ----------
-  Widget _buildAccordionSpecs(bool isDarkMode) {
-    return ExpansionPanelList.radio(
-      dividerColor: Colors.grey,
-      children: [
-        ExpansionPanelRadio(
-          value: 1,
-          headerBuilder: (context, isExpanded) => ListTile(
-            title: Text("WORKING",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.tealAccent : Colors.teal)),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _buildWorkingCard(isDarkMode),
-          ),
-        ),
-        ExpansionPanelRadio(
-          value: 2,
-          headerBuilder: (context, isExpanded) => ListTile(
-            title: Text("3D SPECS",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.tealAccent : Colors.teal)),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _build3DSpecsCard(isDarkMode),
-          ),
-        ),
-        ExpansionPanelRadio(
-          value: 3,
-          headerBuilder: (context, isExpanded) => ListTile(
-            title: Text("HARDWARE",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.tealAccent : Colors.teal)),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _buildHardwareCard(isDarkMode),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ---------- Cards ----------
-  Widget _buildWorkingCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Technical Overview",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
-            const SizedBox(height: 10),
-            featureItem(
-                "Working Principle: Measures wind speed & direction via ultrasonic time-of-flight (ΔToF)",
-                isDarkMode),
-            featureItem(
-                "Transducers: 200 kHz air-coupled piezoelectric, 2–10 cm effective distance",
-                isDarkMode),
-            featureItem(
-                "Electronics: MSP430FR6043 MCU with USS subsystem, 12-bit ADC & TDC",
-                isDarkMode),
-            featureItem(
-                "Power: 3.3–5 V supply, ~50–80 mW active, ultra-low-power sleep modes",
-                isDarkMode),
-            featureItem(
-                "Software: TI USS library for calibration, ADC capture & UART data output",
-                isDarkMode),
-            const SizedBox(height: 16),
-            _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _build3DSpecsCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("3D Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
-            const SizedBox(height: 10),
-            featureItem("Overall Height: 150 mm", isDarkMode),
-            featureItem("Top Plate Diameter: 144.69 mm", isDarkMode),
-            featureItem("Middle Plate Diameter: 121.20 mm", isDarkMode),
-            featureItem("Mounting Hole Circle Diameter: 52 mm", isDarkMode),
-            featureItem("Inner Mounting Slot Diameter: 46 mm", isDarkMode),
-            featureItem("Support Rod Curvature: R11.50 mm", isDarkMode),
-            featureItem("Cylindrical Base Diameter: 52 mm", isDarkMode),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHardwareCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Hardware Information",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
-            const SizedBox(height: 10),
-            featureItem("Processor: ARM Cortex-M4", isDarkMode),
-            featureItem("Memory: 256KB Flash, 64KB SRAM", isDarkMode),
-            featureItem("Interfaces: UART, I2C, SPI", isDarkMode),
-            featureItem("Operating Temp: -40°C to +85°C", isDarkMode),
-          ],
-        ),
-      ),
+            ),
+          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
+                duration: 1200.ms, curve: Curves.easeInOut),
+        );
+      },
     );
   }
 
@@ -576,6 +477,50 @@ class UltrasonicSensorPage extends StatelessWidget {
             ),
           ),
         ],
+      ).animate().fadeIn(duration: 400.ms),
+    );
+  }
+}
+
+class HoverCard extends StatefulWidget {
+  final Widget child;
+  const HoverCard({super.key, required this.child});
+
+  @override
+  State<HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<HoverCard> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        transform: _hovering
+            ? (Matrix4.identity()..scale(1.01)) 
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: _hovering
+              ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)
+              : (isDarkMode ? Colors.grey.shade900 : Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            if (_hovering)
+              BoxShadow(
+                color: isDarkMode ? Colors.black54 : Colors.black26,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+          ],
+        ),
+        child: widget.child,
       ),
     );
   }

@@ -1,15 +1,19 @@
+
+import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
-import 'footer.dart'; // Import the Footer widget
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ATRHSensorPage extends StatelessWidget {
   const ATRHSensorPage({super.key});
+
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
+    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
 
     return Scaffold(
       body: SafeArea(
@@ -33,14 +37,33 @@ class ATRHSensorPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // ---------- Banner Section ----------
                 Stack(
                   children: [
-                    Image.asset(
-                      "assets/arthbg.png",
-                      height: isWideScreen ? 450 : 400,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.centerRight,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: isWideScreen ? 450 : 400,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: isWideScreen ? 450 : 400,
+                            child: Image.asset(
+                              "assets/arthbg.png",
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                            ).animate().fadeIn(duration: 1600.ms).scale(
+                                  duration: 1800.ms,
+                                  curve: Curves.easeOutBack,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                     Container(
                       height: isWideScreen ? 450 : 400,
@@ -74,7 +97,7 @@ class ATRHSensorPage extends StatelessWidget {
                                         .pushReplacementNamed("/");
                                   }
                                 },
-                              ),
+                              ).animate().fadeIn(duration: 1500.ms),
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(
@@ -83,8 +106,7 @@ class ATRHSensorPage extends StatelessWidget {
                               ),
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth:
-                                      isWideScreen ? 600 : double.infinity,
+                                  maxWidth: isWideScreen ? 600 : double.infinity,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +116,7 @@ class ATRHSensorPage extends StatelessWidget {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: "ATRH",
+                                            text: "THPL ",
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 48 : 28,
                                               fontWeight: FontWeight.bold,
@@ -102,7 +124,7 @@ class ATRHSensorPage extends StatelessWidget {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: "Sensors",
+                                            text: "Shield ",
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 48 : 28,
                                               fontWeight: FontWeight.bold,
@@ -112,46 +134,61 @@ class ATRHSensorPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ),
+                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
                                     Container(
                                       margin: const EdgeInsets.only(
                                           top: 6, bottom: 16),
                                       height: 3,
                                       width: isWideScreen ? 270 : 150,
                                       color: Colors.lightBlueAccent,
-                                    ),
+                                    ).animate().scaleX(
+                                          duration: 1800.ms,
+                                          curve: Curves.easeOut,
+                                        ),
                                     Text(
-                                      "Advanced, reliable ARTH sensors for precise measurements",
+                                      "Compact environmental sensing unit for precise measurements",
                                       style: TextStyle(
                                         fontSize: isWideScreen ? 20 : 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
-                                    ),
+                                    ).animate().fadeIn(duration: 1900.ms),
                                     const SizedBox(height: 16),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: const [
                                         BannerPoint(
-                                            "High-precision measurements with cutting-edge ARTH technology"),
+                                            "High-precision measurements with cutting-edge sensor"),
                                         BannerPoint(
                                             "Robust design for long-term reliability and minimal maintenance"),
                                         BannerPoint(
-                                            "Flexible models and outputs tailored to diverse applications"),
+                                            "Flexible model to diverse applications"),
                                       ],
-                                    ),
+                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
                                         _buildBannerButton(
-                                            "ENQUIRE", Colors.lightBlue),
+                                          "Enquire",
+                                          Colors.blue,
+                                          () {},
+                                        ),
                                         _buildBannerButton(
-                                            "DATASHEETS", Colors.teal),
+                                          "Download Manual",
+                                          Colors.teal,
+                                          () {
+                                            DownloadManager.downloadFile(
+                                              context: context,
+                                              sensorKey: "ARTH",
+                                              fileType: "manual",
+                                            );
+                                          },
+                                        ),
                                       ],
-                                    ),
+                                    ).animate().fadeIn(duration: 11000.ms),
                                   ],
                                 ),
                               ),
@@ -159,122 +196,49 @@ class ATRHSensorPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
+
+                // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildFeaturesCard(isDarkMode)),
-                            const SizedBox(width: 16),
-                            Expanded(child: _buildApplicationsCard(isDarkMode)),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _buildFeaturesCard(isDarkMode),
-                            const SizedBox(height: 16),
-                            _buildApplicationsCard(isDarkMode),
-                          ],
-                        ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                   color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    elevation: 6,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: isWideScreen
-                          ? Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/arth.jpg",
-                                      height: 300,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 50),
-                                Expanded(
-                                  flex: 1,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Technical Overview",
-                                          style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
-                                          )),
-                                      const SizedBox(height: 12),
-                                      featureItem("Temp Range: -40°C to +85°C",
-                                          isDarkMode),
-                                      featureItem(
-                                          "Wind direction: 0–360°", isDarkMode),
-                                      featureItem("Humidity Range: 0 to 100%",
-                                          isDarkMode),
-                                      featureItem(
-                                          "Pressure Range: 300 to 1100 hPa",
-                                          isDarkMode),
-                                      featureItem(
-                                          "Accuracy: ±3%RH, ±1°C, ±0.12kPa",
-                                          isDarkMode),
-                                      const SizedBox(height: 16),
-                                      _buildBannerButton(
-                                          "DOWNLOAD DATASHEET", Colors.teal),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
+                  child:  isWideScreen
+                      ? _buildIpadLayout(isDarkMode)
+                      
+                          
                           : Column(
                               children: [
-                                Image.asset(
-                                  "assets/arth.jpg",
-                                  height: 160,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                                const SizedBox(height: 12),
-                                Text("Technical Overview",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    )),
-                                const SizedBox(height: 10),
-                                featureItem("Wind speed: 0–60 m/s (216 km/h)",
-                                    isDarkMode),
-                                featureItem(
-                                    "Wind direction: 0–360°", isDarkMode),
-                                featureItem("Output: NMEA", isDarkMode),
-                                featureItem("Polycarbonate Body", isDarkMode),
-                                featureItem("Weight: 0.5 kg", isDarkMode),
+                                _buildFeaturesCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
                                 const SizedBox(height: 16),
-                                _buildBannerButton(
-                                    "DOWNLOAD DATASHEET", Colors.teal),
+                                _buildApplicationsCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
                               ],
                             ),
+                ),
+
+                // ---------- Specs ----------
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isWideScreen ? 1000 : double.infinity,
+                      ),
+                      child: _buildSpecificationsCard(isDarkMode)
+                          .animate()
+                          .fadeIn()
+                          .slideY(begin: 0.2),
                     ),
                   ),
                 ),
-                const Footer(), // Add the Footer widget here
+
+                const SizedBox(height: 16),
+                const Footer(),
               ],
             ),
           ),
@@ -283,45 +247,134 @@ class ATRHSensorPage extends StatelessWidget {
     );
   }
 
-  static Widget _buildBannerButton(String label, Color color) {
+  // ---------- iPad Layout for Card Alignment ----------
+  Widget _buildIpadLayout(bool isDarkMode) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isWideScreen = screenWidth > 800;
+        final featuresCard = _buildFeaturesCard(isDarkMode)
+            .animate()
+            .slideX(begin: -0.3)
+            .fadeIn();
+        final applicationsCard = _buildApplicationsCard(isDarkMode)
+            .animate()
+            .slideX(begin: 0.3)
+            .fadeIn();
 
-        return ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            padding: EdgeInsets.symmetric(
-              horizontal: isWideScreen ? 20 : 12,
-              vertical: isWideScreen ? 14 : 10,
+        // Get the height of both cards
+        final featuresKey = GlobalKey();
+        final applicationsKey = GlobalKey();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          if (featuresBox != null && applicationsBox != null) {
+            final featuresHeight = featuresBox.size.height;
+            final applicationsHeight = applicationsBox.size.height;
+            if (featuresHeight != applicationsHeight) {
+              // If heights differ, adjust the smaller card to be centered
+              final maxHeight = featuresHeight > applicationsHeight
+                  ? featuresHeight
+                  : applicationsHeight;
+              featuresBox.size = Size(featuresBox.size.width, maxHeight);
+              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+            }
+          }
+        });
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: featuresKey,
+                  child: featuresCard,
+                ),
+              ),
             ),
-            minimumSize: Size(isWideScreen ? 140 : 100, 40),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: applicationsKey,
+                  child: applicationsCard,
+                ),
+              ),
             ),
-          ),
-          onPressed: () {},
-          icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-          label: Text(
-            label,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: isWideScreen ? 15 : 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          ],
         );
       },
     );
   }
 
+  // ---------- Specifications Card ----------
+  Widget _buildSpecificationsCard(bool isDarkMode) {
+    final List<String> specItems = [
+" Supply Voltage : 3.3 V DC",
+"Range of Temperature : -40 to +85 °C",
+"Range of Humidity : 0-100%",
+"Range of Pressure : 300-1100 hPa",
+"Range of Light Intensity: 0-140000 Lux",
+"Communications Protocol : I2C",
+"Temperature Accuracy : ±1°C",
+"Humidity Accuracy:±3.0% RH", 
+
+    ];
+
+    final int splitIndex = (specItems.length/2 ).ceil();
+    final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+    final List<String> rightColumnItems = specItems.sublist(splitIndex);
+
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                "Technical Specifications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: leftColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: rightColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFeaturesCard(bool isDarkMode) {
-    return Card(
-      
-     color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+    return HoverCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -334,18 +387,14 @@ class ATRHSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem(
-                "Wide measurement range: –40 °C to +85 °C, 0–100% RH, 300–1100 hPa",
-                isDarkMode),
-            featureItem(
-                "Maintenance-free for long-term field deployment", isDarkMode),
-            featureItem("Low power consumption, suitable for remote stations",
-                isDarkMode),
-            featureItem("Rugged IP65/IP67 enclosure for harsh environments",
-                isDarkMode),
-            featureItem(
-                "Compact & lightweight, easy to install with radiation shield",
-                isDarkMode),
+          featureItem("Accurate Environmental Measurements", isDarkMode),
+featureItem("Wide measurement range", isDarkMode),
+featureItem("Maintenance-free for long-term field deployment", isDarkMode),
+featureItem("Low power consumption, suitable for remote station", isDarkMode),
+featureItem("Robust, IP66 Compact design", isDarkMode),
+featureItem("All-weather protection", isDarkMode),
+featureItem("Compact & lightweight, easy to install with radiation shield", isDarkMode),
+
           ],
         ),
       ),
@@ -353,10 +402,7 @@ class ATRHSensorPage extends StatelessWidget {
   }
 
   Widget _buildApplicationsCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50, 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+    return HoverCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -366,23 +412,61 @@ class ATRHSensorPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800, 
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Weather monitoring & observation", isDarkMode),
-            featureItem(
-                "Environmental monitoring (air quality, climate change studies)",
-                isDarkMode),
-            featureItem(
-                "Renewable energy (solar farms, wind turbine site monitoring)",
-                isDarkMode),
-            featureItem("Smart cities & IoT projects", isDarkMode),
-            featureItem(
-                "Industrial process monitoring (food storage, pharmaceuticals, clean rooms)",
-                isDarkMode),
+          featureItem("Agriculture and smart irrigation system", isDarkMode),
+featureItem("Environmental monitoring", isDarkMode),
+featureItem("Healthcare & Medical Facilities", isDarkMode),
+featureItem("Greenhouses and Indoor Farming", isDarkMode),
+featureItem("Industrial Process monitoring (HVAC, Food processing)", isDarkMode),
+featureItem("Safety and Security", isDarkMode),
+
+
           ],
         ),
       ),
+    );
+  }
+
+  static Widget _buildBannerButton(
+      String label, Color color, VoidCallback onPressed) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isWideScreen = screenWidth > 800;
+
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: color,
+              padding: EdgeInsets.symmetric(
+                horizontal: isWideScreen ? 20 : 12,
+                vertical: isWideScreen ? 14 : 10,
+              ),
+              minimumSize: Size(isWideScreen ? 160 : 100, 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              elevation: 4,
+            ),
+            onPressed: onPressed,
+            icon: const Icon(Icons.arrow_forward,
+                size: 18, color: Colors.white),
+            label: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isWideScreen ? 15 : 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
+                duration: 1200.ms, curve: Curves.easeInOut),
+        );
+      },
     );
   }
 
@@ -391,8 +475,8 @@ class ATRHSensorPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(Icons.check_circle, 
-            color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
+          Icon(Icons.check_circle,
+              color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -404,6 +488,50 @@ class ATRHSensorPage extends StatelessWidget {
             ),
           ),
         ],
+      ).animate().fadeIn(duration: 400.ms),
+    );
+  }
+}
+
+class HoverCard extends StatefulWidget {
+  final Widget child;
+  const HoverCard({super.key, required this.child});
+
+  @override
+  State<HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<HoverCard> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        transform: _hovering
+            ? (Matrix4.identity()..scale(1.01)) 
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: _hovering
+              ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)
+              : (isDarkMode ? Colors.grey.shade900 : Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            if (_hovering)
+              BoxShadow(
+                color: isDarkMode ? Colors.black54 : Colors.black26,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+          ],
+        ),
+        child: widget.child,
       ),
     );
   }

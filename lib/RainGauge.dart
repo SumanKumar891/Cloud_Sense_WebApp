@@ -1,6 +1,7 @@
 import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
@@ -10,6 +11,7 @@ class ProductPage extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
+    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
 
     return Scaffold(
       body: SafeArea(
@@ -33,17 +35,36 @@ class ProductPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // ---------- Banner Section ----------
                 Stack(
                   children: [
-                    Image.asset(
-                      "assets/raingaugebg.jpg",
-                      height: isWideScreen ? 450 : 350,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      alignment: Alignment.centerRight,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: isWideScreen ? 450 : 400,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            height: isWideScreen ? 450 : 400,
+                            child: Image.asset(
+                              "assets/raingaugerender.jpg",
+                              fit: BoxFit.cover,
+                              alignment: Alignment.center,
+                            ).animate().fadeIn(duration: 1600.ms).scale(
+                                  duration: 1800.ms,
+                                  curve: Curves.easeOutBack,
+                                ),
+                          ),
+                        ),
+                      ],
                     ),
                     Container(
-                      height: isWideScreen ? 450 : 350,
+                      height: isWideScreen ? 450 : 400,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -70,10 +91,11 @@ class ProductPage extends StatelessWidget {
                                   if (Navigator.of(context).canPop()) {
                                     Navigator.of(context).pop();
                                   } else {
-                                    Navigator.of(context).pushReplacementNamed("/");
+                                    Navigator.of(context)
+                                        .pushReplacementNamed("/");
                                   }
                                 },
-                              ),
+                              ).animate().fadeIn(duration: 1500.ms),
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(
@@ -104,60 +126,67 @@ class ProductPage extends StatelessWidget {
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 48 : 28,
                                               fontWeight: FontWeight.bold,
-                                              color: const Color.fromARGB(255, 219, 80, 145),
+                                              color: const Color.fromARGB(
+                                                  255, 219, 80, 145),
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
+                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
                                     Container(
-                                      margin: const EdgeInsets.only(top: 6, bottom: 16),
+                                      margin: const EdgeInsets.only(
+                                          top: 6, bottom: 16),
                                       height: 3,
                                       width: isWideScreen ? 270 : 150,
                                       color: Colors.lightBlueAccent,
-                                    ),
+                                    ).animate().scaleX(
+                                          duration: 1800.ms,
+                                          curve: Curves.easeOut,
+                                        ),
                                     Text(
-                                      "Type: Tipping Bucket Rain Gauge",
+                                      "Reliable rainfall measurementy",
                                       style: TextStyle(
-                                        fontSize: isWideScreen ? 20 : 10,
+                                        fontSize: isWideScreen ? 20 : 14,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
-                                    ),
+                                    ).animate().fadeIn(duration: 1900.ms),
                                     const SizedBox(height: 16),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: const [
-                                        BannerPoint("Collects rain via funnel mechanism"),
-                                        BannerPoint("Each tip equals preset rainfall volume"),
-                                        BannerPoint("Pulse recorded & converted to rainfall"),
-                                        BannerPoint("Accurate & low maintenance"),
+                                        BannerPoint(
+                                            "Real-time temperature & humidity sensing for critical applications"),
+                                        BannerPoint(
+                                            "Provides both analog (0-1000)mV and digital (RS485) output"),
+                                        BannerPoint(
+                                            "Reliable Industrial grade monitoring with CRC validated communications"),
                                       ],
-                                    ),
+                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-                                     _buildBannerButton(
-      "Enquire",
-      Colors.blue,
-      () {
-      },
-    ),
-                                          _buildBannerButton(
-      "Download Manual",
-      Colors.teal,
-      () {
-        DownloadManager.downloadFile(
-          context: context,
-          sensorKey: "RainGauge",
-          fileType: "manual",
-        );
-      },
-    ),
+                                        _buildBannerButton(
+                                          "Enquire",
+                                          Colors.blue,
+                                          () {},
+                                        ),
+                                        _buildBannerButton(
+                                          "Download Manual",
+                                          Colors.teal,
+                                          () {
+                                            DownloadManager.downloadFile(
+                                              context: context,
+                                              sensorKey: "DataLogger",
+                                              fileType: "manual",
+                                            );
+                                          },
+                                        ),
                                       ],
-                                    ),
+                                    ).animate().fadeIn(duration: 11000.ms),
                                   ],
                                 ),
                               ),
@@ -169,391 +198,46 @@ class ProductPage extends StatelessWidget {
                   ],
                 ),
 
+                // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildFeaturesCard(isDarkMode)),
-                            const SizedBox(width: 16),
-                            Expanded(child: _buildApplicationsCard(isDarkMode)),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _buildFeaturesCard(isDarkMode),
-                            const SizedBox(height: 16),
-                            _buildApplicationsCard(isDarkMode),
-                          ],
-                        ),
+                  child:  isWideScreen
+                      ? _buildIpadLayout(isDarkMode)
+                      
+                          
+                          : Column(
+                              children: [
+                                _buildFeaturesCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
+                                const SizedBox(height: 16),
+                                _buildApplicationsCard(isDarkMode)
+                                    .animate()
+                                    .fadeIn(),
+                              ],
+                            ),
                 ),
 
-                // 👇 Updated Technical Overview
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Card(
-                          color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 6,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: isWideScreen
-                                ? Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      // 👇 Images grouped together
-                                      // 👇 Images grouped together (right aligned)
-                                      Flexible(
-                                        flex: 1,
-                                        fit: FlexFit.tight,
-                                        child: Align(
-                                          alignment: Alignment.center, // 👈 right align
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min, // 👈 images jitna space utna hi lenge
-                                            children: [
-                                              SizedBox(
-                                                height: 300,
-                                                child: FittedBox(
-                                                  fit: BoxFit.contain,
-                                                  child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(20), // 👈 round edges
-                                                    child: Image.asset("assets/raingaugerender.jpg"),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
 
-                                      // 👇 Text Section (bilkul chipka diya)
-                                      Flexible(
-                                        flex: 1,
-                                        fit: FlexFit.tight,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Technical Overview",
-                                              style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: isDarkMode ? Colors.white : Colors.black,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 12),
-                                            featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
-                                            featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
-                                            featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
-                                            featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
-                                            featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
-                                            featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
-                                            featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
-                                            const SizedBox(height: 16),
-                                           _buildBannerButton(
-      "Download Datasheet",
-      Colors.teal,
-      () {
-    
-      },
-    ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  )
-
-                                // 👇 Mobile layout
-                                : Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 160,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Image.asset("assets/raingaugerender.jpg"),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text("Technical Overview",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDarkMode ? Colors.white : Colors.black,
-                                          )),
-                                      const SizedBox(height: 10),
-                                      featureItem("Made of ABS material, offering durability and weather resistance", isDarkMode),
-                                      featureItem("Available in two diameter options: 159.5 mm and 200 mm", isDarkMode),
-                                      featureItem("Collection areas: 200 cm² and 314 cm²", isDarkMode),
-                                      featureItem("Resolution: 0.2 mm or 0.5 mm depending on the model", isDarkMode),
-                                      featureItem("Equipped with reed switch or magnetic sensor for tip detection", isDarkMode),
-                                      featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
-                                      featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
-                                      const SizedBox(height: 16),
-                                    _buildBannerButton(
-      "Download Datasheet",
-      Colors.teal,
-      () {
-    
-      },
-    ),
-                                    ],
-                                  ),
-                          ),
-                        ),
+                // ---------- Specs ----------
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-//                               // 👇 Updated Technical Overview with 3 images
-//                       Padding(
-//                         padding: const EdgeInsets.all(16.0),
-//                         child: Card(
-//                           color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-//                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-//                           elevation: 6,
-//                           child: Padding(
-//                             padding: const EdgeInsets.all(16),
-//                             child: isWideScreen
-//                                 ? Row(
-//                                     crossAxisAlignment: CrossAxisAlignment.center,
-//                                     children: [
-//                                       // 👇 Images grouped together (3 images - no overflow)
-//                                       Flexible(
-//                                         flex: 1,
-//                                         fit: FlexFit.tight,
-//                                         child: Align(
-//                                           alignment: Alignment.centerRight, // 👈 thoda right aligned
-//                                           child: Row(
-//                                             mainAxisSize: MainAxisSize.min,
-//                                             children: [
-//                                               Flexible(
-//                                                 child: SizedBox(
-//                                                   height: 260,
-//                                                   child: FittedBox(
-//                                                     fit: BoxFit.contain,
-//                                                     child: Image.asset("assets/RainGaugeCylinder.jpg"),
-//                                                   ),
-//                                                 ),
-//                                               ),
-//                                               const SizedBox(width: 8),
-//                                               Flexible(
-//                                                 child: SizedBox(
-//                                                   height: 260,
-//                                                   child: FittedBox(
-//                                                     fit: BoxFit.contain,
-//                                                     child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
-//                                                   ),
-//                                                 ),
-//                                               ),
-//                                               const SizedBox(width: 8),
-//                                               Flexible(
-//                                                 child: SizedBox(
-//                                                   height: 260,
-//                                                   child: FittedBox(
-//                                                     fit: BoxFit.contain,
-//                                                     child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
-//                                                   ),
-//                                                 ),
-//                                               ),
-//                                             ],
-//                                           ),
-//                                         ),
-//                                       ),
+                      child: _buildSpecificationsCard(isDarkMode)
+                          .animate()
+                          .fadeIn()
+                          .slideY(begin: 0.2),
+                    ),
+                  ),
+                ),
 
-
-//                                       // 👇 Text Section
-//                                       Flexible(
-//                                         flex: 1,
-//                                         fit: FlexFit.tight,
-//                                         child: Padding(
-//                                           padding: const EdgeInsets.only(left: 15), // 👈 left side se 24px push
-//                                           child: Column(
-//                                             crossAxisAlignment: CrossAxisAlignment.start,
-//                                             mainAxisAlignment: MainAxisAlignment.start,
-//                                             children: [
-//                                               Text(
-//                                                 "3D Specifications",
-//                                                 style: TextStyle(
-//                                                   fontSize: 22,
-//                                                   fontWeight: FontWeight.bold,
-//                                                   color: isDarkMode ? Colors.white : Colors.black,
-//                                                 ),
-//                                               ),
-//                                               const SizedBox(height: 12),
-//                                           DefaultTabController(
-//   length: 3,
-//   child: Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       const TabBar(
-//         labelColor: Colors.teal,
-//         unselectedLabelColor: Colors.grey,
-//         indicatorColor: Colors.teal,
-//         tabs: [
-//           Tab(text: "Cylinder"),
-//           Tab(text: "See-Saw"),
-//           Tab(text: "Base"),
-//         ],
-//       ),
-//       SizedBox(
-//         height: 280, // fixed height for content
-//         child: TabBarView(
-//           children: [
-//             // Cylinder Tab
-//             SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   featureItem("Overall height: 301.50 mm", isDarkMode),
-//                   featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
-//                   featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
-//                   featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
-//                   featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
-//                   featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
-//                 ],
-//               ),
-//             ),
-
-//             // See-Saw Tab
-//             SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
-//                   featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
-//                   featureItem("Block height: ≈34.00 mm", isDarkMode),
-//                   featureItem("Block width: ≈24.76 mm", isDarkMode),
-//                   featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
-//                   featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
-//                 ],
-//               ),
-//             ),
-
-//             // Base Tab
-//             SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
-//                   featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
-//                   featureItem("Post height: 52.00 mm", isDarkMode),
-//                   featureItem("Fillet radius on ribs: R10.00", isDarkMode),
-//                   featureItem("Feature span across base: 96.10 mm", isDarkMode),
-//                   featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
-//                   featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
-//                   featureItem("Lower platform width: 113.75 mm", isDarkMode),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     ],
-//   ),
-// ),
-
-                                            
-//                                             ],
-//                                           ),
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   )
-
-//                                 // 👇 Mobile layout with 3 images
-//                                 : Column(
-//                                     children: [
-//                                       SizedBox(
-//                                         height: 160,
-//                                         child: FittedBox(
-//                                           fit: BoxFit.contain,
-//                                           child: Image.asset("assets/RainGaugeCylinder.jpg"),
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 8),
-//                                       SizedBox(
-//                                         height: 160,
-//                                         child: FittedBox(
-//                                           fit: BoxFit.contain,
-//                                           child: Image.asset("assets/RainGaugeSeeSaw.jpg"),
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 8),
-//                                       SizedBox(
-//                                         height: 160,
-//                                         child: FittedBox(
-//                                           fit: BoxFit.contain,
-//                                           child: Image.asset("assets/RainGaugeBase.jpg"), // 👈 new 3rd image
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 12),
-//                                       Text(
-//                                         "3D Specifications",
-//                                         style: TextStyle(
-//                                           fontSize: 20,
-//                                           fontWeight: FontWeight.bold,
-//                                           color: isDarkMode ? Colors.white : Colors.black,
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 10),
-//                                      Column(
-//   crossAxisAlignment: CrossAxisAlignment.start,
-//   children: [
-//     ExpansionTile(
-//       title: Text("Cylinder (Collector Body)",
-//           style: TextStyle(
-//             fontWeight: FontWeight.bold,
-//             color: isDarkMode ? Colors.white : Colors.black,
-//           )),
-//       children: [
-//         featureItem("Overall height: 301.50 mm", isDarkMode),
-//         featureItem("Outer diameter (OD): Ø159.50 mm", isDarkMode),
-//         featureItem("Top/cover plate OD: Ø163.50 mm", isDarkMode),
-//         featureItem("Central bore (lower view): Ø39.72 mm", isDarkMode),
-//         featureItem("Small side/boss hole: Ø32.57 mm", isDarkMode),
-//         featureItem("Drill/through hole: Ø4.20 mm", isDarkMode),
-//       ],
-//     ),
-//     ExpansionTile(
-//       title: Text("See-Saw (Tipping Bucket Assembly)",
-//           style: TextStyle(
-//             fontWeight: FontWeight.bold,
-//             color: isDarkMode ? Colors.white : Colors.black,
-//           )),
-//       children: [
-//         featureItem("Arc/chord length (bucket profile): ≈100.01 mm", isDarkMode),
-//         featureItem("Bucket height (profile): ≈51.05 mm", isDarkMode),
-//         featureItem("Block height: ≈34.00 mm", isDarkMode),
-//         featureItem("Block width: ≈24.76 mm", isDarkMode),
-//         featureItem("Pin/feature spacing: ≈20.04 mm", isDarkMode),
-//         featureItem("Pin/shaft diameter: ≈5.20 mm", isDarkMode),
-//       ],
-//     ),
-//     ExpansionTile(
-//       title: Text("Base (Electronics/Mechanism Mount)",
-//           style: TextStyle(
-//             fontWeight: FontWeight.bold,
-//             color: isDarkMode ? Colors.white : Colors.black,
-//           )),
-//       children: [
-//         featureItem("Base outer radius: R81.75 (OD Ø163.50 mm)", isDarkMode),
-//         featureItem("Boss/post spacing: 57.00 mm", isDarkMode),
-//         featureItem("Post height: 52.00 mm", isDarkMode),
-//         featureItem("Fillet radius on ribs: R10.00", isDarkMode),
-//         featureItem("Feature span across base: 96.10 mm", isDarkMode),
-//         featureItem("Boss diameter: Ø14.80 mm", isDarkMode),
-//         featureItem("Slot length (typ.): 33.00 mm", isDarkMode),
-//         featureItem("Lower platform width: 113.75 mm", isDarkMode),
-//       ],
-//     ),
-//   ],
-// )
-
-                      //               ],
-                      //             ),
-                      //     ),
-                      //   ),
-                      // ),
-const Footer(),
+                const SizedBox(height: 16),
+                const Footer(),
               ],
             ),
           ),
@@ -562,47 +246,135 @@ const Footer(),
     );
   }
 
- static Widget _buildBannerButton(
-    String label, 
-    Color color, 
-    VoidCallback onPressed
-) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      final isWideScreen = screenWidth > 800;
+  // ---------- iPad Layout for Card Alignment ----------
+  Widget _buildIpadLayout(bool isDarkMode) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final featuresCard = _buildFeaturesCard(isDarkMode)
+            .animate()
+            .slideX(begin: -0.3)
+            .fadeIn();
+        final applicationsCard = _buildApplicationsCard(isDarkMode)
+            .animate()
+            .slideX(begin: 0.3)
+            .fadeIn();
 
-      return ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: EdgeInsets.symmetric(
-            horizontal: isWideScreen ? 20 : 12,
-            vertical: isWideScreen ? 14 : 10,
-          ),
-          minimumSize: Size(isWideScreen ? 140 : 100, 40),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
+        // Get the height of both cards
+        final featuresKey = GlobalKey();
+        final applicationsKey = GlobalKey();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          if (featuresBox != null && applicationsBox != null) {
+            final featuresHeight = featuresBox.size.height;
+            final applicationsHeight = applicationsBox.size.height;
+            if (featuresHeight != applicationsHeight) {
+              // If heights differ, adjust the smaller card to be centered
+              final maxHeight = featuresHeight > applicationsHeight
+                  ? featuresHeight
+                  : applicationsHeight;
+              featuresBox.size = Size(featuresBox.size.width, maxHeight);
+              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+            }
+          }
+        });
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: featuresKey,
+                  child: featuresCard,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  key: applicationsKey,
+                  child: applicationsCard,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ---------- Specifications Card ----------
+  Widget _buildSpecificationsCard(bool isDarkMode) {
+    final List<String> specItems = [
+"Made of ABS material, offering durability and weather resistance",
+                                           "Available in two diameter options: 159.5 mm and 200 mm",
+                                          "Collection areas: 200 cm² and 314 cm²",
+                                         "Resolution: 0.2 mm or 0.5 mm depending on the model", 
+                                          "Equipped with reed switch or magnetic sensor for tip detection", 
+                                           "Data Output: Number of tips × Resolution = Total Rainfall", 
+                                           "Suitable for both precise and general-purpose rainfall monitoring", 
+     
+      
+      
+    ];
+
+    final int splitIndex = (specItems.length / 2).ceil();
+    final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+    final List<String> rightColumnItems = specItems.sublist(splitIndex);
+
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                "Technical Specifications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: leftColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: rightColumnItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
+            ),
+          ],
         ),
-        onPressed: onPressed, 
-        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-        label: Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: isWideScreen ? 15 : 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    },
-  );
-}
+      ),
+    );
+  }
+
   Widget _buildFeaturesCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+    return HoverCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -621,6 +393,7 @@ const Footer(),
             featureItem("Accurate even under varying rainfall intensities.)", isDarkMode),
             featureItem("Durable ABS body with weather resistance", isDarkMode),
             featureItem("Easy integration with data loggers and weather stations for automated rainfall recording", isDarkMode),
+           
           ],
         ),
       ),
@@ -628,10 +401,7 @@ const Footer(),
   }
 
   Widget _buildApplicationsCard(bool isDarkMode) {
-    return Card(
-      color: isDarkMode ? Colors.grey.shade800 : Colors.blue.shade50,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+    return HoverCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -646,13 +416,55 @@ const Footer(),
             const SizedBox(height: 10),
             featureItem("Meteorological stations for rainfall monitoring", isDarkMode),
             featureItem("Agriculture & irrigation planning", isDarkMode),
-            featureItem("Flood forecasting & hydrological studies", isDarkMode),
+           
             featureItem("Environmental monitoring & climate research", isDarkMode),
-            featureItem("Urban stormwater management", isDarkMode),
+           
             featureItem("Suitable for both precise scientific research and general-purpose field monitoring", isDarkMode),
+            
           ],
         ),
       ),
+    );
+  }
+
+  static Widget _buildBannerButton(
+      String label, Color color, VoidCallback onPressed) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isWideScreen = screenWidth > 800;
+
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: color,
+              padding: EdgeInsets.symmetric(
+                horizontal: isWideScreen ? 20 : 12,
+                vertical: isWideScreen ? 14 : 10,
+              ),
+              minimumSize: Size(isWideScreen ? 160 : 100, 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+              elevation: 4,
+            ),
+            onPressed: onPressed,
+            icon: const Icon(Icons.arrow_forward,
+                size: 18, color: Colors.white),
+            label: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: isWideScreen ? 15 : 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
+                duration: 1200.ms, curve: Curves.easeInOut),
+        );
+      },
     );
   }
 
@@ -674,6 +486,50 @@ const Footer(),
             ),
           ),
         ],
+      ).animate().fadeIn(duration: 400.ms),
+    );
+  }
+}
+
+class HoverCard extends StatefulWidget {
+  final Widget child;
+  const HoverCard({super.key, required this.child});
+
+  @override
+  State<HoverCard> createState() => _HoverCardState();
+}
+
+class _HoverCardState extends State<HoverCard> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        transform: _hovering
+            ? (Matrix4.identity()..scale(1.01)) 
+            : Matrix4.identity(),
+        decoration: BoxDecoration(
+          color: _hovering
+              ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)
+              : (isDarkMode ? Colors.grey.shade900 : Colors.white),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            if (_hovering)
+              BoxShadow(
+                color: isDarkMode ? Colors.black54 : Colors.black26,
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+          ],
+        ),
+        child: widget.child,
       ),
     );
   }
@@ -685,6 +541,9 @@ class BannerPoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 800;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -694,9 +553,9 @@ class BannerPoint extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: isWideScreen ? 16 : 13,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
