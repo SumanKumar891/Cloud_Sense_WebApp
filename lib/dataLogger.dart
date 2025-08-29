@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
@@ -145,8 +146,23 @@ Positioned.fill(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _buildBannerButton("ENQUIRE", Colors.lightBlue),
-                    _buildBannerButton("DATASHEETS", Colors.teal),
+                   _buildBannerButton(
+      "Enquire",
+      Colors.blue,
+      () {
+      },
+    ),
+                                          _buildBannerButton(
+      "Download Manual",
+      Colors.teal,
+      () {
+        DownloadManager.downloadFile(
+          context: context,
+          sensorKey: "DataLogger",
+          fileType: "manual",
+        );
+      },
+    ),
                   ],
                 ),
               ],
@@ -227,7 +243,13 @@ Positioned.fill(
                                       featureItem("Backup: 30-day onboard data storage", isDarkMode),
                                       featureItem("Power Options: Battery / Solar", isDarkMode),
                                       const SizedBox(height: 16),
-                                      _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                     _buildBannerButton(
+      "Download Datasheet",
+      Colors.teal,
+      () {
+    
+      },
+    ),
                                     ],
                                   ),
                                 ),
@@ -257,7 +279,13 @@ Positioned.fill(
                                       featureItem("Power Options: Battery / Solar", isDarkMode),
                                         
                                 const SizedBox(height: 16),
-                                _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                              _buildBannerButton(
+      "Download Datasheet",
+      Colors.teal,
+      () {
+    
+      },
+    ),
                               ],
                             ),
                     ),
@@ -273,7 +301,11 @@ Positioned.fill(
   }
 
 
-static Widget _buildBannerButton(String label, Color color) {
+static Widget _buildBannerButton(
+    String label, 
+    Color color, 
+    VoidCallback onPressed
+) {
   return LayoutBuilder(
     builder: (context, constraints) {
       final screenWidth = MediaQuery.of(context).size.width;
@@ -291,13 +323,13 @@ static Widget _buildBannerButton(String label, Color color) {
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        onPressed: () {},
+        onPressed: onPressed, 
         icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
         label: Text(
           label,
           style: TextStyle(
             color: Colors.white,
-            fontSize: isWideScreen ? 15 : 12, // responsive text
+            fontSize: isWideScreen ? 15 : 12,
             fontWeight: FontWeight.w600,
           ),
         ),

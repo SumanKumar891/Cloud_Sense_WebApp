@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
@@ -138,8 +139,23 @@ class ProductPage extends StatelessWidget {
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-                                        _buildBannerButton("ENQUIRE", Colors.lightBlue),
-                                        _buildBannerButton("DATASHEETS", Colors.teal),
+                                     _buildBannerButton(
+      "Enquire",
+      Colors.blue,
+      () {
+      },
+    ),
+                                          _buildBannerButton(
+      "Download Manual",
+      Colors.teal,
+      () {
+        DownloadManager.downloadFile(
+          context: context,
+          sensorKey: "RainGauge",
+          fileType: "manual",
+        );
+      },
+    ),
                                       ],
                                     ),
                                   ],
@@ -236,7 +252,13 @@ class ProductPage extends StatelessWidget {
                                             featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
                                             featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
                                             const SizedBox(height: 16),
-                                            _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                           _buildBannerButton(
+      "Download Datasheet",
+      Colors.teal,
+      () {
+    
+      },
+    ),
                                           ],
                                         ),
                                       ),
@@ -269,7 +291,13 @@ class ProductPage extends StatelessWidget {
                                       featureItem("Data Output: Number of tips × Resolution = Total Rainfall", isDarkMode),
                                       featureItem("Suitable for both precise and general-purpose rainfall monitoring", isDarkMode),
                                       const SizedBox(height: 16),
-                                      _buildBannerButton("DOWNLOAD DATASHEET", Colors.teal),
+                                    _buildBannerButton(
+      "Download Datasheet",
+      Colors.teal,
+      () {
+    
+      },
+    ),
                                     ],
                                   ),
                           ),
@@ -534,23 +562,42 @@ const Footer(),
     );
   }
 
-  static Widget _buildBannerButton(String label, Color color) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      ),
-      onPressed: () {},
-      icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-      label: Text(
-        label,
-        style: const TextStyle(
-            color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
+ static Widget _buildBannerButton(
+    String label, 
+    Color color, 
+    VoidCallback onPressed
+) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final isWideScreen = screenWidth > 800;
 
+      return ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: EdgeInsets.symmetric(
+            horizontal: isWideScreen ? 20 : 12,
+            vertical: isWideScreen ? 14 : 10,
+          ),
+          minimumSize: Size(isWideScreen ? 140 : 100, 40),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        onPressed: onPressed, 
+        icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: isWideScreen ? 15 : 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    },
+  );
+}
   Widget _buildFeaturesCard(bool isDarkMode) {
     return Card(
       color: isDarkMode ? Colors.grey.shade800 : Colors.teal.shade50,

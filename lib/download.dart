@@ -1,0 +1,82 @@
+
+
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
+class DownloadManager {
+  static final Map<String, Map<String, String>> sensorFiles = {
+    "WindSensor": {
+      "manual": "assets/manuals/windSensor.pdf",
+      "datasheet": "assets/manuals/windSensor_datasheet.pdf",
+    },
+
+     "ARTH": {
+      "manual": "assets/manuals/windSensor.pdf",
+      "datasheet": "assets/manuals/windSensor_datasheet.pdf",
+  },
+  "RainGauge": {
+      "manual": "assets/manuals/rainGauge.pdf",
+      "datasheet": "assets/manuals/windSensor_datasheet.pdf",
+  },
+  "Gateway": {
+        "manual": "assets/manuals/windSensor.pdf",
+      "datasheet": "assets/manuals/windSensor_datasheet.pdf",
+  },
+  "TempHumidityProbe": {  
+     "manual": "assets/manuals/windSensor.pdf",
+      "datasheet": "assets/manuals/windSensor_datasheet.pdf",},
+
+  "DataLogger": {
+      "manual": "assets/manuals/dataLogger.pdf",
+      "datasheet": "assets/manuals/windSensor_datasheet.pdf",
+  },
+};
+  
+
+  static Future<void> downloadFile({
+    required BuildContext context,
+    required String sensorKey,
+    required String fileType,
+  }) async {
+    final filePath = sensorFiles[sensorKey]?[fileType];
+    if (filePath == null) {
+      _toast(context, "File not found");
+      return;
+    }
+
+    if (kIsWeb) {
+      final fullUrl = Uri.base.resolve(filePath).toString();
+      if (await canLaunchUrl(Uri.parse(fullUrl))) {
+        await launchUrl(Uri.parse(fullUrl));
+      } else {
+        _toast(context, "Could not open file in browser");
+      }
+      return;
+    }
+
+    try {
+      final byteData = await rootBundle.load(filePath);
+      final bytes = byteData.buffer.asUint8List();
+
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/${sensorKey}_$fileType.pdf');
+
+      await file.writeAsBytes(bytes);
+
+      _toast(context, "Saved to ${file.path}");
+    } catch (e) {
+      _toast(context, "Error: $e");
+    }
+  }
+
+  static void _toast(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+}
+

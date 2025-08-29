@@ -859,53 +859,53 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: screenWidth < 600 ? 1 : 3,
-                      crossAxisSpacing: 5,
-                      mainAxisSpacing: 40,
-                      childAspectRatio: 1.5,
-                      padding: const EdgeInsets.symmetric(horizontal: 0),
-                      children: [
-                        _buildSensorCard(
-                          imageAsset: "assets/probebg.jpg",
-                          title: "Temperature and Humidity Probe",
-                          description: "Accurate measurements for temperature and humidity.",
-                          onReadMore: () => Navigator.pushNamed(context, '/probe'),
-                        ),
-                        _buildSensorCard(
-                          imageAsset: "assets/arth.jpg",
-                          title: "ATRH Lux Pressure Sensor",
-                          description: "Multi-sensor for ATRH, lux, and pressure.",
-                          onReadMore: () => Navigator.pushNamed(context, '/atrh'),
-                        ),
-                        _buildSensorCard(
-                          imageAsset: "assets/windsensor.jpg",
-                          title: "Wind Sensor",
-                          description: "Ultrasonic wind sensors for precise wind data.",
-                          onReadMore: () => Navigator.pushNamed(context, '/windsensor'),
-                        ),
-                        _buildSensorCard(
-                          imageAsset: "assets/rbase.png",
-                          title: "Rain Gauge",
-                          description: "Reliable rainfall measurement.",
-                          onReadMore: () => Navigator.pushNamed(context, '/raingauge'),
-                        ),
-                        _buildSensorCard(
-                          imageAsset: "assets/dataloggerrender.png",
-                          title: "Data Logger",
-                          description: "Logs data from multiple sensors.",
-                          onReadMore: () => Navigator.pushNamed(context, '/datalogger'),
-                        ),
-                        _buildSensorCard(
-                          imageAsset: "assets/gateway.jpg",
-                          title: "Gateway",
-                          description: "Connects devices to the cloud.",
-                          onReadMore: () => Navigator.pushNamed(context, '/gateway'),
-                        ),
-                      ],
-                    ),
+                   GridView.count(
+  shrinkWrap: true,
+  physics: const NeverScrollableScrollPhysics(),
+  crossAxisCount: screenWidth < 600 ? 1 : 3,
+  crossAxisSpacing: 5,
+  mainAxisSpacing: 40,
+  childAspectRatio: 1.5, // Maintain a consistent aspect ratio for all cards
+  padding: const EdgeInsets.symmetric(horizontal: 0),
+  children: [
+    _buildSensorCard(
+      imageAsset: "assets/probebg.jpg",
+      title: "ATRH Probe",
+      description: "Accurate measurements for temperature and humidity.",
+      onReadMore: () => Navigator.pushNamed(context, '/probe'),
+    ),
+    _buildSensorCard(
+      imageAsset: "assets/arth.jpg",
+      title: "ATRH Lux Pressure Sensor",
+      description: "Multi-sensor for ATRH, lux, and pressure.",
+      onReadMore: () => Navigator.pushNamed(context, '/atrh'),
+    ),
+    _buildSensorCard(
+      imageAsset: "assets/windsensor.jpg",
+      title: "Wind Sensor",
+      description: "Ultrasonic wind sensors for precise wind data.",
+      onReadMore: () => Navigator.pushNamed(context, '/windsensor'),
+    ),
+    _buildSensorCard(
+      imageAsset: "assets/rbase.png",
+      title: "Rain Gauge",
+      description: "Reliable rainfall measurement.",
+      onReadMore: () => Navigator.pushNamed(context, '/raingauge'),
+    ),
+    _buildSensorCard(
+      imageAsset: "assets/dataloggerrender.png",
+      title: "Data Logger",
+      description: "Logs data from multiple sensors.",
+      onReadMore: () => Navigator.pushNamed(context, '/datalogger'),
+    ),
+    _buildSensorCard(
+      imageAsset: "assets/gateway.jpg",
+      title: "Gateway",
+      description: "Connects devices to the cloud.",
+      onReadMore: () => Navigator.pushNamed(context, '/gateway'),
+    ),
+  ],
+),
                     const SizedBox(height: 60),
                     Wrap(
                       alignment: WrapAlignment.center,
@@ -1336,68 +1336,88 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSensorCard({
-    required String imageAsset,
-    required String title,
-    required String description,
-    required VoidCallback onReadMore,
-  }) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            imageAsset,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(color: Colors.grey);
-            },
-          ),
-          Container(
-            color: Colors.black.withOpacity(0.6), // Increased opacity for darker background
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+Widget _buildSensorCard({
+  required String imageAsset,
+  required String title,
+  required String description,
+  required VoidCallback onReadMore,
+}) {
+  
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        // Background image with consistent fit
+        Image.asset(
+          imageAsset,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(color: Colors.grey);
+          },
+        ),
+        // Dark overlay for readability
+        Container(
+          color: Colors.black.withOpacity(0.65),
+        ),
+        // Text and button layout with fixed positioning
+       Padding(
+          padding: const EdgeInsets.only(top: 40.0, left: 16.0, right: 16.0, bottom: 16.0),// Consistent padding around all sides
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distributes space evenly
+            children: [
+              // Title and description section
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2, // Allow up to 2 lines for longer titles
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6), // Fixed spacing between title and description
                   Text(
                     description,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    style: const TextStyle(color: Colors.white70, fontSize: 16),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2, // Limit to 2 lines to maintain consistency
                   ),
-                  const SizedBox(height: 12),
-                 ElevatedButton(
-  onPressed: onReadMore,
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.cyan,
-    foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(4), // smaller radius → less rounded
-    ),
-  ),
-  child: const Text("READ MORE >"),
-),
-
                 ],
               ),
-            ),
+              // Spacer to push button to the bottom
+              // const Spacer(),
+              // Button with consistent size and position
+              SizedBox(
+                // width: 130, // Increased width to ensure text fits on one line
+                // height: 30, // Fixed height for the button
+                child: ElevatedButton(
+                  onPressed: onReadMore,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    "READ MORE >",
+                    style: TextStyle(fontSize: 12), // Ensure text fits without wrapping
+                    overflow: TextOverflow.ellipsis, // Prevent text wrapping
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }

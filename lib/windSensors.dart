@@ -1,3 +1,4 @@
+import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/material.dart';
 
@@ -145,10 +146,23 @@ class UltrasonicSensorPage extends StatelessWidget {
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-                                        _buildBannerButton(
-                                            "ENQUIRE", Colors.lightBlue),
-                                        _buildBannerButton(
-                                            "DATASHEETS", Colors.teal),
+                                       _buildBannerButton(
+      "Enquire",
+      Colors.blue,
+      () {
+      },
+    ),
+                                          _buildBannerButton(
+      "Download Manual",
+      Colors.teal,
+      () {
+        DownloadManager.downloadFile(
+          context: context,
+          sensorKey: "WindSensor",
+          fileType: "manual",
+        );
+      },
+    ),
                                       ],
                                     ),
                                   ],
@@ -228,8 +242,13 @@ featureItem("Power: 3.3–5 V supply, ~50–80 mW active, ultra-low-power sleep 
 featureItem("Software: TI USS library for calibration, ADC capture & UART data output", isDarkMode),
 
                                       const SizedBox(height: 16),
-                                      _buildBannerButton(
-                                          "DOWNLOAD DATASHEET", Colors.teal),
+                                    _buildBannerButton(
+      "Download Datasheet",
+      Colors.teal,
+      () {
+    
+      },
+    ),
                                     ],
                                   ),
                                 ),
@@ -259,8 +278,13 @@ featureItem("Electronics: MSP430FR6043 MCU with USS subsystem, 12-bit ADC & TDC"
 featureItem("Power: 3.3–5 V supply, ~50–80 mW active, ultra-low-power sleep modes", isDarkMode),
 featureItem("Software: TI USS library for calibration, ADC capture & UART data output", isDarkMode),
                                 const SizedBox(height: 16),
-                                _buildBannerButton(
-                                    "DOWNLOAD DATASHEET", Colors.teal),
+                               _buildBannerButton(
+      "Download Datasheet",
+      Colors.teal,
+      () {
+    
+      },
+    ),
                               ],
                             ),
                     ),
@@ -278,7 +302,11 @@ featureItem("Software: TI USS library for calibration, ADC capture & UART data o
     );
   }
 
- static Widget _buildBannerButton(String label, Color color) {
+static Widget _buildBannerButton(
+    String label, 
+    Color color, 
+    VoidCallback onPressed
+) {
   return LayoutBuilder(
     builder: (context, constraints) {
       final screenWidth = MediaQuery.of(context).size.width;
@@ -296,13 +324,13 @@ featureItem("Software: TI USS library for calibration, ADC capture & UART data o
             borderRadius: BorderRadius.circular(6),
           ),
         ),
-        onPressed: () {},
+        onPressed: onPressed, 
         icon: const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
         label: Text(
           label,
           style: TextStyle(
             color: Colors.white,
-            fontSize: isWideScreen ? 15 : 12, // responsive text
+            fontSize: isWideScreen ? 15 : 12,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -310,7 +338,6 @@ featureItem("Software: TI USS library for calibration, ADC capture & UART data o
     },
   );
 }
-
 
 Widget _build3DSpecsCard(bool isDarkMode) {
   return Card(

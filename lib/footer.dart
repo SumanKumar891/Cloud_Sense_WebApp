@@ -43,13 +43,13 @@ class Footer extends StatelessWidget {
               isDarkMode: isDarkMode,
               isWideScreen: isWideScreen,
             ),
-            const SizedBox(height: 6), // Reduced from 12 to 6
-            _buildContactItem(
-              icon: Icons.phone,
-              text: '+91 8124660891',
-              isDarkMode: isDarkMode,
-              isWideScreen: isWideScreen,
-            ),
+            // const SizedBox(height: 6), // Reduced from 12 to 6
+            // _buildContactItem(
+            //   icon: Icons.phone,
+            //   text: '+91 8124660891',
+            //   isDarkMode: isDarkMode,
+            //   isWideScreen: isWideScreen,
+            // ),
             // const SizedBox(height: 24),
             // Text(
             //   '© 2025 Sensor Solutions. All rights reserved.',
