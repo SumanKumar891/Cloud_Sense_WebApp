@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
 
   // Calculate responsive values based on screen width
 int getCrossAxisCount(double screenWidth) {
-  if (screenWidth < 950) {
+  if (screenWidth < 600) {
     return 1; // Mobile: 1 card per row
   } else if (screenWidth < 1300) {
     return 2; // Tablet: 2 cards per row
@@ -62,7 +62,7 @@ int getCrossAxisCount(double screenWidth) {
 }
 
 double getCardAspectRatio(double screenWidth) {
-  if (screenWidth < 870) {
+  if (screenWidth < 600) {
     return 1.6; // Mobile: slightly taller cards
   } else if (screenWidth < 1300) {
     return 1.4; // Tablet: balanced aspect ratio
@@ -72,7 +72,7 @@ double getCardAspectRatio(double screenWidth) {
 }
 
 double getHorizontalPadding(double screenWidth) {
-  if (screenWidth < 850) {
+  if (screenWidth < 600) {
     return 10; // Mobile: minimal padding
   } else if (screenWidth < 1300) {
     return 40; // Tablet: moderate padding
@@ -1576,24 +1576,24 @@ double getHorizontalPadding(double screenWidth) {
     required VoidCallback onReadMore,
     required double screenWidth,
   }) {
-    double titleFontSize = screenWidth < 850
+    double titleFontSize = screenWidth < 600
         ? 16
-        : (screenWidth < 1300 ? 12 : 16);
-    double descriptionFontSize = screenWidth < 850
+        : (screenWidth < 1300 ? 20 : 24);
+    double descriptionFontSize = screenWidth < 600
         ? 12
-        : (screenWidth < 1300 ? 10 : 14);
-    double buttonFontSize = screenWidth < 850
+        : (screenWidth < 1300 ? 16 : 18);
+    double buttonFontSize = screenWidth < 600
         ? 8.0
-        : (screenWidth < 1300 ? 8.0 : 12.0);
+        : (screenWidth < 1300 ? 10.0 : 14.0);
 
     EdgeInsets cardPadding = EdgeInsets.only(
-      top: screenWidth < 850 ? 16.0 : (screenWidth < 1300 ? 8.0 : 20.0),
-      left: screenWidth < 850 ? 12.0 : 16.0,
-      right: screenWidth < 850 ? 12.0 : 16.0,
-      bottom: screenWidth < 850 ? 12.0 : 14.0,
+      top: screenWidth < 600 ? 16.0 : (screenWidth < 1300 ? 18.0 : 30.0),
+      left: screenWidth < 600 ? 12.0 : 16.0,
+      right: screenWidth < 600 ? 12.0 : 16.0,
+      bottom: screenWidth < 600 ? 12.0 : 14.0,
     );
 
-    double titleDescriptionSpacing = screenWidth < 850 ? 3 : 4;
+    double titleDescriptionSpacing = screenWidth < 600 ? 3 : 8;
 
     return Card(
       elevation: 4,
@@ -1643,7 +1643,7 @@ double getHorizontalPadding(double screenWidth) {
                   ],
                 ),
                 SizedBox(
-                  width: screenWidth < 850 ? 80 : (screenWidth < 1300 ? 90 : 120.0),
+                  width: screenWidth < 850 ? 80 : (screenWidth < 1300 ? 110 : 120.0),
                   height: screenWidth < 850 ? 25 : 24,
                   child: ElevatedButton(
                     onPressed: onReadMore,
