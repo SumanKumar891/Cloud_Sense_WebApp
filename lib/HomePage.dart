@@ -1578,10 +1578,10 @@ double getHorizontalPadding(double screenWidth) {
   }) {
     double titleFontSize = screenWidth < 600
         ? 16
-        : (screenWidth < 1300 ? 16 : 24);
+        : (screenWidth < 1300 ? 14 : 24);
     double descriptionFontSize = screenWidth < 600
         ? 10
-        : (screenWidth < 1300 ? 12 : 18);
+        : (screenWidth < 1300 ? 10 : 18);
     double buttonFontSize = screenWidth < 600
         ? 8.0
         : (screenWidth < 1300 ? 9.0 : 14.0);
