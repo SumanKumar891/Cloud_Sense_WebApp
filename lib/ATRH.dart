@@ -373,6 +373,8 @@ class ATRHSensorPage extends StatelessWidget {
 "LUX Accuracy:±3%"
 
     ];
+ final screenWidth = MediaQuery.of(context).size.width;
+              final isWideScreen = screenWidth > 800;
 
     final int splitIndex = (specItems.length/2 ).ceil();
     final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
@@ -382,10 +384,9 @@ class ATRHSensorPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: isWideScreen ? CrossAxisAlignment.center : CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Text(
+            Text(
                 "Specifications",
                 style: TextStyle(
                   fontSize: 20,
@@ -393,13 +394,13 @@ class ATRHSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 ),
               ),
-            ),
+           
             const SizedBox(height: 20),
           // Use a LayoutBuilder to determine screen width and adjust layout
           LayoutBuilder(
             builder: (context, constraints) {
-              final screenWidth = MediaQuery.of(context).size.width;
-              final isWideScreen = screenWidth > 800;
+              // final screenWidth = MediaQuery.of(context).size.width;
+              // final isWideScreen = screenWidth > 800;
 
               if (isWideScreen) {
                 // Two-column layout for wide screens

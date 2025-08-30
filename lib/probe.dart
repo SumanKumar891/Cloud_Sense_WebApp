@@ -356,97 +356,94 @@ class ProbePage extends StatelessWidget {
 
   // ---------- Specifications Card ----------
   Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
-    final List<String> specItems = [
-      "Supply Voltage : 5-12 V DC",
-      "Range of Temperature : -40 to +60 °C",
-      "Range of humidity : 0-100%",
-      "Communications Protocol : RS485 & 0-1V (ADC)",
-      "Temperature Accuracy : ±0.1°C",
-      "Humidity Accuracy: ±1.0% RH",
-    ];
+  final List<String> specItems = [
+    "Supply Voltage : 5-12 V DC",
+    "Range of Temperature : -40 to +60 °C",
+    "Range of Humidity : 0-100%",
+    "Communications Protocol : RS485 & 0-1V (ADC)",
+    "Temperature Accuracy : ±0.1°C",
+    "Humidity Accuracy: ±1.0% RH",
+  ];
 
-    return HoverCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Text(
-                "Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                ),
-              ),
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isWideScreen = screenWidth > 800;
+
+  return HoverCard(
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: isWideScreen ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Specifications",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.blue.shade800,
             ),
-            const SizedBox(height: 20),
-            // Use a LayoutBuilder to determine screen width and adjust layout
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final screenWidth = MediaQuery.of(context).size.width;
-                final isWideScreen = screenWidth > 800;
+          ),
+          const SizedBox(height: 20),
+          // Use a LayoutBuilder to determine screen width and adjust layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (isWideScreen) {
+                // Two-column layout for wide screens
+                final int splitIndex = (specItems.length / 2).ceil();
+                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+                final List<String> rightColumnItems = specItems.sublist(splitIndex);
 
-                if (isWideScreen) {
-                  // Two-column layout for wide screens
-                  final int splitIndex = (specItems.length / 2).ceil();
-                  final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-                  final List<String> rightColumnItems = specItems.sublist(splitIndex);
-
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: leftColumnItems
-                              .map((item) => featureItem(item, isDarkMode))
-                              .toList(),
-                        ),
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: leftColumnItems
+                            .map((item) => featureItem(item, isDarkMode))
+                            .toList(),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: rightColumnItems
-                              .map((item) => featureItem(item, isDarkMode))
-                              .toList(),
-                        ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: rightColumnItems
+                            .map((item) => featureItem(item, isDarkMode))
+                            .toList(),
                       ),
-                    ],
-                  );
-                } else {
-                  // Single-column layout for mobile
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: specItems
-                        .map((item) => featureItem(item, isDarkMode))
-                        .toList(),
-                  );
-                }
+                    ),
+                  ],
+                );
+              } else {
+                // Single-column layout for mobile
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: specItems
+                      .map((item) => featureItem(item, isDarkMode))
+                      .toList(),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 40),
+          Center(
+            child: _buildBannerButton(
+              "Download Datasheet",
+              Colors.teal,
+              () {
+                DownloadManager.downloadFile(
+                  context: context,
+                  sensorKey: "TempHumidityProbe",
+                  fileType: "datasheet",
+                );
               },
             ),
-            const SizedBox(height: 40),
-            Center(
-              child: _buildBannerButton(
-                "Download Datasheet",
-                Colors.teal,
-                () {
-                  DownloadManager.downloadFile(
-                    context: context,
-                    sensorKey: "TempHumidityProbe",
-                    fileType: "datasheet",
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
       child: Padding(
