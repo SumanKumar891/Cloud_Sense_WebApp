@@ -144,7 +144,7 @@ class ProductPage extends StatelessWidget {
                                           curve: Curves.easeOut,
                                         ),
                                     Text(
-                                      "Reliable rainfall measurementy",
+                                      "Tipping Bucket Rain Gauge",
                                       style: TextStyle(
                                         fontSize: isWideScreen ? 20 : 14,
                                         fontWeight: FontWeight.bold,
@@ -157,11 +157,11 @@ class ProductPage extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: const [
                                         BannerPoint(
-                                            "Real-time temperature & humidity sensing for critical applications"),
+                                            "Measure rain via Tipping Bucket Mechanism"),
                                         BannerPoint(
-                                            "Provides both analog (0-1000)mV and digital (RS485) output"),
+                                            "Accurate and Low Maintenance"),
                                         BannerPoint(
-                                            "Reliable Industrial grade monitoring with CRC validated communications"),
+                                            "Robust design for all weather conditions"),
                                       ],
                                     ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
                                     const SizedBox(height: 20),

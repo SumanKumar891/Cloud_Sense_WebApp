@@ -281,7 +281,7 @@ double getHorizontalPadding(double screenWidth) {
                                   color:
                                       isDarkMode ? Colors.white : Colors.black),
                               SizedBox(width: 8),
-                              Text('THPL Shield'),
+                              Text('Temperature Humidity\nLight Intensity and\nPressure Radiation Shield'),
                             ],
                           ),
                         ),
@@ -1264,7 +1264,7 @@ double getHorizontalPadding(double screenWidth) {
                   ),
                   _buildSensorCard(
                     imageAsset: "assets/arth.jpg",
-                    title: "THPL shield",
+                    title: "Temperature Humidity Light Intensity and Pressure Radiation Shield",
                     description:
                         "Compact environmental sensing unit for precise measurements.",
                     onReadMore: () =>
@@ -1283,7 +1283,7 @@ double getHorizontalPadding(double screenWidth) {
                   _buildSensorCard(
                     imageAsset: "assets/rbase.png",
                     title: "Rain Gauge",
-                    description: "Tipping Bucket Rain Gauge.",
+                    description: "Tipping Bucket rain Gauge.",
                     onReadMore: () =>
                         Navigator.pushNamed(context, '/raingauge'),
                     screenWidth: screenWidth,
@@ -1578,10 +1578,10 @@ double getHorizontalPadding(double screenWidth) {
   }) {
     double titleFontSize = screenWidth < 600
         ? 16
-        : (screenWidth < 1300 ? 14 : 24);
+        : (screenWidth < 1300 ? 8 : 22);
     double descriptionFontSize = screenWidth < 600
         ? 10
-        : (screenWidth < 1300 ? 10 : 18);
+        : (screenWidth < 1300 ? 10 : 20);
     double buttonFontSize = screenWidth < 600
         ? 8.0
         : (screenWidth < 1300 ? 9.0 : 14.0);
@@ -1628,7 +1628,7 @@ double getHorizontalPadding(double screenWidth) {
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
-                      maxLines: screenWidth < 800 ? 2 : 2,
+                      maxLines: screenWidth < 800 ? 2 : 3,
                     ),
                     SizedBox(height: titleDescriptionSpacing),
                     Text(

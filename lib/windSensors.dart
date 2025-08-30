@@ -311,7 +311,9 @@ class UltrasonicSensorPage extends StatelessWidget {
   "Input Supply voltage: 2V - 16V",
 "Measure wind speed and wind direction via Delta Time of Flight",
 "Communication protocols: RS232 or RS485 (Modbus)",
-"Ultra low power sleep mode.",
+"Ultra low power sleep mode"
+"Weight : 0.6kg",
+"Heating option (-40℃ to +70℃)",
 
     ];
 
@@ -404,11 +406,12 @@ class UltrasonicSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.teal.shade800,
                 )),
             const SizedBox(height: 10),
+            featureItem("High Quality measurement upto 60m/s(216km/h).", isDarkMode),
            featureItem("High accuracy with fast response time", isDarkMode),
 featureItem("0°-360° wind direction coverage with 1° resolution", isDarkMode),
-featureItem("Low power consumption", isDarkMode),
+featureItem("Low Maintanence, ensuring low cost of ownership", isDarkMode),
 featureItem("Robust design for all weather conditions", isDarkMode),
-featureItem("Wide input voltage range", isDarkMode),
+
           ],
         ),
       ),
@@ -432,7 +435,7 @@ featureItem("Wide input voltage range", isDarkMode),
            featureItem("Weather monitoring stations", isDarkMode),
 featureItem("Smart agriculture and precision farming", isDarkMode),
 featureItem("Ports and harbours", isDarkMode),
-featureItem("Small airports and helipads", isDarkMode),
+featureItem("Runways and helipads", isDarkMode),
 
           ],
         ),

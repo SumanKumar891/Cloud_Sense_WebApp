@@ -45,14 +45,14 @@ class ATRHSensorPage extends StatelessWidget {
                         Expanded(
                           flex: 1,
                           child: Container(
-                            height: isWideScreen ? 450 : 400,
+                            height: isWideScreen ? 500 : 450,
                             color: Colors.grey.shade600,
                           ),
                         ),
                         Expanded(
                           flex: 1,
                           child: Container(
-                            height: isWideScreen ? 450 : 400,
+                            height: isWideScreen ? 500 : 450,
                             child: Image.asset(
                               "assets/arthbg.png",
                               fit: BoxFit.cover,
@@ -66,7 +66,7 @@ class ATRHSensorPage extends StatelessWidget {
                       ],
                     ),
                     Container(
-                      height: isWideScreen ? 450 : 400,
+                      height: isWideScreen ? 500 : 450,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
@@ -116,9 +116,9 @@ class ATRHSensorPage extends StatelessWidget {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: "THPL ",
+                                            text: "Temperature Humidity Light Intensity and Pressure Radiation ",
                                             style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontSize: isWideScreen ? 40 : 28,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.lightBlueAccent,
                                             ),
@@ -126,7 +126,7 @@ class ATRHSensorPage extends StatelessWidget {
                                           TextSpan(
                                             text: "Shield ",
                                             style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontSize: isWideScreen ? 40 : 28,
                                               fontWeight: FontWeight.bold,
                                               color: const Color.fromARGB(
                                                   255, 219, 80, 145),
@@ -317,6 +317,8 @@ class ATRHSensorPage extends StatelessWidget {
 "Communications Protocol : I2C",
 "Temperature Accuracy : ±1°C",
 "Humidity Accuracy:±3.0% RH", 
+"Pressure Accuracy:±1hPa",
+"LUX Accuracy:±3%"
 
     ];
 

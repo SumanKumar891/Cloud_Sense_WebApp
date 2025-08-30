@@ -314,6 +314,7 @@ class DataLoggerPage extends StatelessWidget {
       "Support SD card",
       "Built in LTE and GPS Antennas",
       "Inbuild Real Time clock",
+      "Ultra low power sleep mode",
       
       
     ];
@@ -443,8 +444,9 @@ class DataLoggerPage extends StatelessWidget {
             featureItem("Remote weather monitoring stations", isDarkMode),
             featureItem("Smart agriculture and irrigation management", isDarkMode),
             
-            featureItem("Industrial & environmental monitoring", isDarkMode),
+            featureItem("Industrial and environmental monitoring", isDarkMode),
             featureItem("Smart cities and IoT projects", isDarkMode),
+             featureItem("Cold storage management", isDarkMode),
             
           ],
         ),
