@@ -411,7 +411,7 @@ class GatewayPage extends StatelessWidget {
             const SizedBox(height: 10),
           featureItem("Real Time Monitoring with low power consumptions", isDarkMode),
 featureItem("FOTA (Firmware Over the Air)", isDarkMode),
-featureItem("100+ Connected at a time", isDarkMode),
+featureItem("100+ Node Connected at a time", isDarkMode),
 featureItem("BLE Range up to 1km at line of sight (LOS)", isDarkMode),
 featureItem("IP66 & Compact design", isDarkMode),
 featureItem("Connectivity option: 4G, WIFI, LAN", isDarkMode),
