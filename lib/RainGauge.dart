@@ -1,7 +1,9 @@
 import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
@@ -169,10 +171,45 @@ class ProductPage extends StatelessWidget {
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
+                                        // Inside Wrap of buttons
                                         _buildBannerButton(
                                           "Enquire",
                                           Colors.blue,
-                                          () {},
+                                          () async {
+                                            // Mailto URI (system default mail app ke liye)
+                                            final Uri emailLaunchUri = Uri(
+                                              scheme: 'mailto',
+                                              path: 'sharmasejal2701@gmail.com',
+                                              query: 'subject=Product Enquiry&body=Hello, I am interested in your product.',
+                                            );
+
+                                            if (kIsWeb) {
+                                              // 👇 Web pe direct Gmail compose kholega
+                                              final Uri gmailUrl = Uri.parse(
+                                                "https://mail.google.com/mail/?view=cm&fs=1"
+                                                "&to=${emailLaunchUri.path}"
+                                                "&su=Product%20Enquiry"
+                                                "&body=Hello,%20I%20am%20interested%20in%20your%20product.",
+                                              );
+
+                                              if (await canLaunchUrl(gmailUrl)) {
+                                                await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text("Could not open Gmail")),
+                                                );
+                                              }
+                                            } else {
+                                              // 👇 Mobile/Desktop pe system ka default mail client open hoga
+                                              if (await canLaunchUrl(emailLaunchUri)) {
+                                                await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text("Could not open email app")),
+                                                );
+                                              }
+                                            }
+                                          },
                                         ),
                                         _buildBannerButton(
                                           "Download Manual",
