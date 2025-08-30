@@ -65,9 +65,9 @@ class _HomePageState extends State<HomePage> {
     if (screenWidth < 600) {
       return 1.6; // Mobile: slightly taller cards
     } else if (screenWidth < 1300) {
-      return 1.5; // Tablet: balanced aspect ratio
+      return 0.8; // Tablet: balanced aspect ratio
     } else {
-      return 1.7; // Desktop: original aspect ratio
+      return 1.3; // Desktop: original aspect ratio
     }
   }
 
@@ -1569,79 +1569,85 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+Widget _buildSensorCard({
+  required String imageAsset,
+  required String title,
+  required String description,
+  required VoidCallback onReadMore,
+  required double screenWidth,
+}) {
+  double titleFontSize = screenWidth < 600
+      ? 16
+      : (screenWidth < 1300 ? 10 : 14);
+  double descriptionFontSize = screenWidth < 600
+      ? 12
+      : (screenWidth < 1300 ? 8: 12);
+  double buttonFontSize = screenWidth < 600
+      ? 10.0
+      : (screenWidth < 1300 ? 6.0 : 12.0);
 
-  Widget _buildSensorCard({
-    required String imageAsset,
-    required String title,
-    required String description,
-    required VoidCallback onReadMore,
-    required double screenWidth,
-  }) {
-    double titleFontSize = screenWidth < 600
-        ? 16
-        : (screenWidth < 1300 ? 8 : 20);
-    double descriptionFontSize = screenWidth < 600
-        ? 10
-        : (screenWidth < 1300 ? 10 : 18);
-    double buttonFontSize = screenWidth < 600
-        ? 8.0
-        : (screenWidth < 1300 ? 9.0 : 14.0);
+  EdgeInsets cardPadding = EdgeInsets.only(
+    top: screenWidth < 600 ? 12.0 : 12.0,
+    left: screenWidth < 600 ? 12.0 : 16.0,
+    right: screenWidth < 600 ? 12.0 : 16.0,
+    bottom: screenWidth < 600 ? 10.0 : 16.0,
+  );
 
-    EdgeInsets cardPadding = EdgeInsets.only(
-      top: screenWidth < 600 ? 16.0 : (screenWidth < 1300 ? 14.0 : 20.0),
-      left: screenWidth < 600 ? 12.0 : 16.0,
-      right: screenWidth < 600 ? 12.0 : 16.0,
-      bottom: screenWidth < 600 ? 12.0 : 13.0,
-    );
+  double titleDescriptionSpacing = screenWidth < 600 ? 4 : (screenWidth < 1300 ? 4.0 : 6.0);
 
-    double titleDescriptionSpacing = screenWidth < 600 ? 3 : 6.5;
+  bool isCardHovered = false;
 
-    bool isCardHovered = false; // State for hover effect
-
-    return StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        return MouseRegion(
-          onEnter: (_) => setState(() => isCardHovered = true),
-          onExit: (_) => setState(() => isCardHovered = false),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            transform: Matrix4.identity()
-              ..scale(isCardHovered ? 1.03 : 1.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: isCardHovered
-                      ? Colors.black.withOpacity(0.4)
-                      : Colors.black.withOpacity(0.2),
-                  blurRadius: isCardHovered ? 10 : 6,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
+  return StatefulBuilder(
+    builder: (BuildContext context, StateSetter setState) {
+      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+      return MouseRegion(
+        onEnter: (_) => setState(() => isCardHovered = true),
+        onExit: (_) => setState(() => isCardHovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: screenWidth < 600 ? 100 : (screenWidth < 1300 ? 140 : 160),
+          height: screenWidth < 600 ? 250 : (screenWidth < 1300 ? 300 : 370),
+          transform: Matrix4.identity()
+            ..scale(isCardHovered ? 1.03 : 1.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: isCardHovered
+                    ? Colors.black.withOpacity(0.4)
+                    : Colors.black.withOpacity(0.2),
+                blurRadius: isCardHovered ? 10 : 6,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            color: isDarkMode ? Colors.grey[800] : Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Centered square image in the middle
+                Padding(
+                  padding: EdgeInsets.only(top: screenWidth < 600 ? 20 : 20),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
                     child: Image.asset(
                       imageAsset,
-                      fit: BoxFit.contain,
+                      width: screenWidth < 600 ? 80 : 90,
+                      height: screenWidth < 600 ? 80 : 90,
+                      fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(color: Colors.grey);
                       },
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.black.withOpacity(0.65),
-                    ),
-                  ),
-                  Padding(
+                ),
+                // Text and button below the image
+                Expanded(
+                  child: Padding(
                     padding: cardPadding,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1650,42 +1656,42 @@ class _HomePageState extends State<HomePage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            SizedBox(height: screenWidth < 600 ? 10 : 14),
                             Text(
                               title.toUpperCase(),
                               style: TextStyle(
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                                 fontSize: titleFontSize,
                                 fontWeight: FontWeight.bold,
                               ),
                               overflow: TextOverflow.ellipsis,
-                              maxLines: screenWidth < 800 ? 2 : 3,
+                              maxLines: screenWidth < 600 ? 2 : 3,
                             ),
                             SizedBox(height: titleDescriptionSpacing),
                             Text(
                               description,
                               style: TextStyle(
-                                color: Colors.white70,
+                                color: isDarkMode ? Colors.white70 : Colors.black54,
                                 fontSize: descriptionFontSize,
                               ),
                               overflow: TextOverflow.ellipsis,
-                              maxLines: screenWidth < 800 ? 3 : 3,
+                              maxLines: screenWidth < 800 ? 3 : 4,
                             ),
                           ],
                         ),
                         SizedBox(
-                          width: screenWidth < 850 ? 80 : (screenWidth < 1300 ? 110 : 120.0),
-                          height: screenWidth < 850 ? 25 : 24,
+                          width: double.infinity,
                           child: ElevatedButton(
                             onPressed: onReadMore,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black,
+                              backgroundColor: Colors.teal,
+                              foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth < 850 ? 6 : 10,
-                                vertical: screenWidth < 850 ? 3 : 6,
+                                horizontal: screenWidth < 850 ? 8 : 12,
+                                vertical: screenWidth < 850 ? 4 : 6,
                               ),
                             ),
                             child: Text(
@@ -1701,12 +1707,13 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 }
