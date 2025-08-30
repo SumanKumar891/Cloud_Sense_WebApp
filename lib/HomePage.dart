@@ -700,7 +700,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   ListTile(
                                     leading: Icon(Icons.thermostat, size: 18),
-                                    title: Text('ATRH Lux Pressure Sensor',
+                                    title: Text('Temperature Humidity\nLight Intensity and\nPressure Radiation Shield',
                                         style: TextStyle(fontSize: 12)),
                                     onTap: () {
                                       Navigator.pop(context);
@@ -712,7 +712,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             ListTile(
                               leading: Icon(Icons.air, size: 20),
-                              title: Text('Wind Sensor',
+                              title: Text('Ultrasonic Anemometer',
                                   style: TextStyle(fontSize: 14)),
                               onTap: () {
                                 Navigator.pop(context);
@@ -739,7 +739,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             ListTile(
                               leading: Icon(Icons.router, size: 20),
-                              title: Text('Gateway',
+                              title: Text('BLE Gateway',
                                   style: TextStyle(fontSize: 14)),
                               onTap: () {
                                 Navigator.pop(context);
