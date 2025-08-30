@@ -1467,108 +1467,96 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAnimatedStatCard({
-    required String statValue,
-    required String label,
-    required ThemeProvider themeProvider,
-    required BuildContext context,
-  }) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double cardSize = screenWidth < 500
-        ? 80
-        : screenWidth < 850
-            ? 150
-            : 180;
-    double valueFontSize = cardSize * 0.12;
-    double labelFontSize = cardSize * 0.10;
+Widget _buildAnimatedStatCard({
+  required String statValue,
+  required String label,
+  required ThemeProvider themeProvider,
+  required BuildContext context,
+}) {
+  double screenWidth = MediaQuery.of(context).size.width;
+  double cardSize = screenWidth < 500
+      ? 80
+      : screenWidth < 850
+          ? 150
+          : 180;
+  double valueFontSize = cardSize * 0.12;
+  double labelFontSize = cardSize * 0.10;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedScale(
-        scale: _isHovered ? 1.05 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        child: Container(
-          width: cardSize,
-          height: cardSize,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              colors: themeProvider.isDarkMode
-                  ? (_isHovered
-                      ? [const Color(0xFF3B6A7F), const Color(0xFF8C6C8E)]
-                      : [
-                          const Color.fromARGB(255, 29, 56, 68),
-                          const Color.fromARGB(228, 69, 59, 71)
-                        ])
-                  : (_isHovered
-                      ? [const Color(0xFF5BAA9D), const Color(0xFFA7DCA1)]
-                      : [
-                          const Color.fromARGB(255, 73, 117, 121),
-                          const Color(0xFF81C784)
-                        ]),
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.6),
-                blurRadius: _isHovered ? 16 : 12,
-                offset: const Offset(4, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0, end: 1),
-                duration: const Duration(seconds: 1),
-                builder: (context, progressValue, child) {
-                  return Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: cardSize * 0.5,
-                        height: cardSize * 0.5,
-                        child: CircularProgressIndicator(
-                          value: progressValue,
-                          strokeWidth: 6,
-                          color: themeProvider.isDarkMode
-                              ? const Color.fromARGB(255, 95, 154, 172)
-                              : Colors.white,
-                          backgroundColor: themeProvider.isDarkMode
-                              ? Colors.white10
-                              : Colors.white24,
-                        ),
-                      ),
-                      Text(
-                        statValue,
-                        style: TextStyle(
-                          fontSize: valueFontSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: labelFontSize,
-                  color: Colors.white70,
-                  fontWeight: FontWeight.w500,
+  return Container(
+    width: cardSize,
+    height: cardSize,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20),
+      gradient: LinearGradient(
+        colors: themeProvider.isDarkMode
+            ? [
+                const Color.fromARGB(255, 29, 56, 68),
+                const Color.fromARGB(228, 69, 59, 71)
+              ]
+            : [
+                const Color.fromARGB(255, 73, 117, 121),
+                const Color(0xFF81C784)
+              ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 12,
+          offset: const Offset(4, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: 1),
+          duration: const Duration(seconds: 1),
+          builder: (context, progressValue, child) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: cardSize * 0.5,
+                  height: cardSize * 0.5,
+                  child: CircularProgressIndicator(
+                    value: progressValue,
+                    strokeWidth: 6,
+                    color: themeProvider.isDarkMode
+                        ? const Color.fromARGB(255, 95, 154, 172)
+                        : Colors.white,
+                    backgroundColor: themeProvider.isDarkMode
+                        ? Colors.white10
+                        : Colors.white24,
+                  ),
                 ),
-              ),
-            ],
+                Text(
+                  statValue,
+                  style: TextStyle(
+                    fontSize: valueFontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: labelFontSize,
+            color: Colors.white70,
+            fontWeight: FontWeight.w500,
           ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 Widget _buildSensorCard({
   required String imageAsset,
   required String title,
