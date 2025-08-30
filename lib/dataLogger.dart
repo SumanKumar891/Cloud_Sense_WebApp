@@ -52,8 +52,8 @@ class DataLoggerPage extends StatelessWidget {
                           child: Container(
                             height: isWideScreen ? 450 : 400,
                             child: Image.asset(
-                              "assets/dataloggerrender.png",
-                              fit: BoxFit.cover,
+                              "assets/datalogger.png",
+                              fit: BoxFit.contain,
                               alignment: Alignment.center,
                             ).animate().fadeIn(duration: 1600.ms).scale(
                                   duration: 1800.ms,

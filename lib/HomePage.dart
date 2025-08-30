@@ -1255,7 +1255,7 @@ class _HomePageState extends State<HomePage> {
                                 horizontal: getHorizontalPadding(screenWidth)),
                             children: [
                               _buildSensorCard(
-                                imageAsset: "assets/thprobe.jpg",
+                                imageAsset: "assets/thprobe.png",
                                 title: "Temperature and Humidity Probe",
                                 description:
                                     "Accurate measurements for temperature and humidity.",
@@ -1273,7 +1273,7 @@ class _HomePageState extends State<HomePage> {
                                 screenWidth: screenWidth,
                               ),
                               _buildSensorCard(
-                                imageAsset: "assets/ultrasonic.jpg",
+                                imageAsset: "assets/ultrasonic.png",
                                 title: "Ultrasonic Anemometer",
                                 description:
                                     "Ultrasonic Anemometer for precise wind speed and wind direction.",
@@ -1290,7 +1290,7 @@ class _HomePageState extends State<HomePage> {
                                 screenWidth: screenWidth,
                               ),
                               _buildSensorCard(
-                                imageAsset: "assets/dataloggerrender.png",
+                                imageAsset: "assets/datalogger.png",
                                 title: "Data Logger",
                                 description:
                                     "Reliable Data Logging & seamless Connectivity.",

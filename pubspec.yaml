@@ -148,7 +148,6 @@ flutter:
     - assets/RainGauge.jpg
     - assets/raingaugebg.jpg
     - assets/arth.jpg
-    - assets/datalogger.jpg
     - assets/windsensor.jpg
     - assets/weatherstation.jpg
     - assets/raingaugecylindrical.jpg
@@ -168,8 +167,9 @@ flutter:
     - assets/dataLogger.pdf
     - assets/rainGauge.pdf
     - assets/windSensor.pdf
-    - assets/thprobe.jpg
-    - assets/ultrasonic.jpg
+    - assets/thprobe.png
+    - assets/ultrasonic.png
+    - assets/datalogger.png
 
    
    

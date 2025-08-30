@@ -52,8 +52,8 @@ class ProbePage extends StatelessWidget {
                           child: Container(
                             height: isWideScreen ? 450 : 450,
                             child: Image.asset(
-                              "assets/probebg.jpg",
-                              fit: BoxFit.cover,
+                              "assets/thprobe.png",
+                              fit: BoxFit.contain,
                               alignment: Alignment.center,
                             ).animate().fadeIn(duration: 600.ms).scale(
                                   duration: 800.ms,
