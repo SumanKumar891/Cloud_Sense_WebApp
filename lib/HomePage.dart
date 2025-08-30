@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
 
   double getCardAspectRatio(double screenWidth) {
     if (screenWidth < 600) {
-      return 1.6; // Mobile: slightly taller cards
+      return 1.3; // Mobile: slightly taller cards
     } else if (screenWidth < 1300) {
       return 0.8; // Tablet: balanced aspect ratio
     } else {
