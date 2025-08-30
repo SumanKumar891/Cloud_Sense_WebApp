@@ -526,7 +526,7 @@ class MyApp extends StatelessWidget {
                     fontFamily: 'OpenSans',
                   ),
             ),
-      initialRoute: initialRoute,
+     initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
         '/about-us': (context) => HomePage(),
