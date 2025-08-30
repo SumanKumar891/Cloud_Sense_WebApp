@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
 
   double getCardAspectRatio(double screenWidth) {
     if (screenWidth < 600) {
-      return 1.3; // Mobile: slightly taller cards
+      return 1.1; // Mobile: slightly taller cards
     } else if (screenWidth < 1300) {
       return 0.8; // Tablet: balanced aspect ratio
     } else {
@@ -1577,23 +1577,23 @@ Widget _buildSensorCard({
   required double screenWidth,
 }) {
   double titleFontSize = screenWidth < 600
-      ? 16
+      ? 12
       : (screenWidth < 1300 ? 10 : 14);
   double descriptionFontSize = screenWidth < 600
-      ? 12
+      ? 10
       : (screenWidth < 1300 ? 8: 12);
   double buttonFontSize = screenWidth < 600
-      ? 10.0
+      ? 8.0
       : (screenWidth < 1300 ? 6.0 : 12.0);
 
   EdgeInsets cardPadding = EdgeInsets.only(
-    top: screenWidth < 600 ? 12.0 : 12.0,
+    top: screenWidth < 600 ? 6.0 : 12.0,
     left: screenWidth < 600 ? 12.0 : 16.0,
     right: screenWidth < 600 ? 12.0 : 16.0,
-    bottom: screenWidth < 600 ? 10.0 : 16.0,
+    bottom: screenWidth < 600 ? 8.0 : 16.0,
   );
 
-  double titleDescriptionSpacing = screenWidth < 600 ? 4 : (screenWidth < 1300 ? 4.0 : 6.0);
+  double titleDescriptionSpacing = screenWidth < 600 ? 2 : (screenWidth < 1300 ? 4.0 : 6.0);
 
   bool isCardHovered = false;
 

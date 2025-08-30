@@ -1,8 +1,10 @@
 
 import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/footer.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ATRHSensorPage extends StatelessWidget {
   const ATRHSensorPage({super.key});
@@ -171,10 +173,55 @@ class ATRHSensorPage extends StatelessWidget {
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-                                        _buildBannerButton(
+                                         _buildBannerButton(
                                           "Enquire",
                                           Colors.blue,
-                                          () {},
+                                          () async {
+                                            final email = "sharmasejal2701@gmail.com";
+                                            final subject = "Product Enquiry";
+                                            final body = "Hello, I am interested in your product.";
+
+                                            if (kIsWeb) {
+                                              // 🌐 Web: Gmail compose in browser
+                                              final Uri gmailUrl = Uri.parse(
+                                                "https://mail.google.com/mail/?view=cm&fs=1"
+                                                "&to=$email"
+                                                "&su=${Uri.encodeComponent(subject)}"
+                                                "&body=${Uri.encodeComponent(body)}",
+                                              );
+
+                                              if (await canLaunchUrl(gmailUrl)) {
+                                                await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text("Could not open Gmail")),
+                                                );
+                                              }
+                                            } else {
+                                              // 📱 Mobile/Desktop: Try Gmail app first
+                                              final Uri gmailAppUri = Uri.parse(
+                                                "googlegmail://co?to=$email&subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}",
+                                              );
+
+                                              final Uri fallbackUri = Uri(
+                                                scheme: 'mailto',
+                                                path: email,
+                                                query: "subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}",
+                                              );
+
+                                              if (await canLaunchUrl(gmailAppUri)) {
+                                                // Gmail app open karega
+                                                await launchUrl(gmailAppUri, mode: LaunchMode.externalApplication);
+                                              } else if (await canLaunchUrl(fallbackUri)) {
+                                                // Agar Gmail app nahi hai to default mail client
+                                                await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text("Could not open any email app")),
+                                                );
+                                              }
+                                            }
+                                          },
                                         ),
                                         // _buildBannerButton(
                                         //   "Download Manual",
