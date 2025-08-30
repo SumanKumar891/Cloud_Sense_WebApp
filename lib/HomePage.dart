@@ -358,23 +358,23 @@ double getHorizontalPadding(double screenWidth) {
   }
 
   Widget _buildUserIcon() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDotDarkMode = Theme.of(context).brightness == Brightness.dark;
     final userProvider = Provider.of<UserProvider>(context);
     final userEmail = userProvider.userEmail;
 
     if (userEmail == null || userEmail.isEmpty) {
       return Icon(
         Icons.person,
-        color: isDarkMode ? Colors.white : Colors.black,
+        color: isDotDarkMode ? Colors.white : Colors.black,
       );
     }
     return CircleAvatar(
       radius: 14,
-      backgroundColor: isDarkMode ? Colors.white : Colors.black,
+      backgroundColor: isDotDarkMode ? Colors.white : Colors.black,
       child: Text(
         userEmail[0].toUpperCase(),
         style: TextStyle(
-          color: isDarkMode ? Colors.black : Colors.white,
+          color: isDotDarkMode ? Colors.black : Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 14,
         ),
@@ -1595,84 +1595,117 @@ double getHorizontalPadding(double screenWidth) {
 
     double titleDescriptionSpacing = screenWidth < 600 ? 3 : 7;
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            imageAsset,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(color: Colors.grey);
-            },
-          ),
-          Container(
-            color: Colors.black.withOpacity(0.65),
-          ),
-          Padding(
-            padding: cardPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title.toUpperCase(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: titleFontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: screenWidth < 800 ? 2 : 3,
-                    ),
-                    SizedBox(height: titleDescriptionSpacing),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: descriptionFontSize,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: screenWidth < 800 ? 3 : 3,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  width: screenWidth < 850 ? 80 : (screenWidth < 1300 ? 110 : 120.0),
-                  height: screenWidth < 850 ? 25 : 24,
-                  child: ElevatedButton(
-                    onPressed: onReadMore,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth < 850 ? 6 : 10,
-                        vertical: screenWidth < 850 ? 3 : 6,
-                      ),
-                    ),
-                    child: Text(
-                      "READ MORE >",
-                      style: TextStyle(
-                        fontSize: buttonFontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+    bool isCardHovered = false; // State for hover effect
+
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return MouseRegion(
+          onEnter: (_) => setState(() => isCardHovered = true),
+          onExit: (_) => setState(() => isCardHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            transform: Matrix4.identity()
+              ..scale(isCardHovered ? 1.03: 1.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: isCardHovered
+                      ? Colors.black.withOpacity(0.4)
+                      : Colors.black.withOpacity(0.2),
+                  blurRadius: isCardHovered ? 10 : 6,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      imageAsset,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(color: Colors.grey);
+                      },
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.black.withOpacity(0.65),
+                    ),
+                  ),
+                  Padding(
+                    padding: cardPadding,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title.toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: titleFontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: screenWidth < 800 ? 2 : 3,
+                            ),
+                            SizedBox(height: titleDescriptionSpacing),
+                            Text(
+                              description,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: descriptionFontSize,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: screenWidth < 800 ? 3 : 3,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: screenWidth < 850 ? 80 : (screenWidth < 1300 ? 110 : 120.0),
+                          height: screenWidth < 850 ? 25 : 24,
+                          child: ElevatedButton(
+                            onPressed: onReadMore,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth < 850 ? 6 : 10,
+                                vertical: screenWidth < 850 ? 3 : 6,
+                              ),
+                            ),
+                            child: Text(
+                              "READ MORE >",
+                              style: TextStyle(
+                                fontSize: buttonFontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
