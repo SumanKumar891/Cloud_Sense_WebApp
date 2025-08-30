@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -1219,99 +1220,93 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   // Full-width products section (outside of padding)
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: themeProvider.isDarkMode
-                          ? Colors.blueGrey[900]
-                          : Colors.teal.shade50,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth < 600 ? 20 : 30,
-                        vertical: 20,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Our Products",
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: themeProvider.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          GridView.count(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: getCrossAxisCount(screenWidth),
-                            crossAxisSpacing: screenWidth < 850 ? 10 : 12,
-                            mainAxisSpacing: screenWidth < 850 ? 20 : 40,
-                            childAspectRatio: getCardAspectRatio(screenWidth),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: getHorizontalPadding(screenWidth)),
-                            children: [
-                              _buildSensorCard(
-                                imageAsset: "assets/thprobe.png",
-                                title: "Temperature and Humidity Probe",
-                                description:
-                                    "Accurate measurements for temperature and humidity.",
-                                onReadMore: () =>
-                                    Navigator.pushNamed(context, '/probe'),
-                                screenWidth: screenWidth,
-                              ),
-                              _buildSensorCard(
-                                imageAsset: "assets/luxpressure.png",
-                                title: "Temperature Humidity Light Intensity and Pressure Radiation Shield",
-                                description:
-                                    "Compact environmental sensing unit for precise measurements.",
-                                onReadMore: () =>
-                                    Navigator.pushNamed(context, '/atrh'),
-                                screenWidth: screenWidth,
-                              ),
-                              _buildSensorCard(
-                                imageAsset: "assets/ultrasonic.png",
-                                title: "Ultrasonic Anemometer",
-                                description:
-                                    "Ultrasonic Anemometer for precise wind speed and wind direction.",
-                                onReadMore: () =>
-                                    Navigator.pushNamed(context, '/windsensor'),
-                                screenWidth: screenWidth,
-                              ),
-                              _buildSensorCard(
-                                imageAsset: "assets/gauge.png",
-                                title: "Rain Gauge",
-                                description: "Tipping Bucket rain Gauge.",
-                                onReadMore: () =>
-                                    Navigator.pushNamed(context, '/raingauge'),
-                                screenWidth: screenWidth,
-                              ),
-                              _buildSensorCard(
-                                imageAsset: "assets/dataloggerrender.png",
-                                title: "Data Logger",
-                                description:
-                                    "Reliable Data Logging & seamless Connectivity.",
-                                onReadMore: () =>
-                                    Navigator.pushNamed(context, '/datalogger'),
-                                screenWidth: screenWidth,
-                              ),
-                              _buildSensorCard(
-                                imageAsset: "assets/blegateway.png",
-                                title: "BLE Gateway",
-                                description: "BLE Gateway For industrial IOT Applications.",
-                                onReadMore: () =>
-                                    Navigator.pushNamed(context, '/gateway'),
-                                screenWidth: screenWidth,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                 // ✅ Usage
+Container(
+  width: double.infinity,
+  decoration: BoxDecoration(
+    color: themeProvider.isDarkMode
+        ? Colors.blueGrey[900]
+        : Colors.teal.shade50,
+  ),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+    child: Column(
+      children: [
+        Text(
+          "Our Products",
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 30),
+
+        // ✅ Fixed Card Size Grid
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: getResponsiveCrossAxisCount(screenWidth),
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 30,
+            mainAxisExtent: 320, // ✅ Fix card ki height (har screen par same)
+          ),
+          itemCount: 6,
+          itemBuilder: (context, index) {
+            final items = [
+              {
+                "image": "assets/thprobe.png",
+                "title": "Temperature and Humidity Probe",
+                "desc": "Accurate measurements for temperature and humidity.",
+                "route": "/probe"
+              },
+              {
+                "image": "assets/luxpressure.png",
+                "title": "Temperature Humidity Light Intensity and Pressure Radiation Shield",
+                "desc": "Compact environmental sensing unit for precise measurements.",
+                "route": "/atrh"
+              },
+              {
+                "image": "assets/ultrasonic.png",
+                "title": "Ultrasonic Anemometer",
+                "desc": "Ultrasonic Anemometer for precise wind speed and wind direction.",
+                "route": "/windsensor"
+              },
+              {
+                "image": "assets/gauge.png",
+                "title": "Rain Gauge",
+                "desc": "Tipping Bucket rain Gauge.",
+                "route": "/raingauge"
+              },
+              {
+                "image": "assets/dataloggerrender.png",
+                "title": "Data Logger",
+                "desc": "Reliable Data Logging & seamless Connectivity.",
+                "route": "/datalogger"
+              },
+              {
+                "image": "assets/blegateway.png",
+                "title": "BLE Gateway",
+                "desc": "BLE Gateway For industrial IOT Applications.",
+                "route": "/gateway"
+              },
+            ];
+
+            final item = items[index];
+            return _buildSensorCard(
+              imageAsset: item["image"]!,
+              title: item["title"]!,
+              description: item["desc"]!,
+              onReadMore: () => Navigator.pushNamed(context, item["route"]!),
+              screenWidth: screenWidth,
+            );
+          },
+        ),
+      ],
+    ),
+  ),
+),
                 ],
               ),
             )
@@ -1466,7 +1461,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 Widget _buildAnimatedStatCard({
   required String statValue,
   required String label,
@@ -1557,6 +1551,7 @@ Widget _buildAnimatedStatCard({
     ),
   );
 }
+
 Widget _buildSensorCard({
   required String imageAsset,
   required String title,
@@ -1566,22 +1561,18 @@ Widget _buildSensorCard({
 }) {
   double titleFontSize = screenWidth < 600
       ? 12
-      : (screenWidth < 1300 ? 10 : 14);
+      : (screenWidth < 1300 ? 12 : 14);
   double descriptionFontSize = screenWidth < 600
       ? 10
-      : (screenWidth < 1300 ? 8: 12);
+      : (screenWidth < 1300 ? 10 : 12);
   double buttonFontSize = screenWidth < 600
       ? 8.0
-      : (screenWidth < 1300 ? 6.0 : 12.0);
+      : (screenWidth < 1300 ? 10.0 : 12.0);
 
-  EdgeInsets cardPadding = EdgeInsets.only(
-    top: screenWidth < 600 ? 6.0 : 12.0,
-    left: screenWidth < 600 ? 12.0 : 16.0,
-    right: screenWidth < 600 ? 12.0 : 16.0,
-    bottom: screenWidth < 600 ? 8.0 : 16.0,
-  );
+  EdgeInsets cardPadding = EdgeInsets.all(screenWidth < 600 ? 12.0 : 16.0);
 
-  double titleDescriptionSpacing = screenWidth < 600 ? 2 : (screenWidth < 1300 ? 4.0 : 6.0);
+  double titleDescriptionSpacing =
+      screenWidth < 600 ? 2 : (screenWidth < 1300 ? 3.0 : 5.0);
 
   bool isCardHovered = false;
 
@@ -1593,10 +1584,7 @@ Widget _buildSensorCard({
         onExit: (_) => setState(() => isCardHovered = false),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          width: screenWidth < 600 ? 100 : (screenWidth < 1300 ? 140 : 160),
-          height: screenWidth < 600 ? 250 : (screenWidth < 1300 ? 300 : 370),
-          transform: Matrix4.identity()
-            ..scale(isCardHovered ? 1.03 : 1.0),
+          transform: Matrix4.identity()..scale(isCardHovered ? 1.03 : 1.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
@@ -1611,92 +1599,84 @@ Widget _buildSensorCard({
           ),
           child: Card(
             elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             color: isDarkMode ? Colors.grey[800] : Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Centered square image in the middle
-                Padding(
-                  padding: EdgeInsets.only(top: screenWidth < 600 ? 20 : 20),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+            child: Padding(
+              padding: cardPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
                     child: Image.asset(
                       imageAsset,
-                      width: screenWidth < 600 ? 80 : 90,
-                      height: screenWidth < 600 ? 80 : 90,
-                      fit: BoxFit.cover,
+                      width: 200,
+                      height: 150,
+                      fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
-                        return Container(color: Colors.grey);
+                        return Container(color: const Color.fromARGB(255, 20, 8, 8), height: 80);
                       },
                     ),
                   ),
-                ),
-                // Text and button below the image
-                Expanded(
-                  child: Padding(
-                    padding: cardPadding,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: screenWidth < 600 ? 10 : 14),
-                            Text(
-                              title.toUpperCase(),
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black87,
-                                fontSize: titleFontSize,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: screenWidth < 600 ? 2 : 3,
-                            ),
-                            SizedBox(height: titleDescriptionSpacing),
-                            Text(
-                              description,
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.white70 : Colors.black54,
-                                fontSize: descriptionFontSize,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: screenWidth < 800 ? 3 : 4,
-                            ),
-                          ],
+                  const SizedBox(height: 12),
+
+                  // ✅ Title
+                  Text(
+                    title.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: titleDescriptionSpacing),
+
+                  // ✅ Description
+                  Text(
+                    description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                      fontSize: descriptionFontSize,
+                    ),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Spacer(),
+
+                  // ✅ Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: onReadMore,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: onReadMore,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth < 850 ? 8 : 12,
-                                vertical: screenWidth < 850 ? 4 : 6,
-                              ),
-                            ),
-                            child: Text(
-                              "READ MORE >",
-                              style: TextStyle(
-                                fontSize: buttonFontSize,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                      ],
+                      ),
+                      child: Text(
+                        "READ MORE >",
+                        style: TextStyle(
+                          fontSize: buttonFontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1704,4 +1684,14 @@ Widget _buildSensorCard({
     },
   );
 }
+
+
+int getResponsiveCrossAxisCount(double screenWidth) {
+  if (screenWidth < 700) return 1; 
+  if (screenWidth < 1000) return 2; 
+  return 3;
+}
+
+
+
 }
