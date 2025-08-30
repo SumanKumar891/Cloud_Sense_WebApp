@@ -468,7 +468,7 @@ class GatewayPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.teal.shade800,
+                  color: isDarkMode ? Colors.white :Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
           featureItem("Real Time Monitoring with low power consumptions", isDarkMode),
