@@ -54,8 +54,8 @@ class ATRHSensorPage extends StatelessWidget {
                           child: Container(
                             height: isWideScreen ? 500 : 450,
                             child: Image.asset(
-                              "assets/arthbg.png",
-                              fit: BoxFit.cover,
+                              "assets/luxpressure.png",
+                              fit: BoxFit.contain,
                               alignment: Alignment.center,
                             ).animate().fadeIn(duration: 1600.ms).scale(
                                   duration: 1800.ms,

@@ -9,7 +9,7 @@ class DownloadManager {
   static final Map<String, Map<String, String>> sensorFiles = {
     "WindSensor": {
       "manual": "assets/assets/windSensor.pdf",
-      "datasheet": "assets/assets/windSensor_datasheet.pdf",
+      "datasheet": "assets/assets/ULTRASONIC_DATASHEET.pdf",
     },
 
      "ARTH": {
@@ -18,7 +18,7 @@ class DownloadManager {
   },
   "RainGauge": {
       "manual": "assets/assets/rainGauge.pdf",
-      "datasheet": "assets/assets/RADIATION_SHIELD_DATASHEET.pdf",
+      "datasheet": "assets/assets/RAIN_GAUGE_DATASHEET.pdf",
   },
   "Gateway": {
         "manual": "assets/assets/windSensor.pdf",

@@ -228,7 +228,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(isDarkMode)
+                      child: _buildSpecificationsCard(context , isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -306,7 +306,7 @@ class UltrasonicSensorPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(bool isDarkMode) {
+  Widget _buildSpecificationsCard( BuildContext context , isDarkMode) {
     final List<String> specItems = [
   "Input Supply voltage: 2V - 16V",
 "Measure wind speed and wind direction via Δ ToF",
@@ -383,10 +383,20 @@ class UltrasonicSensorPage extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 40),
-          Center(
-            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ),
+         const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton(
+                "Download Datasheet",
+                Colors.teal,
+                () {
+                  DownloadManager.downloadFile(
+                    context: context,
+                    sensorKey: "WindSensor",
+                    fileType: "datasheet",
+                  );
+                },
+              ),
+            ),
         ],
       ),
     ),

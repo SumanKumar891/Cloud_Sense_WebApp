@@ -54,8 +54,8 @@ class ProductPage extends StatelessWidget {
                           child: Container(
                             height: isWideScreen ? 450 : 400,
                             child: Image.asset(
-                              "assets/raingaugerender.jpg",
-                              fit: BoxFit.cover,
+                              "assets/gauge.png",
+                              fit: BoxFit.contain,
                               alignment: Alignment.center,
                             ).animate().fadeIn(duration: 1600.ms).scale(
                                   duration: 1800.ms,
@@ -265,7 +265,7 @@ class ProductPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(isDarkMode)
+                      child: _buildSpecificationsCard(context,isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -343,7 +343,7 @@ class ProductPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(bool isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, isDarkMode) {
     final List<String> specItems = [
 "Made of ABS material, offering durability and weather resistance",
                                            "Available in two diameter options: 159.5 mm and 200 mm",
@@ -423,10 +423,20 @@ class ProductPage extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 40),
-          Center(
-            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ),
+           const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton(
+                "Download Datasheet",
+                Colors.teal,
+                () {
+                  DownloadManager.downloadFile(
+                    context: context,
+                    sensorKey: "RainGauge",
+                    fileType: "datasheet",
+                  );
+                },
+              ),
+            ),
         ],
       ),
     ),

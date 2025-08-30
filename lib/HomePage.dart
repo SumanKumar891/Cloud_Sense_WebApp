@@ -1264,7 +1264,7 @@ class _HomePageState extends State<HomePage> {
                                 screenWidth: screenWidth,
                               ),
                               _buildSensorCard(
-                                imageAsset: "assets/arth.jpg",
+                                imageAsset: "assets/luxpressure.png",
                                 title: "Temperature Humidity Light Intensity and Pressure Radiation Shield",
                                 description:
                                     "Compact environmental sensing unit for precise measurements.",
@@ -1282,7 +1282,7 @@ class _HomePageState extends State<HomePage> {
                                 screenWidth: screenWidth,
                               ),
                               _buildSensorCard(
-                                imageAsset: "assets/rbase.png",
+                                imageAsset: "assets/gauge.png",
                                 title: "Rain Gauge",
                                 description: "Tipping Bucket rain Gauge.",
                                 onReadMore: () =>
@@ -1290,7 +1290,7 @@ class _HomePageState extends State<HomePage> {
                                 screenWidth: screenWidth,
                               ),
                               _buildSensorCard(
-                                imageAsset: "assets/datalogger.png",
+                                imageAsset: "assets/dataloggerrender.png",
                                 title: "Data Logger",
                                 description:
                                     "Reliable Data Logging & seamless Connectivity.",
@@ -1299,7 +1299,7 @@ class _HomePageState extends State<HomePage> {
                                 screenWidth: screenWidth,
                               ),
                               _buildSensorCard(
-                                imageAsset: "assets/gateway.jpg",
+                                imageAsset: "assets/blegateway.png",
                                 title: "BLE Gateway",
                                 description: "BLE Gateway For industrial IOT Applications.",
                                 onReadMore: () =>
