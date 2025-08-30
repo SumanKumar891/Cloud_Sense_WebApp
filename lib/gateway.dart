@@ -173,56 +173,61 @@ class GatewayPage extends StatelessWidget {
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-                                         _buildBannerButton(
-                                          "Enquire",
-                                          Colors.blue,
-                                          () async {
-                                            final email = "sharmasejal2701@gmail.com";
-                                            final subject = "Product Enquiry";
-                                            final body = "Hello, I am interested in your product.";
+                                      _buildBannerButton(
+  "Enquire",
+  Colors.blue,
+  () async {
+    final email = "sharmasejal2701@gmail.com";
+    final subject = "Product Enquiry";
+    final body = "Hello, I am interested in your product.";
 
-                                            if (kIsWeb) {
-                                              // 🌐 Web: Gmail compose in browser
-                                              final Uri gmailUrl = Uri.parse(
-                                                "https://mail.google.com/mail/?view=cm&fs=1"
-                                                "&to=$email"
-                                                "&su=${Uri.encodeComponent(subject)}"
-                                                "&body=${Uri.encodeComponent(body)}",
-                                              );
+    final Uri mailtoUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: Uri.encodeFull("subject=$subject&body=$body"),
+    );
 
-                                              if (await canLaunchUrl(gmailUrl)) {
-                                                await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Could not open Gmail")),
-                                                );
-                                              }
-                                            } else {
-                                              // 📱 Mobile/Desktop: Try Gmail app first
-                                              final Uri gmailAppUri = Uri.parse(
-                                                "googlegmail://co?to=$email&subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}",
-                                              );
+    if (kIsWeb) {
+      final isMobileBrowser =
+          defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.android;
 
-                                              final Uri fallbackUri = Uri(
-                                                scheme: 'mailto',
-                                                path: email,
-                                                query: "subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}",
-                                              );
+      if (!isMobileBrowser) {
+        // 🌐 Desktop Web → Gmail compose in browser
+        final Uri gmailUrl = Uri.parse(
+          "https://mail.google.com/mail/?view=cm&fs=1"
+          "&to=$email"
+          "&su=${Uri.encodeComponent(subject)}"
+          "&body=${Uri.encodeComponent(body)}",
+        );
 
-                                              if (await canLaunchUrl(gmailAppUri)) {
-                                                // Gmail app open karega
-                                                await launchUrl(gmailAppUri, mode: LaunchMode.externalApplication);
-                                              } else if (await canLaunchUrl(fallbackUri)) {
-                                                // Agar Gmail app nahi hai to default mail client
-                                                await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(content: Text("Could not open any email app")),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        ),
+        if (await canLaunchUrl(gmailUrl)) {
+          await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
+          return;
+        }
+      }
+
+      // 🌐 Mobile browser (fallback) → use mailto
+      if (await canLaunchUrl(mailtoUri)) {
+        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Could not open email client")),
+        );
+      }
+    } else {
+      // 📱 Native mobile app (Android/iOS) → use mailto directly
+      if (await canLaunchUrl(mailtoUri)) {
+        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Could not open email app")),
+        );
+      }
+    }
+  },
+),
+
                                         // _buildBannerButton(
                                         //   "Download Manual",
                                         //   Colors.teal,
