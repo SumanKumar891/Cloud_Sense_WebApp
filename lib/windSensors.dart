@@ -309,7 +309,7 @@ class UltrasonicSensorPage extends StatelessWidget {
   Widget _buildSpecificationsCard(bool isDarkMode) {
     final List<String> specItems = [
   "Input Supply voltage: 2V - 16V",
-"Measure wind speed and wind direction via Delta Time of Flight",
+"Measure wind speed and wind direction via Δ ToF",
 "Communication protocols: RS232 or RS485 (Modbus)",
 "Ultra low power sleep mode"
 "Weight : 0.6kg",

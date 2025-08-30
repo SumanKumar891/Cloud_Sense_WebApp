@@ -314,7 +314,7 @@ class ProductPage extends StatelessWidget {
                                          "Resolution: 0.2 mm or 0.5 mm depending on the model", 
                                           "Equipped with reed switch or magnetic sensor for tip detection", 
                                            "Data Output: Number of tips × Resolution = Total Rainfall", 
-                                           "Suitable for both precise and general-purpose rainfall monitoring", 
+                                           
      
       
       
@@ -441,7 +441,7 @@ class ProductPage extends StatelessWidget {
            
             featureItem("Environmental monitoring & climate research", isDarkMode),
            
-            featureItem("Suitable for both precise scientific research and general-purpose field monitoring", isDarkMode),
+            featureItem("Suitable for precise/general purpose rain monitoring", isDarkMode),
             
           ],
         ),
