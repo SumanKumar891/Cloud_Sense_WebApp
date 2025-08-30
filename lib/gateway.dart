@@ -332,7 +332,7 @@ class GatewayPage extends StatelessWidget {
           children: [
             Center(
               child: Text(
-                "Technical Specifications",
+                "Specifications",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
