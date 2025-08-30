@@ -412,7 +412,7 @@ class ProductPage extends StatelessWidget {
             featureItem("Balanced tipping bucket mechanism ensures high accuracy", isDarkMode),
             featureItem("Minimal moving parts → long-term reliability with low maintenance", isDarkMode),
             featureItem("Reed switch / magnetic sensor for precise detection", isDarkMode),
-            featureItem("Accurate even under varying rainfall intensities.)", isDarkMode),
+            featureItem("Accurate even under varying rainfall intensities", isDarkMode),
             featureItem("Durable ABS body with weather resistance", isDarkMode),
             featureItem("Easy integration with data loggers and weather stations for automated rainfall recording", isDarkMode),
            
