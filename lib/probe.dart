@@ -174,17 +174,17 @@ class ProbePage extends StatelessWidget {
                                           Colors.blue,
                                           () {},
                                         ),
-                                        _buildBannerButton(
-                                          "Download Manual",
-                                          Colors.teal,
-                                          () {
-                                            DownloadManager.downloadFile(
-                                              context: context,
-                                              sensorKey: "DataLogger",
-                                              fileType: "manual",
-                                            );
-                                          },
-                                        ),
+                                        // _buildBannerButton(
+                                        //   "Download Manual",
+                                        //   Colors.teal,
+                                        //   () {
+                                        //     DownloadManager.downloadFile(
+                                        //       context: context,
+                                        //       sensorKey: "DataLogger",
+                                        //       fileType: "manual",
+                                        //     );
+                                        //   },
+                                        // ),
                                       ],
                                     ).animate().fadeIn(duration: 1000.ms),
                                   ],

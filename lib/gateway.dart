@@ -176,17 +176,17 @@ class GatewayPage extends StatelessWidget {
                                           Colors.blue,
                                           () {},
                                         ),
-                                        _buildBannerButton(
-                                          "Download Manual",
-                                          Colors.teal,
-                                          () {
-                                            DownloadManager.downloadFile(
-                                              context: context,
-                                              sensorKey: "Gateway",
-                                              fileType: "manual",
-                                            );
-                                          },
-                                        ),
+                                        // _buildBannerButton(
+                                        //   "Download Manual",
+                                        //   Colors.teal,
+                                        //   () {
+                                        //     DownloadManager.downloadFile(
+                                        //       context: context,
+                                        //       sensorKey: "Gateway",
+                                        //       fileType: "manual",
+                                        //     );
+                                        //   },
+                                        // ),
                                       ],
                                     ).animate().fadeIn(duration: 11000.ms),
                                   ],

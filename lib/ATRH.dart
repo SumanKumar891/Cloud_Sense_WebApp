@@ -176,17 +176,17 @@ class ATRHSensorPage extends StatelessWidget {
                                           Colors.blue,
                                           () {},
                                         ),
-                                        _buildBannerButton(
-                                          "Download Manual",
-                                          Colors.teal,
-                                          () {
-                                            DownloadManager.downloadFile(
-                                              context: context,
-                                              sensorKey: "ARTH",
-                                              fileType: "manual",
-                                            );
-                                          },
-                                        ),
+                                        // _buildBannerButton(
+                                        //   "Download Manual",
+                                        //   Colors.teal,
+                                        //   () {
+                                        //     DownloadManager.downloadFile(
+                                        //       context: context,
+                                        //       sensorKey: "ARTH",
+                                        //       fileType: "manual",
+                                        //     );
+                                        //   },
+                                        // ),
                                       ],
                                     ).animate().fadeIn(duration: 11000.ms),
                                   ],

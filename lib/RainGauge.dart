@@ -211,17 +211,17 @@ class ProductPage extends StatelessWidget {
                                             }
                                           },
                                         ),
-                                        _buildBannerButton(
-                                          "Download Manual",
-                                          Colors.teal,
-                                          () {
-                                            DownloadManager.downloadFile(
-                                              context: context,
-                                              sensorKey: "DataLogger",
-                                              fileType: "manual",
-                                            );
-                                          },
-                                        ),
+                                        // _buildBannerButton(
+                                        //   "Download Manual",
+                                        //   Colors.teal,
+                                        //   () {
+                                        //     DownloadManager.downloadFile(
+                                        //       context: context,
+                                        //       sensorKey: "DataLogger",
+                                        //       fileType: "manual",
+                                        //     );
+                                        //   },
+                                        // ),
                                       ],
                                     ).animate().fadeIn(duration: 11000.ms),
                                   ],
