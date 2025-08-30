@@ -176,7 +176,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
           Navigator.pushReplacementNamed(context, '/deviceinfo');
         } else {
           print("Navigating to /devicelist for $email");
-          Navigator.pushReplacementNamed(context, '/devicelist');
+          Navigator.pushReplacementNamed(context, '/');
         }
       } else {
         _showSnackbar('Sign-in failed');

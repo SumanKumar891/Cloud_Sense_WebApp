@@ -51,35 +51,35 @@ class _HomePageState extends State<HomePage> {
   bool _isProductsExpanded = false; // For mobile drawer products expansion
 
   // Calculate responsive values based on screen width
-int getCrossAxisCount(double screenWidth) {
-  if (screenWidth < 600) {
-    return 1; // Mobile: 1 card per row
-  } else if (screenWidth < 1300) {
-    return 2; // Tablet: 2 cards per row
-  } else {
-    return 3; // Desktop: 3 cards per row
+  int getCrossAxisCount(double screenWidth) {
+    if (screenWidth < 600) {
+      return 1; // Mobile: 1 card per row
+    } else if (screenWidth < 1300) {
+      return 2; // Tablet: 2 cards per row
+    } else {
+      return 3; // Desktop: 3 cards per row
+    }
   }
-}
 
-double getCardAspectRatio(double screenWidth) {
-  if (screenWidth < 600) {
-    return 1.6; // Mobile: slightly taller cards
-  } else if (screenWidth < 1300) {
-    return 1.4; // Tablet: balanced aspect ratio
-  } else {
-    return 1.5; // Desktop: original aspect ratio
+  double getCardAspectRatio(double screenWidth) {
+    if (screenWidth < 600) {
+      return 1.6; // Mobile: slightly taller cards
+    } else if (screenWidth < 1300) {
+      return 1.5; // Tablet: balanced aspect ratio
+    } else {
+      return 1.7; // Desktop: original aspect ratio
+    }
   }
-}
 
-double getHorizontalPadding(double screenWidth) {
-  if (screenWidth < 600) {
-    return 10; // Mobile: minimal padding
-  } else if (screenWidth < 1300) {
-    return 40; // Tablet: moderate padding
-  } else {
-    return 0; // Desktop: no extra padding (uses main container padding)
+  double getHorizontalPadding(double screenWidth) {
+    if (screenWidth < 600) {
+      return 10; // Mobile: minimal padding
+    } else if (screenWidth < 1300) {
+      return 40; // Tablet: moderate padding
+    } else {
+      return 70; // Desktop: no extra padding (uses main container padding)
+    }
   }
-}
 
   @override
   void initState() {
@@ -129,11 +129,13 @@ double getHorizontalPadding(double screenWidth) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Logged out successfully')),
       );
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     } catch (e) {
       print('Error during logout: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error logging out')),
       );
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
 
@@ -148,15 +150,14 @@ double getHorizontalPadding(double screenWidth) {
       if (email.trim().toLowerCase() == '05agriculture.05@gmail.com') {
         Navigator.pushNamed(context, '/deviceinfo');
       } else {
+        await manageNotificationSubscription();
         Navigator.pushNamed(context, '/devicelist');
       }
-      await manageNotificationSubscription();
     } catch (e) {
       print('Error checking user: $e');
       Navigator.pushNamed(context, '/login');
     }
   }
-
   void _showLoginPopup(BuildContext context) {
     showDialog(
       context: context,
@@ -606,7 +607,7 @@ double getHorizontalPadding(double screenWidth) {
                         title: Text('My Devices'),
                         onTap: () {
                           Navigator.pop(context);
-                          _handleDeviceNavigation();
+                          Navigator.pushNamed(context, '/devicelist');
                         },
                       ),
                       if (userProvider.userEmail?.trim().toLowerCase() !=
@@ -791,529 +792,529 @@ double getHorizontalPadding(double screenWidth) {
               ),
             ),
             SingleChildScrollView(
-  child: Column(
-    children: [
-      // Main content with padding
-      Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth < 800
-              ? 20
-              : screenWidth <= 1024
-                  ? 260
-                  : 260,
-          vertical: 20,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "Welcome to Cloud Sense",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: titleFont,
-                fontWeight: FontWeight.bold,
-                color: themeProvider.isDarkMode
-                    ? Colors.white
-                    : Colors.black,
-                shadows: [
-                  Shadow(
-                    blurRadius: 4,
-                    color: Colors.black26,
-                    offset: Offset(1.5, 1.5),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 6),
-              height: 3,
-              width: 160,
-              decoration: BoxDecoration(
-                color: themeProvider.isDarkMode
-                    ? Colors.white70
-                    : Colors.black54,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 40,
-              child: DefaultTextStyle(
-                style: TextStyle(
-                  fontSize: subtitleFont,
-                  color: themeProvider.isDarkMode
-                      ? Colors.white
-                      : Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-                child: AnimatedTextKit(
-                  repeatForever: true,
-                  pause: const Duration(milliseconds: 1000),
-                  animatedTexts: [
-                    TyperAnimatedText('Explore Sensors'),
-                    TyperAnimatedText('Real time Data'),
-                    TyperAnimatedText('Detailed insights'),
-                    TyperAnimatedText('Interact with Surrounding'),
-                    TyperAnimatedText('IoT enabled Devices'),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Text(
-              "Explore the sensors and dive into the live data they capture. "
-              "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
-              "Monitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. "
-              "Track various factors to help you plan effectively and contribute to optimizing your usage.",
-              textAlign: TextAlign.justify,
-              style: TextStyle(
-                color: themeProvider.isDarkMode
-                    ? Colors.white
-                    : Colors.black,
-                fontSize: paragraphFont,
-              ),
-            ),
-            const SizedBox(height: 30),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 40,
-              runSpacing: 20,
-              children: [
-                _buildAnimatedStatCard(
-                  statValue: _totalDevices.toString(),
-                  label: "Devices",
-                  themeProvider: themeProvider,
-                  context: context,
-                ),
-                _buildAnimatedStatCard(
-                  statValue: "500K",
-                  label: "Data Points",
-                  themeProvider: themeProvider,
-                  context: context,
-                ),
-              ],
-            ),
-            const SizedBox(height: 60),
-            screenWidth < 900
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      MouseRegion(
-                        onEnter: (_) => setState(
-                            () => _isHoveredMyDevicesButton = true),
-                        onExit: (_) => setState(
-                            () => _isHoveredMyDevicesButton = false),
-                        child: GestureDetector(
-                          onTapDown: (_) => setState(
-                              () => _isPressedMyDevicesButton = true),
-                          onTapUp: (_) => setState(
-                              () => _isPressedMyDevicesButton = false),
-                          onTapCancel: () => setState(
-                              () => _isPressedMyDevicesButton = false),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            transform: Matrix4.identity()
-                              ..scale(_isPressedMyDevicesButton
-                                  ? 0.95
-                                  : (_isHoveredMyDevicesButton
-                                      ? 1.05
-                                      : 1.0)),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _isHoveredMyDevicesButton
-                                      ? Colors.black.withOpacity(0.4)
-                                      : Colors.black.withOpacity(0.2),
-                                  blurRadius:
-                                      _isHoveredMyDevicesButton ? 12 : 6,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _handleDeviceNavigation();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: themeProvider.isDarkMode
-                                    ? const Color.fromARGB(
-                                        255, 18, 16, 16)
-                                    : Colors.white,
-                                foregroundColor: themeProvider.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 18,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "My Devices",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: paragraphFont,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    size: paragraphFont + 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      MouseRegion(
-                        onEnter: (_) =>
-                            setState(() => _isHoveredbutton = true),
-                        onExit: (_) =>
-                            setState(() => _isHoveredbutton = false),
-                        child: GestureDetector(
-                          onTapDown: (_) =>
-                              setState(() => _isPressed = true),
-                          onTapUp: (_) =>
-                              setState(() => _isPressed = false),
-                          onTapCancel: () =>
-                              setState(() => _isPressed = false),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            transform: Matrix4.identity()
-                              ..scale(_isPressed
-                                  ? 0.95
-                                  : (_isHoveredbutton ? 1.05 : 1.0)),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _isHoveredbutton
-                                      ? Colors.black.withOpacity(0.4)
-                                      : Colors.black.withOpacity(0.2),
-                                  blurRadius: _isHoveredbutton ? 12 : 6,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DeviceActivityPage(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: themeProvider.isDarkMode
-                                    ? const Color.fromARGB(
-                                        255, 18, 16, 16)
-                                    : Colors.white,
-                                foregroundColor: themeProvider.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 18,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Total Devices",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: paragraphFont,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    size: paragraphFont + 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      MouseRegion(
-                        onEnter: (_) => setState(
-                            () => _isHoveredMyDevicesButton = true),
-                        onExit: (_) => setState(
-                            () => _isHoveredMyDevicesButton = false),
-                        child: GestureDetector(
-                          onTapDown: (_) => setState(
-                              () => _isPressedMyDevicesButton = true),
-                          onTapUp: (_) => setState(
-                              () => _isPressedMyDevicesButton = false),
-                          onTapCancel: () => setState(
-                              () => _isPressedMyDevicesButton = false),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            transform: Matrix4.identity()
-                              ..scale(_isPressedMyDevicesButton
-                                  ? 0.95
-                                  : (_isHoveredMyDevicesButton
-                                      ? 1.05
-                                      : 1.0)),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _isHoveredMyDevicesButton
-                                      ? Colors.black.withOpacity(0.4)
-                                      : Colors.black.withOpacity(0.2),
-                                  blurRadius:
-                                      _isHoveredMyDevicesButton ? 12 : 6,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _handleDeviceNavigation();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: themeProvider.isDarkMode
-                                    ? const Color.fromARGB(
-                                        255, 18, 16, 16)
-                                    : Colors.white,
-                                foregroundColor: themeProvider.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 18,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "My Devices",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: paragraphFont,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    size: paragraphFont + 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 40),
-                      MouseRegion(
-                        onEnter: (_) =>
-                            setState(() => _isHoveredbutton = true),
-                        onExit: (_) =>
-                            setState(() => _isHoveredbutton = false),
-                        child: GestureDetector(
-                          onTapDown: (_) =>
-                              setState(() => _isPressed = true),
-                          onTapUp: (_) =>
-                              setState(() => _isPressed = false),
-                          onTapCancel: () =>
-                              setState(() => _isPressed = false),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            transform: Matrix4.identity()
-                              ..scale(_isPressed
-                                  ? 0.95
-                                  : (_isHoveredbutton ? 1.05 : 1.0)),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _isHoveredbutton
-                                      ? Colors.black.withOpacity(0.4)
-                                      : Colors.black.withOpacity(0.2),
-                                  blurRadius: _isHoveredbutton ? 12 : 6,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DeviceActivityPage(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: themeProvider.isDarkMode
-                                    ? const Color.fromARGB(
-                                        255, 18, 16, 16)
-                                    : Colors.white,
-                                foregroundColor: themeProvider.isDarkMode
-                                    ? Colors.white
-                                    : Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 18,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Total Devices",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: paragraphFont,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    size: paragraphFont + 2,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-            const SizedBox(height: 50),
-          ],
-        ),
-      ),
-      // Full-width products section (outside of padding)
-      Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: themeProvider.isDarkMode
-              ? Colors.blueGrey[900]
-              : Colors.teal.shade50,
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth < 600 ? 20 : 30,
-            vertical: 20,
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Our Products",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkMode
-                      ? Colors.white
-                      : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 30),
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: getCrossAxisCount(screenWidth),
-                crossAxisSpacing: screenWidth < 850 ? 10 : 12,
-                mainAxisSpacing: screenWidth < 850 ? 20 : 40,
-                childAspectRatio: getCardAspectRatio(screenWidth),
-                padding: EdgeInsets.symmetric(
-                    horizontal: getHorizontalPadding(screenWidth)),
+              child: Column(
                 children: [
-                  _buildSensorCard(
-                    imageAsset: "assets/probebg.jpg",
-                    title: "Temperature and Humidity Probe",
-                    description:
-                        "Accurate measurements for temperature and humidity.",
-                    onReadMore: () =>
-                        Navigator.pushNamed(context, '/probe'),
-                    screenWidth: screenWidth,
+                  // Main content with padding
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth < 800
+                          ? 20
+                          : screenWidth <= 1024
+                              ? 260
+                              : 260,
+                      vertical: 20,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Welcome to Cloud Sense",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: titleFont,
+                            fontWeight: FontWeight.bold,
+                            color: themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 4,
+                                color: Colors.black26,
+                                offset: Offset(1.5, 1.5),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          height: 3,
+                          width: 160,
+                          decoration: BoxDecoration(
+                            color: themeProvider.isDarkMode
+                                ? Colors.white70
+                                : Colors.black54,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: 40,
+                          child: DefaultTextStyle(
+                            style: TextStyle(
+                              fontSize: subtitleFont,
+                              color: themeProvider.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            child: AnimatedTextKit(
+                              repeatForever: true,
+                              pause: const Duration(milliseconds: 1000),
+                              animatedTexts: [
+                                TyperAnimatedText('Explore Sensors'),
+                                TyperAnimatedText('Real time Data'),
+                                TyperAnimatedText('Detailed insights'),
+                                TyperAnimatedText('Interact with Surrounding'),
+                                TyperAnimatedText('IoT enabled Devices'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Text(
+                          "Explore the sensors and dive into the live data they capture. "
+                          "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
+                          "Monitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. "
+                          "Track various factors to help you plan effectively and contribute to optimizing your usage.",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            color: themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
+                            fontSize: paragraphFont,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 40,
+                          runSpacing: 20,
+                          children: [
+                            _buildAnimatedStatCard(
+                              statValue: _totalDevices.toString(),
+                              label: "Devices",
+                              themeProvider: themeProvider,
+                              context: context,
+                            ),
+                            _buildAnimatedStatCard(
+                              statValue: "500K",
+                              label: "Data Points",
+                              themeProvider: themeProvider,
+                              context: context,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 60),
+                        screenWidth < 900
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  MouseRegion(
+                                    onEnter: (_) => setState(
+                                        () => _isHoveredMyDevicesButton = true),
+                                    onExit: (_) => setState(
+                                        () => _isHoveredMyDevicesButton = false),
+                                    child: GestureDetector(
+                                      onTapDown: (_) => setState(
+                                          () => _isPressedMyDevicesButton = true),
+                                      onTapUp: (_) => setState(
+                                          () => _isPressedMyDevicesButton = false),
+                                      onTapCancel: () => setState(
+                                          () => _isPressedMyDevicesButton = false),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        transform: Matrix4.identity()
+                                          ..scale(_isPressedMyDevicesButton
+                                              ? 0.95
+                                              : (_isHoveredMyDevicesButton
+                                                  ? 1.05
+                                                  : 1.0)),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _isHoveredMyDevicesButton
+                                                  ? Colors.black.withOpacity(0.4)
+                                                  : Colors.black.withOpacity(0.2),
+                                              blurRadius:
+                                                  _isHoveredMyDevicesButton ? 12 : 6,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                      Navigator.pushNamed(context, '/devicelist');
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: themeProvider.isDarkMode
+                                                ? const Color.fromARGB(
+                                                    255, 18, 16, 16)
+                                                : Colors.white,
+                                            foregroundColor: themeProvider.isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 32,
+                                              vertical: 18,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "My Devices",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: paragraphFont,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                Icons.arrow_forward,
+                                                size: paragraphFont + 2,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  MouseRegion(
+                                    onEnter: (_) =>
+                                        setState(() => _isHoveredbutton = true),
+                                    onExit: (_) =>
+                                        setState(() => _isHoveredbutton = false),
+                                    child: GestureDetector(
+                                      onTapDown: (_) =>
+                                          setState(() => _isPressed = true),
+                                      onTapUp: (_) =>
+                                          setState(() => _isPressed = false),
+                                      onTapCancel: () =>
+                                          setState(() => _isPressed = false),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        transform: Matrix4.identity()
+                                          ..scale(_isPressed
+                                              ? 0.95
+                                              : (_isHoveredbutton ? 1.05 : 1.0)),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _isHoveredbutton
+                                                  ? Colors.black.withOpacity(0.4)
+                                                  : Colors.black.withOpacity(0.2),
+                                              blurRadius: _isHoveredbutton ? 12 : 6,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DeviceActivityPage(),
+                                              ),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: themeProvider.isDarkMode
+                                                ? const Color.fromARGB(
+                                                    255, 18, 16, 16)
+                                                : Colors.white,
+                                            foregroundColor: themeProvider.isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 32,
+                                              vertical: 18,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "Total Devices",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: paragraphFont,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                Icons.arrow_forward,
+                                                size: paragraphFont + 2,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  MouseRegion(
+                                    onEnter: (_) => setState(
+                                        () => _isHoveredMyDevicesButton = true),
+                                    onExit: (_) => setState(
+                                        () => _isHoveredMyDevicesButton = false),
+                                    child: GestureDetector(
+                                      onTapDown: (_) => setState(
+                                          () => _isPressedMyDevicesButton = true),
+                                      onTapUp: (_) => setState(
+                                          () => _isPressedMyDevicesButton = false),
+                                      onTapCancel: () => setState(
+                                          () => _isPressedMyDevicesButton = false),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        transform: Matrix4.identity()
+                                          ..scale(_isPressedMyDevicesButton
+                                              ? 0.95
+                                              : (_isHoveredMyDevicesButton
+                                                  ? 1.05
+                                                  : 1.0)),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _isHoveredMyDevicesButton
+                                                  ? Colors.black.withOpacity(0.4)
+                                                  : Colors.black.withOpacity(0.2),
+                                              blurRadius:
+                                                  _isHoveredMyDevicesButton ? 12 : 6,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            _handleDeviceNavigation();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: themeProvider.isDarkMode
+                                                ? const Color.fromARGB(
+                                                    255, 18, 16, 16)
+                                                : Colors.white,
+                                            foregroundColor: themeProvider.isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 32,
+                                              vertical: 18,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "My Devices",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: paragraphFont,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                Icons.arrow_forward,
+                                                size: paragraphFont + 2,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 40),
+                                  MouseRegion(
+                                    onEnter: (_) =>
+                                        setState(() => _isHoveredbutton = true),
+                                    onExit: (_) =>
+                                        setState(() => _isHoveredbutton = false),
+                                    child: GestureDetector(
+                                      onTapDown: (_) =>
+                                          setState(() => _isPressed = true),
+                                      onTapUp: (_) =>
+                                          setState(() => _isPressed = false),
+                                      onTapCancel: () =>
+                                          setState(() => _isPressed = false),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        transform: Matrix4.identity()
+                                          ..scale(_isPressed
+                                              ? 0.95
+                                              : (_isHoveredbutton ? 1.05 : 1.0)),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _isHoveredbutton
+                                                  ? Colors.black.withOpacity(0.4)
+                                                  : Colors.black.withOpacity(0.2),
+                                              blurRadius: _isHoveredbutton ? 12 : 6,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DeviceActivityPage(),
+                                              ),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: themeProvider.isDarkMode
+                                                ? const Color.fromARGB(
+                                                    255, 18, 16, 16)
+                                                : Colors.white,
+                                            foregroundColor: themeProvider.isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 32,
+                                              vertical: 18,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "Total Devices",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: paragraphFont,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                Icons.arrow_forward,
+                                                size: paragraphFont + 2,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                        const SizedBox(height: 50),
+                      ],
+                    ),
                   ),
-                  _buildSensorCard(
-                    imageAsset: "assets/arth.jpg",
-                    title: "Temperature Humidity Light Intensity and Pressure Radiation Shield",
-                    description:
-                        "Compact environmental sensing unit for precise measurements.",
-                    onReadMore: () =>
-                        Navigator.pushNamed(context, '/atrh'),
-                    screenWidth: screenWidth,
-                  ),
-                  _buildSensorCard(
-                    imageAsset: "assets/windsensor.jpg",
-                    title: "Ultrasonic Anemometer",
-                    description:
-                        "Ultrasonic Anemometer for precise wind speed and wind direction.",
-                    onReadMore: () =>
-                        Navigator.pushNamed(context, '/windsensor'),
-                    screenWidth: screenWidth,
-                  ),
-                  _buildSensorCard(
-                    imageAsset: "assets/rbase.png",
-                    title: "Rain Gauge",
-                    description: "Tipping Bucket rain Gauge.",
-                    onReadMore: () =>
-                        Navigator.pushNamed(context, '/raingauge'),
-                    screenWidth: screenWidth,
-                  ),
-                  _buildSensorCard(
-                    imageAsset: "assets/dataloggerrender.png",
-                    title: "Data Logger",
-                    description:
-                        "Reliable Data Logging & seamless Connectivity.",
-                    onReadMore: () =>
-                        Navigator.pushNamed(context, '/datalogger'),
-                    screenWidth: screenWidth,
-                  ),
-                  _buildSensorCard(
-                    imageAsset: "assets/gateway.jpg",
-                    title: "BLE Gateway",
-                    description: "BLE Gateway For industrial IOT Applications.",
-                    onReadMore: () =>
-                        Navigator.pushNamed(context, '/gateway'),
-                    screenWidth: screenWidth,
+                  // Full-width products section (outside of padding)
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: themeProvider.isDarkMode
+                          ? Colors.blueGrey[900]
+                          : Colors.teal.shade50,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth < 600 ? 20 : 30,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Our Products",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: themeProvider.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                          GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: getCrossAxisCount(screenWidth),
+                            crossAxisSpacing: screenWidth < 850 ? 10 : 12,
+                            mainAxisSpacing: screenWidth < 850 ? 20 : 40,
+                            childAspectRatio: getCardAspectRatio(screenWidth),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: getHorizontalPadding(screenWidth)),
+                            children: [
+                              _buildSensorCard(
+                                imageAsset: "assets/thprobe.jpg",
+                                title: "Temperature and Humidity Probe",
+                                description:
+                                    "Accurate measurements for temperature and humidity.",
+                                onReadMore: () =>
+                                    Navigator.pushNamed(context, '/probe'),
+                                screenWidth: screenWidth,
+                              ),
+                              _buildSensorCard(
+                                imageAsset: "assets/arth.jpg",
+                                title: "Temperature Humidity Light Intensity and Pressure Radiation Shield",
+                                description:
+                                    "Compact environmental sensing unit for precise measurements.",
+                                onReadMore: () =>
+                                    Navigator.pushNamed(context, '/atrh'),
+                                screenWidth: screenWidth,
+                              ),
+                              _buildSensorCard(
+                                imageAsset: "assets/ultrasonic.jpg",
+                                title: "Ultrasonic Anemometer",
+                                description:
+                                    "Ultrasonic Anemometer for precise wind speed and wind direction.",
+                                onReadMore: () =>
+                                    Navigator.pushNamed(context, '/windsensor'),
+                                screenWidth: screenWidth,
+                              ),
+                              _buildSensorCard(
+                                imageAsset: "assets/rbase.png",
+                                title: "Rain Gauge",
+                                description: "Tipping Bucket rain Gauge.",
+                                onReadMore: () =>
+                                    Navigator.pushNamed(context, '/raingauge'),
+                                screenWidth: screenWidth,
+                              ),
+                              _buildSensorCard(
+                                imageAsset: "assets/dataloggerrender.png",
+                                title: "Data Logger",
+                                description:
+                                    "Reliable Data Logging & seamless Connectivity.",
+                                onReadMore: () =>
+                                    Navigator.pushNamed(context, '/datalogger'),
+                                screenWidth: screenWidth,
+                              ),
+                              _buildSensorCard(
+                                imageAsset: "assets/gateway.jpg",
+                                title: "BLE Gateway",
+                                description: "BLE Gateway For industrial IOT Applications.",
+                                onReadMore: () =>
+                                    Navigator.pushNamed(context, '/gateway'),
+                                screenWidth: screenWidth,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
-      ),
-    ],
-  ),
-)
+            )
           ],
         ),
       );
@@ -1438,7 +1439,7 @@ double getHorizontalPadding(double screenWidth) {
         );
 
         if (selected == 'devices') {
-          _handleDeviceNavigation();
+          Navigator.pushNamed(context, '/devicelist');
         } else if (selected == 'account' && !isAdmin) {
           Navigator.pushNamed(context, '/accountinfo');
         } else if (selected == 'logout') {
@@ -1578,22 +1579,22 @@ double getHorizontalPadding(double screenWidth) {
   }) {
     double titleFontSize = screenWidth < 600
         ? 16
-        : (screenWidth < 1300 ? 8 : 22);
+        : (screenWidth < 1300 ? 8 : 20);
     double descriptionFontSize = screenWidth < 600
         ? 10
-        : (screenWidth < 1300 ? 10 : 20);
+        : (screenWidth < 1300 ? 10 : 18);
     double buttonFontSize = screenWidth < 600
         ? 8.0
         : (screenWidth < 1300 ? 9.0 : 14.0);
 
     EdgeInsets cardPadding = EdgeInsets.only(
-      top: screenWidth < 600 ? 16.0 : (screenWidth < 1300 ? 14.0 : 30.0),
+      top: screenWidth < 600 ? 16.0 : (screenWidth < 1300 ? 14.0 : 20.0),
       left: screenWidth < 600 ? 12.0 : 16.0,
       right: screenWidth < 600 ? 12.0 : 16.0,
-      bottom: screenWidth < 600 ? 12.0 : 14.0,
+      bottom: screenWidth < 600 ? 12.0 : 13.0,
     );
 
-    double titleDescriptionSpacing = screenWidth < 600 ? 3 : 7;
+    double titleDescriptionSpacing = screenWidth < 600 ? 3 : 6.5;
 
     bool isCardHovered = false; // State for hover effect
 
@@ -1605,7 +1606,7 @@ double getHorizontalPadding(double screenWidth) {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             transform: Matrix4.identity()
-              ..scale(isCardHovered ? 1.03: 1.0),
+              ..scale(isCardHovered ? 1.03 : 1.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
@@ -1628,7 +1629,7 @@ double getHorizontalPadding(double screenWidth) {
                     borderRadius: BorderRadius.circular(20),
                     child: Image.asset(
                       imageAsset,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(color: Colors.grey);
                       },

@@ -168,6 +168,8 @@ flutter:
     - assets/dataLogger.pdf
     - assets/rainGauge.pdf
     - assets/windSensor.pdf
+    - assets/thprobe.jpg
+    - assets/ultrasonic.jpg
 
    
    
