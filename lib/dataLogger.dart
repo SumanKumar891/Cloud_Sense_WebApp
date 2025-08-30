@@ -227,7 +227,7 @@ class DataLoggerPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(isDarkMode)
+                      child: _buildSpecificationsCard(context ,isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -305,7 +305,7 @@ class DataLoggerPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(bool isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context,bool isDarkMode) {
     final List<String> specItems = [
       "Input Supply voltage: 5V - 16",
       "Communication interfaces: ADC, UART, I2C, SPI, RS232, RS485",
@@ -385,10 +385,20 @@ class DataLoggerPage extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 40),
-          Center(
-            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ),
+         const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton(
+                "Download Datasheet",
+                Colors.teal,
+                () {
+                  DownloadManager.downloadFile(
+                    context: context,
+                    sensorKey: "DataLogger",
+                    fileType: "datasheet",
+                  );
+                },
+              ),
+            ),
         ],
       ),
     ),

@@ -199,23 +199,21 @@ class ProbePage extends StatelessWidget {
                 ),
 
                 // ---------- Features & Applications ----------
-               Padding(
+                Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child:  isWideScreen
+                  child: isWideScreen
                       ? _buildIpadLayout(isDarkMode)
-                      
-                          
-                          : Column(
-                              children: [
-                                _buildFeaturesCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                                const SizedBox(height: 16),
-                                _buildApplicationsCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                              ],
-                            ),
+                      : Column(
+                          children: [
+                            _buildFeaturesCard(isDarkMode)
+                                .animate()
+                                .fadeIn(),
+                            const SizedBox(height: 16),
+                            _buildApplicationsCard(isDarkMode)
+                                .animate()
+                                .fadeIn(),
+                          ],
+                        ),
                 ),
 
                 // ---------- Specs ----------
@@ -227,7 +225,7 @@ class ProbePage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(isDarkMode)
+                      child: _buildSpecificationsCard(context, isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -305,87 +303,98 @@ class ProbePage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(bool isDarkMode) {
-  final List<String> specItems = [
-    "Supply Voltage : 5-12 V DC",
-    "Range of Temperature : -40 to +60 °C",
-    "Range of humidity : 0-100%",
-    "Communications Protocol : RS485 & 0-1V (ADC)",
-    "Temperature Accuracy : ±0.1°C",
-    "Humidity Accuracy: ±1.0% RH",
-  ];
+  Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
+    final List<String> specItems = [
+      "Supply Voltage : 5-12 V DC",
+      "Range of Temperature : -40 to +60 °C",
+      "Range of humidity : 0-100%",
+      "Communications Protocol : RS485 & 0-1V (ADC)",
+      "Temperature Accuracy : ±0.1°C",
+      "Humidity Accuracy: ±1.0% RH",
+    ];
 
-  return HoverCard(
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Center(
-            child: Text(
-              "Specifications",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.blue.shade800,
+    return HoverCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Center(
+              child: Text(
+                "Specifications",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          // Use a LayoutBuilder to determine screen width and adjust layout
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final screenWidth = MediaQuery.of(context).size.width;
-              final isWideScreen = screenWidth > 800;
+            const SizedBox(height: 20),
+            // Use a LayoutBuilder to determine screen width and adjust layout
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final isWideScreen = screenWidth > 800;
 
-              if (isWideScreen) {
-                // Two-column layout for wide screens
-                final int splitIndex = (specItems.length / 2).ceil();
-                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-                final List<String> rightColumnItems = specItems.sublist(splitIndex);
+                if (isWideScreen) {
+                  // Two-column layout for wide screens
+                  final int splitIndex = (specItems.length / 2).ceil();
+                  final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
+                  final List<String> rightColumnItems = specItems.sublist(splitIndex);
 
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: leftColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: leftColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: rightColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: rightColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              } else {
-                // Single-column layout for mobile
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: specItems
-                      .map((item) => featureItem(item, isDarkMode))
-                      .toList(),
-                );
-              }
-            },
-          ),
-          const SizedBox(height: 40),
-          Center(
-            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ),
-        ],
+                    ],
+                  );
+                } else {
+                  // Single-column layout for mobile
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: specItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton(
+                "Download Datasheet",
+                Colors.teal,
+                () {
+                  DownloadManager.downloadFile(
+                    context: context,
+                    sensorKey: "TempHumidityProbe",
+                    fileType: "datasheet",
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
       child: Padding(
@@ -402,7 +411,7 @@ class ProbePage extends StatelessWidget {
             const SizedBox(height: 10),
             featureItem("High precision temperature and humidity sensing probe",
                 isDarkMode),
-            featureItem("Compact low power design suitable  for iot and embedded applications",
+            featureItem("Compact low power design suitable for iot and embedded applications",
                 isDarkMode),
             featureItem("Robust RS485/MODBUS RTU communications for industrial use",
                 isDarkMode),
@@ -411,7 +420,6 @@ class ProbePage extends StatelessWidget {
             featureItem(
                 "Output provides both analog and digital value",
                 isDarkMode),
-           
           ],
         ),
       ),
@@ -434,12 +442,10 @@ class ProbePage extends StatelessWidget {
             const SizedBox(height: 10),
             featureItem("IOT and agriculture irrigation system", isDarkMode),
             featureItem("Healthcare and Medical Facilities", isDarkMode),
-            
             featureItem("Agriculture and Farming", isDarkMode),
             featureItem("Cold Storage and Warehouse", isDarkMode),
-             featureItem("Food and Beverage Industry", isDarkMode),
-              featureItem("Transportation and Logistics", isDarkMode),
-            
+            featureItem("Food and Beverage Industry", isDarkMode),
+            featureItem("Transportation and Logistics", isDarkMode),
           ],
         ),
       ),
@@ -532,7 +538,7 @@ class _HoverCardState extends State<HoverCard> {
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
         transform: _hovering
-            ? (Matrix4.identity()..scale(1.01)) 
+            ? (Matrix4.identity()..scale(1.01))
             : Matrix4.identity(),
         decoration: BoxDecoration(
           color: _hovering

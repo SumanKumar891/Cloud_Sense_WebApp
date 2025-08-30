@@ -170,6 +170,10 @@ flutter:
     - assets/thprobe.png
     - assets/ultrasonic.png
     - assets/datalogger.png
+    - assets/PROBE_DATASHEET.pdf
+    - assets/Data_logger_datasheet.pdf
+    - assets/BLE_GATEWAY_Datasheet.pdf
+    - assets/RADIATION_SHIELD_DATASHEET.pdf
 
    
    

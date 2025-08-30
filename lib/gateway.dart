@@ -228,7 +228,7 @@ class GatewayPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(isDarkMode)
+                      child: _buildSpecificationsCard(context ,isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -306,7 +306,7 @@ class GatewayPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(bool isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context,bool isDarkMode) {
     final List<String> specItems = [
 "Input Voltage Range : 5 - 30 v",
 "On board led indications for networking , cloud and BLE connectivity.",
@@ -387,9 +387,19 @@ class GatewayPage extends StatelessWidget {
             },
           ),
           const SizedBox(height: 40),
-          Center(
-            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ),
+            Center(
+              child: _buildBannerButton(
+                "Download Datasheet",
+                Colors.teal,
+                () {
+                  DownloadManager.downloadFile(
+                    context: context,
+                    sensorKey: "Gateway",
+                    fileType: "datasheet",
+                  );
+                },
+              ),
+            ),
         ],
       ),
     ),

@@ -229,7 +229,7 @@ class ATRHSensorPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(isDarkMode)
+                      child: _buildSpecificationsCard(context,isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -307,7 +307,7 @@ class ATRHSensorPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(bool isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
 " Supply Voltage : 3.3 V DC",
 "Range of Temperature : -40 to +85 °C",
@@ -388,10 +388,20 @@ class ATRHSensorPage extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 40),
-          Center(
-            child: _buildBannerButton("Download Datasheet", Colors.teal, () {}),
-          ),
+         const SizedBox(height: 40),
+            Center(
+              child: _buildBannerButton(
+                "Download Datasheet",
+                Colors.teal,
+                () {
+                  DownloadManager.downloadFile(
+                    context: context,
+                    sensorKey: "ARTH",
+                    fileType: "datasheet",
+                  );
+                },
+              ),
+            ),
         ],
       ),
     ),
