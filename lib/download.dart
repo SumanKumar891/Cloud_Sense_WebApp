@@ -9,30 +9,30 @@ class DownloadManager {
   static final Map<String, Map<String, String>> sensorFiles = {
     "WindSensor": {
       "manual": "assets/assets/windSensor.pdf",
-      "datasheet": "assets/windSensor_datasheet.pdf",
+      "datasheet": "assets/assets/windSensor_datasheet.pdf",
     },
 
      "ARTH": {
       "manual": "assets/assets/windSensor.pdf",
-      "datasheet": "assets/RADIATION_SHIELD_DATASHEET.pdf",
+      "datasheet": "assets/assets/RADIATION_SHIELD_DATASHEET.pdf",
   },
   "RainGauge": {
       "manual": "assets/assets/rainGauge.pdf",
-      "datasheet": "assets/RADIATION_SHIELD_DATASHEET.pdf",
+      "datasheet": "assets/assets/RADIATION_SHIELD_DATASHEET.pdf",
   },
   "Gateway": {
         "manual": "assets/assets/windSensor.pdf",
-      "datasheet": "assets/BLE_GATEWAY_Datasheet.pdf",
+      "datasheet": "assets/assets/BLE_GATEWAY_Datasheet.pdf",
       
   },
   "TempHumidityProbe": {  
      "manual": "assets/assets/windSensor.pdf",
-      "datasheet": "assets/PROBE_DATASHEET.pdf",
+      "datasheet": "assets/assets/PROBE_DATASHEET.pdf",
   },
 
   "DataLogger": {
       "manual": "assets/assets/dataLogger.pdf",
-      "datasheet": "assets/Data_logger_datasheet.pdf",
+      "datasheet": "assets/assets/Data_logger_datasheet.pdf",
   },
 };
   
