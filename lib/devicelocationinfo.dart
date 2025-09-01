@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_sense_webapp/devicemap.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -168,6 +167,119 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
     return filteredList;
   }
 
+  // ✅ Single clean dropdown widget
+  Widget _buildDropdown(bool isDarkMode) {
+    return Container(
+      height: 48,
+      width: 180,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[850] : Colors.grey[200],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: DropdownButton<String>(
+        isExpanded: true,
+        dropdownColor:
+            isDarkMode ? const Color.fromARGB(255, 92, 90, 90) : Colors.white70,
+        hint: Text(
+          "Select Device Type",
+          style: TextStyle(
+            color: isDarkMode ? Colors.black : Colors.white70,
+          ),
+        ),
+        iconEnabledColor: isDarkMode ? Colors.white : Colors.black,
+        iconDisabledColor: Colors.grey,
+        value: filter,
+        items: [
+          DropdownMenuItem(
+            value: "All",
+            child: Text(
+              "All Devices",
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          DropdownMenuItem(
+            value: "Active",
+            child: Text(
+              "Active Devices",
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          DropdownMenuItem(
+            value: "Inactive",
+            child: Text(
+              "Inactive Devices",
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+        ],
+        onChanged: (value) {
+          setState(() {
+            if (value == "Clear") {
+              filter = null;
+              showList = false;
+            } else if (value == filter) {
+              showList = !showList;
+            } else {
+              filter = value;
+              showList = true;
+            }
+          });
+        },
+        style: TextStyle(
+          color: isDarkMode ? Colors.black : Colors.white,
+        ),
+      ),
+    );
+  }
+
+  // ✅ Single clean search widget
+  Widget _buildSearchField(bool isDarkMode) {
+    return SizedBox(
+      height: 48,
+      width: 180,
+      child: TextField(
+        onChanged: (query) {
+          setState(() {
+            searchQuery = query.toLowerCase();
+            showList = true;
+          });
+        },
+        decoration: InputDecoration(
+          hintText: "Search device...",
+          hintStyle: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+            fontSize: 14,
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+          filled: true,
+          fillColor: isDarkMode ? Colors.grey[850] : Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 0,
+            horizontal: 12,
+          ),
+        ),
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -253,139 +365,40 @@ class _DeviceActivityPageState extends State<DeviceActivityPage> {
                                 "Inactive: $totalInactive",
                                 style: TextStyle(
                                   fontSize: 16,
-                                  color: isDarkMode ? Colors.red : Colors.red,
+                                  color: Colors.red,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                height: 48,
-                                width: 180,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
-                                decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? Colors.grey[850]
-                                      : Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: DropdownButton<String>(
-                                  dropdownColor: isDarkMode
-                                      ? const Color.fromARGB(255, 92, 90, 90)
-                                      : Colors.white70,
-                                  hint: Text(
-                                    "Select Device Type",
-                                    style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.black
-                                            : Colors.white70),
-                                  ),
-                                  iconEnabledColor:
-                                      isDarkMode ? Colors.white : Colors.black,
-                                  iconDisabledColor: Colors.grey,
-                                  value: filter,
-                                  items: [
-                                    DropdownMenuItem(
-                                      value: "All",
-                                      child: Text(
-                                        "All Devices",
-                                        style: TextStyle(
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: "Active",
-                                      child: Text(
-                                        "Active Devices",
-                                        style: TextStyle(
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: "Inactive",
-                                      child: Text(
-                                        "Inactive Devices",
-                                        style: TextStyle(
-                                          color: isDarkMode
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
+
+                          // ✅ LayoutBuilder for mobile/PC
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              bool isMobile = constraints.maxWidth < 600;
+
+                              if (isMobile) {
+                                // 📱 Mobile → Column
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    _buildDropdown(isDarkMode),
+                                    const SizedBox(height: 12),
+                                    _buildSearchField(isDarkMode),
                                   ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value == "Clear") {
-                                        filter = null;
-                                        showList = false;
-                                      } else if (value == filter) {
-                                        showList = !showList;
-                                      } else {
-                                        filter = value;
-                                        showList = true;
-                                      }
-                                    });
-                                  },
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.black
-                                        : Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              SizedBox(
-                                height: 48,
-                                width: 200,
-                                child: TextField(
-                                  onChanged: (query) {
-                                    setState(() {
-                                      searchQuery = query.toLowerCase();
-                                      showList = true;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: "Search device...",
-                                    hintStyle: TextStyle(
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontSize: 14,
-                                    ),
-                                    prefixIcon: Icon(Icons.search,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black),
-                                    filled: true,
-                                    fillColor: isDarkMode
-                                        ? Colors.grey[850]
-                                        : Colors.grey[200],
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 0, horizontal: 12),
-                                  ),
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ],
+                                );
+                              } else {
+                                // 💻 PC → Row
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildDropdown(isDarkMode),
+                                    const SizedBox(width: 12),
+                                    _buildSearchField(isDarkMode),
+                                  ],
+                                );
+                              }
+                            },
                           ),
                           const SizedBox(height: 8),
                         ],
