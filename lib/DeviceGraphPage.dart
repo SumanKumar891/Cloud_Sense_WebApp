@@ -5291,7 +5291,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     // Handle pH explicitly to preserve "pH"
     if (paramName.toLowerCase().contains('pH')) {
       return {
-        'displayName': 'pH',
+        'displayName': 'p H',
         'unit': 'pH',
       };
     }
