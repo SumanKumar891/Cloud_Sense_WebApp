@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
 
   double getCardAspectRatio(double screenWidth) {
     if (screenWidth < 600) {
-      return 1.0; // Mobile: slightly taller cards
+      return 0.6; // Mobile: slightly taller cards
     } else if (screenWidth < 1300) {
       return 0.8; // Tablet: balanced aspect ratio
     } else {
@@ -1637,7 +1637,7 @@ class _HomePageState extends State<HomePage> {
     EdgeInsets cardPadding = EdgeInsets.all(screenWidth < 600 ? 12.0 : 0.0);
 
     double titleDescriptionSpacing =
-        screenWidth < 600 ? 2 : (screenWidth < 1300 ? 3.0 : 5.0);
+        screenWidth < 600 ? 16 : (screenWidth < 1300 ? 7.0 : 5.0);
 
     bool isCardHovered = false;
 
@@ -1673,7 +1673,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Image.asset(
                         imageAsset,
                         width: screenWidth < 600
@@ -1704,17 +1704,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: titleDescriptionSpacing),
 
-                    // // ✅ Description
-                    // Text(
-                    //   description,
-                    //   textAlign: TextAlign.center,
-                    //   style: TextStyle(
-                    //     color: isDarkMode ? Colors.white70 : Colors.black54,
-                    //     fontSize: descriptionFontSize,
-                    //   ),
-                    //   maxLines: 4,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
                     // const Spacer(),
 
                     // ✅ Button
