@@ -703,102 +703,108 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   late final String activityType;
 
 // Helper function to calculate total rainfall (unchanged)
-double _calculateTotalRainfall(List<ChartData> rainData) {
-  if (rainData.isEmpty) return 0.0;
+  double _calculateTotalRainfall(List<ChartData> rainData) {
+    if (rainData.isEmpty) return 0.0;
 
-  final Map<DateTime, double> hourlyTotals = {};
+    final Map<DateTime, double> hourlyTotals = {};
 
-  for (var data in rainData) {
-    DateTime hourEnd = DateTime(
-      data.timestamp.year,
-      data.timestamp.month,
-      data.timestamp.day,
-      data.timestamp.hour,
-      0,
-    );
-    if (data.timestamp.minute > 0) {
-      hourEnd = DateTime(
-        data.timestamp.year,
-        data.timestamp.month,
-        data.timestamp.day,
-        data.timestamp.hour + 1,
-        0,
-      );
-    }
-
-    if (data.timestamp.isAtSameMomentAs(hourEnd) || data.timestamp.isBefore(hourEnd)) {
-      hourlyTotals[hourEnd] = data.value;
-    }
-  }
-
-  return hourlyTotals.values.fold(0.0, (sum, total) => sum + total);
-}
-
-// Helper function to transform cumulative rainfall to incremental rainfall
-List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
-  if (rainData.isEmpty) return [];
-
-  // Sort data by timestamp to ensure chronological order
-  final sortedData = List<ChartData>.from(rainData)
-    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-  List<ChartData> incrementalData = [];
-  double previousValue = 0.0;
-  DateTime? previousTimestamp;
-
-  for (var data in sortedData) {
-    double incrementalValue;
-
-    if (previousTimestamp == null) {
-      // First data point: treat as incremental (no previous value)
-      incrementalValue = data.value;
-    } else {
-      // Determine the hour start for the current and previous timestamps
-      DateTime currentHourStart = DateTime(
+    for (var data in rainData) {
+      DateTime hourEnd = DateTime(
         data.timestamp.year,
         data.timestamp.month,
         data.timestamp.day,
         data.timestamp.hour,
-        data.timestamp.minute >= 1 ? data.timestamp.hour : data.timestamp.hour - 1,
+        0,
       );
-      DateTime previousHourStart = DateTime(
-        previousTimestamp.year,
-        previousTimestamp.month,
-        previousTimestamp.day,
-        previousTimestamp.hour,
-        previousTimestamp.minute >= 1 ? previousTimestamp.hour : previousTimestamp.hour - 1,
-      );
+      if (data.timestamp.minute > 0) {
+        hourEnd = DateTime(
+          data.timestamp.year,
+          data.timestamp.month,
+          data.timestamp.day,
+          data.timestamp.hour + 1,
+          0,
+        );
+      }
 
-      bool isEndOfHour = data.timestamp.minute == 0 && data.timestamp.second == 0;
-      bool isReset = data.timestamp.minute == 1 && data.timestamp.second == 0;
-      bool isNewHour = currentHourStart.isAfter(previousHourStart);
-
-      if (isEndOfHour) {
-        // At XX:00, use the full value as the incremental total for the hour
-        incrementalValue = data.value;
-      } else if (isReset || isNewHour) {
-        // At XX:01 or after a new hour boundary, the value is the incremental amount (reset occurred)
-        incrementalValue = data.value;
-      } else {
-        // Within the same hour, calculate the difference from the previous value
-        incrementalValue = data.value - previousValue;
-        // Ensure incremental value is non-negative (in case of anomalies)
-        incrementalValue = incrementalValue >= 0 ? incrementalValue : 0.0;
+      if (data.timestamp.isAtSameMomentAs(hourEnd) ||
+          data.timestamp.isBefore(hourEnd)) {
+        hourlyTotals[hourEnd] = data.value;
       }
     }
 
-    incrementalData.add(ChartData(
-      timestamp: data.timestamp,
-      value: incrementalValue,
-    ));
-
-    // Update previousValue after calculating the incremental value
-    previousValue = data.value;
-    previousTimestamp = data.timestamp;
+    return hourlyTotals.values.fold(0.0, (sum, total) => sum + total);
   }
 
-  return incrementalData;
-}
+// Helper function to transform cumulative rainfall to incremental rainfall
+  List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
+    if (rainData.isEmpty) return [];
+
+    // Sort data by timestamp to ensure chronological order
+    final sortedData = List<ChartData>.from(rainData)
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    List<ChartData> incrementalData = [];
+    double previousValue = 0.0;
+    DateTime? previousTimestamp;
+
+    for (var data in sortedData) {
+      double incrementalValue;
+
+      if (previousTimestamp == null) {
+        // First data point: treat as incremental (no previous value)
+        incrementalValue = data.value;
+      } else {
+        // Determine the hour start for the current and previous timestamps
+        DateTime currentHourStart = DateTime(
+          data.timestamp.year,
+          data.timestamp.month,
+          data.timestamp.day,
+          data.timestamp.hour,
+          data.timestamp.minute >= 1
+              ? data.timestamp.hour
+              : data.timestamp.hour - 1,
+        );
+        DateTime previousHourStart = DateTime(
+          previousTimestamp.year,
+          previousTimestamp.month,
+          previousTimestamp.day,
+          previousTimestamp.hour,
+          previousTimestamp.minute >= 1
+              ? previousTimestamp.hour
+              : previousTimestamp.hour - 1,
+        );
+
+        bool isEndOfHour =
+            data.timestamp.minute == 0 && data.timestamp.second == 0;
+        bool isReset = data.timestamp.minute == 1 && data.timestamp.second == 0;
+        bool isNewHour = currentHourStart.isAfter(previousHourStart);
+
+        if (isEndOfHour) {
+          // At XX:00, use the full value as the incremental total for the hour
+          incrementalValue = data.value;
+        } else if (isReset || isNewHour) {
+          // At XX:01 or after a new hour boundary, the value is the incremental amount (reset occurred)
+          incrementalValue = data.value;
+        } else {
+          // Within the same hour, calculate the difference from the previous value
+          incrementalValue = data.value - previousValue;
+          // Ensure incremental value is non-negative (in case of anomalies)
+          incrementalValue = incrementalValue >= 0 ? incrementalValue : 0.0;
+        }
+      }
+
+      incrementalData.add(ChartData(
+        timestamp: data.timestamp,
+        value: incrementalValue,
+      ));
+
+      // Update previousValue after calculating the incremental value
+      previousValue = data.value;
+      previousTimestamp = data.timestamp;
+    }
+
+    return incrementalData;
+  }
 
   double? _lastLatitude;
   double? _lastLongitude;
@@ -5283,7 +5289,7 @@ List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
     }
 
     // Handle pH explicitly to preserve "pH"
-    if (paramName.toLowerCase().contains('ph')) {
+    if (paramName.toLowerCase().contains('pH')) {
       return {
         'displayName': 'pH',
         'unit': 'pH',
@@ -5336,6 +5342,8 @@ List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
       displayName = 'Chlorine';
     } else if (displayName.toLowerCase().contains('pH')) {
       displayName = 'pH';
+    } else if (displayName.toLowerCase().contains('Phosphorus')) {
+      displayName = 'Phosphorus';
     }
 
     String unit = '';
@@ -9167,7 +9175,7 @@ List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
                                                 'Longitude',
                                                 'Latitude',
                                                 'SignalStrength',
-                                            //  'BatteryVoltage',   
+                                                //  'BatteryVoltage',
                                                 'MaximumTemperature',
                                                 'MinimumTemperature',
                                                 'AverageTemperature',
@@ -9231,7 +9239,7 @@ List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
                                                 'Longitude',
                                                 'Latitude',
                                                 'SignalStrength',
-                                                 'BatteryVoltage',
+                                                'BatteryVoltage',
                                                 'MaximumTemperature',
                                                 'MinimumTemperature',
                                                 'AverageTemperature',

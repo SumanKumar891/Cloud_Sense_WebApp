@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:cloud_sense_webapp/LoginPage.dart';
+import 'package:cloud_sense_webapp/appbar.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/manuallyenter.dart';
@@ -226,6 +227,7 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
     // Restore dialog after build
     _restoreDialog();
     return Scaffold(
+      appBar: AppBarWidget(),
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
@@ -252,14 +254,14 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        size: MediaQuery.of(context).size.width < 800 ? 20 : 28,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
+                    // IconButton(
+                    //   icon: Icon(
+                    //     Icons.arrow_back,
+                    //     color: isDarkMode ? Colors.white : Colors.black,
+                    //     size: MediaQuery.of(context).size.width < 800 ? 20 : 28,
+                    //   ),
+                    //   onPressed: () => Navigator.pop(context),
+                    // ),
                   ],
                 ),
               ),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_sense_webapp/appbar.dart';
 
 class ATRHSensorPage extends StatelessWidget {
   const ATRHSensorPage({super.key});
@@ -16,6 +17,7 @@ class ATRHSensorPage extends StatelessWidget {
     final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
 
     return Scaffold(
+      appBar: AppBarWidget(),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -86,18 +88,18 @@ class ATRHSensorPage extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(top: 12, left: 8),
-                              child: IconButton(
-                                icon: const Icon(Icons.arrow_back,
-                                    color: Colors.white, size: 22),
-                                onPressed: () {
-                                  if (Navigator.of(context).canPop()) {
-                                    Navigator.of(context).pop();
-                                  } else {
-                                    Navigator.of(context)
-                                        .pushReplacementNamed("/");
-                                  }
-                                },
-                              ).animate().fadeIn(duration: 1500.ms),
+                              // child: IconButton(
+                              //   icon: const Icon(Icons.arrow_back,
+                              //       color: Colors.white, size: 22),
+                              //   onPressed: () {
+                              //     if (Navigator.of(context).canPop()) {
+                              //       Navigator.of(context).pop();
+                              //     } else {
+                              //       Navigator.of(context)
+                              //           .pushReplacementNamed("/");
+                              //     }
+                              //   },
+                              // ).animate().fadeIn(duration: 1500.ms),
                             ),
                             Padding(
                               padding: EdgeInsets.symmetric(

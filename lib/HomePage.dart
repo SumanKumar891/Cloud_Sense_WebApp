@@ -664,7 +664,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       title: Text('Products'),
-                      // subtitle: Text('Browse our sensor products'),
                       onTap: () {
                         setState(() {
                           _isProductsExpanded = !_isProductsExpanded;
@@ -930,7 +929,7 @@ class _HomePageState extends State<HomePage> {
                                               ? 0.95
                                               : (_isHoveredMyDevicesButton
                                                   ? 1.05
-                                                  : 1.0)),
+                                                  : 0.85)),
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -1015,7 +1014,7 @@ class _HomePageState extends State<HomePage> {
                                               ? 0.95
                                               : (_isHoveredbutton
                                                   ? 1.05
-                                                  : 1.0)),
+                                                  : 0.85)),
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -1527,17 +1526,20 @@ class _HomePageState extends State<HomePage> {
     required BuildContext context,
   }) {
     double screenWidth = MediaQuery.of(context).size.width;
+
+    // ⬆️ Slightly increased cardSize to allow padding
     double cardSize = screenWidth < 500
-        ? 80
+        ? 100
         : screenWidth < 850
-            ? 150
-            : 180;
+            ? 170
+            : 200;
+
     double valueFontSize = cardSize * 0.12;
     double labelFontSize = cardSize * 0.10;
 
     return Container(
       width: cardSize,
-      height: cardSize,
+      // height: cardSize,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
@@ -1561,52 +1563,55 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0, end: 1),
-            duration: const Duration(seconds: 1),
-            builder: (context, progressValue, child) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: cardSize * 0.5,
-                    height: cardSize * 0.5,
-                    child: CircularProgressIndicator(
-                      value: progressValue,
-                      strokeWidth: 6,
-                      color: themeProvider.isDarkMode
-                          ? const Color.fromARGB(255, 95, 154, 172)
-                          : Colors.white,
-                      backgroundColor: themeProvider.isDarkMode
-                          ? Colors.white10
-                          : Colors.white24,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0), // 👈 Added padding inside the box
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: const Duration(seconds: 1),
+              builder: (context, progressValue, child) {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: cardSize * 0.5,
+                      height: cardSize * 0.5,
+                      child: CircularProgressIndicator(
+                        value: progressValue,
+                        strokeWidth: 6,
+                        color: themeProvider.isDarkMode
+                            ? const Color.fromARGB(255, 95, 154, 172)
+                            : Colors.white,
+                        backgroundColor: themeProvider.isDarkMode
+                            ? Colors.white10
+                            : Colors.white24,
+                      ),
                     ),
-                  ),
-                  Text(
-                    statValue,
-                    style: TextStyle(
-                      fontSize: valueFontSize,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    Text(
+                      statValue,
+                      style: TextStyle(
+                        fontSize: valueFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: labelFontSize,
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
+                  ],
+                );
+              },
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: labelFontSize,
+                color: Colors.white70,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
