@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
-
 class UltrasonicSensorPage extends StatelessWidget {
   const UltrasonicSensorPage({super.key});
 
@@ -108,7 +106,8 @@ class UltrasonicSensorPage extends StatelessWidget {
                               ),
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth: isWideScreen ? 600 : double.infinity,
+                                  maxWidth:
+                                      isWideScreen ? 600 : double.infinity,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +135,10 @@ class UltrasonicSensorPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
+                                    )
+                                        .animate()
+                                        .fadeIn(duration: 1700.ms)
+                                        .slideX(),
                                     Container(
                                       margin: const EdgeInsets.only(
                                           top: 6, bottom: 16),
@@ -160,73 +162,94 @@ class UltrasonicSensorPage extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: const [
-                                        BannerPoint(
-                                            "Accurate wind monitoring"),
+                                        BannerPoint("Accurate wind monitoring"),
                                         BannerPoint(
                                             "Real time speed and direction measurement"),
                                         BannerPoint(
                                             "Robust and compact design"),
                                       ],
-                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
+                                    ).animate().fadeIn(
+                                        delay: 1200.ms, duration: 1500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-                                       _buildBannerButton(
-  "Enquire",
-  Colors.blue,
-  () async {
-    final email = "sharmasejal2701@gmail.com";
-    final subject = "Product Enquiry";
-    final body = "Hello, I am interested in your product.";
+                                        _buildBannerButton(
+                                          "Enquire",
+                                          Colors.teal,
+                                          () async {
+                                            final email =
+                                                "sharmasejal2701@gmail.com";
+                                            final subject = "Product Enquiry";
+                                            final body =
+                                                "Hello, I am interested in your product.";
 
-    final Uri mailtoUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      query: Uri.encodeFull("subject=$subject&body=$body"),
-    );
+                                            final Uri mailtoUri = Uri(
+                                              scheme: 'mailto',
+                                              path: email,
+                                              query: Uri.encodeFull(
+                                                  "subject=$subject&body=$body"),
+                                            );
 
-    if (kIsWeb) {
-      final isMobileBrowser =
-          defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.android;
+                                            if (kIsWeb) {
+                                              final isMobileBrowser =
+                                                  defaultTargetPlatform ==
+                                                          TargetPlatform.iOS ||
+                                                      defaultTargetPlatform ==
+                                                          TargetPlatform
+                                                              .android;
 
-      if (!isMobileBrowser) {
-        // 🌐 Desktop Web → Gmail compose in browser
-        final Uri gmailUrl = Uri.parse(
-          "https://mail.google.com/mail/?view=cm&fs=1"
-          "&to=$email"
-          "&su=${Uri.encodeComponent(subject)}"
-          "&body=${Uri.encodeComponent(body)}",
-        );
+                                              if (!isMobileBrowser) {
+                                                // 🌐 Desktop Web → Gmail compose in browser
+                                                final Uri gmailUrl = Uri.parse(
+                                                  "https://mail.google.com/mail/?view=cm&fs=1"
+                                                  "&to=$email"
+                                                  "&su=${Uri.encodeComponent(subject)}"
+                                                  "&body=${Uri.encodeComponent(body)}",
+                                                );
 
-        if (await canLaunchUrl(gmailUrl)) {
-          await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
-          return;
-        }
-      }
+                                                if (await canLaunchUrl(
+                                                    gmailUrl)) {
+                                                  await launchUrl(gmailUrl,
+                                                      mode: LaunchMode
+                                                          .externalApplication);
+                                                  return;
+                                                }
+                                              }
 
-      // 🌐 Mobile browser (fallback) → use mailto
-      if (await canLaunchUrl(mailtoUri)) {
-        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Could not open email client")),
-        );
-      }
-    } else {
-      // 📱 Native mobile app (Android/iOS) → use mailto directly
-      if (await canLaunchUrl(mailtoUri)) {
-        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Could not open email app")),
-        );
-      }
-    }
-  },
-),
+                                              // 🌐 Mobile browser (fallback) → use mailto
+                                              if (await canLaunchUrl(
+                                                  mailtoUri)) {
+                                                await launchUrl(mailtoUri,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Could not open email client")),
+                                                );
+                                              }
+                                            } else {
+                                              // 📱 Native mobile app (Android/iOS) → use mailto directly
+                                              if (await canLaunchUrl(
+                                                  mailtoUri)) {
+                                                await launchUrl(mailtoUri,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Could not open email app")),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
 
                                         // _buildBannerButton(
                                         //   "Download Manual",
@@ -257,18 +280,15 @@ class UltrasonicSensorPage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: isWideScreen
                       ? _buildIpadLayout(isDarkMode)
-                      : 
-                         Column(
-                              children: [
-                                _buildFeaturesCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                                const SizedBox(height: 16),
-                                _buildApplicationsCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                              ],
-                            ),
+                      : Column(
+                          children: [
+                            _buildFeaturesCard(isDarkMode).animate().fadeIn(),
+                            const SizedBox(height: 16),
+                            _buildApplicationsCard(isDarkMode)
+                                .animate()
+                                .fadeIn(),
+                          ],
+                        ),
                 ),
 
                 // ---------- Specs ----------
@@ -280,7 +300,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(context , isDarkMode)
+                      child: _buildSpecificationsCard(context, isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -315,8 +335,10 @@ class UltrasonicSensorPage extends StatelessWidget {
         final featuresKey = GlobalKey();
         final applicationsKey = GlobalKey();
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
-          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          final featuresBox =
+              featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox =
+              applicationsKey.currentContext?.findRenderObject() as RenderBox?;
           if (featuresBox != null && applicationsBox != null) {
             final featuresHeight = featuresBox.size.height;
             final applicationsHeight = applicationsBox.size.height;
@@ -326,7 +348,8 @@ class UltrasonicSensorPage extends StatelessWidget {
                   ? featuresHeight
                   : applicationsHeight;
               featuresBox.size = Size(featuresBox.size.width, maxHeight);
-              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+              applicationsBox.size =
+                  Size(applicationsBox.size.width, maxHeight);
             }
           }
         });
@@ -358,19 +381,18 @@ class UltrasonicSensorPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard( BuildContext context , isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, isDarkMode) {
     final List<String> specItems = [
-  "Input Supply voltage: 2V - 16V",
-"Measure wind speed and wind direction via Δ ToF",
-"Communication protocols: RS232 or RS485 (Modbus)",
-"Ultra low power sleep mode"
-"Weight : 0.6kg",
-"Heating option (-40℃ to +70℃)",
-
+      "Input Supply voltage: 2V - 16V",
+      "Measure wind speed and wind direction via Δ ToF",
+      "Communication protocols: RS232 or RS485 (Modbus)",
+      "Ultra low power sleep mode"
+          "Weight : 0.6kg",
+      "Heating option (-40℃ to +70℃)",
     ];
-final screenWidth = MediaQuery.of(context).size.width;
-  final isWideScreen = screenWidth > 800;
-    final int splitIndex = (specItems.length/2 ).ceil();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 800;
+    final int splitIndex = (specItems.length / 2).ceil();
     final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
     final List<String> rightColumnItems = specItems.sublist(splitIndex);
 
@@ -378,64 +400,68 @@ final screenWidth = MediaQuery.of(context).size.width;
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-         crossAxisAlignment: isWideScreen ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          crossAxisAlignment: isWideScreen
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
           children: [
             Text(
-                "Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                ),
+              "Specifications",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.blue.shade800,
               ),
-           
+            ),
+
             const SizedBox(height: 20),
-          // Use a LayoutBuilder to determine screen width and adjust layout
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // final screenWidth = MediaQuery.of(context).size.width;
-              // final isWideScreen = screenWidth > 800;
+            // Use a LayoutBuilder to determine screen width and adjust layout
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // final screenWidth = MediaQuery.of(context).size.width;
+                // final isWideScreen = screenWidth > 800;
 
-              if (isWideScreen) {
-                // Two-column layout for wide screens
-                final int splitIndex = (specItems.length / 2).ceil();
-                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-                final List<String> rightColumnItems = specItems.sublist(splitIndex);
+                if (isWideScreen) {
+                  // Two-column layout for wide screens
+                  final int splitIndex = (specItems.length / 2).ceil();
+                  final List<String> leftColumnItems =
+                      specItems.sublist(0, splitIndex);
+                  final List<String> rightColumnItems =
+                      specItems.sublist(splitIndex);
 
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: leftColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: leftColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: rightColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: rightColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              } else {
-                // Single-column layout for mobile
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: specItems
-                      .map((item) => featureItem(item, isDarkMode))
-                      .toList(),
-                );
-              }
-            },
-          ),
-         const SizedBox(height: 40),
+                    ],
+                  );
+                } else {
+                  // Single-column layout for mobile
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: specItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 40),
             Center(
               child: _buildBannerButton(
                 "Download Datasheet",
@@ -449,11 +475,12 @@ final screenWidth = MediaQuery.of(context).size.width;
                 },
               ),
             ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
       child: Padding(
@@ -468,12 +495,14 @@ final screenWidth = MediaQuery.of(context).size.width;
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("High Quality measurement upto 60m/s(216km/h).", isDarkMode),
-           featureItem("High accuracy with fast response time", isDarkMode),
-featureItem("0°-360° wind direction coverage with 1° resolution", isDarkMode),
-featureItem("Low Maintanence, ensuring low cost of ownership", isDarkMode),
-featureItem("Robust design for all weather conditions", isDarkMode),
-
+            featureItem(
+                "High Quality measurement upto 60m/s(216km/h).", isDarkMode),
+            featureItem("High accuracy with fast response time", isDarkMode),
+            featureItem("0°-360° wind direction coverage with 1° resolution",
+                isDarkMode),
+            featureItem(
+                "Low Maintanence, ensuring low cost of ownership", isDarkMode),
+            featureItem("Robust design for all weather conditions", isDarkMode),
           ],
         ),
       ),
@@ -494,11 +523,10 @@ featureItem("Robust design for all weather conditions", isDarkMode),
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-           featureItem("Weather monitoring stations", isDarkMode),
-featureItem("Smart agriculture and precision farming", isDarkMode),
-featureItem("Ports and harbours", isDarkMode),
-featureItem("Runways and helipads", isDarkMode),
-
+            featureItem("Weather monitoring stations", isDarkMode),
+            featureItem("Smart agriculture and precision farming", isDarkMode),
+            featureItem("Ports and harbours", isDarkMode),
+            featureItem("Runways and helipads", isDarkMode),
           ],
         ),
       ),
@@ -528,8 +556,8 @@ featureItem("Runways and helipads", isDarkMode),
               elevation: 4,
             ),
             onPressed: onPressed,
-            icon: const Icon(Icons.arrow_forward,
-                size: 18, color: Colors.white),
+            icon:
+                const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
             label: Text(
               label,
               style: TextStyle(
@@ -539,8 +567,11 @@ featureItem("Runways and helipads", isDarkMode),
               ),
             ),
           ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
-                duration: 1200.ms, curve: Curves.easeInOut),
+            ..scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.05, 1.05),
+                duration: 1200.ms,
+                curve: Curves.easeInOut),
         );
       },
     );
@@ -590,9 +621,8 @@ class _HoverCardState extends State<HoverCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        transform: _hovering
-            ? (Matrix4.identity()..scale(1.01)) 
-            : Matrix4.identity(),
+        transform:
+            _hovering ? (Matrix4.identity()..scale(1.01)) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: _hovering
               ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)

@@ -106,7 +106,8 @@ class ProductPage extends StatelessWidget {
                               ),
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth: isWideScreen ? 600 : double.infinity,
+                                  maxWidth:
+                                      isWideScreen ? 600 : double.infinity,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +135,10 @@ class ProductPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
+                                    )
+                                        .animate()
+                                        .fadeIn(duration: 1700.ms)
+                                        .slideX(),
                                     Container(
                                       margin: const EdgeInsets.only(
                                           top: 6, bottom: 16),
@@ -165,67 +169,89 @@ class ProductPage extends StatelessWidget {
                                         BannerPoint(
                                             "Robust design for all weather conditions"),
                                       ],
-                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
+                                    ).animate().fadeIn(
+                                        delay: 1200.ms, duration: 1500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
                                         // Inside Wrap of buttons
-                                       _buildBannerButton(
-  "Enquire",
-  Colors.blue,
-  () async {
-    final email = "sharmasejal2701@gmail.com";
-    final subject = "Product Enquiry";
-    final body = "Hello, I am interested in your product.";
+                                        _buildBannerButton(
+                                          "Enquire",
+                                          Colors.teal,
+                                          () async {
+                                            final email =
+                                                "sharmasejal2701@gmail.com";
+                                            final subject = "Product Enquiry";
+                                            final body =
+                                                "Hello, I am interested in your product.";
 
-    final Uri mailtoUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      query: Uri.encodeFull("subject=$subject&body=$body"),
-    );
+                                            final Uri mailtoUri = Uri(
+                                              scheme: 'mailto',
+                                              path: email,
+                                              query: Uri.encodeFull(
+                                                  "subject=$subject&body=$body"),
+                                            );
 
-    if (kIsWeb) {
-      final isMobileBrowser =
-          defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.android;
+                                            if (kIsWeb) {
+                                              final isMobileBrowser =
+                                                  defaultTargetPlatform ==
+                                                          TargetPlatform.iOS ||
+                                                      defaultTargetPlatform ==
+                                                          TargetPlatform
+                                                              .android;
 
-      if (!isMobileBrowser) {
-        // 🌐 Desktop Web → Gmail compose in browser
-        final Uri gmailUrl = Uri.parse(
-          "https://mail.google.com/mail/?view=cm&fs=1"
-          "&to=$email"
-          "&su=${Uri.encodeComponent(subject)}"
-          "&body=${Uri.encodeComponent(body)}",
-        );
+                                              if (!isMobileBrowser) {
+                                                // 🌐 Desktop Web → Gmail compose in browser
+                                                final Uri gmailUrl = Uri.parse(
+                                                  "https://mail.google.com/mail/?view=cm&fs=1"
+                                                  "&to=$email"
+                                                  "&su=${Uri.encodeComponent(subject)}"
+                                                  "&body=${Uri.encodeComponent(body)}",
+                                                );
 
-        if (await canLaunchUrl(gmailUrl)) {
-          await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
-          return;
-        }
-      }
+                                                if (await canLaunchUrl(
+                                                    gmailUrl)) {
+                                                  await launchUrl(gmailUrl,
+                                                      mode: LaunchMode
+                                                          .externalApplication);
+                                                  return;
+                                                }
+                                              }
 
-      // 🌐 Mobile browser (fallback) → use mailto
-      if (await canLaunchUrl(mailtoUri)) {
-        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Could not open email client")),
-        );
-      }
-    } else {
-      // 📱 Native mobile app (Android/iOS) → use mailto directly
-      if (await canLaunchUrl(mailtoUri)) {
-        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Could not open email app")),
-        );
-      }
-    }
-  },
-),
+                                              // 🌐 Mobile browser (fallback) → use mailto
+                                              if (await canLaunchUrl(
+                                                  mailtoUri)) {
+                                                await launchUrl(mailtoUri,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Could not open email client")),
+                                                );
+                                              }
+                                            } else {
+                                              // 📱 Native mobile app (Android/iOS) → use mailto directly
+                                              if (await canLaunchUrl(
+                                                  mailtoUri)) {
+                                                await launchUrl(mailtoUri,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Could not open email app")),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
 
                                         // _buildBannerButton(
                                         //   "Download Manual",
@@ -254,23 +280,18 @@ class ProductPage extends StatelessWidget {
                 // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child:  isWideScreen
+                  child: isWideScreen
                       ? _buildIpadLayout(isDarkMode)
-                      
-                          
-                          : Column(
-                              children: [
-                                _buildFeaturesCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                                const SizedBox(height: 16),
-                                _buildApplicationsCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                              ],
-                            ),
+                      : Column(
+                          children: [
+                            _buildFeaturesCard(isDarkMode).animate().fadeIn(),
+                            const SizedBox(height: 16),
+                            _buildApplicationsCard(isDarkMode)
+                                .animate()
+                                .fadeIn(),
+                          ],
+                        ),
                 ),
-
 
                 // ---------- Specs ----------
                 Padding(
@@ -281,7 +302,7 @@ class ProductPage extends StatelessWidget {
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(context,isDarkMode)
+                      child: _buildSpecificationsCard(context, isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -316,8 +337,10 @@ class ProductPage extends StatelessWidget {
         final featuresKey = GlobalKey();
         final applicationsKey = GlobalKey();
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
-          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          final featuresBox =
+              featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox =
+              applicationsKey.currentContext?.findRenderObject() as RenderBox?;
           if (featuresBox != null && applicationsBox != null) {
             final featuresHeight = featuresBox.size.height;
             final applicationsHeight = applicationsBox.size.height;
@@ -327,7 +350,8 @@ class ProductPage extends StatelessWidget {
                   ? featuresHeight
                   : applicationsHeight;
               featuresBox.size = Size(featuresBox.size.width, maxHeight);
-              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+              applicationsBox.size =
+                  Size(applicationsBox.size.width, maxHeight);
             }
           }
         });
@@ -361,19 +385,15 @@ class ProductPage extends StatelessWidget {
   // ---------- Specifications Card ----------
   Widget _buildSpecificationsCard(BuildContext context, isDarkMode) {
     final List<String> specItems = [
-"Made of ABS material, offering durability and weather resistance",
-                                           "Available in two diameter options: 159.5 mm and 200 mm",
-                                          "Collection areas: 200 cm² and 314 cm²",
-                                         "Resolution: 0.2 mm or 0.5 mm depending on the model", 
-                                          "Equipped with reed switch or magnetic sensor for tip detection", 
-                                           "Data Output: Number of tips × Resolution = Total Rainfall", 
-                                           
-     
-      
-      
+      "Made of ABS material, offering durability and weather resistance",
+      "Available in two diameter options: 159.5 mm and 200 mm",
+      "Collection areas: 200 cm² and 314 cm²",
+      "Resolution: 0.2 mm or 0.5 mm depending on the model",
+      "Equipped with reed switch or magnetic sensor for tip detection",
+      "Data Output: Number of tips × Resolution = Total Rainfall",
     ];
- final screenWidth = MediaQuery.of(context).size.width;
-              final isWideScreen = screenWidth > 800;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 800;
     final int splitIndex = (specItems.length / 2).ceil();
     final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
     final List<String> rightColumnItems = specItems.sublist(splitIndex);
@@ -382,64 +402,68 @@ class ProductPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: isWideScreen ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          crossAxisAlignment: isWideScreen
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
           children: [
             Text(
-                "Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                ),
+              "Specifications",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.blue.shade800,
               ),
-           
+            ),
+
             const SizedBox(height: 20),
-          // Use a LayoutBuilder to determine screen width and adjust layout
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // final screenWidth = MediaQuery.of(context).size.width;
-              // final isWideScreen = screenWidth > 800;
+            // Use a LayoutBuilder to determine screen width and adjust layout
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // final screenWidth = MediaQuery.of(context).size.width;
+                // final isWideScreen = screenWidth > 800;
 
-              if (isWideScreen) {
-                // Two-column layout for wide screens
-                final int splitIndex = (specItems.length / 2).ceil();
-                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-                final List<String> rightColumnItems = specItems.sublist(splitIndex);
+                if (isWideScreen) {
+                  // Two-column layout for wide screens
+                  final int splitIndex = (specItems.length / 2).ceil();
+                  final List<String> leftColumnItems =
+                      specItems.sublist(0, splitIndex);
+                  final List<String> rightColumnItems =
+                      specItems.sublist(splitIndex);
 
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: leftColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: leftColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: rightColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: rightColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              } else {
-                // Single-column layout for mobile
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: specItems
-                      .map((item) => featureItem(item, isDarkMode))
-                      .toList(),
-                );
-              }
-            },
-          ),
-           const SizedBox(height: 40),
+                    ],
+                  );
+                } else {
+                  // Single-column layout for mobile
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: specItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 40),
             Center(
               child: _buildBannerButton(
                 "Download Datasheet",
@@ -453,11 +477,12 @@ class ProductPage extends StatelessWidget {
                 },
               ),
             ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
       child: Padding(
@@ -472,13 +497,20 @@ class ProductPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Balanced tipping bucket mechanism ensures high accuracy", isDarkMode),
-            featureItem("Minimal moving parts → long-term reliability with low maintenance", isDarkMode),
-            featureItem("Reed switch / magnetic sensor for precise detection", isDarkMode),
-            featureItem("Accurate even under varying rainfall intensities", isDarkMode),
+            featureItem(
+                "Balanced tipping bucket mechanism ensures high accuracy",
+                isDarkMode),
+            featureItem(
+                "Minimal moving parts → long-term reliability with low maintenance",
+                isDarkMode),
+            featureItem("Reed switch / magnetic sensor for precise detection",
+                isDarkMode),
+            featureItem(
+                "Accurate even under varying rainfall intensities", isDarkMode),
             featureItem("Durable ABS body with weather resistance", isDarkMode),
-            featureItem("Easy integration with data loggers and weather stations for automated rainfall recording", isDarkMode),
-           
+            featureItem(
+                "Easy integration with data loggers and weather stations for automated rainfall recording",
+                isDarkMode),
           ],
         ),
       ),
@@ -499,13 +531,13 @@ class ProductPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Meteorological stations for rainfall monitoring", isDarkMode),
+            featureItem(
+                "Meteorological stations for rainfall monitoring", isDarkMode),
             featureItem("Agriculture & irrigation planning", isDarkMode),
-           
-            featureItem("Environmental monitoring & climate research", isDarkMode),
-           
-            featureItem("Suitable for precise/general purpose rain monitoring", isDarkMode),
-            
+            featureItem(
+                "Environmental monitoring & climate research", isDarkMode),
+            featureItem("Suitable for precise/general purpose rain monitoring",
+                isDarkMode),
           ],
         ),
       ),
@@ -535,8 +567,8 @@ class ProductPage extends StatelessWidget {
               elevation: 4,
             ),
             onPressed: onPressed,
-            icon: const Icon(Icons.arrow_forward,
-                size: 18, color: Colors.white),
+            icon:
+                const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
             label: Text(
               label,
               style: TextStyle(
@@ -546,8 +578,11 @@ class ProductPage extends StatelessWidget {
               ),
             ),
           ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
-                duration: 1200.ms, curve: Curves.easeInOut),
+            ..scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.05, 1.05),
+                duration: 1200.ms,
+                curve: Curves.easeInOut),
         );
       },
     );
@@ -597,9 +632,8 @@ class _HoverCardState extends State<HoverCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        transform: _hovering
-            ? (Matrix4.identity()..scale(1.01)) 
-            : Matrix4.identity(),
+        transform:
+            _hovering ? (Matrix4.identity()..scale(1.01)) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: _hovering
               ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)

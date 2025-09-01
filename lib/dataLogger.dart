@@ -106,7 +106,8 @@ class DataLoggerPage extends StatelessWidget {
                               ),
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(
-                                  maxWidth: isWideScreen ? 600 : double.infinity,
+                                  maxWidth:
+                                      isWideScreen ? 600 : double.infinity,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +135,10 @@ class DataLoggerPage extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                    ).animate().fadeIn(duration: 1700.ms).slideX(),
+                                    )
+                                        .animate()
+                                        .fadeIn(duration: 1700.ms)
+                                        .slideX(),
                                     Container(
                                       margin: const EdgeInsets.only(
                                           top: 6, bottom: 16),
@@ -165,66 +169,88 @@ class DataLoggerPage extends StatelessWidget {
                                         BannerPoint(
                                             "Robust Design with IP66 Rating."),
                                       ],
-                                    ).animate().fadeIn(delay: 1200.ms, duration: 1500.ms),
+                                    ).animate().fadeIn(
+                                        delay: 1200.ms, duration: 1500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 8,
                                       children: [
-_buildBannerButton(
-  "Enquire",
-  Colors.blue,
-  () async {
-    final email = "sharmasejal2701@gmail.com";
-    final subject = "Product Enquiry";
-    final body = "Hello, I am interested in your product.";
+                                        _buildBannerButton(
+                                          "Enquire",
+                                          Colors.teal,
+                                          () async {
+                                            final email =
+                                                "sharmasejal2701@gmail.com";
+                                            final subject = "Product Enquiry";
+                                            final body =
+                                                "Hello, I am interested in your product.";
 
-    final Uri mailtoUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      query: Uri.encodeFull("subject=$subject&body=$body"),
-    );
+                                            final Uri mailtoUri = Uri(
+                                              scheme: 'mailto',
+                                              path: email,
+                                              query: Uri.encodeFull(
+                                                  "subject=$subject&body=$body"),
+                                            );
 
-    if (kIsWeb) {
-      final isMobileBrowser =
-          defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.android;
+                                            if (kIsWeb) {
+                                              final isMobileBrowser =
+                                                  defaultTargetPlatform ==
+                                                          TargetPlatform.iOS ||
+                                                      defaultTargetPlatform ==
+                                                          TargetPlatform
+                                                              .android;
 
-      if (!isMobileBrowser) {
-        // 🌐 Desktop Web → Gmail compose in browser
-        final Uri gmailUrl = Uri.parse(
-          "https://mail.google.com/mail/?view=cm&fs=1"
-          "&to=$email"
-          "&su=${Uri.encodeComponent(subject)}"
-          "&body=${Uri.encodeComponent(body)}",
-        );
+                                              if (!isMobileBrowser) {
+                                                // 🌐 Desktop Web → Gmail compose in browser
+                                                final Uri gmailUrl = Uri.parse(
+                                                  "https://mail.google.com/mail/?view=cm&fs=1"
+                                                  "&to=$email"
+                                                  "&su=${Uri.encodeComponent(subject)}"
+                                                  "&body=${Uri.encodeComponent(body)}",
+                                                );
 
-        if (await canLaunchUrl(gmailUrl)) {
-          await launchUrl(gmailUrl, mode: LaunchMode.externalApplication);
-          return;
-        }
-      }
+                                                if (await canLaunchUrl(
+                                                    gmailUrl)) {
+                                                  await launchUrl(gmailUrl,
+                                                      mode: LaunchMode
+                                                          .externalApplication);
+                                                  return;
+                                                }
+                                              }
 
-      // 🌐 Mobile browser (fallback) → use mailto
-      if (await canLaunchUrl(mailtoUri)) {
-        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Could not open email client")),
-        );
-      }
-    } else {
-      // 📱 Native mobile app (Android/iOS) → use mailto directly
-      if (await canLaunchUrl(mailtoUri)) {
-        await launchUrl(mailtoUri, mode: LaunchMode.externalApplication);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Could not open email app")),
-        );
-      }
-    }
-  },
-),
+                                              // 🌐 Mobile browser (fallback) → use mailto
+                                              if (await canLaunchUrl(
+                                                  mailtoUri)) {
+                                                await launchUrl(mailtoUri,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Could not open email client")),
+                                                );
+                                              }
+                                            } else {
+                                              // 📱 Native mobile app (Android/iOS) → use mailto directly
+                                              if (await canLaunchUrl(
+                                                  mailtoUri)) {
+                                                await launchUrl(mailtoUri,
+                                                    mode: LaunchMode
+                                                        .externalApplication);
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          "Could not open email app")),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
 
                                         // _buildBannerButton(
                                         //   "Download Manual",
@@ -251,23 +277,19 @@ _buildBannerButton(
                 ),
 
                 // ---------- Features & Applications ----------
-               Padding(
+                Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child:  isWideScreen
+                  child: isWideScreen
                       ? _buildIpadLayout(isDarkMode)
-                      
-                          
-                          : Column(
-                              children: [
-                                _buildFeaturesCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                                const SizedBox(height: 16),
-                                _buildApplicationsCard(isDarkMode)
-                                    .animate()
-                                    .fadeIn(),
-                              ],
-                            ),
+                      : Column(
+                          children: [
+                            _buildFeaturesCard(isDarkMode).animate().fadeIn(),
+                            const SizedBox(height: 16),
+                            _buildApplicationsCard(isDarkMode)
+                                .animate()
+                                .fadeIn(),
+                          ],
+                        ),
                 ),
 
                 // ---------- Specs ----------
@@ -279,7 +301,7 @@ _buildBannerButton(
                       constraints: BoxConstraints(
                         maxWidth: isWideScreen ? 1000 : double.infinity,
                       ),
-                      child: _buildSpecificationsCard(context ,isDarkMode)
+                      child: _buildSpecificationsCard(context, isDarkMode)
                           .animate()
                           .fadeIn()
                           .slideY(begin: 0.2),
@@ -314,8 +336,10 @@ _buildBannerButton(
         final featuresKey = GlobalKey();
         final applicationsKey = GlobalKey();
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final featuresBox = featuresKey.currentContext?.findRenderObject() as RenderBox?;
-          final applicationsBox = applicationsKey.currentContext?.findRenderObject() as RenderBox?;
+          final featuresBox =
+              featuresKey.currentContext?.findRenderObject() as RenderBox?;
+          final applicationsBox =
+              applicationsKey.currentContext?.findRenderObject() as RenderBox?;
           if (featuresBox != null && applicationsBox != null) {
             final featuresHeight = featuresBox.size.height;
             final applicationsHeight = applicationsBox.size.height;
@@ -325,7 +349,8 @@ _buildBannerButton(
                   ? featuresHeight
                   : applicationsHeight;
               featuresBox.size = Size(featuresBox.size.width, maxHeight);
-              applicationsBox.size = Size(applicationsBox.size.width, maxHeight);
+              applicationsBox.size =
+                  Size(applicationsBox.size.width, maxHeight);
             }
           }
         });
@@ -357,7 +382,7 @@ _buildBannerButton(
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(BuildContext context,bool isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
       "Input Supply voltage: 5V - 16",
       "Communication interfaces: ADC, UART, I2C, SPI, RS232, RS485",
@@ -367,11 +392,9 @@ _buildBannerButton(
       "Built in LTE and GPS Antennas",
       "Inbuild Real Time clock",
       "Ultra low power sleep mode",
-      
-      
     ];
- final screenWidth = MediaQuery.of(context).size.width;
-              final isWideScreen = screenWidth > 800;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWideScreen = screenWidth > 800;
     final int splitIndex = (specItems.length / 2).ceil();
     final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
     final List<String> rightColumnItems = specItems.sublist(splitIndex);
@@ -380,64 +403,68 @@ _buildBannerButton(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: isWideScreen ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          crossAxisAlignment: isWideScreen
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
           children: [
-           Text(
-                "Specifications",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                ),
+            Text(
+              "Specifications",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.blue.shade800,
               ),
-          
-             const SizedBox(height: 20),
-          // Use a LayoutBuilder to determine screen width and adjust layout
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // final screenWidth = MediaQuery.of(context).size.width;
-              // final isWideScreen = screenWidth > 800;
+            ),
 
-              if (isWideScreen) {
-                // Two-column layout for wide screens
-                final int splitIndex = (specItems.length / 2).ceil();
-                final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-                final List<String> rightColumnItems = specItems.sublist(splitIndex);
+            const SizedBox(height: 20),
+            // Use a LayoutBuilder to determine screen width and adjust layout
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // final screenWidth = MediaQuery.of(context).size.width;
+                // final isWideScreen = screenWidth > 800;
 
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: leftColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                if (isWideScreen) {
+                  // Two-column layout for wide screens
+                  final int splitIndex = (specItems.length / 2).ceil();
+                  final List<String> leftColumnItems =
+                      specItems.sublist(0, splitIndex);
+                  final List<String> rightColumnItems =
+                      specItems.sublist(splitIndex);
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: leftColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: rightColumnItems
-                            .map((item) => featureItem(item, isDarkMode))
-                            .toList(),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: rightColumnItems
+                              .map((item) => featureItem(item, isDarkMode))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              } else {
-                // Single-column layout for mobile
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: specItems
-                      .map((item) => featureItem(item, isDarkMode))
-                      .toList(),
-                );
-              }
-            },
-          ),
-         const SizedBox(height: 40),
+                    ],
+                  );
+                } else {
+                  // Single-column layout for mobile
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: specItems
+                        .map((item) => featureItem(item, isDarkMode))
+                        .toList(),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 40),
             Center(
               child: _buildBannerButton(
                 "Download Datasheet",
@@ -451,11 +478,11 @@ _buildBannerButton(
                 },
               ),
             ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildFeaturesCard(bool isDarkMode) {
     return HoverCard(
@@ -468,21 +495,17 @@ _buildBannerButton(
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white :Colors.blue.shade800,
+                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("4G Dual sim connectivity",
-                isDarkMode),
-            featureItem("25-30 Days Data Backup",
-                isDarkMode),
-            featureItem("Support Multi protocol communication Interfaces",
-                isDarkMode),
+            featureItem("4G Dual sim connectivity", isDarkMode),
+            featureItem("25-30 Days Data Backup", isDarkMode),
+            featureItem(
+                "Support Multi protocol communication Interfaces", isDarkMode),
             featureItem("Robust IP66 Enclosure for harsh weather condition",
                 isDarkMode),
-            featureItem(
-                "Solar and Battery Powered option for remote site.",
+            featureItem("Solar and Battery Powered option for remote site.",
                 isDarkMode),
-           
           ],
         ),
       ),
@@ -504,12 +527,11 @@ _buildBannerButton(
                 )),
             const SizedBox(height: 10),
             featureItem("Remote weather monitoring stations", isDarkMode),
-            featureItem("Smart agriculture and irrigation management", isDarkMode),
-            
+            featureItem(
+                "Smart agriculture and irrigation management", isDarkMode),
             featureItem("Industrial and environmental monitoring", isDarkMode),
             featureItem("Smart cities and IoT projects", isDarkMode),
-             featureItem("Cold storage management", isDarkMode),
-            
+            featureItem("Cold storage management", isDarkMode),
           ],
         ),
       ),
@@ -539,8 +561,8 @@ _buildBannerButton(
               elevation: 4,
             ),
             onPressed: onPressed,
-            icon: const Icon(Icons.arrow_forward,
-                size: 18, color: Colors.white),
+            icon:
+                const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
             label: Text(
               label,
               style: TextStyle(
@@ -550,8 +572,11 @@ _buildBannerButton(
               ),
             ),
           ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-            ..scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05),
-                duration: 1200.ms, curve: Curves.easeInOut),
+            ..scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.05, 1.05),
+                duration: 1200.ms,
+                curve: Curves.easeInOut),
         );
       },
     );
@@ -601,9 +626,8 @@ class _HoverCardState extends State<HoverCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        transform: _hovering
-            ? (Matrix4.identity()..scale(1.01)) 
-            : Matrix4.identity(),
+        transform:
+            _hovering ? (Matrix4.identity()..scale(1.01)) : Matrix4.identity(),
         decoration: BoxDecoration(
           color: _hovering
               ? (isDarkMode ? Colors.blueGrey.shade700 : Colors.teal.shade50)

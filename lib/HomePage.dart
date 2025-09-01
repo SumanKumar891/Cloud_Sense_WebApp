@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -159,6 +158,7 @@ class _HomePageState extends State<HomePage> {
       Navigator.pushNamed(context, '/login');
     }
   }
+
   void _showLoginPopup(BuildContext context) {
     showDialog(
       context: context,
@@ -283,7 +283,8 @@ class _HomePageState extends State<HomePage> {
                                   color:
                                       isDarkMode ? Colors.white : Colors.black),
                               SizedBox(width: 8),
-                              Text('Temperature Humidity\nLight Intensity and\nPressure Radiation Shield'),
+                              Text(
+                                  'Temperature Humidity\nLight Intensity and\nPressure Radiation Shield'),
                             ],
                           ),
                         ),
@@ -465,7 +466,8 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       TextButton(
                         key: productsButtonKey,
-                        onPressed: () => _showSensorPopup(context, buttonKey: productsButtonKey),
+                        onPressed: () => _showSensorPopup(context,
+                            buttonKey: productsButtonKey),
                         child: Row(
                           children: [
                             SizedBox(width: 4),
@@ -490,7 +492,8 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 _buildUserIcon(),
                                 SizedBox(width: 8),
-                                _buildUserDropdown(isDarkMode, isTablet, userButtonKey),
+                                _buildUserDropdown(
+                                    isDarkMode, isTablet, userButtonKey),
                               ],
                             )
                           : TextButton(
@@ -501,13 +504,17 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     'Login/Signup',
                                     style: TextStyle(
-                                      color: isDarkMode ? Colors.white : Colors.black,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                       fontWeight: FontWeight.bold,
                                       fontSize: isTablet ? 14 : 16,
                                     ),
                                   ),
                                   Icon(Icons.arrow_drop_down,
-                                      color: isDarkMode ? Colors.white : Colors.black,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                       size: isTablet ? 18 : 20),
                                 ],
                               ),
@@ -520,7 +527,9 @@ class _HomePageState extends State<HomePage> {
                         child: Row(
                           children: [
                             Icon(
-                              themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                              themeProvider.isDarkMode
+                                  ? Icons.light_mode
+                                  : Icons.dark_mode,
                               color: isDarkMode ? Colors.white : Colors.black,
                               size: isTablet ? 18 : 20,
                             ),
@@ -655,7 +664,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       title: Text('Products'),
-                      subtitle: Text('Browse our sensor products'),
+                      // subtitle: Text('Browse our sensor products'),
                       onTap: () {
                         setState(() {
                           _isProductsExpanded = !_isProductsExpanded;
@@ -700,7 +709,8 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   ListTile(
                                     leading: Icon(Icons.thermostat, size: 18),
-                                    title: Text('Temperature Humidity\nLight Intensity and\nPressure Radiation Shield',
+                                    title: Text(
+                                        'Temperature Humidity\nLight Intensity and\nPressure Radiation Shield',
                                         style: TextStyle(fontSize: 12)),
                                     onTap: () {
                                       Navigator.pop(context);
@@ -903,17 +913,18 @@ class _HomePageState extends State<HomePage> {
                                   MouseRegion(
                                     onEnter: (_) => setState(
                                         () => _isHoveredMyDevicesButton = true),
-                                    onExit: (_) => setState(
-                                        () => _isHoveredMyDevicesButton = false),
+                                    onExit: (_) => setState(() =>
+                                        _isHoveredMyDevicesButton = false),
                                     child: GestureDetector(
-                                      onTapDown: (_) => setState(
-                                          () => _isPressedMyDevicesButton = true),
-                                      onTapUp: (_) => setState(
-                                          () => _isPressedMyDevicesButton = false),
-                                      onTapCancel: () => setState(
-                                          () => _isPressedMyDevicesButton = false),
+                                      onTapDown: (_) => setState(() =>
+                                          _isPressedMyDevicesButton = true),
+                                      onTapUp: (_) => setState(() =>
+                                          _isPressedMyDevicesButton = false),
+                                      onTapCancel: () => setState(() =>
+                                          _isPressedMyDevicesButton = false),
                                       child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 200),
+                                        duration:
+                                            const Duration(milliseconds: 200),
                                         transform: Matrix4.identity()
                                           ..scale(_isPressedMyDevicesButton
                                               ? 0.95
@@ -921,30 +932,38 @@ class _HomePageState extends State<HomePage> {
                                                   ? 1.05
                                                   : 1.0)),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           boxShadow: [
                                             BoxShadow(
                                               color: _isHoveredMyDevicesButton
-                                                  ? Colors.black.withOpacity(0.4)
-                                                  : Colors.black.withOpacity(0.2),
+                                                  ? Colors.black
+                                                      .withOpacity(0.4)
+                                                  : Colors.black
+                                                      .withOpacity(0.2),
                                               blurRadius:
-                                                  _isHoveredMyDevicesButton ? 12 : 6,
+                                                  _isHoveredMyDevicesButton
+                                                      ? 12
+                                                      : 6,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
                                         ),
                                         child: ElevatedButton(
                                           onPressed: () {
-                                      Navigator.pushNamed(context, '/devicelist');
+                                            Navigator.pushNamed(
+                                                context, '/devicelist');
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: themeProvider.isDarkMode
-                                                ? const Color.fromARGB(
-                                                    255, 18, 16, 16)
-                                                : Colors.white,
-                                            foregroundColor: themeProvider.isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
+                                            backgroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? const Color.fromARGB(
+                                                        255, 18, 16, 16)
+                                                    : Colors.white,
+                                            foregroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black,
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 32,
                                               vertical: 18,
@@ -979,8 +998,8 @@ class _HomePageState extends State<HomePage> {
                                   MouseRegion(
                                     onEnter: (_) =>
                                         setState(() => _isHoveredbutton = true),
-                                    onExit: (_) =>
-                                        setState(() => _isHoveredbutton = false),
+                                    onExit: (_) => setState(
+                                        () => _isHoveredbutton = false),
                                     child: GestureDetector(
                                       onTapDown: (_) =>
                                           setState(() => _isPressed = true),
@@ -989,19 +1008,26 @@ class _HomePageState extends State<HomePage> {
                                       onTapCancel: () =>
                                           setState(() => _isPressed = false),
                                       child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 200),
+                                        duration:
+                                            const Duration(milliseconds: 200),
                                         transform: Matrix4.identity()
                                           ..scale(_isPressed
                                               ? 0.95
-                                              : (_isHoveredbutton ? 1.05 : 1.0)),
+                                              : (_isHoveredbutton
+                                                  ? 1.05
+                                                  : 1.0)),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           boxShadow: [
                                             BoxShadow(
                                               color: _isHoveredbutton
-                                                  ? Colors.black.withOpacity(0.4)
-                                                  : Colors.black.withOpacity(0.2),
-                                              blurRadius: _isHoveredbutton ? 12 : 6,
+                                                  ? Colors.black
+                                                      .withOpacity(0.4)
+                                                  : Colors.black
+                                                      .withOpacity(0.2),
+                                              blurRadius:
+                                                  _isHoveredbutton ? 12 : 6,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
@@ -1017,13 +1043,15 @@ class _HomePageState extends State<HomePage> {
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: themeProvider.isDarkMode
-                                                ? const Color.fromARGB(
-                                                    255, 18, 16, 16)
-                                                : Colors.white,
-                                            foregroundColor: themeProvider.isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
+                                            backgroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? const Color.fromARGB(
+                                                        255, 18, 16, 16)
+                                                    : Colors.white,
+                                            foregroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black,
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 32,
                                               vertical: 18,
@@ -1062,17 +1090,18 @@ class _HomePageState extends State<HomePage> {
                                   MouseRegion(
                                     onEnter: (_) => setState(
                                         () => _isHoveredMyDevicesButton = true),
-                                    onExit: (_) => setState(
-                                        () => _isHoveredMyDevicesButton = false),
+                                    onExit: (_) => setState(() =>
+                                        _isHoveredMyDevicesButton = false),
                                     child: GestureDetector(
-                                      onTapDown: (_) => setState(
-                                          () => _isPressedMyDevicesButton = true),
-                                      onTapUp: (_) => setState(
-                                          () => _isPressedMyDevicesButton = false),
-                                      onTapCancel: () => setState(
-                                          () => _isPressedMyDevicesButton = false),
+                                      onTapDown: (_) => setState(() =>
+                                          _isPressedMyDevicesButton = true),
+                                      onTapUp: (_) => setState(() =>
+                                          _isPressedMyDevicesButton = false),
+                                      onTapCancel: () => setState(() =>
+                                          _isPressedMyDevicesButton = false),
                                       child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 200),
+                                        duration:
+                                            const Duration(milliseconds: 200),
                                         transform: Matrix4.identity()
                                           ..scale(_isPressedMyDevicesButton
                                               ? 0.95
@@ -1080,14 +1109,19 @@ class _HomePageState extends State<HomePage> {
                                                   ? 1.05
                                                   : 1.0)),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           boxShadow: [
                                             BoxShadow(
                                               color: _isHoveredMyDevicesButton
-                                                  ? Colors.black.withOpacity(0.4)
-                                                  : Colors.black.withOpacity(0.2),
+                                                  ? Colors.black
+                                                      .withOpacity(0.4)
+                                                  : Colors.black
+                                                      .withOpacity(0.2),
                                               blurRadius:
-                                                  _isHoveredMyDevicesButton ? 12 : 6,
+                                                  _isHoveredMyDevicesButton
+                                                      ? 12
+                                                      : 6,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
@@ -1097,13 +1131,15 @@ class _HomePageState extends State<HomePage> {
                                             _handleDeviceNavigation();
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: themeProvider.isDarkMode
-                                                ? const Color.fromARGB(
-                                                    255, 18, 16, 16)
-                                                : Colors.white,
-                                            foregroundColor: themeProvider.isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
+                                            backgroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? const Color.fromARGB(
+                                                        255, 18, 16, 16)
+                                                    : Colors.white,
+                                            foregroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black,
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 32,
                                               vertical: 18,
@@ -1138,8 +1174,8 @@ class _HomePageState extends State<HomePage> {
                                   MouseRegion(
                                     onEnter: (_) =>
                                         setState(() => _isHoveredbutton = true),
-                                    onExit: (_) =>
-                                        setState(() => _isHoveredbutton = false),
+                                    onExit: (_) => setState(
+                                        () => _isHoveredbutton = false),
                                     child: GestureDetector(
                                       onTapDown: (_) =>
                                           setState(() => _isPressed = true),
@@ -1148,19 +1184,26 @@ class _HomePageState extends State<HomePage> {
                                       onTapCancel: () =>
                                           setState(() => _isPressed = false),
                                       child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 200),
+                                        duration:
+                                            const Duration(milliseconds: 200),
                                         transform: Matrix4.identity()
                                           ..scale(_isPressed
                                               ? 0.95
-                                              : (_isHoveredbutton ? 1.05 : 1.0)),
+                                              : (_isHoveredbutton
+                                                  ? 1.05
+                                                  : 1.0)),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           boxShadow: [
                                             BoxShadow(
                                               color: _isHoveredbutton
-                                                  ? Colors.black.withOpacity(0.4)
-                                                  : Colors.black.withOpacity(0.2),
-                                              blurRadius: _isHoveredbutton ? 12 : 6,
+                                                  ? Colors.black
+                                                      .withOpacity(0.4)
+                                                  : Colors.black
+                                                      .withOpacity(0.2),
+                                              blurRadius:
+                                                  _isHoveredbutton ? 12 : 6,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
@@ -1176,13 +1219,15 @@ class _HomePageState extends State<HomePage> {
                                             );
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: themeProvider.isDarkMode
-                                                ? const Color.fromARGB(
-                                                    255, 18, 16, 16)
-                                                : Colors.white,
-                                            foregroundColor: themeProvider.isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
+                                            backgroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? const Color.fromARGB(
+                                                        255, 18, 16, 16)
+                                                    : Colors.white,
+                                            foregroundColor:
+                                                themeProvider.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black,
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 32,
                                               vertical: 18,
@@ -1220,93 +1265,106 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   // Full-width products section (outside of padding)
-                 // ✅ Usage
-Container(
-  width: double.infinity,
-  decoration: BoxDecoration(
-    color: themeProvider.isDarkMode
-        ? Colors.blueGrey[900]
-        : Colors.teal.shade50,
-  ),
-  child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-    child: Column(
-      children: [
-        Text(
-          "Our Products",
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: themeProvider.isDarkMode ? Colors.white : Colors.black,
-          ),
-        ),
-        const SizedBox(height: 30),
+                  // ✅ Usage
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: themeProvider.isDarkMode
+                          ? Colors.blueGrey[900]
+                          : Colors.teal.shade50,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 20),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Our Products",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: themeProvider.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
 
-        // ✅ Fixed Card Size Grid
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getResponsiveCrossAxisCount(screenWidth),
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 30,
-            mainAxisExtent: 320, // ✅ Fix card ki height (har screen par same)
-          ),
-          itemCount: 6,
-          itemBuilder: (context, index) {
-            final items = [
-              {
-                "image": "assets/thprobe.png",
-                "title": "Temperature and Humidity Probe",
-                "desc": "Accurate measurements for temperature and humidity.",
-                "route": "/probe"
-              },
-              {
-                "image": "assets/luxpressure.png",
-                "title": "Temperature Humidity Light Intensity and Pressure Radiation Shield",
-                "desc": "Compact environmental sensing unit for precise measurements.",
-                "route": "/atrh"
-              },
-              {
-                "image": "assets/ultrasonic.png",
-                "title": "Ultrasonic Anemometer",
-                "desc": "Ultrasonic Anemometer for precise wind speed and wind direction.",
-                "route": "/windsensor"
-              },
-              {
-                "image": "assets/gauge.png",
-                "title": "Rain Gauge",
-                "desc": "Tipping Bucket rain Gauge.",
-                "route": "/raingauge"
-              },
-              {
-                "image": "assets/dataloggerrender.png",
-                "title": "Data Logger",
-                "desc": "Reliable Data Logging & seamless Connectivity.",
-                "route": "/datalogger"
-              },
-              {
-                "image": "assets/blegateway.png",
-                "title": "BLE Gateway",
-                "desc": "BLE Gateway For industrial IOT Applications.",
-                "route": "/gateway"
-              },
-            ];
+                          // ✅ Fixed Card Size Grid
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount:
+                                  getResponsiveCrossAxisCount(screenWidth),
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 30,
+                              mainAxisExtent:
+                                  320, // ✅ Fix card ki height (har screen par same)
+                            ),
+                            itemCount: 6,
+                            itemBuilder: (context, index) {
+                              final items = [
+                                {
+                                  "image": "assets/thprobe.png",
+                                  "title": "Temperature and Humidity Probe",
+                                  "desc":
+                                      "Accurate measurements for temperature and humidity.",
+                                  "route": "/probe"
+                                },
+                                {
+                                  "image": "assets/luxpressure.png",
+                                  "title":
+                                      "Temperature Humidity Light Intensity and Pressure Radiation Shield",
+                                  "desc":
+                                      "Compact environmental sensing unit for precise measurements.",
+                                  "route": "/atrh"
+                                },
+                                {
+                                  "image": "assets/ultrasonic.png",
+                                  "title": "Ultrasonic Anemometer",
+                                  "desc":
+                                      "Ultrasonic Anemometer for precise wind speed and wind direction.",
+                                  "route": "/windsensor"
+                                },
+                                {
+                                  "image": "assets/gauge.png",
+                                  "title": "Rain Gauge",
+                                  "desc": "Tipping Bucket rain Gauge.",
+                                  "route": "/raingauge"
+                                },
+                                {
+                                  "image": "assets/dataloggerrender.png",
+                                  "title": "Data Logger",
+                                  "desc":
+                                      "Reliable Data Logging & seamless Connectivity.",
+                                  "route": "/datalogger"
+                                },
+                                {
+                                  "image": "assets/blegateway.png",
+                                  "title": "BLE Gateway",
+                                  "desc":
+                                      "BLE Gateway For industrial IOT Applications.",
+                                  "route": "/gateway"
+                                },
+                              ];
 
-            final item = items[index];
-            return _buildSensorCard(
-              imageAsset: item["image"]!,
-              title: item["title"]!,
-              description: item["desc"]!,
-              onReadMore: () => Navigator.pushNamed(context, item["route"]!),
-              screenWidth: screenWidth,
-            );
-          },
-        ),
-      ],
-    ),
-  ),
-),
+                              final item = items[index];
+                              return _buildSensorCard(
+                                imageAsset: item["image"]!,
+                                title: item["title"]!,
+                                description: item["desc"]!,
+                                onReadMore: () => Navigator.pushNamed(
+                                    context, item["route"]!),
+                                screenWidth: screenWidth,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             )
@@ -1461,237 +1519,232 @@ Container(
       ),
     );
   }
-Widget _buildAnimatedStatCard({
-  required String statValue,
-  required String label,
-  required ThemeProvider themeProvider,
-  required BuildContext context,
-}) {
-  double screenWidth = MediaQuery.of(context).size.width;
-  double cardSize = screenWidth < 500
-      ? 80
-      : screenWidth < 850
-          ? 150
-          : 180;
-  double valueFontSize = cardSize * 0.12;
-  double labelFontSize = cardSize * 0.10;
 
-  return Container(
-    width: cardSize,
-    height: cardSize,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      gradient: LinearGradient(
-        colors: themeProvider.isDarkMode
-            ? [
-                const Color.fromARGB(255, 29, 56, 68),
-                const Color.fromARGB(228, 69, 59, 71)
-              ]
-            : [
-                const Color.fromARGB(255, 73, 117, 121),
-                const Color(0xFF81C784)
-              ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+  Widget _buildAnimatedStatCard({
+    required String statValue,
+    required String label,
+    required ThemeProvider themeProvider,
+    required BuildContext context,
+  }) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double cardSize = screenWidth < 500
+        ? 80
+        : screenWidth < 850
+            ? 150
+            : 180;
+    double valueFontSize = cardSize * 0.12;
+    double labelFontSize = cardSize * 0.10;
+
+    return Container(
+      width: cardSize,
+      height: cardSize,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: themeProvider.isDarkMode
+              ? [
+                  const Color.fromARGB(255, 29, 56, 68),
+                  const Color.fromARGB(228, 69, 59, 71)
+                ]
+              : [
+                  const Color.fromARGB(255, 73, 117, 121),
+                  const Color(0xFF81C784)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(4, 4),
+          ),
+        ],
       ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.2),
-          blurRadius: 12,
-          offset: const Offset(4, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: 0, end: 1),
-          duration: const Duration(seconds: 1),
-          builder: (context, progressValue, child) {
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: cardSize * 0.5,
-                  height: cardSize * 0.5,
-                  child: CircularProgressIndicator(
-                    value: progressValue,
-                    strokeWidth: 6,
-                    color: themeProvider.isDarkMode
-                        ? const Color.fromARGB(255, 95, 154, 172)
-                        : Colors.white,
-                    backgroundColor: themeProvider.isDarkMode
-                        ? Colors.white10
-                        : Colors.white24,
-                  ),
-                ),
-                Text(
-                  statValue,
-                  style: TextStyle(
-                    fontSize: valueFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 12),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: labelFontSize,
-            color: Colors.white70,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildSensorCard({
-  required String imageAsset,
-  required String title,
-  required String description,
-  required VoidCallback onReadMore,
-  required double screenWidth,
-}) {
-  double titleFontSize = screenWidth < 600
-      ? 12
-      : (screenWidth < 1300 ? 12 : 14);
-  double descriptionFontSize = screenWidth < 600
-      ? 10
-      : (screenWidth < 1300 ? 10 : 12);
-  double buttonFontSize = screenWidth < 600
-      ? 8.0
-      : (screenWidth < 1300 ? 10.0 : 12.0);
-
-  EdgeInsets cardPadding = EdgeInsets.all(screenWidth < 600 ? 12.0 : 16.0);
-
-  double titleDescriptionSpacing =
-      screenWidth < 600 ? 2 : (screenWidth < 1300 ? 3.0 : 5.0);
-
-  bool isCardHovered = false;
-
-  return StatefulBuilder(
-    builder: (BuildContext context, StateSetter setState) {
-      final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-      return MouseRegion(
-        onEnter: (_) => setState(() => isCardHovered = true),
-        onExit: (_) => setState(() => isCardHovered = false),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          transform: Matrix4.identity()..scale(isCardHovered ? 1.03 : 1.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: isCardHovered
-                    ? Colors.black.withOpacity(0.4)
-                    : Colors.black.withOpacity(0.2),
-                blurRadius: isCardHovered ? 10 : 6,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Card(
-            elevation: 4,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            color: isDarkMode ? Colors.grey[800] : Colors.white,
-            child: Padding(
-              padding: cardPadding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: 1),
+            duration: const Duration(seconds: 1),
+            builder: (context, progressValue, child) {
+              return Stack(
+                alignment: Alignment.center,
                 children: [
-                  
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Image.asset(
-                      imageAsset,
-                      width: 200,
-                      height: 150,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(color: const Color.fromARGB(255, 20, 8, 8), height: 80);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // ✅ Title
-                  Text(
-                    title.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: titleDescriptionSpacing),
-
-                  // ✅ Description
-                  Text(
-                    description,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.black54,
-                      fontSize: descriptionFontSize,
-                    ),
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Spacer(),
-
-                  // ✅ Button
                   SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: onReadMore,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
-                      child: Text(
-                        "READ MORE >",
-                        style: TextStyle(
-                          fontSize: buttonFontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    width: cardSize * 0.5,
+                    height: cardSize * 0.5,
+                    child: CircularProgressIndicator(
+                      value: progressValue,
+                      strokeWidth: 6,
+                      color: themeProvider.isDarkMode
+                          ? const Color.fromARGB(255, 95, 154, 172)
+                          : Colors.white,
+                      backgroundColor: themeProvider.isDarkMode
+                          ? Colors.white10
+                          : Colors.white24,
+                    ),
+                  ),
+                  Text(
+                    statValue,
+                    style: TextStyle(
+                      fontSize: valueFontSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ],
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: labelFontSize,
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSensorCard({
+    required String imageAsset,
+    required String title,
+    required String description,
+    required VoidCallback onReadMore,
+    required double screenWidth,
+  }) {
+    double titleFontSize =
+        screenWidth < 600 ? 12 : (screenWidth < 1300 ? 12 : 14);
+    double descriptionFontSize =
+        screenWidth < 600 ? 10 : (screenWidth < 1300 ? 10 : 12);
+    double buttonFontSize =
+        screenWidth < 600 ? 8.0 : (screenWidth < 1300 ? 10.0 : 12.0);
+
+    EdgeInsets cardPadding = EdgeInsets.all(screenWidth < 600 ? 12.0 : 16.0);
+
+    double titleDescriptionSpacing =
+        screenWidth < 600 ? 2 : (screenWidth < 1300 ? 3.0 : 5.0);
+
+    bool isCardHovered = false;
+
+    return StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+        return MouseRegion(
+          onEnter: (_) => setState(() => isCardHovered = true),
+          onExit: (_) => setState(() => isCardHovered = false),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            transform: Matrix4.identity()..scale(isCardHovered ? 1.03 : 1.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: isCardHovered
+                      ? Colors.black.withOpacity(0.4)
+                      : Colors.black.withOpacity(0.2),
+                  blurRadius: isCardHovered ? 10 : 6,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              color: isDarkMode ? Colors.grey[800] : Colors.white,
+              child: Padding(
+                padding: cardPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Image.asset(
+                        imageAsset,
+                        width: 200,
+                        height: 150,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                              color: const Color.fromARGB(255, 20, 8, 8),
+                              height: 80);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // ✅ Title
+                    Text(
+                      title.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: titleDescriptionSpacing),
+
+                    // ✅ Description
+                    Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                        fontSize: descriptionFontSize,
+                      ),
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+
+                    // ✅ Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: onReadMore,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: Text(
+                          "READ MORE >",
+                          style: TextStyle(
+                            fontSize: buttonFontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
-
-int getResponsiveCrossAxisCount(double screenWidth) {
-  if (screenWidth < 700) return 1; 
-  if (screenWidth < 1000) return 2; 
-  return 3;
-}
-
-
-
+  int getResponsiveCrossAxisCount(double screenWidth) {
+    if (screenWidth < 700) return 1;
+    if (screenWidth < 1000) return 2;
+    return 3;
+  }
 }
