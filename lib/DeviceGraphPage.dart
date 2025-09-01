@@ -760,18 +760,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
           data.timestamp.month,
           data.timestamp.day,
           data.timestamp.hour,
-          data.timestamp.minute >= 1
-              ? data.timestamp.hour
-              : data.timestamp.hour - 1,
         );
+
         DateTime previousHourStart = DateTime(
           previousTimestamp.year,
           previousTimestamp.month,
           previousTimestamp.day,
           previousTimestamp.hour,
-          previousTimestamp.minute >= 1
-              ? previousTimestamp.hour
-              : previousTimestamp.hour - 1,
         );
 
         bool isEndOfHour =
@@ -780,15 +775,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         bool isNewHour = currentHourStart.isAfter(previousHourStart);
 
         if (isEndOfHour) {
-          // At XX:00, use the full value as the incremental total for the hour
-          incrementalValue = data.value;
+          // At XX:00, use the difference from previous value (not the full cumulative)
+          incrementalValue = data.value - previousValue;
+          incrementalValue = incrementalValue >= 0 ? incrementalValue : 0.0;
         } else if (isReset || isNewHour) {
-          // At XX:01 or after a new hour boundary, the value is the incremental amount (reset occurred)
+          // At XX:01 or new hour, the value is fresh (reset happened)
           incrementalValue = data.value;
         } else {
-          // Within the same hour, calculate the difference from the previous value
+          // Within the same hour, calculate difference
           incrementalValue = data.value - previousValue;
-          // Ensure incremental value is non-negative (in case of anomalies)
           incrementalValue = incrementalValue >= 0 ? incrementalValue : 0.0;
         }
       }
@@ -798,7 +793,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
         value: incrementalValue,
       ));
 
-      // Update previousValue after calculating the incremental value
+      // Update for next iteration
       previousValue = data.value;
       previousTimestamp = data.timestamp;
     }
