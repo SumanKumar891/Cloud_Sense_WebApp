@@ -59,8 +59,8 @@ class GatewayPage extends StatelessWidget {
                               "assets/blegateway.png",
                               fit: BoxFit.contain,
                               alignment: Alignment.center,
-                            ).animate().fadeIn(duration: 1600.ms).scale(
-                                  duration: 1800.ms,
+                            ).animate().fadeIn(duration: 600.ms).scale(
+                                  duration: 800.ms,
                                   curve: Curves.easeOutBack,
                                 ),
                           ),
@@ -139,7 +139,7 @@ class GatewayPage extends StatelessWidget {
                                       ),
                                     )
                                         .animate()
-                                        .fadeIn(duration: 1700.ms)
+                                        .fadeIn(duration: 700.ms)
                                         .slideX(),
                                     Container(
                                       margin: const EdgeInsets.only(
@@ -158,7 +158,7 @@ class GatewayPage extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
-                                    ).animate().fadeIn(duration: 1900.ms),
+                                    ).animate().fadeIn(duration: 900.ms),
                                     const SizedBox(height: 16),
                                     Column(
                                       crossAxisAlignment:
@@ -172,7 +172,7 @@ class GatewayPage extends StatelessWidget {
                                             "Scalable Gateway for 100+ nodes"),
                                       ],
                                     ).animate().fadeIn(
-                                        delay: 1200.ms, duration: 1500.ms),
+                                        delay: 200.ms, duration: 500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
@@ -266,7 +266,7 @@ class GatewayPage extends StatelessWidget {
                                         //   },
                                         // ),
                                       ],
-                                    ).animate().fadeIn(duration: 11000.ms),
+                                    ).animate().fadeIn(duration: 1000.ms),
                                   ],
                                 ),
                               ),

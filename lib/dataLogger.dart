@@ -59,7 +59,7 @@ class DataLoggerPage extends StatelessWidget {
                               "assets/dataloggerrender.png",
                               fit: BoxFit.contain,
                               alignment: Alignment.center,
-                            ).animate().fadeIn(duration: 1600.ms).scale(
+                            ).animate().fadeIn(duration: 600.ms).scale(
                                   duration: 1800.ms,
                                   curve: Curves.easeOutBack,
                                 ),
@@ -139,7 +139,7 @@ class DataLoggerPage extends StatelessWidget {
                                       ),
                                     )
                                         .animate()
-                                        .fadeIn(duration: 1700.ms)
+                                        .fadeIn(duration: 700.ms)
                                         .slideX(),
                                     Container(
                                       margin: const EdgeInsets.only(
@@ -148,7 +148,7 @@ class DataLoggerPage extends StatelessWidget {
                                       width: isWideScreen ? 270 : 150,
                                       color: Colors.lightBlueAccent,
                                     ).animate().scaleX(
-                                          duration: 1800.ms,
+                                          duration: 800.ms,
                                           curve: Curves.easeOut,
                                         ),
                                     Text(
@@ -158,7 +158,7 @@ class DataLoggerPage extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
-                                    ).animate().fadeIn(duration: 1900.ms),
+                                    ).animate().fadeIn(duration: 900.ms),
                                     const SizedBox(height: 16),
                                     Column(
                                       crossAxisAlignment:
@@ -172,7 +172,7 @@ class DataLoggerPage extends StatelessWidget {
                                             "Robust Design with IP66 Rating."),
                                       ],
                                     ).animate().fadeIn(
-                                        delay: 1200.ms, duration: 1500.ms),
+                                        delay: 200.ms, duration: 500.ms),
                                     const SizedBox(height: 20),
                                     Wrap(
                                       spacing: 8,
@@ -266,7 +266,7 @@ class DataLoggerPage extends StatelessWidget {
                                         //   },
                                         // ),
                                       ],
-                                    ).animate().fadeIn(duration: 11000.ms),
+                                    ).animate().fadeIn(duration: 1000.ms),
                                   ],
                                 ),
                               ),
