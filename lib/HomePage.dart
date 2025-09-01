@@ -49,6 +49,8 @@ class _HomePageState extends State<HomePage> {
   bool _isHoveredbutton = false;
   bool _isPressed = false;
   bool _isProductsExpanded = false; // For mobile drawer products expansion
+  // Add a GlobalKey for the Scaffold
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Calculate responsive values based on screen width
   int getCrossAxisCount(double screenWidth) {
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
 
   double getCardAspectRatio(double screenWidth) {
     if (screenWidth < 600) {
-      return 1.1; // Mobile: slightly taller cards
+      return 1.0; // Mobile: slightly taller cards
     } else if (screenWidth < 1300) {
       return 0.8; // Tablet: balanced aspect ratio
     } else {
@@ -418,6 +420,7 @@ class _HomePageState extends State<HomePage> {
           constraints.maxWidth >= 800 && constraints.maxWidth <= 1024;
 
       return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           iconTheme: IconThemeData(
@@ -664,6 +667,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       title: Text('Products'),
+                      // subtitle: Text('Browse our sensor products'),
                       onTap: () {
                         setState(() {
                           _isProductsExpanded = !_isProductsExpanded;
@@ -1630,7 +1634,7 @@ class _HomePageState extends State<HomePage> {
     double buttonFontSize =
         screenWidth < 600 ? 8.0 : (screenWidth < 1300 ? 10.0 : 12.0);
 
-    EdgeInsets cardPadding = EdgeInsets.all(screenWidth < 600 ? 12.0 : 16.0);
+    EdgeInsets cardPadding = EdgeInsets.all(screenWidth < 600 ? 12.0 : 0.0);
 
     double titleDescriptionSpacing =
         screenWidth < 600 ? 2 : (screenWidth < 1300 ? 3.0 : 5.0);
@@ -1672,9 +1676,11 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.only(top: 20),
                       child: Image.asset(
                         imageAsset,
-                        width: 200,
-                        height: 150,
-                        fit: BoxFit.contain,
+                        width: screenWidth < 600
+                            ? 150
+                            : 200, // 📱 smaller on mobile
+                        height: screenWidth < 600 ? 150 : 200,
+                        fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                               color: const Color.fromARGB(255, 20, 8, 8),
@@ -1698,43 +1704,41 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: titleDescriptionSpacing),
 
-                    // ✅ Description
-                    Text(
-                      description,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
-                        fontSize: descriptionFontSize,
-                      ),
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
+                    // // ✅ Description
+                    // Text(
+                    //   description,
+                    //   textAlign: TextAlign.center,
+                    //   style: TextStyle(
+                    //     color: isDarkMode ? Colors.white70 : Colors.black54,
+                    //     fontSize: descriptionFontSize,
+                    //   ),
+                    //   maxLines: 4,
+                    //   overflow: TextOverflow.ellipsis,
+                    // ),
+                    // const Spacer(),
 
                     // ✅ Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: onReadMore,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
+                    // ✅ Button
+                    ElevatedButton(
+                      onPressed: onReadMore,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          "READ MORE >",
-                          style: TextStyle(
-                            fontSize: buttonFontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 8,
                         ),
+                      ),
+                      child: Text(
+                        "READ MORE >",
+                        style: TextStyle(
+                          fontSize: buttonFontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
