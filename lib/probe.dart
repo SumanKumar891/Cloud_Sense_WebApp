@@ -1,4 +1,3 @@
-import 'package:cloud_sense_webapp/appbar.dart';
 import 'package:cloud_sense_webapp/download.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_sense_webapp/appbar.dart';
 
 class ProbePage extends StatelessWidget {
   const ProbePage({super.key});
@@ -14,8 +14,34 @@ class ProbePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
-    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
+
+    final isWideScreen = screenWidth > 1024; // Desktop
+    final isTablet = screenWidth > 700 && screenWidth <= 1024; // iPad
+    final isMobile = screenWidth <= 700; // Mobile
+
+    // Hero section height
+    final heroHeight = isWideScreen
+        ? 450.0
+        : (isTablet ? 400.0 : 350.0); // iPad thoda bada height
+
+    // Responsive font sizes
+    double headlineSize;
+    double bannerTextSize;
+    double bannerPointSize;
+
+    if (isWideScreen) {
+      headlineSize = 45;
+      bannerTextSize = 20;
+      bannerPointSize = 16;
+    } else if (isTablet) {
+      headlineSize = 35;
+      bannerTextSize = 18;
+      bannerPointSize = 16;
+    } else {
+      headlineSize = 28;
+      bannerTextSize = 14;
+      bannerPointSize = 13;
+    }
 
     return Scaffold(
       appBar: AppBarWidget(),
@@ -41,249 +67,21 @@ class ProbePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ---------- Banner Section ----------
-                Stack(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: isWideScreen ? 450 : 450,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: isWideScreen ? 450 : 450,
-                            child: Image.asset(
-                              "assets/thprobe.png",
-                              fit: BoxFit.contain,
-                              alignment: Alignment.center,
-                            ).animate().fadeIn(duration: 600.ms).scale(
-                                  duration: 800.ms,
-                                  curve: Curves.easeOutBack,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: isWideScreen ? 450 : 450,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black.withOpacity(0.6),
-                            Colors.black.withOpacity(0.3)
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12, left: 8),
-                              // child: IconButton(
-                              //   icon: const Icon(Icons.arrow_back,
-                              //       color: Colors.white, size: 22),
-                              //   onPressed: () {
-                              //     if (Navigator.of(context).canPop()) {
-                              //       Navigator.of(context).pop();
-                              //     } else {
-                              //       Navigator.of(context)
-                              //           .pushReplacementNamed("/");
-                              //     }
-                              //   },
-                              // ).animate().fadeIn(duration: 500.ms),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isWideScreen ? 84 : 16,
-                                vertical: isWideScreen ? 20 : 12,
-                              ),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      isWideScreen ? 600 : double.infinity,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 12),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: "Temperature and Humidity ",
-                                            style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.lightBlueAccent,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: "Probe",
-                                            style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
-                                              fontWeight: FontWeight.bold,
-                                              color: const Color.fromARGB(
-                                                  255, 219, 80, 145),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                        .animate()
-                                        .fadeIn(duration: 700.ms)
-                                        .slideX(),
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 6, bottom: 16),
-                                      height: 3,
-                                      width: isWideScreen ? 270 : 150,
-                                      color: Colors.lightBlueAccent,
-                                    ).animate().scaleX(
-                                          duration: 800.ms,
-                                          curve: Curves.easeOut,
-                                        ),
-                                    Text(
-                                      "Accurate measurements for temperature and humidity",
-                                      style: TextStyle(
-                                        fontSize: isWideScreen ? 20 : 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ).animate().fadeIn(duration: 900.ms),
-                                    const SizedBox(height: 16),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: const [
-                                        BannerPoint(
-                                            "Real-time temperature & humidity sensing for critical applications"),
-                                        BannerPoint(
-                                            "Provides both analog (0-1000)mV and digital (RS485) output"),
-                                        BannerPoint(
-                                            "Reliable Industrial grade monitoring with CRC validated communications"),
-                                      ],
-                                    ).animate().fadeIn(
-                                        delay: 200.ms, duration: 500.ms),
-                                    const SizedBox(height: 20),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: [
-                                        _buildBannerButton(
-                                          "Enquire",
-                                          Colors.teal,
-                                          () async {
-                                            final email =
-                                                "sharmasejal2701@gmail.com";
-                                            final subject = "Product Enquiry";
-                                            final body =
-                                                "Hello, I am interested in your product.";
-
-                                            final Uri mailtoUri = Uri(
-                                              scheme: 'mailto',
-                                              path: email,
-                                              query: Uri.encodeFull(
-                                                  "subject=$subject&body=$body"),
-                                            );
-
-                                            if (kIsWeb) {
-                                              final isMobileBrowser =
-                                                  defaultTargetPlatform ==
-                                                          TargetPlatform.iOS ||
-                                                      defaultTargetPlatform ==
-                                                          TargetPlatform
-                                                              .android;
-
-                                              if (!isMobileBrowser) {
-                                                // 🌐 Desktop Web → Gmail compose in browser
-                                                final Uri gmailUrl = Uri.parse(
-                                                  "https://mail.google.com/mail/?view=cm&fs=1"
-                                                  "&to=$email"
-                                                  "&su=${Uri.encodeComponent(subject)}"
-                                                  "&body=${Uri.encodeComponent(body)}",
-                                                );
-
-                                                if (await canLaunchUrl(
-                                                    gmailUrl)) {
-                                                  await launchUrl(gmailUrl,
-                                                      mode: LaunchMode
-                                                          .externalApplication);
-                                                  return;
-                                                }
-                                              }
-
-                                              // 🌐 Mobile browser (fallback) → use mailto
-                                              if (await canLaunchUrl(
-                                                  mailtoUri)) {
-                                                await launchUrl(mailtoUri,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          "Could not open email client")),
-                                                );
-                                              }
-                                            } else {
-                                              // 📱 Native mobile app (Android/iOS) → use mailto directly
-                                              if (await canLaunchUrl(
-                                                  mailtoUri)) {
-                                                await launchUrl(mailtoUri,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          "Could not open email app")),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        ),
-
-                                        // _buildBannerButton(
-                                        //   "Download Manual",
-                                        //   Colors.teal,
-                                        //   () {
-                                        //     DownloadManager.downloadFile(
-                                        //       context: context,
-                                        //       sensorKey: "DataLogger",
-                                        //       fileType: "manual",
-                                        //     );
-                                        //   },
-                                        // ),
-                                      ],
-                                    ).animate().fadeIn(duration: 1000.ms),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // ---------- Hero Section ----------
+                if (isWideScreen)
+                  _buildHeroDesktop(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context)
+                else if (isTablet)
+                  _buildHeroTablet(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context)
+                else
+                  _buildHeroMobile(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context),
 
                 // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
+                  child: (isWideScreen || isTablet)
                       ? _buildIpadLayout(isDarkMode)
                       : Column(
                           children: [
@@ -323,7 +121,332 @@ class ProbePage extends StatelessWidget {
     );
   }
 
-  // ---------- iPad Layout for Card Alignment ----------
+  // ---------- Hero Widgets ----------
+  Widget _buildHeroDesktop(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Stack(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(height: heroHeight, color: Colors.grey.shade600),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                height: heroHeight,
+                child: Image.asset(
+                  "assets/thprobe.png",
+                  fit: BoxFit.contain,
+                ).animate().fadeIn(duration: 600.ms).scale(
+                      duration: 800.ms,
+                      curve: Curves.easeOutBack,
+                    ),
+              ),
+            ),
+          ],
+        ),
+        Container(
+          height: heroHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withOpacity(0.6),
+                Colors.black.withOpacity(0.3)
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 12, left: 8),
+                  // child: IconButton(
+                  //   icon: const Icon(Icons.arrow_back,
+                  //       color: Colors.white, size: 22),
+                  //   onPressed: () {
+                  //     if (Navigator.of(context).canPop()) {
+                  //       Navigator.of(context).pop();
+                  //     } else {
+                  //       Navigator.of(context).pushReplacementNamed("/");
+                  //     }
+                  //   },
+                  // ).animate().fadeIn(duration: 500.ms),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroTablet(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Column(
+      children: [
+        // Text section with grey background and overlay
+        Container(
+          width: double.infinity,
+          color: Colors.grey.shade600, // text background
+          child: Stack(
+            children: [
+              // Overlay
+              Container(
+                height: heroHeight * 0.4,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    ),
+              ),
+
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
+                    const SizedBox(height: 8),
+                    _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Image below text
+        Container(
+          height: heroHeight * 0.6,
+          child: Image.asset(
+            "assets/thprobe.png",
+            fit: BoxFit.contain,
+          ).animate().fadeIn(duration: 600.ms).scale(
+                duration: 800.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroMobile(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Column(
+      children: [
+        // Text section with grey background and overlay
+        Container(
+          width: double.infinity,
+          color: Colors.grey.shade600, // text background
+          child: Stack(
+            children: [
+              // Overlay
+              Container(
+                height: heroHeight * 0.4,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    ),
+              ),
+
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
+                    const SizedBox(height: 8),
+                    _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Image below text
+        Container(
+          height: heroHeight * 0.6,
+          child: Image.asset(
+            "assets/thprobe.png",
+            fit: BoxFit.contain,
+          ).animate().fadeIn(duration: 600.ms).scale(
+                duration: 800.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ],
+    );
+  }
+
+  // ---------- Hero Text ----------
+  Widget _buildHeroText(double headlineSize, double bannerTextSize,
+      double bannerPointSize, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "Temperature and Humidity ",
+                style: TextStyle(
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightBlueAccent),
+              ),
+              TextSpan(
+                text: "Probe",
+                style: TextStyle(
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 219, 80, 145)),
+              ),
+            ],
+          ),
+        ).animate().fadeIn(duration: 700.ms).slideX(),
+        Container(
+          margin: const EdgeInsets.only(top: 6, bottom: 16),
+          height: 3,
+          width: headlineSize * 5.5,
+          color: Colors.lightBlueAccent,
+        ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
+        Text(
+          "Accurate measurements for temperature and humidity",
+          style: TextStyle(
+              fontSize: bannerTextSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
+        ).animate().fadeIn(duration: 900.ms),
+        const SizedBox(height: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BannerPoint(
+                "Real-time temperature & humidity sensing for critical applications",
+                fontSize: bannerPointSize),
+            BannerPoint(
+                "Provides both analog (0-1000)mV and digital (RS485) output",
+                fontSize: bannerPointSize),
+            BannerPoint(
+                "Reliable Industrial grade monitoring with CRC validated communications",
+                fontSize: bannerPointSize),
+          ],
+        ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
+        const SizedBox(height: 20),
+        // ---------- Enquire Button ----------
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _buildBannerButton(
+              "Enquire",
+              Colors.teal,
+              () async {
+                final email = "sharmasejal2701@gmail.com";
+                final subject = "Product Enquiry";
+                final body = "Hello, I am interested in your product.";
+
+                final Uri mailtoUri = Uri(
+                  scheme: 'mailto',
+                  path: email,
+                  query: Uri.encodeFull("subject=$subject&body=$body"),
+                );
+
+                if (kIsWeb) {
+                  final isMobileBrowser =
+                      defaultTargetPlatform == TargetPlatform.iOS ||
+                          defaultTargetPlatform == TargetPlatform.android;
+
+                  if (!isMobileBrowser) {
+                    final Uri gmailUrl = Uri.parse(
+                      "https://mail.google.com/mail/?view=cm&fs=1"
+                      "&to=$email"
+                      "&su=${Uri.encodeComponent(subject)}"
+                      "&body=${Uri.encodeComponent(body)}",
+                    );
+
+                    if (await canLaunchUrl(gmailUrl)) {
+                      await launchUrl(gmailUrl,
+                          mode: LaunchMode.externalApplication);
+                      return;
+                    }
+                  }
+
+                  if (await canLaunchUrl(mailtoUri)) {
+                    await launchUrl(mailtoUri,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Could not open email client")),
+                    );
+                  }
+                } else {
+                  if (await canLaunchUrl(mailtoUri)) {
+                    await launchUrl(mailtoUri,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Could not open email app")),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ---------- iPad/Desktop Layout for Cards ----------
   Widget _buildIpadLayout(bool isDarkMode) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -336,56 +459,19 @@ class ProbePage extends StatelessWidget {
             .slideX(begin: 0.3)
             .fadeIn();
 
-        // Get the height of both cards
-        final featuresKey = GlobalKey();
-        final applicationsKey = GlobalKey();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final featuresBox =
-              featuresKey.currentContext?.findRenderObject() as RenderBox?;
-          final applicationsBox =
-              applicationsKey.currentContext?.findRenderObject() as RenderBox?;
-          if (featuresBox != null && applicationsBox != null) {
-            final featuresHeight = featuresBox.size.height;
-            final applicationsHeight = applicationsBox.size.height;
-            if (featuresHeight != applicationsHeight) {
-              // If heights differ, adjust the smaller card to be centered
-              final maxHeight = featuresHeight > applicationsHeight
-                  ? featuresHeight
-                  : applicationsHeight;
-              featuresBox.size = Size(featuresBox.size.width, maxHeight);
-              applicationsBox.size =
-                  Size(applicationsBox.size.width, maxHeight);
-            }
-          }
-        });
-
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Center(
-                child: SizedBox(
-                  key: featuresKey,
-                  child: featuresCard,
-                ),
-              ),
-            ),
+            Expanded(child: featuresCard),
             const SizedBox(width: 16),
-            Expanded(
-              child: Center(
-                child: SizedBox(
-                  key: applicationsKey,
-                  child: applicationsCard,
-                ),
-              ),
-            ),
+            Expanded(child: applicationsCard),
           ],
         );
       },
     );
   }
 
-  // ---------- Specifications Card ----------
+  // ---------- Other cards & buttons remain same ----------
   Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
       "Supply Voltage : 5-12 V DC",
@@ -407,20 +493,15 @@ class ProbePage extends StatelessWidget {
               ? CrossAxisAlignment.center
               : CrossAxisAlignment.start,
           children: [
-            Text(
-              "Specifications",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.blue.shade800,
-              ),
-            ),
+            Text("Specifications",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 20),
-            // Use a LayoutBuilder to determine screen width and adjust layout
             LayoutBuilder(
               builder: (context, constraints) {
                 if (isWideScreen) {
-                  // Two-column layout for wide screens
                   final int splitIndex = (specItems.length / 2).ceil();
                   final List<String> leftColumnItems =
                       specItems.sublist(0, splitIndex);
@@ -450,7 +531,6 @@ class ProbePage extends StatelessWidget {
                     ],
                   );
                 } else {
-                  // Single-column layout for mobile
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: specItems
@@ -462,17 +542,12 @@ class ProbePage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             Center(
-              child: _buildBannerButton(
-                "Download Datasheet",
-                Colors.teal,
-                () {
-                  DownloadManager.downloadFile(
+              child: _buildBannerButton("Download Datasheet", Colors.teal, () {
+                DownloadManager.downloadFile(
                     context: context,
                     sensorKey: "TempHumidityProbe",
-                    fileType: "datasheet",
-                  );
-                },
-              ),
+                    fileType: "datasheet");
+              }),
             ),
           ],
         ),
@@ -489,10 +564,9 @@ class ProbePage extends StatelessWidget {
           children: [
             Text("Key Features",
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 10),
             featureItem("High precision temperature and humidity sensing probe",
                 isDarkMode),
@@ -522,10 +596,9 @@ class ProbePage extends StatelessWidget {
           children: [
             Text("Applications",
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 10),
             featureItem("IOT and agriculture irrigation system", isDarkMode),
             featureItem("Healthcare and Medical Facilities", isDarkMode),
@@ -552,26 +625,21 @@ class ProbePage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: color,
               padding: EdgeInsets.symmetric(
-                horizontal: isWideScreen ? 20 : 12,
-                vertical: isWideScreen ? 14 : 10,
-              ),
+                  horizontal: isWideScreen ? 20 : 12,
+                  vertical: isWideScreen ? 14 : 10),
               minimumSize: Size(isWideScreen ? 160 : 100, 40),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
+                  borderRadius: BorderRadius.circular(6)),
               elevation: 4,
             ),
             onPressed: onPressed,
-            icon:
-                const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-            label: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: isWideScreen ? 15 : 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            // icon:
+            //     const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+            label: Text(label,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isWideScreen ? 15 : 12,
+                    fontWeight: FontWeight.w600)),
           ).animate(onPlay: (controller) => controller.repeat(reverse: true))
             ..scale(
                 begin: const Offset(1, 1),
@@ -592,20 +660,17 @@ class ProbePage extends StatelessWidget {
               color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 15,
-                color: isDarkMode ? Colors.white : Colors.black87,
-              ),
-            ),
-          ),
+              child: Text(text,
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: isDarkMode ? Colors.white : Colors.black87))),
         ],
       ).animate().fadeIn(duration: 400.ms),
     );
   }
 }
 
+// ---------- HoverCard ----------
 class HoverCard extends StatefulWidget {
   final Widget child;
   const HoverCard({super.key, required this.child});
@@ -649,15 +714,14 @@ class _HoverCardState extends State<HoverCard> {
   }
 }
 
+// ---------- Banner Point ----------
 class BannerPoint extends StatelessWidget {
   final String text;
-  const BannerPoint(this.text, {super.key});
+  final double fontSize;
+  const BannerPoint(this.text, {super.key, required this.fontSize});
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -668,11 +732,10 @@ class BannerPoint extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white,
-                fontSize: isWideScreen ? 16 : 13,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
-              ),
+                  color: Colors.white,
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w500,
+                  height: 1.4),
             ),
           ),
         ],
