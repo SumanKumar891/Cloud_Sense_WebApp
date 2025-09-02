@@ -1,5 +1,6 @@
 import 'package:cloud_sense_webapp/appbar.dart';
 import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class DataLoggerPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBarWidget(),
+      endDrawer: !isWideScreen ? const EndDrawerWidget() : null,
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(

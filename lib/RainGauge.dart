@@ -1,5 +1,6 @@
 import 'package:cloud_sense_webapp/appbar.dart';
 import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,19 @@ class ProductPage extends StatelessWidget {
     final isWideScreen = screenWidth > 800;
     final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
 
+    bool isMobile = screenWidth < 800;
+    bool isTablet = screenWidth >= 800 && screenWidth <= 1024;
+    bool isDesktop = screenWidth > 1024;
+
+    double titleFontSize = isMobile
+        ? 28 // Mobile
+        : isTablet
+            ? 36 // Tablet
+            : 48; // Desktop
+
     return Scaffold(
       appBar: AppBarWidget(),
+      endDrawer: !isWideScreen ? const EndDrawerWidget() : null,
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -121,7 +133,7 @@ class ProductPage extends StatelessWidget {
                                           TextSpan(
                                             text: "Rain ",
                                             style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
+                                              fontSize: titleFontSize,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.lightBlueAccent,
                                             ),
