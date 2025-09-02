@@ -821,73 +821,73 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          "Welcome to Cloud Sense",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: titleFont,
-                            fontWeight: FontWeight.bold,
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 4,
-                                color: Colors.black26,
-                                offset: Offset(1.5, 1.5),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 6),
-                          height: 3,
-                          width: 160,
-                          decoration: BoxDecoration(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white70
-                                : Colors.black54,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          height: 40,
-                          child: DefaultTextStyle(
-                            style: TextStyle(
-                              fontSize: subtitleFont,
-                              color: themeProvider.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            child: AnimatedTextKit(
-                              repeatForever: true,
-                              pause: const Duration(milliseconds: 1000),
-                              animatedTexts: [
-                                TyperAnimatedText('Explore Sensors'),
-                                TyperAnimatedText('Real time Data'),
-                                TyperAnimatedText('Detailed insights'),
-                                TyperAnimatedText('Interact with Surrounding'),
-                                TyperAnimatedText('IoT enabled Devices'),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Text(
-                          "Explore the sensors and dive into the live data they capture. "
-                          "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
-                          "Monitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. "
-                          "Track various factors to help you plan effectively and contribute to optimizing your usage.",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.black,
-                            fontSize: paragraphFont,
-                          ),
-                        ),
+                        // Text(
+                        //   "Welcome to Cloud Sense",
+                        //   textAlign: TextAlign.center,
+                        //   style: TextStyle(
+                        //     fontSize: titleFont,
+                        //     fontWeight: FontWeight.bold,
+                        //     color: themeProvider.isDarkMode
+                        //         ? Colors.white
+                        //         : Colors.black,
+                        //     shadows: [
+                        //       Shadow(
+                        //         blurRadius: 4,
+                        //         color: Colors.black26,
+                        //         offset: Offset(1.5, 1.5),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // Container(
+                        //   margin: const EdgeInsets.only(top: 6),
+                        //   height: 3,
+                        //   width: 160,
+                        //   decoration: BoxDecoration(
+                        //     color: themeProvider.isDarkMode
+                        //         ? Colors.white70
+                        //         : Colors.black54,
+                        //     borderRadius: BorderRadius.circular(2),
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 10),
+                        // SizedBox(
+                        //   height: 40,
+                        //   child: DefaultTextStyle(
+                        //     style: TextStyle(
+                        //       fontSize: subtitleFont,
+                        //       color: themeProvider.isDarkMode
+                        //           ? Colors.white
+                        //           : Colors.black,
+                        //       fontWeight: FontWeight.w500,
+                        //     ),
+                        //     child: AnimatedTextKit(
+                        //       repeatForever: true,
+                        //       pause: const Duration(milliseconds: 1000),
+                        //       animatedTexts: [
+                        //         TyperAnimatedText('Explore Sensors'),
+                        //         TyperAnimatedText('Real time Data'),
+                        //         TyperAnimatedText('Detailed insights'),
+                        //         TyperAnimatedText('Interact with Surrounding'),
+                        //         TyperAnimatedText('IoT enabled Devices'),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 30),
+                        // Text(
+                        //   "Explore the sensors and dive into the live data they capture. "
+                        //   "With just a tap, you can access detailed insights for each sensor, keeping you informed. "
+                        //   "Monitor conditions to ensure a healthy and safe space, detect potential issues, and stay alert for any irregularities. "
+                        //   "Track various factors to help you plan effectively and contribute to optimizing your usage.",
+                        //   textAlign: TextAlign.justify,
+                        //   style: TextStyle(
+                        //     color: themeProvider.isDarkMode
+                        //         ? Colors.white
+                        //         : Colors.black,
+                        //     fontSize: paragraphFont,
+                        //   ),
+                        // ),
                         const SizedBox(height: 30),
                         Wrap(
                           alignment: WrapAlignment.center,
