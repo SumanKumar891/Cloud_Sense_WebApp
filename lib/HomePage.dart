@@ -13,8 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'main.dart';
 import 'dart:async';
-
-import 'dart:html' as html;
+import 'package:universal_html/html.dart' as html;
 
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;

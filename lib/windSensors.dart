@@ -14,8 +14,34 @@ class UltrasonicSensorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
-    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
+
+    final isWideScreen = screenWidth > 1024; // Desktop
+    final isTablet = screenWidth > 700 && screenWidth <= 1024; // iPad
+    final isMobile = screenWidth <= 700; // Mobile
+
+    // Hero section height
+    final heroHeight = isWideScreen
+        ? 450.0
+        : (isTablet ? 400.0 : 350.0); // iPad thoda bada height
+
+    // Responsive font sizes
+    double headlineSize;
+    double bannerTextSize;
+    double bannerPointSize;
+
+    if (isWideScreen) {
+      headlineSize = 45;
+      bannerTextSize = 20;
+      bannerPointSize = 16;
+    } else if (isTablet) {
+      headlineSize = 35;
+      bannerTextSize = 18;
+      bannerPointSize = 16;
+    } else {
+      headlineSize = 28;
+      bannerTextSize = 14;
+      bannerPointSize = 13;
+    }
 
     return Scaffold(
       appBar: AppBarWidget(),
@@ -41,248 +67,21 @@ class UltrasonicSensorPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ---------- Banner Section ----------
-                Stack(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: isWideScreen ? 450 : 400,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: isWideScreen ? 450 : 400,
-                            child: Image.asset(
-                              "assets/ultrasonic.png",
-                              fit: BoxFit.contain,
-                              alignment: Alignment.center,
-                            ).animate().fadeIn(duration: 600.ms).scale(
-                                  duration: 1800.ms,
-                                  curve: Curves.easeOutBack,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: isWideScreen ? 450 : 400,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black.withOpacity(0.6),
-                            Colors.black.withOpacity(0.3)
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12, left: 8),
-                              // child: IconButton(
-                              //   icon: const Icon(Icons.arrow_back,
-                              //       color: Colors.white, size: 22),
-                              //   onPressed: () {
-                              //     if (Navigator.of(context).canPop()) {
-                              //       Navigator.of(context).pop();
-                              //     } else {
-                              //       Navigator.of(context)
-                              //           .pushReplacementNamed("/");
-                              //     }
-                              //   },
-                              // ).animate().fadeIn(duration: 1500.ms),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isWideScreen ? 84 : 16,
-                                vertical: isWideScreen ? 20 : 12,
-                              ),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      isWideScreen ? 600 : double.infinity,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 12),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: "Ultrasonic ",
-                                            style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.lightBlueAccent,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: "Anemometer",
-                                            style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
-                                              fontWeight: FontWeight.bold,
-                                              color: const Color.fromARGB(
-                                                  255, 219, 80, 145),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                        .animate()
-                                        .fadeIn(duration: 700.ms)
-                                        .slideX(),
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 6, bottom: 16),
-                                      height: 3,
-                                      width: isWideScreen ? 270 : 150,
-                                      color: Colors.lightBlueAccent,
-                                    ).animate().scaleX(
-                                          duration: 1800.ms,
-                                          curve: Curves.easeOut,
-                                        ),
-                                    Text(
-                                      "Ultrasonic Anemometer for precise wind speed and wind direction",
-                                      style: TextStyle(
-                                        fontSize: isWideScreen ? 20 : 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ).animate().fadeIn(duration: 900.ms),
-                                    const SizedBox(height: 16),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: const [
-                                        BannerPoint("Accurate wind monitoring"),
-                                        BannerPoint(
-                                            "Real time speed and direction measurement"),
-                                        BannerPoint(
-                                            "Robust and compact design"),
-                                      ],
-                                    ).animate().fadeIn(
-                                        delay: 200.ms, duration: 500.ms),
-                                    const SizedBox(height: 20),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: [
-                                        _buildBannerButton(
-                                          "Enquire",
-                                          Colors.teal,
-                                          () async {
-                                            final email =
-                                                "sharmasejal2701@gmail.com";
-                                            final subject = "Product Enquiry";
-                                            final body =
-                                                "Hello, I am interested in your product.";
-
-                                            final Uri mailtoUri = Uri(
-                                              scheme: 'mailto',
-                                              path: email,
-                                              query: Uri.encodeFull(
-                                                  "subject=$subject&body=$body"),
-                                            );
-
-                                            if (kIsWeb) {
-                                              final isMobileBrowser =
-                                                  defaultTargetPlatform ==
-                                                          TargetPlatform.iOS ||
-                                                      defaultTargetPlatform ==
-                                                          TargetPlatform
-                                                              .android;
-
-                                              if (!isMobileBrowser) {
-                                                // 🌐 Desktop Web → Gmail compose in browser
-                                                final Uri gmailUrl = Uri.parse(
-                                                  "https://mail.google.com/mail/?view=cm&fs=1"
-                                                  "&to=$email"
-                                                  "&su=${Uri.encodeComponent(subject)}"
-                                                  "&body=${Uri.encodeComponent(body)}",
-                                                );
-
-                                                if (await canLaunchUrl(
-                                                    gmailUrl)) {
-                                                  await launchUrl(gmailUrl,
-                                                      mode: LaunchMode
-                                                          .externalApplication);
-                                                  return;
-                                                }
-                                              }
-
-                                              // 🌐 Mobile browser (fallback) → use mailto
-                                              if (await canLaunchUrl(
-                                                  mailtoUri)) {
-                                                await launchUrl(mailtoUri,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          "Could not open email client")),
-                                                );
-                                              }
-                                            } else {
-                                              // 📱 Native mobile app (Android/iOS) → use mailto directly
-                                              if (await canLaunchUrl(
-                                                  mailtoUri)) {
-                                                await launchUrl(mailtoUri,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          "Could not open email app")),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        ),
-
-                                        // _buildBannerButton(
-                                        //   "Download Manual",
-                                        //   Colors.teal,
-                                        //   () {
-                                        //     DownloadManager.downloadFile(
-                                        //       context: context,
-                                        //       sensorKey: "WindSensor",
-                                        //       fileType: "manual",
-                                        //     );
-                                        //   },
-                                        // ),
-                                      ],
-                                    ).animate().fadeIn(duration: 1000.ms),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // ---------- Hero Section ----------
+                if (isWideScreen)
+                  _buildHeroDesktop(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context)
+                else if (isTablet)
+                  _buildHeroTablet(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context)
+                else
+                  _buildHeroMobile(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context),
 
                 // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
+                  child: (isWideScreen || isTablet)
                       ? _buildIpadLayout(isDarkMode)
                       : Column(
                           children: [
@@ -319,6 +118,302 @@ class UltrasonicSensorPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  // ---------- Hero Widgets ----------
+  Widget _buildHeroDesktop(
+    double heroHeight,
+    double headlineSize,
+    double bannerTextSize,
+    double bannerPointSize,
+    BuildContext context,
+  ) {
+    return Container(
+      color: const Color.fromARGB(
+          255, 78, 127, 133), // background same as you want
+      padding: const EdgeInsets.symmetric(horizontal: 92, vertical: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left side text
+          Expanded(
+            flex: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: _buildHeroText(
+                headlineSize,
+                bannerTextSize,
+                bannerPointSize,
+                context,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 20),
+
+          // Right side image with height limit ✅
+          Expanded(
+            flex: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 450, // 👈 PC par max 400px height
+              ),
+              child: Image.asset(
+                "assets/ultrasonic.png",
+                fit: BoxFit.contain,
+              ).animate().fadeIn(duration: 600.ms).scale(
+                    duration: 800.ms,
+                    curve: Curves.easeOutBack,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroTablet(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Column(
+      children: [
+        // Text section with grey background and overlay
+        Container(
+          width: double.infinity,
+          color: const Color.fromARGB(255, 78, 127, 133),
+          child: Stack(
+            children: [
+              // Overlay
+              Container(
+                height: heroHeight * 0.4,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    ),
+              ),
+
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
+                    const SizedBox(height: 8),
+                    _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Image below text
+        Container(
+          height: heroHeight * 0.6,
+          child: Image.asset(
+            "assets/ultrasonic.png",
+            fit: BoxFit.contain,
+          ).animate().fadeIn(duration: 600.ms).scale(
+                duration: 800.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroMobile(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Column(
+      children: [
+        // Text section with grey background and overlay
+        Container(
+          width: double.infinity,
+          color: const Color.fromARGB(255, 78, 127, 133),
+          child: Stack(
+            children: [
+              // Overlay
+              Container(
+                height: heroHeight * 0.4,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    ),
+              ),
+
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
+                    const SizedBox(height: 8),
+                    _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Image below text
+        Container(
+          height: heroHeight * 0.6,
+          child: Image.asset(
+            "assets/ultrasonic.png",
+            fit: BoxFit.contain,
+          ).animate().fadeIn(duration: 600.ms).scale(
+                duration: 800.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ],
+    );
+  }
+
+  // ---------- Hero Text ----------
+  Widget _buildHeroText(double headlineSize, double bannerTextSize,
+      double bannerPointSize, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "Ultrasonic ",
+                style: TextStyle(
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightBlueAccent),
+              ),
+              TextSpan(
+                text: "Anemometer",
+                style: TextStyle(
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 219, 80, 145)),
+              ),
+            ],
+          ),
+        ).animate().fadeIn(duration: 700.ms).slideX(),
+        Container(
+          margin: const EdgeInsets.only(top: 6, bottom: 16),
+          height: 3,
+          width: headlineSize * 5.5,
+          color: Colors.lightBlueAccent,
+        ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
+        Text(
+          "Ultrasonic Anemometer for precise wind speed and wind direction",
+          style: TextStyle(
+              fontSize: bannerTextSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
+        ).animate().fadeIn(duration: 900.ms),
+        const SizedBox(height: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BannerPoint("Accurate wind monitoring", fontSize: bannerPointSize),
+            BannerPoint("Real time speed and direction measurement",
+                fontSize: bannerPointSize),
+            BannerPoint("Robust and compact design", fontSize: bannerPointSize),
+          ],
+        ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
+        const SizedBox(height: 20),
+        // ---------- Enquire Button ----------
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _buildBannerButton(
+              "Enquire",
+              Colors.teal,
+              () async {
+                final email = "sharmasejal2701@gmail.com";
+                final subject = "Product Enquiry";
+                final body = "Hello, I am interested in your product.";
+
+                final Uri mailtoUri = Uri(
+                  scheme: 'mailto',
+                  path: email,
+                  query: Uri.encodeFull("subject=$subject&body=$body"),
+                );
+
+                if (kIsWeb) {
+                  final isMobileBrowser =
+                      defaultTargetPlatform == TargetPlatform.iOS ||
+                          defaultTargetPlatform == TargetPlatform.android;
+
+                  if (!isMobileBrowser) {
+                    final Uri gmailUrl = Uri.parse(
+                      "https://mail.google.com/mail/?view=cm&fs=1"
+                      "&to=$email"
+                      "&su=${Uri.encodeComponent(subject)}"
+                      "&body=${Uri.encodeComponent(body)}",
+                    );
+
+                    if (await canLaunchUrl(gmailUrl)) {
+                      await launchUrl(gmailUrl,
+                          mode: LaunchMode.externalApplication);
+                      return;
+                    }
+                  }
+
+                  if (await canLaunchUrl(mailtoUri)) {
+                    await launchUrl(mailtoUri,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Could not open email client")),
+                    );
+                  }
+                } else {
+                  if (await canLaunchUrl(mailtoUri)) {
+                    await launchUrl(mailtoUri,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Could not open email app")),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -385,13 +480,13 @@ class UltrasonicSensorPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(BuildContext context, isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
       "Input Supply voltage: 2V - 16V",
       "Measure wind speed and wind direction via Δ ToF",
       "Communication protocols: RS232 or RS485 (Modbus)",
-      "Ultra low power sleep mode"
-          "Weight : 0.6kg",
+      "Ultra low power sleep mode",
+      "Weight : 0.6kg",
       "Heating option (-40℃ to +70℃)",
     ];
     final screenWidth = MediaQuery.of(context).size.width;
@@ -421,17 +516,8 @@ class UltrasonicSensorPage extends StatelessWidget {
             // Use a LayoutBuilder to determine screen width and adjust layout
             LayoutBuilder(
               builder: (context, constraints) {
-                // final screenWidth = MediaQuery.of(context).size.width;
-                // final isWideScreen = screenWidth > 800;
-
                 if (isWideScreen) {
                   // Two-column layout for wide screens
-                  final int splitIndex = (specItems.length / 2).ceil();
-                  final List<String> leftColumnItems =
-                      specItems.sublist(0, splitIndex);
-                  final List<String> rightColumnItems =
-                      specItems.sublist(splitIndex);
-
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -500,12 +586,12 @@ class UltrasonicSensorPage extends StatelessWidget {
                 )),
             const SizedBox(height: 10),
             featureItem(
-                "High Quality measurement upto 60m/s(216km/h).", isDarkMode),
+                "High Quality measurement up to 60m/s (216km/h)", isDarkMode),
             featureItem("High accuracy with fast response time", isDarkMode),
             featureItem("0°-360° wind direction coverage with 1° resolution",
                 isDarkMode),
             featureItem(
-                "Low Maintanence, ensuring low cost of ownership", isDarkMode),
+                "Low Maintenance, ensuring low cost of ownership", isDarkMode),
             featureItem("Robust design for all weather conditions", isDarkMode),
           ],
         ),
@@ -649,12 +735,14 @@ class _HoverCardState extends State<HoverCard> {
 
 class BannerPoint extends StatelessWidget {
   final String text;
-  const BannerPoint(this.text, {super.key});
+  final double? fontSize;
+  const BannerPoint(this.text, {super.key, this.fontSize});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
+    final isWideScreen = screenWidth > 1024;
+    final effectiveFontSize = fontSize ?? (isWideScreen ? 16 : 13);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -667,7 +755,7 @@ class BannerPoint extends StatelessWidget {
               text,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isWideScreen ? 16 : 13,
+                fontSize: effectiveFontSize,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),

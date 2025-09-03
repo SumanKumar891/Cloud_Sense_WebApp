@@ -14,8 +14,34 @@ class DataLoggerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
-    final isIpadRange = screenWidth > 800 && screenWidth <= 1024;
+
+    final isWideScreen = screenWidth > 1024; // Desktop
+    final isTablet = screenWidth > 700 && screenWidth <= 1024; // iPad
+    final isMobile = screenWidth <= 700; // Mobile
+
+    // Hero section height
+    final heroHeight = isWideScreen
+        ? 450.0
+        : (isTablet ? 400.0 : 350.0); // iPad thoda bada height
+
+    // Responsive font sizes
+    double headlineSize;
+    double bannerTextSize;
+    double bannerPointSize;
+
+    if (isWideScreen) {
+      headlineSize = 45;
+      bannerTextSize = 20;
+      bannerPointSize = 16;
+    } else if (isTablet) {
+      headlineSize = 35;
+      bannerTextSize = 18;
+      bannerPointSize = 16;
+    } else {
+      headlineSize = 28;
+      bannerTextSize = 14;
+      bannerPointSize = 13;
+    }
 
     return Scaffold(
       appBar: AppBarWidget(),
@@ -41,249 +67,21 @@ class DataLoggerPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ---------- Banner Section ----------
-                Stack(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: isWideScreen ? 450 : 400,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: isWideScreen ? 450 : 400,
-                            child: Image.asset(
-                              "assets/dataloggerrender.png",
-                              fit: BoxFit.contain,
-                              alignment: Alignment.center,
-                            ).animate().fadeIn(duration: 600.ms).scale(
-                                  duration: 1800.ms,
-                                  curve: Curves.easeOutBack,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: isWideScreen ? 450 : 400,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black.withOpacity(0.6),
-                            Colors.black.withOpacity(0.3)
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12, left: 8),
-                              // child: IconButton(
-                              //   icon: const Icon(Icons.arrow_back,
-                              //       color: Colors.white, size: 22),
-                              //   onPressed: () {
-                              //     if (Navigator.of(context).canPop()) {
-                              //       Navigator.of(context).pop();
-                              //     } else {
-                              //       Navigator.of(context)
-                              //           .pushReplacementNamed("/");
-                              //     }
-                              //   },
-                              // ).animate().fadeIn(duration: 1500.ms),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isWideScreen ? 84 : 16,
-                                vertical: isWideScreen ? 20 : 12,
-                              ),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      isWideScreen ? 600 : double.infinity,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 12),
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: "Data ",
-                                            style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.lightBlueAccent,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: "Logger",
-                                            style: TextStyle(
-                                              fontSize: isWideScreen ? 48 : 28,
-                                              fontWeight: FontWeight.bold,
-                                              color: const Color.fromARGB(
-                                                  255, 219, 80, 145),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                        .animate()
-                                        .fadeIn(duration: 700.ms)
-                                        .slideX(),
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 6, bottom: 16),
-                                      height: 3,
-                                      width: isWideScreen ? 270 : 150,
-                                      color: Colors.lightBlueAccent,
-                                    ).animate().scaleX(
-                                          duration: 800.ms,
-                                          curve: Curves.easeOut,
-                                        ),
-                                    Text(
-                                      "Reliable Data Logging & seamless Connectivity",
-                                      style: TextStyle(
-                                        fontSize: isWideScreen ? 20 : 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ).animate().fadeIn(duration: 900.ms),
-                                    const SizedBox(height: 16),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: const [
-                                        BannerPoint(
-                                            "4G Dual sim With multi protocol Support"),
-                                        BannerPoint(
-                                            "Advance power management with solar charging"),
-                                        BannerPoint(
-                                            "Robust Design with IP66 Rating."),
-                                      ],
-                                    ).animate().fadeIn(
-                                        delay: 200.ms, duration: 500.ms),
-                                    const SizedBox(height: 20),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: [
-                                        _buildBannerButton(
-                                          "Enquire",
-                                          Colors.teal,
-                                          () async {
-                                            final email =
-                                                "sharmasejal2701@gmail.com";
-                                            final subject = "Product Enquiry";
-                                            final body =
-                                                "Hello, I am interested in your product.";
-
-                                            final Uri mailtoUri = Uri(
-                                              scheme: 'mailto',
-                                              path: email,
-                                              query: Uri.encodeFull(
-                                                  "subject=$subject&body=$body"),
-                                            );
-
-                                            if (kIsWeb) {
-                                              final isMobileBrowser =
-                                                  defaultTargetPlatform ==
-                                                          TargetPlatform.iOS ||
-                                                      defaultTargetPlatform ==
-                                                          TargetPlatform
-                                                              .android;
-
-                                              if (!isMobileBrowser) {
-                                                // 🌐 Desktop Web → Gmail compose in browser
-                                                final Uri gmailUrl = Uri.parse(
-                                                  "https://mail.google.com/mail/?view=cm&fs=1"
-                                                  "&to=$email"
-                                                  "&su=${Uri.encodeComponent(subject)}"
-                                                  "&body=${Uri.encodeComponent(body)}",
-                                                );
-
-                                                if (await canLaunchUrl(
-                                                    gmailUrl)) {
-                                                  await launchUrl(gmailUrl,
-                                                      mode: LaunchMode
-                                                          .externalApplication);
-                                                  return;
-                                                }
-                                              }
-
-                                              // 🌐 Mobile browser (fallback) → use mailto
-                                              if (await canLaunchUrl(
-                                                  mailtoUri)) {
-                                                await launchUrl(mailtoUri,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          "Could not open email client")),
-                                                );
-                                              }
-                                            } else {
-                                              // 📱 Native mobile app (Android/iOS) → use mailto directly
-                                              if (await canLaunchUrl(
-                                                  mailtoUri)) {
-                                                await launchUrl(mailtoUri,
-                                                    mode: LaunchMode
-                                                        .externalApplication);
-                                              } else {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          "Could not open email app")),
-                                                );
-                                              }
-                                            }
-                                          },
-                                        ),
-
-                                        // _buildBannerButton(
-                                        //   "Download Manual",
-                                        //   Colors.teal,
-                                        //   () {
-                                        //     DownloadManager.downloadFile(
-                                        //       context: context,
-                                        //       sensorKey: "DataLogger",
-                                        //       fileType: "manual",
-                                        //     );
-                                        //   },
-                                        // ),
-                                      ],
-                                    ).animate().fadeIn(duration: 1000.ms),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // ---------- Hero Section ----------
+                if (isWideScreen)
+                  _buildHeroDesktop(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context)
+                else if (isTablet)
+                  _buildHeroTablet(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context)
+                else
+                  _buildHeroMobile(heroHeight, headlineSize, bannerTextSize,
+                      bannerPointSize, context),
 
                 // ---------- Features & Applications ----------
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: isWideScreen
+                  child: (isWideScreen || isTablet)
                       ? _buildIpadLayout(isDarkMode)
                       : Column(
                           children: [
@@ -320,6 +118,304 @@ class DataLoggerPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  // ---------- Hero Widgets ----------
+  Widget _buildHeroDesktop(
+    double heroHeight,
+    double headlineSize,
+    double bannerTextSize,
+    double bannerPointSize,
+    BuildContext context,
+  ) {
+    return Container(
+      color: const Color.fromARGB(
+          255, 78, 127, 133), // background same as you want
+      padding: const EdgeInsets.symmetric(horizontal: 92, vertical: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left side text
+          Expanded(
+            flex: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: _buildHeroText(
+                headlineSize,
+                bannerTextSize,
+                bannerPointSize,
+                context,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 20),
+
+          // Right side image with height limit ✅
+          Expanded(
+            flex: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 450, // 👈 PC par max 400px height
+              ),
+              child: Image.asset(
+                "assets/dataloggerrender.png",
+                fit: BoxFit.contain,
+              ).animate().fadeIn(duration: 600.ms).scale(
+                    duration: 800.ms,
+                    curve: Curves.easeOutBack,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroTablet(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Column(
+      children: [
+        // Text section with grey background and overlay
+        Container(
+          width: double.infinity,
+          color: const Color.fromARGB(255, 78, 127, 133),
+          child: Stack(
+            children: [
+              // Overlay
+              Container(
+                height: heroHeight * 0.4,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    ),
+              ),
+
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
+                    const SizedBox(height: 8),
+                    _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Image below text
+        Container(
+          height: heroHeight * 0.6,
+          child: Image.asset(
+            "assets/dataloggerrender.png",
+            fit: BoxFit.contain,
+          ).animate().fadeIn(duration: 600.ms).scale(
+                duration: 800.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeroMobile(double heroHeight, double headlineSize,
+      double bannerTextSize, double bannerPointSize, BuildContext context) {
+    return Column(
+      children: [
+        // Text section with grey background and overlay
+        Container(
+          width: double.infinity,
+          color: const Color.fromARGB(255, 78, 127, 133),
+          child: Stack(
+            children: [
+              // Overlay
+              Container(
+                height: heroHeight * 0.4,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.3)],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    ),
+              ),
+
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
+                    const SizedBox(height: 8),
+                    _buildHeroText(
+                        headlineSize, bannerTextSize, bannerPointSize, context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Image below text
+        Container(
+          height: heroHeight * 0.6,
+          child: Image.asset(
+            "assets/dataloggerrender.png",
+            fit: BoxFit.contain,
+          ).animate().fadeIn(duration: 600.ms).scale(
+                duration: 800.ms,
+                curve: Curves.easeOutBack,
+              ),
+        ),
+      ],
+    );
+  }
+
+  // ---------- Hero Text ----------
+  Widget _buildHeroText(double headlineSize, double bannerTextSize,
+      double bannerPointSize, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "Data ",
+                style: TextStyle(
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightBlueAccent),
+              ),
+              TextSpan(
+                text: "Logger",
+                style: TextStyle(
+                    fontSize: headlineSize,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 219, 80, 145)),
+              ),
+            ],
+          ),
+        ).animate().fadeIn(duration: 700.ms).slideX(),
+        Container(
+          margin: const EdgeInsets.only(top: 6, bottom: 16),
+          height: 3,
+          width: headlineSize * 5.5,
+          color: Colors.lightBlueAccent,
+        ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
+        Text(
+          "Reliable Data Logging & seamless Connectivity",
+          style: TextStyle(
+              fontSize: bannerTextSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
+        ).animate().fadeIn(duration: 900.ms),
+        const SizedBox(height: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BannerPoint("4G Dual sim With multi protocol Support",
+                fontSize: bannerPointSize),
+            BannerPoint("Advance power management with solar charging",
+                fontSize: bannerPointSize),
+            BannerPoint("Robust Design with IP66 Rating.",
+                fontSize: bannerPointSize),
+          ],
+        ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
+        const SizedBox(height: 20),
+        // ---------- Enquire Button ----------
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _buildBannerButton(
+              "Enquire",
+              Colors.teal,
+              () async {
+                final email = "sharmasejal2701@gmail.com";
+                final subject = "Product Enquiry";
+                final body = "Hello, I am interested in your product.";
+
+                final Uri mailtoUri = Uri(
+                  scheme: 'mailto',
+                  path: email,
+                  query: Uri.encodeFull("subject=$subject&body=$body"),
+                );
+
+                if (kIsWeb) {
+                  final isMobileBrowser =
+                      defaultTargetPlatform == TargetPlatform.iOS ||
+                          defaultTargetPlatform == TargetPlatform.android;
+
+                  if (!isMobileBrowser) {
+                    final Uri gmailUrl = Uri.parse(
+                      "https://mail.google.com/mail/?view=cm&fs=1"
+                      "&to=$email"
+                      "&su=${Uri.encodeComponent(subject)}"
+                      "&body=${Uri.encodeComponent(body)}",
+                    );
+
+                    if (await canLaunchUrl(gmailUrl)) {
+                      await launchUrl(gmailUrl,
+                          mode: LaunchMode.externalApplication);
+                      return;
+                    }
+                  }
+
+                  if (await canLaunchUrl(mailtoUri)) {
+                    await launchUrl(mailtoUri,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Could not open email client")),
+                    );
+                  }
+                } else {
+                  if (await canLaunchUrl(mailtoUri)) {
+                    await launchUrl(mailtoUri,
+                        mode: LaunchMode.externalApplication);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Could not open email app")),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -654,12 +750,14 @@ class _HoverCardState extends State<HoverCard> {
 
 class BannerPoint extends StatelessWidget {
   final String text;
-  const BannerPoint(this.text, {super.key});
+  final double? fontSize;
+  const BannerPoint(this.text, {super.key, this.fontSize});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 800;
+    final isWideScreen = screenWidth > 1024;
+    final effectiveFontSize = fontSize ?? (isWideScreen ? 16 : 13);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -672,7 +770,7 @@ class BannerPoint extends StatelessWidget {
               text,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: isWideScreen ? 16 : 13,
+                fontSize: effectiveFontSize,
                 fontWeight: FontWeight.w500,
                 height: 1.4,
               ),
