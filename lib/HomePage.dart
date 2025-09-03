@@ -12,6 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'main.dart';
+import 'dart:async';
+
+import 'dart:html' as html;
 
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
@@ -397,11 +400,42 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchNearestDevice() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      double userLat = 0, userLon = 0;
 
-      final userLat = position.latitude;
-      final userLon = position.longitude;
+      if (kIsWeb) {
+        final completer = Completer<Position>();
+
+        html.window.navigator.geolocation?.getCurrentPosition().then((pos) {
+          final coords = pos.coords;
+          completer.complete(Position(
+            latitude: coords?.latitude?.toDouble() ?? 0,
+            longitude: coords?.longitude?.toDouble() ?? 0,
+            timestamp: DateTime.now(),
+            accuracy: 0,
+            altitude: 0,
+            heading: 0,
+            speed: 0,
+            speedAccuracy: 0,
+            altitudeAccuracy: 0,
+            headingAccuracy: 0,
+          ));
+        }).catchError((e) {
+          setState(() {
+            errorMessage = "Location error: $e";
+            isLoading = false;
+          });
+        });
+
+        final position = await completer.future;
+        userLat = position.latitude;
+        userLon = position.longitude;
+      } else {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        userLat = position.latitude;
+        userLon = position.longitude;
+      }
 
       setState(() {
         locationName =
