@@ -5015,6 +5015,8 @@ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 --------------------------------------------------------------------------------
 dbus
+geoclue
+gsettings
 
 Mozilla Public License Version 2.0
 ==================================
@@ -9026,6 +9028,13 @@ geocoding
 geocoding_android
 geocoding_ios
 geocoding_platform_interface
+geolocator
+geolocator_android
+geolocator_apple
+geolocator_linux
+geolocator_platform_interface
+geolocator_web
+geolocator_windows
 
 MIT License
 

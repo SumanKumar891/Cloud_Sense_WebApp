@@ -122,7 +122,7 @@ class ATRHSensorPage extends StatelessWidget {
                                         children: [
                                           TextSpan(
                                             text:
-                                                "Temperature Humidity Light Intensity and Pressure Radiation ",
+                                                "Temperature Humidity Light Intensity and Pressure ",
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 40 : 28,
                                               fontWeight: FontWeight.bold,
@@ -130,7 +130,7 @@ class ATRHSensorPage extends StatelessWidget {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: "Shield ",
+                                            text: "Sensor ",
                                             style: TextStyle(
                                               fontSize: isWideScreen ? 40 : 28,
                                               fontWeight: FontWeight.bold,

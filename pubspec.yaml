@@ -82,6 +82,7 @@ dependencies:
   flutter_map_marker_popup: ^8.0.1
   animated_text_kit: ^4.2.3
   smooth_page_indicator: ^1.2.1
+  geolocator: ^14.0.2
  
  
  
