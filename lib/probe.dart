@@ -576,7 +576,6 @@ class ProbePage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 10),
-            featureItem("IOT and agriculture irrigation system", isDarkMode),
             featureItem("Healthcare and Medical Facilities", isDarkMode),
             featureItem("Agriculture and Farming", isDarkMode),
             featureItem("Cold Storage and Warehouse", isDarkMode),
