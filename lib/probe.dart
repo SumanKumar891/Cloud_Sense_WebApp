@@ -122,78 +122,54 @@ class ProbePage extends StatelessWidget {
   }
 
   // ---------- Hero Widgets ----------
-  Widget _buildHeroDesktop(double heroHeight, double headlineSize,
-      double bannerTextSize, double bannerPointSize, BuildContext context) {
-    return Stack(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Container(height: heroHeight, color: Colors.grey.shade600),
-            ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                height: heroHeight,
-                child: Image.asset(
-                  "assets/thprobe.png",
-                  fit: BoxFit.contain,
-                ).animate().fadeIn(duration: 600.ms).scale(
-                      duration: 800.ms,
-                      curve: Curves.easeOutBack,
-                    ),
+  Widget _buildHeroDesktop(
+    double heroHeight,
+    double headlineSize,
+    double bannerTextSize,
+    double bannerPointSize,
+    BuildContext context,
+  ) {
+    return Container(
+      color:
+          const Color.fromARGB(255, 28, 59, 75), // background same as you want
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left side text
+          Expanded(
+            flex: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: _buildHeroText(
+                headlineSize,
+                bannerTextSize,
+                bannerPointSize,
+                context,
               ),
             ),
-          ],
-        ),
-        Container(
-          height: heroHeight,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.black.withOpacity(0.6),
-                Colors.black.withOpacity(0.3)
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
           ),
-        ),
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 12, left: 8),
-                  // child: IconButton(
-                  //   icon: const Icon(Icons.arrow_back,
-                  //       color: Colors.white, size: 22),
-                  //   onPressed: () {
-                  //     if (Navigator.of(context).canPop()) {
-                  //       Navigator.of(context).pop();
-                  //     } else {
-                  //       Navigator.of(context).pushReplacementNamed("/");
-                  //     }
-                  //   },
-                  // ).animate().fadeIn(duration: 500.ms),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    child: _buildHeroText(
-                        headlineSize, bannerTextSize, bannerPointSize, context),
+
+          const SizedBox(width: 20),
+
+          // Right side image with height limit ✅
+          Expanded(
+            flex: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 450, // 👈 PC par max 400px height
+              ),
+              child: Image.asset(
+                "assets/thprobe.png",
+                fit: BoxFit.contain,
+              ).animate().fadeIn(duration: 600.ms).scale(
+                    duration: 800.ms,
+                    curve: Curves.easeOutBack,
                   ),
-                ),
-              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -204,7 +180,7 @@ class ProbePage extends StatelessWidget {
         // Text section with grey background and overlay
         Container(
           width: double.infinity,
-          color: Colors.grey.shade600, // text background
+          color: Colors.blueGrey.shade600, // text background
           child: Stack(
             children: [
               // Overlay
