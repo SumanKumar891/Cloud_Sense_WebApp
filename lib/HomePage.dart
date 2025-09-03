@@ -1065,8 +1065,15 @@ class _HomePageState extends State<HomePage> {
                                                   child: Card(
                                                     elevation: 10,
                                                     shadowColor: Colors.black54,
-                                                    color: Colors.white
-                                                        .withOpacity(0.12),
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                            .withOpacity(0.12)
+                                                        : const Color.fromARGB(
+                                                                255,
+                                                                18,
+                                                                193,
+                                                                178)
+                                                            .withOpacity(0.12),
                                                     shape:
                                                         RoundedRectangleBorder(
                                                       borderRadius:
