@@ -1284,14 +1284,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       if (topic == null) return 'FS'; // Default to FS if topic is null
       if (topic.contains('SSMET')) return 'SM';
       if (topic.contains('NARL')) return 'NA';
+      if (topic == 'WS/Campus/2') return 'CF'; // Exact match before contains
       if (topic.contains('WS/Campus')) return 'CP';
       if (topic.contains('KJSCE')) return 'KJ';
       if (topic.contains('SVPU')) return 'SV';
       if (topic.contains('Mysuru')) return 'MY';
-      if (topic.contains('CF'))
-        return 'CF'; // Adjust if topic pattern for CF is known
       return 'FS'; // Default to FS for other WS topics
     }
+
     return activityType;
   }
 
@@ -1605,6 +1605,21 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
           setState(() {
             cfParametersData.clear();
             cfParametersData = _parseCFParametersData(data);
+
+            // Update last location data
+            if (data.isNotEmpty) {
+              for (var item in data.reversed) {
+                if (item['Latitude'] != null &&
+                    item['Latitude'] != 0 &&
+                    item['Longitude'] != null &&
+                    item['Longitude'] != 0) {
+                  _lastLatitude = item['Latitude'].toDouble();
+                  _lastLongitude = item['Longitude'].toDouble();
+                  _lastLocationTime = DateTime.parse(item['TimeStamp']);
+                  break;
+                }
+              }
+            }
 
             if (cfParametersData.isEmpty) {
               _csvRows = [
@@ -5286,7 +5301,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
     // Handle pH explicitly to preserve "pH"
     if (paramName.toLowerCase().contains('pH')) {
       return {
-        'displayName': 'p H',
+        'displayName': 'pH',
         'unit': 'pH',
       };
     }
