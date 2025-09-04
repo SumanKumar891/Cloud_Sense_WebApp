@@ -3,6 +3,7 @@ import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/appbar.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
+import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/manuallyenter.dart';
 import 'package:cloud_sense_webapp/GPS.dart';
 import 'package:flutter/material.dart';
@@ -224,10 +225,14 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final isWideScreen = screenWidth > 1024; // Desktop
     // Restore dialog after build
     _restoreDialog();
     return Scaffold(
       appBar: AppBarWidget(),
+      endDrawer: !isWideScreen ? const EndDrawerWidget() : null,
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
@@ -860,7 +865,8 @@ class _HoverableCardState extends State<_HoverableCard> {
                       widget.category,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize:
+                            MediaQuery.of(context).size.width < 800 ? 10 : 14,
                         fontWeight: FontWeight.bold,
                         color: widget.getCardTextColor(),
                       ),
