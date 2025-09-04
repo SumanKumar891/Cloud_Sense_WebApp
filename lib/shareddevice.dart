@@ -39,9 +39,19 @@ class DeviceUtils {
   static String getSensorPrefix(String deviceId) {
     if (deviceId.length < 2) return '';
     String prefix = deviceId.substring(0, 2);
-    return validPrefixes.contains(prefix)
-        ? prefix
-        : 'RS'; // 'UN' for unknown sensors
+    return validPrefixes.contains(prefix) ? prefix : 'RS';
+  }
+
+  // Validate device ID format (2 uppercase letters + 3 digits)
+  static bool isValidDeviceId(String deviceId) {
+    // Check if deviceId matches the pattern: 2 uppercase letters followed by 3 digits
+    final RegExp deviceIdPattern = RegExp(r'^[A-Z]{2}\d{3}$');
+    if (!deviceIdPattern.hasMatch(deviceId)) {
+      return false;
+    }
+    // Check if the prefix is in the validPrefixes list
+    String prefix = deviceId.substring(0, 2);
+    return validPrefixes.contains(prefix);
   }
 
   // Display a confirmation dialog for adding a device
@@ -51,6 +61,15 @@ class DeviceUtils {
     required Map<String, List<String>> devices,
     required Function onConfirm,
   }) async {
+    // Validate device ID
+    if (!isValidDeviceId(deviceId)) {
+      _showDialog(
+        context: context,
+        title: 'Invalid Device ID',
+        content: 'Enter Valid Device ID.',
+      );
+      return;
+    }
     String sensorType = getSensorType(deviceId);
     String sensorPrefix = getSensorPrefix(deviceId);
 
