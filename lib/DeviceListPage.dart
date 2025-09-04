@@ -846,7 +846,9 @@ class _HoverableCardState extends State<_HoverableCard> {
                           "Add Device",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: MediaQuery.of(context).size.width < 800
+                                ? 12
+                                : 14,
                             fontWeight: FontWeight.bold,
                             color:
                                 widget.isDarkMode ? Colors.white : Colors.black,

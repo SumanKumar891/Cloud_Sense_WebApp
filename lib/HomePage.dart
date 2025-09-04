@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -159,15 +160,21 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     try {
-      if (email.trim().toLowerCase() == '05agriculture.05@gmail.com') {
-        Navigator.pushNamed(context, '/deviceinfo');
+      print('Navigating for user: $email'); // Debug log
+      if (email.trim().toLowerCase() == 'sejalsankhyan2001@gmail.com') {
+        print('Navigating to /admin for super admin');
+        Navigator.pushNamed(context, '/admin');
+      } else if (email.trim().toLowerCase() == '05agriculture.05@gmail.com') {
+        print('Navigating to /graph for agriculture user');
+        Navigator.pushNamed(context, '/graph');
       } else {
+        print('Navigating to /devicelist for other users');
         await manageNotificationSubscription();
         Navigator.pushNamed(context, '/devicelist');
       }
     } catch (e) {
       print('Error checking user: $e');
-      Navigator.pushNamed(context, '/login');
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
 
@@ -755,6 +762,20 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: isMobile
               ? [
+                  // Padding(
+                  //   padding: const EdgeInsets.only(
+                  //       right: 12.0), // adjust value as needed
+                  //   child: IconButton(
+                  //     icon: const Icon(Icons.share),
+                  //     color: isDarkMode ? Colors.white : Colors.black,
+                  //     onPressed: () {
+                  //       Share.share(
+                  //         'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
+                  //         subject: 'Download Our App',
+                  //       );
+                  //     },
+                  //   ),
+                  // ),
                   Builder(
                     builder: (context) => IconButton(
                       icon: Icon(
@@ -815,41 +836,81 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     if (userProvider.userEmail != null) ...[
-                      ListTile(
-                        leading: Icon(Icons.devices),
-                        title: Text('My Devices'),
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.pushNamed(context, '/devicelist');
-                        },
-                      ),
-                      if (userProvider.userEmail?.trim().toLowerCase() !=
-                          '05agriculture.05@gmail.com')
+                      if (userProvider.userEmail?.trim().toLowerCase() ==
+                          'sejalsankhyan2001@gmail.com') ...[
                         ListTile(
-                          leading: Icon(Icons.account_circle),
-                          title: Text('Account Info'),
+                          leading: Icon(Icons.data_usage),
+                          title: Text('My Data'),
                           onTap: () {
                             Navigator.pop(context);
-                            Navigator.pushNamed(context, '/accountinfo');
+                            Navigator.pushNamed(context, '/admin');
                           },
                         ),
-                      ListTile(
-                        leading: Icon(themeProvider.isDarkMode
-                            ? Icons.light_mode
-                            : Icons.dark_mode),
-                        title: Text('Theme'),
-                        onTap: () {
-                          themeProvider.toggleTheme();
-                        },
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text('Logout'),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _handleLogout();
-                        },
-                      ),
+                        ListTile(
+                          leading: Icon(Icons.logout),
+                          title: Text('Logout'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _handleLogout();
+                          },
+                        ),
+                      ] else ...[
+                        ListTile(
+                          leading: Icon(Icons.devices),
+                          title: Text('My Devices'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            if (userProvider.userEmail?.trim().toLowerCase() ==
+                                'sejalsankhyan2001@gmail.com') {
+                              Navigator.pushNamed(context, '/admin');
+                            } else if (userProvider.userEmail
+                                    ?.trim()
+                                    .toLowerCase() ==
+                                '05agriculture.05@gmail.com') {
+                              Navigator.pushNamed(context, '/deviceinfo');
+                            } else {
+                              Navigator.pushNamed(context, '/devicelist');
+                            }
+                          },
+                        ),
+                        if (userProvider.userEmail?.trim().toLowerCase() !=
+                            '05agriculture.05@gmail.com')
+                          ListTile(
+                            leading: Icon(Icons.account_circle),
+                            title: Text('Account Info'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/accountinfo');
+                            },
+                          ),
+                        ListTile(
+                          leading: Icon(themeProvider.isDarkMode
+                              ? Icons.light_mode
+                              : Icons.dark_mode),
+                          title: const Text('Theme'),
+                          onTap: () {
+                            themeProvider.toggleTheme();
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.share),
+                          title: const Text('Share'),
+                          onTap: () {
+                            Share.share(
+                              'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                              subject: 'Download Our App',
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.logout),
+                          title: Text('Logout'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _handleLogout();
+                          },
+                        ),
+                      ],
                       Divider(),
                     ],
                     ListTile(
@@ -976,9 +1037,19 @@ class _HomePageState extends State<HomePage> {
                         leading: Icon(themeProvider.isDarkMode
                             ? Icons.light_mode
                             : Icons.dark_mode),
-                        title: Text('Theme'),
+                        title: const Text('Theme'),
                         onTap: () {
                           themeProvider.toggleTheme();
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.share),
+                        title: const Text('Share'),
+                        onTap: () {
+                          Share.share(
+                            'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                            subject: 'Download Our App',
+                          );
                         },
                       ),
                     ],
@@ -1393,8 +1464,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         child: ElevatedButton(
                                           onPressed: () {
-                                            Navigator.pushNamed(
-                                                context, '/devicelist');
+                                            _handleDeviceNavigation();
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor:
@@ -1862,6 +1932,8 @@ class _HomePageState extends State<HomePage> {
     final userProvider = Provider.of<UserProvider>(context);
     final isAdmin = userProvider.userEmail?.trim().toLowerCase() ==
         '05agriculture.05@gmail.com';
+    final isSuperAdmin = userProvider.userEmail?.trim().toLowerCase() ==
+        'sejalsankhyan2001@gmail.com';
 
     return GestureDetector(
       onTap: () async {
@@ -1882,42 +1954,72 @@ class _HomePageState extends State<HomePage> {
           ),
           color: isDarkMode ? Colors.grey[800] : Colors.white,
           items: userProvider.userEmail != null
-              ? [
-                  PopupMenuItem(
-                    value: 'devices',
-                    child: Row(
-                      children: [
-                        Icon(Icons.devices,
-                            color: isDarkMode ? Colors.white : Colors.black),
-                        SizedBox(width: 8),
-                        Text('My Devices'),
-                      ],
-                    ),
-                  ),
-                  if (!isAdmin)
-                    PopupMenuItem(
-                      value: 'account',
-                      child: Row(
-                        children: [
-                          Icon(Icons.account_circle,
-                              color: isDarkMode ? Colors.white : Colors.black),
-                          SizedBox(width: 8),
-                          Text('Account Info'),
-                        ],
+              ? isSuperAdmin
+                  ? [
+                      PopupMenuItem(
+                        value: 'data',
+                        child: Row(
+                          children: [
+                            Icon(Icons.data_usage,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black),
+                            SizedBox(width: 8),
+                            Text('My Data'),
+                          ],
+                        ),
                       ),
-                    ),
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout,
-                            color: isDarkMode ? Colors.white : Colors.black),
-                        SizedBox(width: 8),
-                        Text('Logout'),
-                      ],
-                    ),
-                  ),
-                ]
+                      PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black),
+                            SizedBox(width: 8),
+                            Text('Logout'),
+                          ],
+                        ),
+                      ),
+                    ]
+                  : [
+                      PopupMenuItem(
+                        value: 'devices',
+                        child: Row(
+                          children: [
+                            Icon(Icons.devices,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black),
+                            SizedBox(width: 8),
+                            Text('My Devices'),
+                          ],
+                        ),
+                      ),
+                      if (!isAdmin)
+                        PopupMenuItem(
+                          value: 'account',
+                          child: Row(
+                            children: [
+                              Icon(Icons.account_circle,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black),
+                              SizedBox(width: 8),
+                              Text('Account Info'),
+                            ],
+                          ),
+                        ),
+                      PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout,
+                                color:
+                                    isDarkMode ? Colors.white : Colors.black),
+                            SizedBox(width: 8),
+                            Text('Logout'),
+                          ],
+                        ),
+                      ),
+                    ]
               : [
                   PopupMenuItem(
                     value: 'login',
@@ -1933,8 +2035,18 @@ class _HomePageState extends State<HomePage> {
                 ],
         );
 
-        if (selected == 'devices') {
-          Navigator.pushNamed(context, '/devicelist');
+        if (selected == 'data' && isSuperAdmin) {
+          Navigator.pushNamed(context, '/admin');
+        } else if (selected == 'devices') {
+          if (userProvider.userEmail?.trim().toLowerCase() ==
+              'sejalsankhyan2001@gmail.com') {
+            Navigator.pushNamed(context, '/admin');
+          } else if (userProvider.userEmail?.trim().toLowerCase() ==
+              '05agriculture.05@gmail.com') {
+            Navigator.pushNamed(context, '/deviceinfo');
+          } else {
+            Navigator.pushNamed(context, '/devicelist');
+          }
         } else if (selected == 'account' && !isAdmin) {
           Navigator.pushNamed(context, '/accountinfo');
         } else if (selected == 'logout') {

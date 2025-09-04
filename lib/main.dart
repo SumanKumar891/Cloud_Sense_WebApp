@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cloud_sense_webapp/ATRH.dart';
 import 'package:cloud_sense_webapp/AccountInfo.dart';
+import 'package:cloud_sense_webapp/AdminPage';
 import 'package:cloud_sense_webapp/DeviceGraphPage.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
 import 'package:cloud_sense_webapp/LoginPage.dart';
@@ -526,7 +527,7 @@ class MyApp extends StatelessWidget {
                     fontFamily: 'OpenSans',
                   ),
             ),
-     initialRoute: '/',
+      initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
         '/about-us': (context) => HomePage(),
@@ -535,8 +536,9 @@ class MyApp extends StatelessWidget {
         '/deviceinfo': (context) => MapPage(),
         '/raingauge': (context) => ProductPage(),
         '/windsensor': (context) => UltrasonicSensorPage(),
-          '/gateway': (context) => GatewayPage(),
+        '/gateway': (context) => GatewayPage(),
         '/probe': (context) => ProbePage(),
+        '/admin': (context) => AdminPage(),
         '/datalogger': (context) => DataLoggerPage(),
         '/atrh': (context) => ATRHSensorPage(),
         '/devicelist': (context) => DataDisplayPage(),

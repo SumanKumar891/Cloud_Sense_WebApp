@@ -73,6 +73,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               await prefs.remove('isAmmoniaTokenSubscribed');
             }
             Navigator.pushReplacementNamed(context, '/deviceinfo');
+          } else if (email.trim().toLowerCase() ==
+              "sejalsankhyan2001@gmail.com") {
+            print("Navigating to /admin for $email in _checkCurrentUser");
+            Navigator.pushReplacementNamed(context, '/admin');
           } else {
             bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
             if (hasAmmoniaSensor) {
@@ -597,24 +601,24 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-  leading: IconButton(
-    icon: Icon(
-      Icons.arrow_back,
-      color: isDarkMode ? Colors.white : Colors.black,
-      size: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-    ),
-    onPressed: () {
-      // Navigate to home screen and remove all previous routes
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/', // Route name for home screen
-        (Route<dynamic> route) => false, // Remove all previous routes
-      );
-    },
-  ),
-  backgroundColor: Colors.transparent,
-  elevation: 0,
-),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDarkMode ? Colors.white : Colors.black,
+            size: MediaQuery.of(context).size.width < 800 ? 16 : 32,
+          ),
+          onPressed: () {
+            // Navigate to home screen and remove all previous routes
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/', // Route name for home screen
+              (Route<dynamic> route) => false, // Remove all previous routes
+            );
+          },
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Stack(
         children: [
           Container(

@@ -1,0 +1,297 @@
+import 'package:flutter/material.dart';
+
+class AdminPage extends StatelessWidget {
+  const AdminPage({Key? key}) : super(key: key);
+
+  // Placeholder function for delete action
+  void _deleteUser(BuildContext context, String email) {
+    // Implement your delete logic here (e.g., API call, database update)
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Delete action for $email triggered')),
+    );
+  }
+
+  // Function to show device details dialog
+  void _showDeviceDetails(BuildContext context, String deviceId, String location, String status, String lastUpdate) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+        title: Text(
+          'Device Details',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: isTablet ? 20 : 18,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Device ID: $deviceId',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Location: $location',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Status: $status',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Last Update: $lastUpdate',
+              style: TextStyle(
+                fontSize: isTablet ? 16 : 14,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Close',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.blue,
+                fontSize: isTablet ? 16 : 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Admin Dashboard',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: isTablet ? 24 : 20,
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
+        elevation: 2,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(isTablet ? 24.0 : 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Devices Section
+            Text(
+              'Devices',
+              style: TextStyle(
+                fontSize: isTablet ? 20 : 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
+              ),
+              child: DataTable(
+                columnSpacing: isTablet ? 24 : 12,
+                columns: const [
+                  DataColumn(
+                    label: Text(
+                      'Device ID',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Location',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Status',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Last Update',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+                rows: [
+                  DataRow(cells: [
+                    DataCell(
+                      GestureDetector(
+                        onTap: () => _showDeviceDetails(
+                          context,
+                          'WS001',
+                          'Station A',
+                          'Active',
+                          '2025-09-03 17:00',
+                        ),
+                        child: Text(
+                          'WS001',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.blue[300] : Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(Text('Station A')),
+                    DataCell(Text('Active')),
+                    DataCell(Text('2025-09-03 17:00')),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(
+                      GestureDetector(
+                        onTap: () => _showDeviceDetails(
+                          context,
+                          'WS002',
+                          'Station B',
+                          'Inactive',
+                          '2025-09-03 16:45',
+                        ),
+                        child: Text(
+                          'WS002',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.blue[300] : Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(Text('Station B')),
+                    DataCell(Text('Inactive')),
+                    DataCell(Text('2025-09-03 16:45')),
+                  ]),
+                ],
+              ),
+            ),
+            SizedBox(height: 32),
+            // Accounts Section
+            Text(
+              'User Accounts',
+              style: TextStyle(
+                fontSize: isTablet ? 20 : 18,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            SizedBox(height: 16),
+            Container(
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!),
+              ),
+              child: DataTable(
+                columnSpacing: isTablet ? 24 : 12,
+                columns: const [
+                  DataColumn(
+                    label: Text(
+                      'Email',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Name',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Role',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Last Login',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Actions',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+                rows: [
+                  // Placeholder data with delete button
+                  DataRow(cells: [
+                    DataCell(Text('user1@example.com')),
+                    DataCell(Text('John Doe')),
+                    DataCell(Text('User')),
+                    DataCell(Text('2025-09-03 10:00')),
+                    DataCell(
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: isDarkMode ? Colors.red[300] : Colors.red,
+                          size: isTablet ? 20 : 18,
+                        ),
+                        onPressed: () => _deleteUser(context, 'user1@example.com'),
+                        tooltip: 'Delete Account',
+                      ),
+                    ),
+                  ]),
+                  DataRow(cells: [
+                    DataCell(Text('admin@example.com')),
+                    DataCell(Text('Jane Smith')),
+                    DataCell(Text('Admin')),
+                    DataCell(Text('2025-09-03 12:30')),
+                    DataCell(
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: isDarkMode ? Colors.red[300] : Colors.red,
+                          size: isTablet ? 20 : 18,
+                        ),
+                        onPressed: () => _deleteUser(context, 'admin@example.com'),
+                        tooltip: 'Delete Account',
+                      ),
+                    ),
+                  ]),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

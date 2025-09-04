@@ -3,6 +3,7 @@ import 'package:cloud_sense_webapp/HomePage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'main.dart';
 
 class EndDrawerWidget extends StatefulWidget {
@@ -93,6 +94,17 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                 },
               ),
               ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text('Share'),
+                onTap: () {
+                  Share.share(
+                    'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
+                    subject: 'Download Our App',
+                  );
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
                 onTap: () {
@@ -133,20 +145,23 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
             if (userProvider.userEmail == null) ...[
               const Divider(),
               ListTile(
-                leading: const Icon(Icons.login),
-                title: const Text('Login/Signup'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showLoginPopup(context);
-                },
-              ),
-              ListTile(
                 leading: Icon(themeProvider.isDarkMode
                     ? Icons.light_mode
                     : Icons.dark_mode),
                 title: const Text('Theme'),
                 onTap: () {
                   themeProvider.toggleTheme();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text('Share'),
+                onTap: () {
+                  Share.share(
+                    'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
+                    subject: 'Download Our App',
+                  );
+                  Navigator.pop(context);
                 },
               ),
             ],
