@@ -72,7 +72,7 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Future<void> fetchAnomalies() async {
-    anomalies.clear();
+    final newNotifications = <Map<String, String>>[];
     for (final d in allDevices) {
       final deviceId = d['DeviceId'] ?? "";
       final topic = d['Topic'] ?? "Unknown";
@@ -83,16 +83,23 @@ class _AdminPageState extends State<AdminPage> {
         final response = await http.get(Uri.parse("$flaggingApiUrl?DeviceID=$deviceId"));
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          if (data is List) {
-            for (final item in data) {
-              final anomaly = item['Anomaly']?.toString() ?? "";
-              if (anomaly.isNotEmpty) {
-                anomalies[deviceIdTopic] = anomaly;
-                if (!seenAnomalies.contains(deviceIdTopic)) {
-                  _showNotification(deviceIdTopic, anomaly);
-                  seenAnomalies.add(deviceIdTopic);
+          if (data is List && data.isNotEmpty) {
+            final item = data.last;
+            final anomaly = item['Anomaly']?.toString() ?? "";
+            final timestamp = item['Timestamp']?.toString() ?? "N/A";
+            if (anomaly.isNotEmpty) {
+              anomalies[deviceIdTopic] = anomaly;
+              if (!seenAnomalies.contains(deviceIdTopic)) {
+                newNotifications.add({
+                  'deviceIdTopic': deviceIdTopic,
+                  'message': _buildNotificationMessage(deviceIdTopic, anomaly, timestamp),
+                });
+                seenAnomalies.add(deviceIdTopic);
+              } else {
+                final existingIndex = notifications.indexWhere((n) => n['deviceIdTopic'] == deviceIdTopic);
+                if (existingIndex != -1) {
+                  notifications[existingIndex]['message'] = _buildNotificationMessage(deviceIdTopic, anomaly, timestamp);
                 }
-                break;
               }
             }
           }
@@ -103,24 +110,30 @@ class _AdminPageState extends State<AdminPage> {
         print("Flagging API Exception for $deviceId: $e");
       }
     }
-    setState(() {});
+
+    if (newNotifications.isNotEmpty) {
+      setState(() {
+        notifications.insertAll(0, newNotifications);
+        for (var notification in newNotifications) {
+          _showNotification(notification['deviceIdTopic']!, notification['message']!);
+        }
+      });
+    } else {
+      setState(() {});
+    }
   }
 
-  Future<void> _showNotification(String deviceIdTopic, String anomaly) async {
+  String _buildNotificationMessage(String deviceIdTopic, String anomaly, String timestamp) {
     final deviceId = deviceIdTopic.split('#')[0];
     final topic = deviceIdTopic.split('#').length > 1 ? deviceIdTopic.split('#')[1] : "Unknown";
     final mapped = _mapCategoryAndPrefix(topic);
     final sensorName = mapped.prefix.isNotEmpty ? "${mapped.prefix}${deviceId.padLeft(3, '0')}" : deviceId;
-    final message = "Anomaly in Device $sensorName: $anomaly";
+    return "Anomaly in Device $sensorName: $anomaly at $timestamp";
+  }
 
+  Future<void> _showNotification(String deviceIdTopic, String message) async {
     if (kIsWeb) {
-      if (!mounted) return;
-      setState(() {
-        notifications.add({
-          'deviceIdTopic': deviceIdTopic,
-          'message': message,
-        });
-      });
+      return;
     } else {
       const androidDetails = AndroidNotificationDetails(
         'anomaly_channel',
@@ -205,6 +218,9 @@ class _AdminPageState extends State<AdminPage> {
     setState(() {
       notifications.removeWhere((n) => n['deviceIdTopic'] == deviceIdTopic);
       seenAnomalies.remove(deviceIdTopic);
+      if (!kIsWeb) {
+        _notificationsPlugin?.cancel(deviceIdTopic.hashCode);
+      }
     });
   }
 
@@ -216,65 +232,71 @@ class _AdminPageState extends State<AdminPage> {
 
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 400),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder: (_) => StatefulBuilder(
+        builder: (dialogContext, dialogSetState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 400),
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  Text(
-                    "Notifications (${notifications.length})",
-                    style: TextStyle(color: strong, fontSize: 16, fontWeight: FontWeight.w800),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Notifications (${notifications.length})",
+                        style: TextStyle(color: strong, fontSize: 16, fontWeight: FontWeight.w800),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: subtle),
+                        onPressed: () => Navigator.pop(dialogContext),
+                        tooltip: 'Close',
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: subtle),
-                    onPressed: () => Navigator.pop(context),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: notifications.isEmpty
+                        ? Center(child: Text("No notifications", style: TextStyle(color: subtle)))
+                        : Scrollbar(
+                            thumbVisibility: true,
+                            child: ListView.separated(
+                              itemCount: notifications.length,
+                              separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
+                              itemBuilder: (_, i) {
+                                final n = notifications[i];
+                                final deviceIdTopic = n['deviceIdTopic']!;
+                                return ListTile(
+                                  leading: Icon(Icons.warning, color: Colors.orange),
+                                  title: Text(
+                                    n['message']!,
+                                    style: TextStyle(color: strong, fontWeight: FontWeight.w600),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      dialogSetState(() {
+                                        _dismissNotification(deviceIdTopic);
+                                      });
+                                    },
+                                    tooltip: 'Dismiss',
+                                  ),
+                                  onTap: () {
+                                    Navigator.pop(dialogContext);
+                                    _handleNotificationTap(deviceIdTopic);
+                                  },
+                                );
+                              },
+                            ),
+                          ),
                   ),
                 ],
               ),
-              const Divider(height: 1),
-              const SizedBox(height: 8),
-              Expanded(
-                child: notifications.isEmpty
-                    ? Center(child: Text("No notifications", style: TextStyle(color: subtle)))
-                    : Scrollbar(
-                        thumbVisibility: true,
-                        child: ListView.separated(
-                          itemCount: notifications.length,
-                          separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
-                          itemBuilder: (_, i) {
-                            final n = notifications[i];
-                            final deviceIdTopic = n['deviceIdTopic']!;
-                            return ListTile(
-                              leading: Icon(Icons.warning, color: Colors.orange),
-                              title: Text(
-                                n['message']!,
-                                style: TextStyle(color: strong, fontWeight: FontWeight.w600),
-                              ),
-                              trailing: IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  _dismissNotification(deviceIdTopic);
-                                  setState(() {});
-                                },
-                                tooltip: 'Dismiss',
-                              ),
-                              onTap: () {
-                                Navigator.pop(context);
-                                _handleNotificationTap(deviceIdTopic);
-                              },
-                            );
-                          },
-                        ),
-                      ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -413,186 +435,285 @@ class _AdminPageState extends State<AdminPage> {
 
     showDialog(
       context: context,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 600, maxHeight: 400),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, dialogSetState) {
+          Future<void> _refreshDevices() async {
+            dialogSetState(() => isLoadingDevices = true);
+            try {
+              final response = await http.get(Uri.parse("$userDevicesApiUrl?email_id=$email"));
+              if (response.statusCode == 200) {
+                final result = json.decode(response.body);
+                dialogSetState(() {
+                  deviceCategories = {
+                    for (var key in result.keys)
+                      if (key != 'device_id' && key != 'email_id')
+                        key: List<String>.from(result[key] ?? [])
+                  };
+                });
+              } else {
+                _toast("Failed to load devices: Status ${response.statusCode}");
+              }
+            } catch (e) {
+              _toast("Error fetching devices: $e");
+            }
+            dialogSetState(() => isLoadingDevices = false);
+          }
+
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 600, maxHeight: 400),
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  Text(
-                    "Devices for $email",
-                    style: TextStyle(color: strong, fontSize: 16, fontWeight: FontWeight.w800),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Devices for $email",
+                        style: TextStyle(color: strong, fontSize: 16, fontWeight: FontWeight.w800),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.refresh, color: subtle),
+                            onPressed: _refreshDevices,
+                            tooltip: 'Refresh',
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: subtle),
+                            onPressed: () => Navigator.pop(dialogContext),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: subtle),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const Divider(height: 1),
-              const SizedBox(height: 8),
-              Expanded(
-                child: isLoadingDevices
-                    ? const Center(child: CircularProgressIndicator())
-                    : deviceCategories.isEmpty
-                        ? Center(child: Text("No devices found", style: TextStyle(color: subtle)))
-                        : SingleChildScrollView(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                headingRowColor: MaterialStateProperty.all(
-                                  isDark ? const Color.fromARGB(255, 6, 94, 138) : Colors.white,
-                                ),
-                                dataRowColor: MaterialStateProperty.all(
-                                  isDark ? const Color.fromARGB(255, 5, 35, 49) : const Color.fromARGB(255, 129, 173, 166),
-                                ),
-                                columnSpacing: 20.0,
-                                columns: deviceCategories.keys.map((sensorKey) => DataColumn(
-                                  label: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      sensorKey.trim(),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: isLoadingDevices
+                        ? const Center(child: CircularProgressIndicator())
+                        : deviceCategories.isEmpty
+                            ? Center(child: Text("No devices found", style: TextStyle(color: subtle)))
+                            : ListView.builder(
+                                itemCount: deviceCategories.keys.length,
+                                itemBuilder: (ctx, index) {
+                                  final category = deviceCategories.keys.elementAt(index);
+                                  final devices = deviceCategories[category]!;
+                                  return ExpansionTile(
+                                    title: Text(
+                                      category.trim(),
                                       style: TextStyle(
-                                        color: isDark ? Colors.white : Colors.black,
+                                        color: strong,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
                                     ),
-                                  ),
-                                )).toList(),
-                                rows: List.generate(
-                                  deviceCategories.values.map((list) => list.length).reduce((a, b) => a > b ? a : b),
-                                  (index) => DataRow(
-                                    cells: deviceCategories.keys.map((sensorKey) {
-                                      final devices = deviceCategories[sensorKey]!;
-                                      final device = index < devices.length ? devices[index] : '';
-                                      return DataCell(
-                                        Text(
-                                          device.isNotEmpty ? '• $device' : '',
-                                          style: TextStyle(
-                                            color: isDark ? Colors.white : Colors.black,
-                                            fontSize: 14,
-                                          ),
+                                    children: devices.map((device) {
+                                      return ListTile(
+                                        title: Text(
+                                          '• $device',
+                                          style: TextStyle(color: strong, fontSize: 14),
+                                        ),
+                                        trailing: IconButton(
+                                          icon: Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () async {
+                                            final confirm = await showDialog<bool>(
+                                              context: dialogContext,
+                                              builder: (confirmCtx) => AlertDialog(
+                                                title: const Text("Confirm Deletion"),
+                                                content: Text("Are you sure you want to delete device $device from $email?"),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.pop(confirmCtx, false),
+                                                    child: const Text("Cancel"),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () => Navigator.pop(confirmCtx, true),
+                                                    child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                            if (confirm == true) {
+                                              await _deleteUserDevice(email, device, dialogContext, dialogSetState);
+                                              // Check if there are any devices left
+                                              if (deviceCategories.values.every((devices) => devices.isEmpty)) {
+                                                Navigator.pop(dialogContext); // Close dialog if no devices remain
+                                              } else {
+                                                await _refreshDevices();
+                                              }
+                                            }
+                                          },
+                                          tooltip: 'Delete',
                                         ),
                                       );
                                     }).toList(),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
-                            ),
-                          ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-Future<void> _addDeviceToUser(String email, String deviceId) async {
-  try {
-    // Validate device ID format
-    if (!DeviceUtils.isValidDeviceId(deviceId)) {
-      _toast("Invalid Device ID.");
-      return;
-    }
-
-    // Check if device already exists
-    final deviceExists = allDevices.any((d) => d['DeviceId'] == deviceId);
-    if (deviceExists) {
-      _toast("Device $deviceId is already added.");
-      return;
-    }
-
-    final response = await http.get(Uri.parse("$addDeviceApiUrl?email_id=$email&device_id=$deviceId"));
-    if (kDebugMode) {
-      print("Add Device Response: Status=${response.statusCode}, Body=${response.body}");
-    }
-
-    if (response.statusCode == 200) {
-      try {
-        final responseBody = json.decode(response.body);
-        if (responseBody['message']?.toString().toLowerCase().contains('success') == true) {
-          _toast("Device $deviceId added to $email successfully");
-          await fetchDevices(); // Refresh device list
-          await fetchAnomalies(); // Refresh anomalies if needed
-        } else {
-          _toast("Failed to add device: ${responseBody['message'] ?? 'Unknown error'}");
+  Future<void> _deleteUserDevice(String email, String deviceId, BuildContext dialogContext, StateSetter dialogSetState) async {
+    final url = "$userApiUrl?email_id=$email&action=delete_devices&device_id=$deviceId";
+    try {
+      final response = await http.delete(Uri.parse(url));
+      if (response.statusCode == 200) {
+        try {
+          final body = json.decode(response.body);
+          if (body['message']?.toString().toLowerCase().contains('deleted') == true) {
+            _toast("Device $deviceId deleted from $email");
+            // Remove any related notifications and anomalies
+            final deviceIdTopic = allDevices
+                .firstWhere((d) => d['DeviceId'] == deviceId, orElse: () => {'Topic': ''})['Topic']
+                .toString();
+            final fullDeviceIdTopic = "$deviceId#$deviceIdTopic";
+            dialogSetState(() {
+              notifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
+              seenAnomalies.remove(fullDeviceIdTopic);
+              anomalies.remove(fullDeviceIdTopic);
+            });
+            if (!kIsWeb) {
+              _notificationsPlugin?.cancel(fullDeviceIdTopic.hashCode);
+            }
+          } else {
+            _toast("Failed to delete device: ${body['message'] ?? 'Unknown error'}");
+          }
+        } on FormatException {
+          if (response.body.toLowerCase().contains('deleted')) {
+            _toast("Device $deviceId deleted from $email");
+            final deviceIdTopic = allDevices
+                .firstWhere((d) => d['DeviceId'] == deviceId, orElse: () => {'Topic': ''})['Topic']
+                .toString();
+            final fullDeviceIdTopic = "$deviceId#$deviceIdTopic";
+            dialogSetState(() {
+              notifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
+              seenAnomalies.remove(fullDeviceIdTopic);
+              anomalies.remove(fullDeviceIdTopic);
+            });
+            if (!kIsWeb) {
+              _notificationsPlugin?.cancel(fullDeviceIdTopic.hashCode);
+            }
+          } else {
+            _toast("Failed to delete device: ${response.body}");
+          }
         }
-      } on FormatException {
-        // Handle non-JSON response
-        if (response.body.toLowerCase().contains('success')) {
-          _toast("Device $deviceId added to $email successfully");
-          await fetchDevices();
-          await fetchAnomalies();
-        } else {
-          _toast("Failed to add device: ${response.body}");
-        }
+      } else {
+        _toast("Delete API error: Status ${response.statusCode}, Body: ${response.body}");
       }
-    } else {
-      _toast("Add device API error: Status ${response.statusCode}, ${response.body}");
-    }
-  } catch (e) {
-    _toast("Error adding device: $e");
-    if (kDebugMode) {
-      print("Exception during device addition: $e");
+    } catch (e) {
+      _toast("Error deleting device: $e");
+      if (kDebugMode) print("Delete device error: $e");
     }
   }
-}
-void _showAddDeviceDialog(String email) {
-  final TextEditingController deviceIdController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (_) => StatefulBuilder(
-      builder: (context, setState) {
-        return AlertDialog(
-          title: Text("Add Device to $email"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: deviceIdController,
-                decoration: InputDecoration(
-                  labelText: "Enter Device ID (e.g., CP001)",
-                  border: OutlineInputBorder(),
-                  helperText: "Use 2 uppercase letters (e.g., CP) + 3 digits (e.g., 001)",
+  Future<void> _addDeviceToUser(String email, String deviceId) async {
+    try {
+      if (!DeviceUtils.isValidDeviceId(deviceId)) {
+        _toast("Invalid Device ID.");
+        return;
+      }
+
+      final deviceExists = allDevices.any((d) => d['DeviceId'] == deviceId);
+      if (deviceExists) {
+        _toast("Device $deviceId is already added.");
+        return;
+      }
+
+      final response = await http.get(Uri.parse("$addDeviceApiUrl?email_id=$email&device_id=$deviceId"));
+      if (kDebugMode) {
+        print("Add Device Response: Status=${response.statusCode}, Body=${response.body}");
+      }
+
+      if (response.statusCode == 200) {
+        try {
+          final responseBody = json.decode(response.body);
+          if (responseBody['message']?.toString().toLowerCase().contains('success') == true) {
+            _toast("Device $deviceId added to $email successfully");
+            // await fetchDevices();
+            // await fetchAnomalies();
+          } else {
+            _toast("Failed to add device: ${responseBody['message'] ?? 'Unknown error'}");
+          }
+        } on FormatException {
+          if (response.body.toLowerCase().contains('success')) {
+            _toast("Device $deviceId added to $email successfully");
+            // await fetchDevices();
+            // await fetchAnomalies();
+          } else {
+            _toast("Failed to add device: ${response.body}");
+          }
+        }
+      } else {
+        _toast("Add device API error: Status ${response.statusCode}, ${response.body}");
+      }
+    } catch (e) {
+      _toast("Error adding device: $e");
+      if (kDebugMode) {
+        print("Exception during device addition: $e");
+      }
+    }
+  }
+
+  void _showAddDeviceDialog(String email) {
+    final TextEditingController deviceIdController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text("Add Device to $email"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: deviceIdController,
+                  decoration: InputDecoration(
+                    labelText: "Enter Device ID (e.g., CP001)",
+                    border: OutlineInputBorder(),
+                    helperText: "Use 2 uppercase letters (e.g., CP) + 3 digits (e.g., 001)",
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
                 ),
-                onChanged: (value) {
-                  setState(() {}); // Rebuild dialog on text change
-                },
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: deviceIdController.text.trim().isEmpty
+                    ? null
+                    : () {
+                        final deviceId = deviceIdController.text.trim();
+                        if (!DeviceUtils.isValidDeviceId(deviceId)) {
+                          _toast("Invalid Device ID.");
+                          return;
+                        }
+                        Navigator.pop(context);
+                        _addDeviceToUser(email, deviceId);
+                      },
+                child: const Text("Add"),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: deviceIdController.text.trim().isEmpty
-                  ? null
-                  : () {
-                      final deviceId = deviceIdController.text.trim();
-                      if (!DeviceUtils.isValidDeviceId(deviceId)) {
-                        _toast("Invalid Device ID.");
-                        return;
-                      }
-                      Navigator.pop(context);
-                      _addDeviceToUser(email, deviceId);
-                    },
-              child: const Text("Add"),
-            ),
-          ],
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
+
   DateTime? parseDate(String? dateStr) {
     if (dateStr == null) return null;
     try {
@@ -836,312 +957,394 @@ void _showAddDeviceDialog(String email) {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          children: [
-            GridView.count(
-              crossAxisCount: 4,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 2.6,
-              children: [
-                _StatCard(
-                  title: "Total Devices",
-                  value: allDevices.length.toString(),
-                  icon: Icons.devices,
-                  iconBg: Colors.blue,
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                ),
-                _StatCard(
-                  title: "Active",
-                  value: totalActive.toString(),
-                  icon: Icons.check_circle,
-                  iconBg: Colors.green,
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                ),
-                _StatCard(
-                  title: "Inactive",
-                  value: totalInactive.toString(),
-                  icon: Icons.cancel,
-                  iconBg: Colors.red,
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                ),
-                _StatCard(
-                  title: "Users",
-                  value: users.length.toString(),
-                  icon: Icons.people_alt,
-                  iconBg: Colors.orange,
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 1.3,
-              children: [
-                _SectionCard(
-                  title: "Devices",
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                  child: isLoading
-                      ? const Center(child: Padding(
-                          padding: EdgeInsets.all(24.0),
-                          child: CircularProgressIndicator(),
-                        ))
-                      : Column(
-                          children: [
-                            Row(
-                              children: [
-                                _ChipFilter(
-                                  value: filter,
-                                  onChanged: (v) {
-                                    setState(() => filter = v);
-                                  },
-                                  strong: strong,
-                                  subtle: subtle,
-                                  isDark: isDark,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _SearchField(
-                                    hint: "Search device id, group, or topic...",
-                                    onChanged: (q) => setState(() {
-                                      searchQuery = q;
-                                    }),
-                                    strong: strong,
-                                    subtle: subtle,
-                                    isDark: isDark,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  tooltip: "Refresh",
-                                  onPressed: () {
-                                    fetchDevices();
-                                    fetchAnomalies();
-                                  },
-                                  icon: Icon(Icons.refresh, color: strong),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            const Divider(height: 1),
-                            const SizedBox(height: 8),
-                            ConstrainedBox(
-                              constraints: const BoxConstraints(maxHeight: 480),
-                              child: filteredDevices.isEmpty
-                                  ? Center(child: Text("No devices found", style: TextStyle(color: subtle)))
-                                  : Scrollbar(
-                                      thumbVisibility: true,
-                                      child: ListView.separated(
-                                        itemCount: filteredDevices.length,
-                                        separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
-                                        itemBuilder: (_, i) {
-                                          final d = filteredDevices[i];
-                                          final active = d['isActive'] == true;
-                                          final topic = d['Topic']?.toString() ?? "Unknown";
-                                          final deviceId = d['DeviceId']?.toString() ?? "Unknown";
-                                          final deviceIdTopic = "$deviceId#$topic";
-                                          final hasAnomaly = anomalies.containsKey(deviceIdTopic);
-                                          final mapped = _mapCategoryAndPrefix(topic);
-                                          final sensorName = mapped.prefix.isNotEmpty
-                                              ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
-                                              : deviceId;
-                                          final sequentialName = "${mapped.category}";
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          int statCrossAxisCount = (constraints.maxWidth > 1200) ? 4 : (constraints.maxWidth > 600) ? 2 : 1;
+          int sectionCrossAxisCount = (constraints.maxWidth > 600) ? 2 : 1;
 
-                                          return ListTile(
-                                            leading: _StatusDot(color: active ? Colors.green : Colors.red),
-                                            title: Text(
-                                              "ID: $sensorName",
-                                              style: TextStyle(color: strong, fontWeight: FontWeight.w700),
-                                            ),
-                                            subtitle: Text(
-                                              "Name: $sequentialName\nLast: ${d['lastReceivedTime']}",
-                                              style: TextStyle(color: subtle),
-                                            ),
-                                            trailing: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                              decoration: BoxDecoration(
-                                                color: (active ? Colors.green : Colors.red).withOpacity(.12),
-                                                borderRadius: BorderRadius.circular(20),
-                                              ),
-                                              child: Text(
-                                                active ? "Active" : "Inactive",
-                                                style: TextStyle(color: active ? Colors.green : Colors.red, fontWeight: FontWeight.w700),
-                                              ),
-                                            ),
-                                            onTap: () {
-                                              if (hasAnomaly) {
-                                                _handleNotificationTap(deviceIdTopic);
-                                              } else {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => DeviceGraphPage(
-                                                      deviceName: sensorName,
-                                                      sequentialName: sequentialName,
-                                                      backgroundImagePath: 'assets/backgroundd.jpg',
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    ),
-                            ),
-                          ],
-                        ),
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(constraints.maxWidth > 600 ? 18 : 12),
+            child: Column(
+              children: [
+                GridView.count(
+                  crossAxisCount: statCrossAxisCount,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: (constraints.maxWidth > 600) ? 2.6 : 3.8,
+                  children: [
+                    _StatCard(
+                      title: "Total Devices",
+                      value: allDevices.length.toString(),
+                      icon: Icons.devices,
+                      iconBg: Colors.blue,
+                      cardColor: card,
+                      strong: strong,
+                      subtle: subtle,
+                    ),
+                    _StatCard(
+                      title: "Active",
+                      value: totalActive.toString(),
+                      icon: Icons.check_circle,
+                      iconBg: Colors.green,
+                      cardColor: card,
+                      strong: strong,
+                      subtle: subtle,
+                    ),
+                    _StatCard(
+                      title: "Inactive",
+                      value: totalInactive.toString(),
+                      icon: Icons.cancel,
+                      iconBg: Colors.red,
+                      cardColor: card,
+                      strong: strong,
+                      subtle: subtle,
+                    ),
+                    _StatCard(
+                      title: "Users",
+                      value: users.length.toString(),
+                      icon: Icons.people_alt,
+                      iconBg: Colors.orange,
+                      cardColor: card,
+                      strong: strong,
+                      subtle: subtle,
+                    ),
+                  ],
                 ),
-                _SectionCard(
-                  title: "User Accounts",
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                  child: isUsersLoading
-                      ? const Center(child: Padding(
-                          padding: EdgeInsets.all(24.0),
-                          child: CircularProgressIndicator(),
-                        ))
-                      : users.isNotEmpty
-                          ? Column(
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text("Total ${users.length}", style: TextStyle(color: subtle)),
-                                ),
-                                const SizedBox(height: 8),
-                                const Divider(height: 1),
-                                const SizedBox(height: 8),
-                                ConstrainedBox(
-                                  constraints: const BoxConstraints(maxHeight: 480),
-                                  child: Scrollbar(
-                                    thumbVisibility: true,
-                                    child: ListView.separated(
-                                      itemCount: users.length,
-                                      separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
-                                      itemBuilder: (_, i) {
-                                        final u = users[i];
-                                        return ListTile(
-                                          leading: CircleAvatar(
-                                            backgroundColor: Colors.blue.withOpacity(.12),
-                                            child: const Icon(Icons.person, color: Colors.blue),
+                const SizedBox(height: 18),
+                GridView.count(
+                  crossAxisCount: sectionCrossAxisCount,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: (constraints.maxWidth > 600) ? 1.8 : 1.0,
+                  children: [
+                    _SectionCard(
+                      title: "Devices",
+                      cardColor: card,
+                      strong: strong,
+                      subtle: subtle,
+                      child: isLoading
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(24.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : LayoutBuilder(
+                              builder: (context, constraints) {
+                                int rows;
+                                if (constraints.maxWidth > 900) {
+                                  rows = 5;
+                                } else if (constraints.maxWidth > 600) {
+                                  rows = 3;
+                                } else {
+                                  rows = 2;
+                                }
+
+                                return Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        _ChipFilter(
+                                          value: filter,
+                                          onChanged: (v) {
+                                            setState(() => filter = v);
+                                          },
+                                          strong: strong,
+                                          subtle: subtle,
+                                          isDark: isDark,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _SearchField(
+                                            hint: "Search device id, group, or topic...",
+                                            onChanged: (q) => setState(() {
+                                              searchQuery = q;
+                                            }),
+                                            strong: strong,
+                                            subtle: subtle,
+                                            isDark: isDark,
                                           ),
-                                          title: Text(
-                                            u["name"] ?? "",
-                                            style: TextStyle(color: strong, fontWeight: FontWeight.w700),
-                                          ),
-                                          subtitle: Text(
-                                            "${u["email"]} • ${u["role"]}",
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          tooltip: "Refresh",
+                                          onPressed: () {
+                                            fetchDevices();
+                                            fetchAnomalies();
+                                          },
+                                          icon: Icon(Icons.refresh, color: strong),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const Divider(height: 1),
+                                    const SizedBox(height: 8),
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight: rows * 72.0,
+                                      ),
+                                      child: filteredDevices.isEmpty
+                                          ? Center(
+                                              child: Text("No devices found",
+                                                  style: TextStyle(color: subtle)),
+                                            )
+                                          : SizedBox(
+                                              height: rows * 72.0,
+                                              child: ListView.separated(
+                                                itemCount: filteredDevices.length,
+                                                separatorBuilder: (_, __) =>
+                                                    Divider(color: subtle.withOpacity(.12)),
+                                                itemBuilder: (_, i) {
+                                                  final d = filteredDevices[i];
+                                                  final active = d['isActive'] == true;
+                                                  final topic =
+                                                      d['Topic']?.toString() ?? "Unknown";
+                                                  final deviceId =
+                                                      d['DeviceId']?.toString() ?? "Unknown";
+                                                  final deviceIdTopic = "$deviceId#$topic";
+                                                  final hasAnomaly =
+                                                      anomalies.containsKey(deviceIdTopic);
+                                                  final mapped = _mapCategoryAndPrefix(topic);
+                                                  final sensorName = mapped.prefix.isNotEmpty
+                                                      ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
+                                                      : deviceId;
+                                                  final sequentialName = "${mapped.category}";
+
+                                                  return ListTile(
+                                                    leading: _StatusDot(
+                                                      color:
+                                                          active ? Colors.green : Colors.red,
+                                                    ),
+                                                    title: Text(
+                                                      "ID: $sensorName",
+                                                      style: TextStyle(
+                                                        color: strong,
+                                                        fontWeight: FontWeight.w700,
+                                                      ),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
+                                                    subtitle: Text(
+                                                      "Name: $sequentialName\nLast: ${d['lastReceivedTime']}",
+                                                      style: TextStyle(color: subtle),
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 2,
+                                                    ),
+                                                    trailing: Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                          horizontal: 10, vertical: 6),
+                                                      decoration: BoxDecoration(
+                                                        color: (active
+                                                                ? Colors.green
+                                                                : Colors.red)
+                                                            .withOpacity(.12),
+                                                        borderRadius: BorderRadius.circular(20),
+                                                      ),
+                                                      child: Text(
+                                                        active ? "Active" : "Inactive",
+                                                        style: TextStyle(
+                                                          color: active
+                                                              ? Colors.green
+                                                              : Colors.red,
+                                                          fontWeight: FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      if (hasAnomaly) {
+                                                        _handleNotificationTap(deviceIdTopic);
+                                                      } else {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                DeviceGraphPage(
+                                                              deviceName: sensorName,
+                                                              sequentialName: sequentialName,
+                                                              backgroundImagePath:
+                                                                  'assets/backgroundd.jpg',
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                    ),
+                    _SectionCard(
+                      title: "User Accounts",
+                      cardColor: card,
+                      strong: strong,
+                      subtle: subtle,
+
+                      child: isUsersLoading
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(24.0),
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : users.isNotEmpty
+                              ? LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    int rows;
+                                    if (constraints.maxWidth > 900) {
+                                      rows = 5;
+                                    } else if (constraints.maxWidth > 600) {
+                                      rows = 3;
+                                    } else {
+                                      rows = 2;
+                                    }
+
+                                    return Column(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            "Total ${users.length}",
                                             style: TextStyle(color: subtle),
                                           ),
-                                          trailing: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                tooltip: "Add Device",
-                                                onPressed: () => _showAddDeviceDialog(u["email"]!),
-                                                icon: const Icon(Icons.add, color: Colors.blue),
-                                              ),
-                                              IconButton(
-                                                tooltip: "Delete",
-                                                onPressed: () => _deleteUser(u["email"]!),
-                                                icon: const Icon(Icons.delete, color: Colors.red),
-                                              ),
-                                            ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        const Divider(height: 1),
+                                        const SizedBox(height: 8),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight: rows * 72.0,
                                           ),
-                                          onTap: () => _showUserDevices(u["email"]!),
-                                        );
-                                      },
-                                    ),
+                                          child: SizedBox(
+                                            height: rows * 72.0,
+                                            child: ListView.separated(
+                                              itemCount: users.length,
+                                              separatorBuilder: (_, __) =>
+                                                  Divider(color: subtle.withOpacity(.12)),
+                                              itemBuilder: (_, i) {
+                                                final u = users[i];
+                                                return ListTile(
+                                                  leading: CircleAvatar(
+                                                    backgroundColor: Colors.blue.withOpacity(.12),
+                                                    child: const Icon(Icons.person, color: Colors.blue),
+                                                  ),
+                                                  title: Text(
+                                                    u["name"] ?? "",
+                                                    style: TextStyle(
+                                                      color: strong,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                  ),
+                                                  subtitle: Text(
+                                                    "${u["email"]} • ${u["role"]}",
+                                                    style: TextStyle(color: subtle),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                  ),
+                                                  trailing: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      IconButton(
+                                                        tooltip: "Add Device",
+                                                        onPressed: () =>
+                                                            _showAddDeviceDialog(u["email"]!),
+                                                        icon: const Icon(Icons.add, color: Colors.blue),
+                                                      ),
+                                                      IconButton(
+                                                        tooltip: "Delete",
+                                                        onPressed: () => _deleteUser(u["email"]!),
+                                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  onTap: () => _showUserDevices(u["email"]!),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("No users available", style: TextStyle(color: subtle)),
+                                      const SizedBox(height: 8),
+                                      ElevatedButton(
+                                        onPressed: fetchUsers,
+                                        child: const Text("Retry"),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            )
-                          : Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("No users available", style: TextStyle(color: subtle)),
-                                  const SizedBox(height: 8),
-                                  ElevatedButton(
-                                    onPressed: fetchUsers,
-                                    child: const Text("Retry"),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  title: "Analytics",
+                  cardColor: card,
+                  strong: strong,
+                  subtle: subtle,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 6),
+                      Card(
+                        color: card,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text("Active vs Inactive", style: TextStyle(color: strong, fontWeight: FontWeight.w700)),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                height: constraints.maxWidth > 600 ? 160 : 120,
+                                child: PieChart(
+                                  PieChartData(
+                                    sections: _pieSections(),
+                                    centerSpaceRadius: 28,
+                                    sectionsSpace: 2,
                                   ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _LegendDot(color: Colors.green, text: "Active ($totalActive)"),
+                                  const SizedBox(width: 12),
+                                  _LegendDot(color: Colors.red, text: "Inactive ($totalInactive)"),
                                 ],
                               ),
-                            ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _SectionCard(
-              title: "Analytics",
-              cardColor: card,
-              strong: strong,
-              subtle: subtle,
-              child: Column(
-                children: [
-                  const SizedBox(height: 6),
-                  Card(
-                    color: card,
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Active vs Inactive", style: TextStyle(color: strong, fontWeight: FontWeight.w700)),
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            height: 160,
-                            child: PieChart(
-                              PieChartData(
-                                sections: _pieSections(),
-                                centerSpaceRadius: 28,
-                                sectionsSpace: 2,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _LegendDot(color: Colors.green, text: "Active ($totalActive)"),
-                              const SizedBox(width: 12),
-                              _LegendDot(color: Colors.red, text: "Inactive ($totalInactive)"),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -1404,4 +1607,3 @@ class _LegendDot extends StatelessWidget {
     );
   }
 }
-
