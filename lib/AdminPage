@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'DeviceGraphPage.dart';
+import 'shareddevice.dart'; // Adjust path as needed
 
 class AdminPage extends StatefulWidget {
   const AdminPage({Key? key}) : super(key: key);
@@ -492,72 +493,77 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
-  Future<void> _addDeviceToUser(String email, String deviceId) async {
-    try {
-      final response = await http.get(Uri.parse("$addDeviceApiUrl?email_id=$email&device_id=$deviceId"));
-      if (response.statusCode == 200) {
+Future<void> _addDeviceToUser(String email, String deviceId) async {
+  try {
+    // Validate device ID format
+    if (!DeviceUtils.isValidDeviceId(deviceId)) {
+      _toast("Invalid Device ID.");
+      return;
+    }
+
+    // Check if device already exists
+    final deviceExists = allDevices.any((d) => d['DeviceId'] == deviceId);
+    if (deviceExists) {
+      _toast("Device $deviceId is already added.");
+      return;
+    }
+
+    final response = await http.get(Uri.parse("$addDeviceApiUrl?email_id=$email&device_id=$deviceId"));
+    if (kDebugMode) {
+      print("Add Device Response: Status=${response.statusCode}, Body=${response.body}");
+    }
+
+    if (response.statusCode == 200) {
+      try {
         final responseBody = json.decode(response.body);
         if (responseBody['message']?.toString().toLowerCase().contains('success') == true) {
           _toast("Device $deviceId added to $email successfully");
-          await fetchUsers();
+          await fetchDevices(); // Refresh device list
+          await fetchAnomalies(); // Refresh anomalies if needed
         } else {
           _toast("Failed to add device: ${responseBody['message'] ?? 'Unknown error'}");
         }
-      } else {
-        _toast("Add device API error: ${response.statusCode}");
+      } on FormatException {
+        // Handle non-JSON response
+        if (response.body.toLowerCase().contains('success')) {
+          _toast("Device $deviceId added to $email successfully");
+          await fetchDevices();
+          await fetchAnomalies();
+        } else {
+          _toast("Failed to add device: ${response.body}");
+        }
       }
-    } catch (e) {
-      _toast("Error adding device: $e");
+    } else {
+      _toast("Add device API error: Status ${response.statusCode}, ${response.body}");
+    }
+  } catch (e) {
+    _toast("Error adding device: $e");
+    if (kDebugMode) {
+      print("Exception during device addition: $e");
     }
   }
+}
+void _showAddDeviceDialog(String email) {
+  final TextEditingController deviceIdController = TextEditingController();
 
-  void _showAddDeviceDialog(String email) {
-    String? selectedDeviceId;
-    final TextEditingController deviceIdController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
+  showDialog(
+    context: context,
+    builder: (_) => StatefulBuilder(
+      builder: (context, setState) {
+        return AlertDialog(
           title: Text("Add Device to $email"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: "Select Device",
-                  border: OutlineInputBorder(),
-                ),
-                value: selectedDeviceId,
-                items: allDevices.map((device) {
-                  final deviceId = device['DeviceId']?.toString() ?? "Unknown";
-                  final mapped = _mapCategoryAndPrefix(device['Topic']?.toString() ?? "Unknown");
-                  final sensorName = mapped.prefix.isNotEmpty
-                      ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
-                      : deviceId;
-                  return DropdownMenuItem<String>(
-                    value: deviceId,
-                    child: Text(sensorName),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setDialogState(() {
-                    selectedDeviceId = value;
-                    deviceIdController.text = value ?? '';
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
               TextField(
                 controller: deviceIdController,
                 decoration: InputDecoration(
-                  labelText: "Or Enter Device ID",
+                  labelText: "Enter Device ID (e.g., CP001)",
                   border: OutlineInputBorder(),
+                  helperText: "Use 2 uppercase letters (e.g., CP) + 3 digits (e.g., 001)",
                 ),
                 onChanged: (value) {
-                  setDialogState(() {
-                    selectedDeviceId = value;
-                  });
+                  setState(() {}); // Rebuild dialog on text change
                 },
               ),
             ],
@@ -568,20 +574,25 @@ class _AdminPageState extends State<AdminPage> {
               child: const Text("Cancel"),
             ),
             TextButton(
-              onPressed: selectedDeviceId == null || selectedDeviceId!.isEmpty
+              onPressed: deviceIdController.text.trim().isEmpty
                   ? null
-                  : () async {
+                  : () {
+                      final deviceId = deviceIdController.text.trim();
+                      if (!DeviceUtils.isValidDeviceId(deviceId)) {
+                        _toast("Invalid Device ID.");
+                        return;
+                      }
                       Navigator.pop(context);
-                      await _addDeviceToUser(email, selectedDeviceId!);
+                      _addDeviceToUser(email, deviceId);
                     },
               child: const Text("Add"),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
+        );
+      },
+    ),
+  );
+}
   DateTime? parseDate(String? dateStr) {
     if (dateStr == null) return null;
     try {
@@ -1393,3 +1404,4 @@ class _LegendDot extends StatelessWidget {
     );
   }
 }
+
