@@ -8,9 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:latlong2/latlong.dart' show Distance;
 import 'package:provider/provider.dart';
-import 'package:cloud_sense_webapp/main.dart';
 
 enum MapType { defaultMap, satellite, terrain }
 

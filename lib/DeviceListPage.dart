@@ -239,12 +239,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
           gradient: LinearGradient(
             colors: isDarkMode
                 ? [
-                    const Color.fromARGB(255, 57, 57, 57)!,
-                    const Color.fromARGB(255, 2, 54, 76)!,
+                    const Color.fromARGB(255, 57, 57, 57),
+                    const Color.fromARGB(255, 2, 54, 76),
                   ]
                 : [
-                    const Color.fromARGB(255, 191, 242, 237)!,
-                    const Color.fromARGB(255, 79, 106, 112)!,
+                    const Color.fromARGB(255, 191, 242, 237),
+                    const Color.fromARGB(255, 79, 106, 112),
                   ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -444,12 +444,12 @@ class _DataDisplayPageState extends State<DataDisplayPage> {
               gradient: LinearGradient(
                 colors: isDarkMode
                     ? [
-                        const Color.fromARGB(255, 57, 57, 57)!,
-                        const Color.fromARGB(255, 2, 54, 76)!,
+                        const Color.fromARGB(255, 57, 57, 57),
+                        const Color.fromARGB(255, 2, 54, 76),
                       ]
                     : [
-                        const Color.fromARGB(255, 191, 242, 237)!,
-                        const Color.fromARGB(255, 79, 106, 112)!,
+                        const Color.fromARGB(255, 191, 242, 237),
+                        const Color.fromARGB(255, 79, 106, 112),
                       ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

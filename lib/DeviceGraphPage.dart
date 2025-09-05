@@ -1320,7 +1320,7 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   String _lastRSSI_Value = "";
 
   Future<void> _fetchDataForRange(String range,
-      [DateTime? selectedDate, double? latitude, double? longitude]) async {
+      [DateTime? selectedDate]) async {
     setState(() {
       _isLoading = true;
       _csvRows.clear();
@@ -6079,12 +6079,12 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                 end: Alignment.bottomCenter,
                 colors: isDarkMode
                     ? [
-                        const Color.fromARGB(255, 192, 185, 185)!,
-                        const Color.fromARGB(255, 123, 159, 174)!,
+                        const Color.fromARGB(255, 192, 185, 185),
+                        const Color.fromARGB(255, 123, 159, 174),
                       ]
                     : [
-                        const Color.fromARGB(255, 126, 171, 166)!,
-                        const Color.fromARGB(255, 54, 58, 59)!,
+                        const Color.fromARGB(255, 126, 171, 166),
+                        const Color.fromARGB(255, 54, 58, 59),
                       ],
               ),
             ),
@@ -7146,7 +7146,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                   .startsWith('WD') &&
                                               isWindDirectionValid(
                                                   _lastWindDirection) &&
-                                              _lastWindDirection != null &&
                                               _lastWindDirection.isNotEmpty)
                                             Column(
                                               children: [
@@ -7197,7 +7196,6 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                                 .startsWith('IT') &&
                                             iswinddirectionValid(
                                                 _lastwinddirection) &&
-                                            _lastwinddirection != null &&
                                             _lastwinddirection.isNotEmpty) {
                                           return _buildWindCompass(
                                               _lastwinddirection);

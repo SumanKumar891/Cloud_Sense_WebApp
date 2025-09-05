@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'dart:math';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -515,82 +516,179 @@ class _HomePageState extends State<HomePage> {
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return R * c;
   }
+Widget _buildDynamicInfo(Map<String, dynamic> device) {
+  final excludeKeys = {
+    "Latitude",
+    "Longitude",
+    "WindDirection",
+    "WindSpeed",
+    "TimeStamp",
+    "CurrentTemperature",
+    "IMEINumber",
+    "LastUpdated",
+    "RainfallWeekly",
+    "RainfallDaily",
+    "Topic",
+    "SignalStrength"
 
-  static String _safeValue(dynamic val) {
-    if (val == null) return "--";
-    final str = val.toString().trim();
-    if (str.isEmpty || str.toLowerCase() == "null") return "--";
-    return str;
-  }
 
-  Widget _infoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+  }; 
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: device.entries
+        .where((e) => !_isNullOrEmpty(e.value))
+        .where((e) => !excludeKeys.contains(e.key))
+       .map((e) => _infoRow(e.key, e.value.toString()))
+
+        .toList(),
+  );
+}
+
+bool _isNullOrEmpty(dynamic val) {
+  if (val == null) return true;
+  final str = val.toString().trim();
+  if (str.isEmpty || str.toLowerCase() == "null") return true;
+  return false; 
+}
+
+Widget _infoRow(String key, dynamic rawValue) {
+ final formatted = (rawValue); 
+  final unit = _getUnitForKey(key);
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(_getIconForKey(key), color: Colors.white70, size: 18),
+        const SizedBox(width: 8),
+        Text(
+          "$key:",
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            unit.isNotEmpty ? "$formatted $unit" : formatted,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+IconData _getIconForKey(String key) {
+  key = key.toLowerCase();
+
+  if (key.contains("humidity")) return Icons.water_drop;
+  if (key.contains("pressure")) return Icons.speed;
+  if (key.contains("light")) return Icons.light_mode;
+  if (key.contains("battery")) return Icons.battery_full;
+  if (key.contains("temperature")) return Icons.thermostat;
+  if (key.contains("device")) return Icons.memory;
+  if (key.contains("voltage")) return Icons.bolt;
+  if (key.contains("soil")) return Icons.grass;
+  if (key.contains("rain")) return Icons.cloudy_snowing;
+
+  return Icons.circle; 
+}
+
+
+Widget _windDial(dynamic direction, dynamic speed) {
+  double angle = double.tryParse(direction?.toString() ?? "") ?? 0.0;
+  double velocity = double.tryParse(speed?.toString() ?? "") ?? 0.0;
+
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Stack(
+        alignment: Alignment.center,
         children: [
-          Icon(icon, color: Colors.white70, size: 18), // 👈 icon
-          const SizedBox(width: 8),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white)),
-          const SizedBox(width: 8),
-          Text(value,
-              style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          Container(
+            height: 120,
+            width: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white70, width: 2),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Positioned(top: 6, child: Text("N", style: _dirStyle())),
+                Positioned(bottom: 6, child: Text("S", style: _dirStyle())),
+                Positioned(left: 6, child: Text("W", style: _dirStyle())),
+                Positioned(right: 6, child: Text("E", style: _dirStyle())),
+              ],
+            ),
+          ),
+          Transform.rotate(
+            angle: angle * pi / 180,
+            child: const Icon(Icons.navigation,
+                size: 50, color: Colors.redAccent),
+          ),
         ],
       ),
-    );
-  }
+      const SizedBox(height: 6),
+      Text("Wind: ${_safeValue(velocity)} km/h\n${_safeValue(angle)}°",
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white, fontSize: 13)),
+    ],
+  );
+}
 
-  Widget _windDial(dynamic direction, dynamic speed) {
-    double angle = double.tryParse(direction?.toString() ?? "") ?? 0.0;
-    double velocity = double.tryParse(speed?.toString() ?? "") ?? 0.0;
+TextStyle _dirStyle() =>
+    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              height: 120,
-              width: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white70, width: 2),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Positioned(top: 6, child: Text("N", style: _dirStyle())),
-                  Positioned(bottom: 6, child: Text("S", style: _dirStyle())),
-                  Positioned(left: 6, child: Text("W", style: _dirStyle())),
-                  Positioned(right: 6, child: Text("E", style: _dirStyle())),
-                ],
-              ),
-            ),
-            Transform.rotate(
-              angle: angle * pi / 180,
-              child: const Icon(Icons.navigation,
-                  size: 50, color: Colors.redAccent),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Text("Wind: ${_safeValue(velocity)} km/h\n${_safeValue(angle)}°",
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 13)),
-      ],
-    );
-  }
+static String _safeValue(dynamic val) {
+  if (val == null) return "--";
+  final str = val.toString().trim();
+  if (str.isEmpty || str.toLowerCase() == "null") return "--";
+  return str;
+}
 
-  TextStyle _dirStyle() =>
-      const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+String _getUnitForKey(String paramName) {
+  if (paramName.contains('Rainfall')) return 'mm';
+  if (paramName.contains('Voltage')) return 'V';
+  if (paramName.contains('SignalStrength')) return 'dBm';
+  if (paramName.contains('Latitude') || paramName.contains('Longitude')) return '°';
+  if (paramName.contains('Temperature')) return '°C';
+  if (paramName.contains('Humidity')) return '%';
+  if (paramName.contains('Pressure')) return 'hPa';
+  if (paramName.contains('LightIntensity')) return 'Lux';
+  if (paramName.contains('WindSpeed')) return 'm/s';
+  if (paramName.contains('WindDirection')) return '°';
+  if (paramName.contains('Potassium')) return 'mg/Kg';
+  if (paramName.contains('Nitrogen')) return 'mg/Kg';
+  if (paramName.contains('Salinity')) return 'mg/L';
+  if (paramName.contains('ElectricalConductivity')) return 'µS/cm';
+  if (paramName.contains('Phosphorus')) return 'mg/Kg';
+  if (paramName.contains('pH')) return 'pH';
+  if (paramName.contains('Irradiance') || paramName.contains('Radiation')) return 'W/m²';
+  if (paramName.contains('Chlorine') ||
+      paramName.contains('COD') ||
+      paramName.contains('BOD') ||
+      paramName.contains('DO')) return 'mg/L';
+  if (paramName.contains('TDS')) return 'ppm';
+  if (paramName.contains('EC')) return 'mS/cm';
+  if (paramName.contains('Ammonia')) return 'PPM';
+  if (paramName.contains('Visibility')) return 'm';
+  if (paramName.contains('ElectrodeSignal')) return 'mV';
+
+  return ''; 
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -1093,311 +1191,175 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SafeArea(
-                          child: Center(
-                            child: isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white)
-                                : errorMessage != null
-                                    ? Text(
-                                        errorMessage!,
-                                        style: const TextStyle(
-                                          color: Colors.redAccent,
-                                          fontSize: 18,
+  child: Center(
+    child: isLoading
+        ? const CircularProgressIndicator(color: Colors.white)
+        : errorMessage != null
+            ? Text(
+                errorMessage!,
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 18,
+                ),
+              )
+            : nearestDevice == null
+                ? const Text(
+                    "No nearest device found.",
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 18,
+                    ),
+                  )
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      double screenWidth = constraints.maxWidth;
+
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth < 600
+                              ? 16
+                              : screenWidth < 1024
+                                  ? 24
+                                  : 40,
+                          vertical: screenWidth < 600 ? 16 : 32,
+                        ),
+                        child: ConstrainedBox(
+                          constraints:
+                              const BoxConstraints(maxWidth: 1400),
+                          child: Card(
+                            elevation: 10,
+                            shadowColor: Colors.black54,
+                            color: isDarkMode
+                                ? Colors.white.withOpacity(0.12)
+                                : const Color.fromARGB(255, 18, 193, 178)
+                                    .withOpacity(0.12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    screenWidth < 600 ? 20 : 64,
+                                vertical:
+                                    screenWidth < 600 ? 20 : 32,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.stretch,
+                                children: [
+                                  // 🌍 Header
+                                  Column(
+                                    children: [
+                                      Text(
+                                        locationName,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: screenWidth < 600
+                                              ? 16
+                                              : 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
                                         ),
-                                      )
-                                    : nearestDevice == null
-                                        ? const Text(
-                                            "No nearest device found.",
-                                            style: TextStyle(
-                                              color: Colors.redAccent,
-                                              fontSize: 18,
-                                            ),
-                                          )
-                                        : LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              double screenWidth =
-                                                  constraints.maxWidth;
-
-                                              return Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: screenWidth < 600
-                                                      ? 16
-                                                      : screenWidth < 1024
-                                                          ? 24
-                                                          : 40,
-                                                  vertical: screenWidth < 600
-                                                      ? 16
-                                                      : 32,
-                                                ),
-                                                child: ConstrainedBox(
-                                                  constraints:
-                                                      const BoxConstraints(
-                                                          maxWidth: 1400),
-                                                  child: Card(
-                                                    elevation: 10,
-                                                    shadowColor: Colors.black54,
-                                                    color: isDarkMode
-                                                        ? Colors.white
-                                                            .withOpacity(0.12)
-                                                        : const Color.fromARGB(
-                                                                255,
-                                                                18,
-                                                                193,
-                                                                178)
-                                                            .withOpacity(0.12),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              24),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                        horizontal:
-                                                            screenWidth < 600
-                                                                ? 20
-                                                                : 64,
-                                                        vertical:
-                                                            screenWidth < 600
-                                                                ? 20
-                                                                : 32,
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .stretch,
-                                                        children: [
-                                                          // 🌍 Header
-                                                          Column(
-                                                            children: [
-                                                              Text(
-                                                                locationName,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      screenWidth <
-                                                                              600
-                                                                          ? 16
-                                                                          : 20,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 10),
-                                                              Text(
-                                                                currentDate,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      screenWidth <
-                                                                              600
-                                                                          ? 13
-                                                                          : 15,
-                                                                  color: Colors
-                                                                      .white70,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 20),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  const Icon(
-                                                                    Icons
-                                                                        .sunny_snowing,
-                                                                    color: Colors
-                                                                        .white,
-                                                                    size: 40,
-                                                                  ),
-                                                                  const SizedBox(
-                                                                      width:
-                                                                          12),
-                                                                  Text(
-                                                                    "${_safeValue(nearestDevice?["CurrentTemperature"])}°C",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize: screenWidth <
-                                                                              600
-                                                                          ? 36
-                                                                          : 50,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .white,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-
-                                                          const SizedBox(
-                                                              height: 32),
-
-                                                          // 📊 Info + Compass
-                                                          screenWidth < 700
-                                                              ? Column(
-                                                                  children: [
-                                                                    // Info block
-                                                                    Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        if (nearestDevice?["DeviceId"] !=
-                                                                            null)
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(bottom: 12),
-                                                                            child:
-                                                                                Text(
-                                                                              "Device ID: ${nearestDevice!["DeviceId"]}",
-                                                                              style: const TextStyle(
-                                                                                fontSize: 14,
-                                                                                color: Colors.white70,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        _infoRow(
-                                                                          Icons
-                                                                              .water_drop,
-                                                                          "Humidity:",
-                                                                          "${_safeValue(nearestDevice?["CurrentHumidity"])} %",
-                                                                        ),
-                                                                        _infoRow(
-                                                                          Icons
-                                                                              .speed,
-                                                                          "Pressure:",
-                                                                          "${_safeValue(nearestDevice?["AtmPressure"])} hPa",
-                                                                        ),
-                                                                        _infoRow(
-                                                                          Icons
-                                                                              .light_mode,
-                                                                          "Light Intensity:",
-                                                                          "${_safeValue(nearestDevice?["LightIntensity"])} lx",
-                                                                        ),
-                                                                        _infoRow(
-                                                                          Icons
-                                                                              .battery_full,
-                                                                          "Battery Voltage:",
-                                                                          "${_safeValue(nearestDevice?["BatteryVoltage"])} V",
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        height:
-                                                                            20),
-                                                                    // Compass niche aa jayega
-                                                                    _windDial(
-                                                                      nearestDevice?[
-                                                                          "WindDirection"],
-                                                                      nearestDevice?[
-                                                                          "WindSpeed"],
-                                                                    ),
-                                                                  ],
-                                                                )
-                                                              : Row(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child:
-                                                                          Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          if (nearestDevice?["DeviceId"] !=
-                                                                              null)
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(bottom: 12),
-                                                                              child: Text(
-                                                                                "Device ID: ${nearestDevice!["DeviceId"]}",
-                                                                                style: const TextStyle(
-                                                                                  fontSize: 15,
-                                                                                  color: Colors.white70,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          _infoRow(
-                                                                            Icons.water_drop,
-                                                                            "Humidity:",
-                                                                            "${_safeValue(nearestDevice?["CurrentHumidity"])} %",
-                                                                          ),
-                                                                          _infoRow(
-                                                                            Icons.speed,
-                                                                            "Pressure:",
-                                                                            "${_safeValue(nearestDevice?["AtmPressure"])} hPa",
-                                                                          ),
-                                                                          _infoRow(
-                                                                            Icons.light_mode,
-                                                                            "Light Intensity:",
-                                                                            "${_safeValue(nearestDevice?["LightIntensity"])} lx",
-                                                                          ),
-                                                                          _infoRow(
-                                                                            Icons.battery_full,
-                                                                            "Battery Voltage:",
-                                                                            "${_safeValue(nearestDevice?["BatteryVoltage"])} V",
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            30),
-                                                                    _windDial(
-                                                                      nearestDevice?[
-                                                                          "WindDirection"],
-                                                                      nearestDevice?[
-                                                                          "WindSpeed"],
-                                                                    ),
-                                                                  ],
-                                                                ),
-
-                                                          const SizedBox(
-                                                              height: 24),
-
-                                                          // 🕒 Footer
-                                                          Text(
-                                                            "Last Updated: ${_safeValue(nearestDevice?["TimeStamp"])}",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 13,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                              color: Colors
-                                                                  .white70,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        currentDate,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: screenWidth < 600
+                                              ? 13
+                                              : 15,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.sunny_snowing,
+                                            color: Colors.white,
+                                            size: 40,
                                           ),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            "${_safeValue(nearestDevice?["CurrentTemperature"])}°C",
+                                            style: TextStyle(
+                                              fontSize: screenWidth < 600
+                                                  ? 36
+                                                  : 50,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 32),
+
+                                  // 📊 Info + Compass
+                                  screenWidth < 700
+                                      ? Column(
+                                          children: [
+                                          
+                                            _buildDynamicInfo(
+                                                nearestDevice ?? {}),
+                                            const SizedBox(height: 20),
+                                          
+                                         if (!_isNullOrEmpty(nearestDevice?["WindDirection"]) &&
+    !_isNullOrEmpty(nearestDevice?["WindSpeed"]))
+  _windDial(
+    nearestDevice?["WindDirection"],
+    nearestDevice?["WindSpeed"],
+  ),
+
+                                          ],
+                                        )
+                                      : Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: _buildDynamicInfo(
+                                                  nearestDevice ?? {}),
+                                            ),
+                                            if (!_isNullOrEmpty(nearestDevice?["WindDirection"]) &&
+                                                !_isNullOrEmpty(nearestDevice?["WindSpeed"])) ...[
+                                              const SizedBox(width: 30),
+                                              _windDial(
+                                                nearestDevice?["WindDirection"],
+                                                nearestDevice?["WindSpeed"],
+                                              ),
+                                            ]
+                                          ],
+                                        ),
+
+                                  const SizedBox(height: 24),
+
+                             
+                                  Text(
+                                    "Last Updated: ${_safeValue(nearestDevice?["TimeStamp"])}",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
+                      );
+                    },
+                  ),
+  ),
+),
                         const SizedBox(height: 30),
                         Wrap(
                           alignment: WrapAlignment.center,

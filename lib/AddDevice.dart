@@ -1,4 +1,3 @@
-import 'package:cloud_sense_webapp/manuallyenter.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
