@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'DeviceGraphPage.dart';
 import 'shareddevice.dart'; // Adjust path as needed
 
@@ -35,12 +36,14 @@ class _AdminPageState extends State<AdminPage> {
   Map<String, String> anomalies = {};
   List<String> seenAnomalies = [];
   List<Map<String, String>> notifications = [];
+  List<Map<String, String>> dismissedNotifications = [];
   Timer? _anomalyTimer;
   FlutterLocalNotificationsPlugin? _notificationsPlugin;
 
   @override
   void initState() {
     super.initState();
+    _loadPrefs();
     fetchDevices();
     fetchUsers();
     if (!kIsWeb) {
@@ -48,6 +51,29 @@ class _AdminPageState extends State<AdminPage> {
     }
     fetchAnomalies();
     _anomalyTimer = Timer.periodic(Duration(seconds: 30), (_) => fetchAnomalies());
+  }
+
+  Future<void> _loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final notifsJson = prefs.getString('notifications');
+    if (notifsJson != null) {
+      final decoded = json.decode(notifsJson) as List;
+      notifications = decoded.map((item) => Map<String, String>.from(item)).toList();
+    }
+    final dismissedJson = prefs.getString('dismissedNotifications');
+    if (dismissedJson != null) {
+      final decoded = json.decode(dismissedJson) as List;
+      dismissedNotifications = decoded.map((item) => Map<String, String>.from(item)).toList();
+    }
+    seenAnomalies = prefs.getStringList('seenAnomalies') ?? [];
+    setState(() {});
+  }
+
+  Future<void> _savePrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('notifications', json.encode(notifications));
+    prefs.setString('dismissedNotifications', json.encode(dismissedNotifications));
+    prefs.setStringList('seenAnomalies', seenAnomalies);
   }
 
   @override
@@ -89,7 +115,14 @@ class _AdminPageState extends State<AdminPage> {
             final timestamp = item['Timestamp']?.toString() ?? "N/A";
             if (anomaly.isNotEmpty) {
               anomalies[deviceIdTopic] = anomaly;
-              if (!seenAnomalies.contains(deviceIdTopic)) {
+              final dismissed = dismissedNotifications.firstWhere(
+                (n) => n['deviceIdTopic'] == deviceIdTopic,
+                orElse: () => {},
+              );
+              if (!seenAnomalies.contains(deviceIdTopic) &&
+                  (dismissed.isEmpty ||
+                      dismissed['anomaly'] != anomaly ||
+                      dismissed['timestamp'] != timestamp)) {
                 newNotifications.add({
                   'deviceIdTopic': deviceIdTopic,
                   'message': _buildNotificationMessage(deviceIdTopic, anomaly, timestamp),
@@ -118,6 +151,7 @@ class _AdminPageState extends State<AdminPage> {
           _showNotification(notification['deviceIdTopic']!, notification['message']!);
         }
       });
+      await _savePrefs();
     } else {
       setState(() {});
     }
@@ -216,12 +250,27 @@ class _AdminPageState extends State<AdminPage> {
 
   void _dismissNotification(String deviceIdTopic) {
     setState(() {
-      notifications.removeWhere((n) => n['deviceIdTopic'] == deviceIdTopic);
-      seenAnomalies.remove(deviceIdTopic);
-      if (!kIsWeb) {
-        _notificationsPlugin?.cancel(deviceIdTopic.hashCode);
+      final notification = notifications.firstWhere(
+        (n) => n['deviceIdTopic'] == deviceIdTopic,
+        orElse: () => {},
+      );
+      if (notification.isNotEmpty) {
+        final anomaly = anomalies[deviceIdTopic] ?? "";
+        final message = notification['message'] ?? "";
+        final timestamp = message.contains(' at ') ? message.split(' at ').last : "N/A";
+        dismissedNotifications.add({
+          'deviceIdTopic': deviceIdTopic,
+          'anomaly': anomaly,
+          'timestamp': timestamp,
+        });
+        notifications.removeWhere((n) => n['deviceIdTopic'] == deviceIdTopic);
+        seenAnomalies.remove(deviceIdTopic);
+        if (!kIsWeb) {
+          _notificationsPlugin?.cancel(deviceIdTopic.hashCode);
+        }
       }
     });
+    _savePrefs();
   }
 
   void _showNotificationsDialog() {
@@ -234,6 +283,8 @@ class _AdminPageState extends State<AdminPage> {
       context: context,
       builder: (_) => StatefulBuilder(
         builder: (dialogContext, dialogSetState) {
+          final ScrollController scrollController = ScrollController();
+
           return Dialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Container(
@@ -262,7 +313,9 @@ class _AdminPageState extends State<AdminPage> {
                         ? Center(child: Text("No notifications", style: TextStyle(color: subtle)))
                         : Scrollbar(
                             thumbVisibility: true,
+                            controller: scrollController,
                             child: ListView.separated(
+                              controller: scrollController,
                               itemCount: notifications.length,
                               separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
                               itemBuilder: (_, i) {
@@ -580,10 +633,12 @@ class _AdminPageState extends State<AdminPage> {
               notifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
               seenAnomalies.remove(fullDeviceIdTopic);
               anomalies.remove(fullDeviceIdTopic);
+              dismissedNotifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
             });
             if (!kIsWeb) {
               _notificationsPlugin?.cancel(fullDeviceIdTopic.hashCode);
             }
+            await _savePrefs();
           } else {
             _toast("Failed to delete device: ${body['message'] ?? 'Unknown error'}");
           }
@@ -598,10 +653,12 @@ class _AdminPageState extends State<AdminPage> {
               notifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
               seenAnomalies.remove(fullDeviceIdTopic);
               anomalies.remove(fullDeviceIdTopic);
+              dismissedNotifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
             });
             if (!kIsWeb) {
               _notificationsPlugin?.cancel(fullDeviceIdTopic.hashCode);
             }
+            await _savePrefs();
           } else {
             _toast("Failed to delete device: ${response.body}");
           }
@@ -959,11 +1016,20 @@ class _AdminPageState extends State<AdminPage> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          int statCrossAxisCount = (constraints.maxWidth > 1200) ? 4 : (constraints.maxWidth > 600) ? 2 : 1;
-          int sectionCrossAxisCount = (constraints.maxWidth > 600) ? 2 : 1;
+          // Define screen size categories
+          final isMobile = constraints.maxWidth <= 600;
+          final isTablet = constraints.maxWidth > 600 && constraints.maxWidth <= 1024;
+          final isLargeScreen = constraints.maxWidth > 1024;
+
+          // Set layout properties based on screen size
+          final int statCrossAxisCount = isMobile ? 1 : isTablet ? 2 : 4;
+          final int sectionCrossAxisCount = isMobile ? 1 : isTablet ? 1 : 2;
+          final double statChildAspectRatio = isMobile ? 3.8 : isTablet ? 3.0 : 2.4;
+          final double sectionChildAspectRatio = isMobile ? 1.0 : isTablet ? 2.0 : 1.6;
+          final double padding = isMobile ? 12.0 : isTablet ? 16.0 : 18.0;
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(constraints.maxWidth > 600 ? 18 : 12),
+            padding: EdgeInsets.all(padding),
             child: Column(
               children: [
                 GridView.count(
@@ -972,7 +1038,7 @@ class _AdminPageState extends State<AdminPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: (constraints.maxWidth > 600) ? 2.6 : 3.8,
+                  childAspectRatio: statChildAspectRatio,
                   children: [
                     _StatCard(
                       title: "Total Devices",
@@ -1019,7 +1085,7 @@ class _AdminPageState extends State<AdminPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: (constraints.maxWidth > 600) ? 1.8 : 1.0,
+                  childAspectRatio: sectionChildAspectRatio,
                   children: [
                     _SectionCard(
                       title: "Devices",
@@ -1035,14 +1101,8 @@ class _AdminPageState extends State<AdminPage> {
                             )
                           : LayoutBuilder(
                               builder: (context, constraints) {
-                                int rows;
-                                if (constraints.maxWidth > 900) {
-                                  rows = 5;
-                                } else if (constraints.maxWidth > 600) {
-                                  rows = 3;
-                                } else {
-                                  rows = 2;
-                                }
+                                final int rows = isMobile ? 3 : isTablet ? 2 : 3;
+                                final ScrollController scrollController = ScrollController();
 
                                 return Column(
                                   children: [
@@ -1092,9 +1152,11 @@ class _AdminPageState extends State<AdminPage> {
                                               child: Text("No devices found",
                                                   style: TextStyle(color: subtle)),
                                             )
-                                          : SizedBox(
-                                              height: rows * 72.0,
+                                          : Scrollbar(
+                                              thumbVisibility: true,
+                                              controller: scrollController,
                                               child: ListView.separated(
+                                                controller: scrollController,
                                                 itemCount: filteredDevices.length,
                                                 separatorBuilder: (_, __) =>
                                                     Divider(color: subtle.withOpacity(.12)),
@@ -1187,7 +1249,6 @@ class _AdminPageState extends State<AdminPage> {
                       cardColor: card,
                       strong: strong,
                       subtle: subtle,
-
                       child: isUsersLoading
                           ? const Center(
                               child: Padding(
@@ -1198,14 +1259,8 @@ class _AdminPageState extends State<AdminPage> {
                           : users.isNotEmpty
                               ? LayoutBuilder(
                                   builder: (context, constraints) {
-                                    int rows;
-                                    if (constraints.maxWidth > 900) {
-                                      rows = 5;
-                                    } else if (constraints.maxWidth > 600) {
-                                      rows = 3;
-                                    } else {
-                                      rows = 2;
-                                    }
+                                    final int rows = isMobile ? 3 : isTablet ? 3: 3;
+                                    final ScrollController scrollController = ScrollController();
 
                                     return Column(
                                       children: [
@@ -1223,9 +1278,11 @@ class _AdminPageState extends State<AdminPage> {
                                           constraints: BoxConstraints(
                                             maxHeight: rows * 72.0,
                                           ),
-                                          child: SizedBox(
-                                            height: rows * 72.0,
+                                          child: Scrollbar(
+                                            thumbVisibility: true,
+                                            controller: scrollController,
                                             child: ListView.separated(
+                                              controller: scrollController,
                                               itemCount: users.length,
                                               separatorBuilder: (_, __) =>
                                                   Divider(color: subtle.withOpacity(.12)),
@@ -1316,7 +1373,7 @@ class _AdminPageState extends State<AdminPage> {
                               ),
                               const SizedBox(height: 8),
                               SizedBox(
-                                height: constraints.maxWidth > 600 ? 160 : 120,
+                                height: isMobile ? 120 : isTablet ? 140 : 160,
                                 child: PieChart(
                                   PieChartData(
                                     sections: _pieSections(),
@@ -1348,6 +1405,8 @@ class _AdminPageState extends State<AdminPage> {
       ),
     );
   }
+
+
 
   void _showDeviceDetails(Map<String, dynamic> d) {
     showDialog(
