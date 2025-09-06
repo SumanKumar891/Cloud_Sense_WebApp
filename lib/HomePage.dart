@@ -173,7 +173,11 @@ class _HomePageState extends State<HomePage> {
     }
     try {
       print('Navigating for user: $email'); // Debug log
-      if (email.trim().toLowerCase() == 'sejalsankhyan2001@gmail.com') {
+      if ([
+        'sejalsankhyan2001@gmail.com',
+        'pallavikrishnan01@gmail.com',
+        'officeharsh25@gmail.com'
+      ].contains(email.trim().toLowerCase())) {
         print('Navigating to /admin for super admin');
         Navigator.pushNamed(context, '/admin');
       } else if (email.trim().toLowerCase() == '05agriculture.05@gmail.com') {
@@ -878,20 +882,6 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: isMobile
               ? [
-                  // Padding(
-                  //   padding: const EdgeInsets.only(
-                  //       right: 12.0), // adjust value as needed
-                  //   child: IconButton(
-                  //     icon: const Icon(Icons.share),
-                  //     color: isDarkMode ? Colors.white : Colors.black,
-                  //     onPressed: () {
-                  //       Share.share(
-                  //         'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
-                  //         subject: 'Download Our App',
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
                   Builder(
                     builder: (context) => IconButton(
                       icon: Icon(
@@ -952,8 +942,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     if (userProvider.userEmail != null) ...[
-                      if (userProvider.userEmail?.trim().toLowerCase() ==
-                          'sejalsankhyan2001@gmail.com') ...[
+                      if ([
+                        'sejalsankhyan2001@gmail.com',
+        'pallavikrishnan01@gmail.com',
+        'officeharsh25@gmail.com'
+                      ].contains(userProvider.userEmail?.trim().toLowerCase())) ...[
                         ListTile(
                           leading: Icon(Icons.data_usage),
                           title: Text('My Data'),
@@ -976,8 +969,11 @@ class _HomePageState extends State<HomePage> {
                           title: Text('My Devices'),
                           onTap: () {
                             Navigator.pop(context);
-                            if (userProvider.userEmail?.trim().toLowerCase() ==
-                                'sejalsankhyan2001@gmail.com') {
+                            if ([
+                              'sejalsankhyan2001@gmail.com',
+        'pallavikrishnan01@gmail.com',
+        'officeharsh25@gmail.com'
+                            ].contains(userProvider.userEmail?.trim().toLowerCase())) {
                               Navigator.pushNamed(context, '/admin');
                             } else if (userProvider.userEmail
                                     ?.trim()
@@ -1044,7 +1040,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       title: Text('Products'),
-                      // subtitle: Text('Browse our sensor products'),
                       onTap: () {
                         setState(() {
                           _isProductsExpanded = !_isProductsExpanded;
@@ -2076,8 +2071,8 @@ class _HomePageState extends State<HomePage> {
                                         child: GestureDetector(
                                           onTapDown: (_) =>
                                               setState(() => _isPressed = true),
-                                          onTapUp: (_) => setState(
-                                              () => _isPressed = false),
+                                          onTapUp: (_) =>
+                                              setState(() => _isPressed = false),
                                           onTapCancel: () => setState(
                                               () => _isPressed = false),
                                           child: AnimatedContainer(
@@ -2322,8 +2317,11 @@ class _HomePageState extends State<HomePage> {
     final userProvider = Provider.of<UserProvider>(context);
     final isAdmin = userProvider.userEmail?.trim().toLowerCase() ==
         '05agriculture.05@gmail.com';
-    final isSuperAdmin = userProvider.userEmail?.trim().toLowerCase() ==
-        'sejalsankhyan2001@gmail.com';
+    final isSuperAdmin = [
+      'sejalsankhyan2001@gmail.com',
+        'pallavikrishnan01@gmail.com',
+        'officeharsh25@gmail.com'
+    ].contains(userProvider.userEmail?.trim().toLowerCase());
 
     return GestureDetector(
       onTap: () async {
@@ -2428,8 +2426,11 @@ class _HomePageState extends State<HomePage> {
         if (selected == 'data' && isSuperAdmin) {
           Navigator.pushNamed(context, '/admin');
         } else if (selected == 'devices') {
-          if (userProvider.userEmail?.trim().toLowerCase() ==
-              'sejalsankhyan2001@gmail.com') {
+          if ([
+            'sejalsankhyan2001@gmail.com',
+        'pallavikrishnan01@gmail.com',
+        'officeharsh25@gmail.com'
+          ].contains(userProvider.userEmail?.trim().toLowerCase())) {
             Navigator.pushNamed(context, '/admin');
           } else if (userProvider.userEmail?.trim().toLowerCase() ==
               '05agriculture.05@gmail.com') {
@@ -2560,7 +2561,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
   Widget _buildSensorCard({
     required String imageAsset,
     required String title,
