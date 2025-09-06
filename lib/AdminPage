@@ -40,6 +40,9 @@ class _AdminPageState extends State<AdminPage> {
   Timer? _anomalyTimer;
   FlutterLocalNotificationsPlugin? _notificationsPlugin;
 
+  bool showAllDevices = false;
+  bool showAllUsers = false;
+
   @override
   void initState() {
     super.initState();
@@ -114,6 +117,7 @@ class _AdminPageState extends State<AdminPage> {
             final anomaly = item['Anomaly']?.toString() ?? "";
             final timestamp = item['Timestamp']?.toString() ?? "N/A";
             if (anomaly.isNotEmpty) {
+              // Update anomalies map
               anomalies[deviceIdTopic] = anomaly;
               final dismissed = dismissedNotifications.firstWhere(
                 (n) => n['deviceIdTopic'] == deviceIdTopic,
@@ -134,6 +138,9 @@ class _AdminPageState extends State<AdminPage> {
                   notifications[existingIndex]['message'] = _buildNotificationMessage(deviceIdTopic, anomaly, timestamp);
                 }
               }
+            } else {
+              // Remove anomaly if none exists
+              anomalies.remove(deviceIdTopic);
             }
           }
         } else {
@@ -154,6 +161,10 @@ class _AdminPageState extends State<AdminPage> {
       await _savePrefs();
     } else {
       setState(() {});
+    }
+    if (kDebugMode) {
+      print("Anomalies map: $anomalies");
+      print("Notifications: $notifications");
     }
   }
 
@@ -200,7 +211,22 @@ class _AdminPageState extends State<AdminPage> {
       final mapped = _mapCategoryAndPrefix(topic);
       final sensorName = mapped.prefix.isNotEmpty ? "${mapped.prefix}${deviceId.padLeft(3, '0')}" : deviceId;
       final sequentialName = "${mapped.category}";
-      final anomalyMessage = anomalies[deviceIdTopic] ?? "No anomaly data available";
+      // Retrieve anomaly directly from notification message to ensure consistency
+      final notification = notifications.firstWhere(
+        (n) => n['deviceIdTopic'] == deviceIdTopic,
+        orElse: () => {'message': 'No anomaly data available'},
+      );
+      final anomalyMessage = notification['message']?.split(': ').length == 2
+          ? notification['message']!.split(': ')[1].split(' at ')[0]
+          : anomalies[deviceIdTopic] ?? "No anomaly data available";
+
+      if (kDebugMode) {
+        print("Handling notification tap for deviceIdTopic: $deviceIdTopic");
+        print("Device: $d");
+        print("Anomaly from notification: ${notification['message']}");
+        print("Anomaly from map: ${anomalies[deviceIdTopic]}");
+        print("Last Received Time: ${d['lastReceivedTime']}");
+      }
 
       showDialog(
         context: context,
@@ -215,8 +241,7 @@ class _AdminPageState extends State<AdminPage> {
               Text("Topic: $topic"),
               const SizedBox(height: 6),
               Text("Anomaly: $anomalyMessage"),
-              const SizedBox(height: 6),
-              Text("Last Received: ${d['lastReceivedTime']}"),
+             
             ],
           ),
           actions: [
@@ -245,6 +270,9 @@ class _AdminPageState extends State<AdminPage> {
       );
     } else {
       _toast("Device not found for $deviceIdTopic");
+      if (kDebugMode) {
+        print("Device not found for deviceIdTopic: $deviceIdTopic");
+      }
     }
   }
 
@@ -403,6 +431,10 @@ class _AdminPageState extends State<AdminPage> {
           totalInactive = inactiveCount;
           isLoading = false;
         });
+
+        if (kDebugMode) {
+          print("Fetched devices: $devices");
+        }
       } else {
         setState(() => isLoading = false);
         _toast("Device API error: ${response.statusCode}");
@@ -1023,15 +1055,14 @@ class _AdminPageState extends State<AdminPage> {
 
           // Set layout properties based on screen size
           final int statCrossAxisCount = isMobile ? 1 : isTablet ? 2 : 4;
-          final int sectionCrossAxisCount = isMobile ? 1 : isTablet ? 1 : 2;
           final double statChildAspectRatio = isMobile ? 3.8 : isTablet ? 3.0 : 2.4;
-          final double sectionChildAspectRatio = isMobile ? 1.0 : isTablet ? 2.0 : 1.6;
           final double padding = isMobile ? 12.0 : isTablet ? 16.0 : 18.0;
 
           return SingleChildScrollView(
             padding: EdgeInsets.all(padding),
             child: Column(
               children: [
+                // Stats Cards
                 GridView.count(
                   crossAxisCount: statCrossAxisCount,
                   shrinkWrap: true,
@@ -1079,14 +1110,11 @@ class _AdminPageState extends State<AdminPage> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                GridView.count(
-                  crossAxisCount: sectionCrossAxisCount,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: sectionChildAspectRatio,
+
+                // Sections
+                Column(
                   children: [
+                    // Devices Section
                     _SectionCard(
                       title: "Devices",
                       cardColor: card,
@@ -1099,151 +1127,126 @@ class _AdminPageState extends State<AdminPage> {
                                 child: CircularProgressIndicator(),
                               ),
                             )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                final int rows = isMobile ? 3 : isTablet ? 2 : 3;
-                                final ScrollController scrollController = ScrollController();
-
-                                return Column(
+                          : Column(
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
-                                    Row(
-                                      children: [
-                                        _ChipFilter(
-                                          value: filter,
-                                          onChanged: (v) {
-                                            setState(() => filter = v);
-                                          },
-                                          strong: strong,
-                                          subtle: subtle,
-                                          isDark: isDark,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: _SearchField(
-                                            hint: "Search device id, group, or topic...",
-                                            onChanged: (q) => setState(() {
-                                              searchQuery = q;
-                                            }),
-                                            strong: strong,
-                                            subtle: subtle,
-                                            isDark: isDark,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        IconButton(
-                                          tooltip: "Refresh",
-                                          onPressed: () {
-                                            fetchDevices();
-                                            fetchAnomalies();
-                                          },
-                                          icon: Icon(Icons.refresh, color: strong),
-                                        ),
-                                      ],
+                                    _ChipFilter(
+                                      value: filter,
+                                      onChanged: (v) {
+                                        setState(() => filter = v);
+                                      },
+                                      strong: strong,
+                                      subtle: subtle,
+                                      isDark: isDark,
                                     ),
-                                    const SizedBox(height: 10),
-                                    const Divider(height: 1),
-                                    const SizedBox(height: 8),
-                                    ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxHeight: rows * 72.0,
-                                      ),
-                                      child: filteredDevices.isEmpty
-                                          ? Center(
-                                              child: Text("No devices found",
-                                                  style: TextStyle(color: subtle)),
-                                            )
-                                          : Scrollbar(
-                                              thumbVisibility: true,
-                                              controller: scrollController,
-                                              child: ListView.separated(
-                                                controller: scrollController,
-                                                itemCount: filteredDevices.length,
-                                                separatorBuilder: (_, __) =>
-                                                    Divider(color: subtle.withOpacity(.12)),
-                                                itemBuilder: (_, i) {
-                                                  final d = filteredDevices[i];
-                                                  final active = d['isActive'] == true;
-                                                  final topic =
-                                                      d['Topic']?.toString() ?? "Unknown";
-                                                  final deviceId =
-                                                      d['DeviceId']?.toString() ?? "Unknown";
-                                                  final deviceIdTopic = "$deviceId#$topic";
-                                                  final hasAnomaly =
-                                                      anomalies.containsKey(deviceIdTopic);
-                                                  final mapped = _mapCategoryAndPrefix(topic);
-                                                  final sensorName = mapped.prefix.isNotEmpty
-                                                      ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
-                                                      : deviceId;
-                                                  final sequentialName = "${mapped.category}";
-
-                                                  return ListTile(
-                                                    leading: _StatusDot(
-                                                      color:
-                                                          active ? Colors.green : Colors.red,
-                                                    ),
-                                                    title: Text(
-                                                      "ID: $sensorName",
-                                                      style: TextStyle(
-                                                        color: strong,
-                                                        fontWeight: FontWeight.w700,
-                                                      ),
-                                                      overflow: TextOverflow.ellipsis,
-                                                      maxLines: 1,
-                                                    ),
-                                                    subtitle: Text(
-                                                      "Name: $sequentialName\nLast: ${d['lastReceivedTime']}",
-                                                      style: TextStyle(color: subtle),
-                                                      overflow: TextOverflow.ellipsis,
-                                                      maxLines: 2,
-                                                    ),
-                                                    trailing: Container(
-                                                      padding: const EdgeInsets.symmetric(
-                                                          horizontal: 10, vertical: 6),
-                                                      decoration: BoxDecoration(
-                                                        color: (active
-                                                                ? Colors.green
-                                                                : Colors.red)
-                                                            .withOpacity(.12),
-                                                        borderRadius: BorderRadius.circular(20),
-                                                      ),
-                                                      child: Text(
-                                                        active ? "Active" : "Inactive",
-                                                        style: TextStyle(
-                                                          color: active
-                                                              ? Colors.green
-                                                              : Colors.red,
-                                                          fontWeight: FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onTap: () {
-                                                      if (hasAnomaly) {
-                                                        _handleNotificationTap(deviceIdTopic);
-                                                      } else {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                DeviceGraphPage(
-                                                              deviceName: sensorName,
-                                                              sequentialName: sequentialName,
-                                                              backgroundImagePath:
-                                                                  'assets/backgroundd.jpg',
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    },
-                                                  );
-                                                },
-                                              ),
-                                            ),
+                                    IconButton(
+                                      tooltip: "Refresh",
+                                      onPressed: () {
+                                        fetchDevices();
+                                        fetchAnomalies();
+                                      },
+                                      icon: Icon(Icons.refresh, color: strong),
                                     ),
                                   ],
-                                );
-                              },
+                                ),
+                                const SizedBox(height: 20),
+                                const Divider(height: 1),
+                                const SizedBox(height: 8),
+                                if (filteredDevices.isEmpty)
+                                  Center(
+                                    child: Text("No devices found",
+                                        style: TextStyle(color: subtle)),
+                                  )
+                                else
+                                  Column(
+                                    children: [
+                                      ...((showAllDevices
+                                              ? filteredDevices
+                                              : filteredDevices.take(4))
+                                          .map(
+                                        (d) => Column(
+                                          children: [
+                                            ListTile(
+                                              leading: _StatusDot(
+                                                color: d['isActive'] == true
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                              ),
+                                              title: Text(
+                                                "ID: ${d['DeviceId'] ?? "Unknown"}",
+                                                style: TextStyle(
+                                                  color: strong,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              subtitle: Text(
+                                                "Name: ${d['Topic'] ?? "Unknown"}\nLast: ${d['lastReceivedTime']}",
+                                                style: TextStyle(color: subtle),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                              ),
+                                              trailing: Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                    horizontal: 10, vertical: 6),
+                                                decoration: BoxDecoration(
+                                                  color: (d['isActive'] == true
+                                                          ? Colors.green
+                                                          : Colors.red)
+                                                      .withOpacity(.12),
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Text(
+                                                  d['isActive'] == true ? "Active" : "Inactive",
+                                                  style: TextStyle(
+                                                    color: d['isActive'] == true
+                                                        ? Colors.green
+                                                        : Colors.red,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                final deviceId = d['DeviceId'] ?? "Unknown";
+                                                final topic = d['Topic'] ?? "Unknown";
+                                                final mapped = _mapCategoryAndPrefix(topic);
+                                                final sensorName = mapped.prefix.isNotEmpty
+                                                    ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
+                                                    : deviceId;
+                                                final sequentialName = "${mapped.category}";
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => DeviceGraphPage(
+                                                      deviceName: sensorName,
+                                                      sequentialName: sequentialName,
+                                                      backgroundImagePath: 'assets/backgroundd.jpg',
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            Divider(color: subtle.withOpacity(.12)),
+                                          ],
+                                        ),
+                                      )),
+                                      if (filteredDevices.length > 4)
+                                        TextButton(
+                                          onPressed: () =>
+                                              setState(() => showAllDevices = !showAllDevices),
+                                          child: Text(showAllDevices ? "Show Less" : "Show More"),
+                                        ),
+                                    ],
+                                  ),
+                              ],
                             ),
                     ),
+
+                    // Users Section
                     _SectionCard(
                       title: "User Accounts",
                       cardColor: card,
@@ -1257,82 +1260,79 @@ class _AdminPageState extends State<AdminPage> {
                               ),
                             )
                           : users.isNotEmpty
-                              ? LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    final int rows = isMobile ? 3 : isTablet ? 3: 3;
-                                    final ScrollController scrollController = ScrollController();
-
-                                    return Column(
+                              ? Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        "Total ${users.length}",
+                                        style: TextStyle(color: subtle),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Divider(height: 1),
+                                    const SizedBox(height: 8),
+                                    Column(
                                       children: [
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            "Total ${users.length}",
-                                            style: TextStyle(color: subtle),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Divider(height: 1),
-                                        const SizedBox(height: 8),
-                                        ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxHeight: rows * 72.0,
-                                          ),
-                                          child: Scrollbar(
-                                            thumbVisibility: true,
-                                            controller: scrollController,
-                                            child: ListView.separated(
-                                              controller: scrollController,
-                                              itemCount: users.length,
-                                              separatorBuilder: (_, __) =>
-                                                  Divider(color: subtle.withOpacity(.12)),
-                                              itemBuilder: (_, i) {
-                                                final u = users[i];
-                                                return ListTile(
-                                                  leading: CircleAvatar(
-                                                    backgroundColor: Colors.blue.withOpacity(.12),
-                                                    child: const Icon(Icons.person, color: Colors.blue),
+                                        ...((showAllUsers ? users : users.take(4))
+                                            .map(
+                                          (u) => Column(
+                                            children: [
+                                              ListTile(
+                                                leading: CircleAvatar(
+                                                  backgroundColor: Colors.blue.withOpacity(.12),
+                                                  child: const Icon(Icons.person,
+                                                      color: Colors.blue),
+                                                ),
+                                                title: Text(
+                                                  u["name"] ?? "",
+                                                  style: TextStyle(
+                                                    color: strong,
+                                                    fontWeight: FontWeight.w700,
                                                   ),
-                                                  title: Text(
-                                                    u["name"] ?? "",
-                                                    style: TextStyle(
-                                                      color: strong,
-                                                      fontWeight: FontWeight.w700,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                                subtitle: Text(
+                                                  "${u["email"]} • ${u["role"]}",
+                                                  style: TextStyle(color: subtle),
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
+                                                ),
+                                                trailing: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    IconButton(
+                                                      tooltip: "Add Device",
+                                                      onPressed: () =>
+                                                          _showAddDeviceDialog(u["email"]!),
+                                                      icon: const Icon(Icons.add,
+                                                          color: Colors.blue),
                                                     ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                  ),
-                                                  subtitle: Text(
-                                                    "${u["email"]} • ${u["role"]}",
-                                                    style: TextStyle(color: subtle),
-                                                    overflow: TextOverflow.ellipsis,
-                                                    maxLines: 2,
-                                                  ),
-                                                  trailing: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      IconButton(
-                                                        tooltip: "Add Device",
-                                                        onPressed: () =>
-                                                            _showAddDeviceDialog(u["email"]!),
-                                                        icon: const Icon(Icons.add, color: Colors.blue),
-                                                      ),
-                                                      IconButton(
-                                                        tooltip: "Delete",
-                                                        onPressed: () => _deleteUser(u["email"]!),
-                                                        icon: const Icon(Icons.delete, color: Colors.red),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  onTap: () => _showUserDevices(u["email"]!),
-                                                );
-                                              },
-                                            ),
+                                                    IconButton(
+                                                      tooltip: "Delete",
+                                                      onPressed: () =>
+                                                          _deleteUser(u["email"]!),
+                                                      icon: const Icon(Icons.delete,
+                                                          color: Colors.red),
+                                                    ),
+                                                  ],
+                                                ),
+                                                onTap: () => _showUserDevices(u["email"]!),
+                                              ),
+                                              Divider(color: subtle.withOpacity(.12)),
+                                            ],
                                           ),
-                                        ),
+                                        )),
+                                        if (users.length > 4)
+                                          TextButton(
+                                            onPressed: () =>
+                                                setState(() => showAllUsers = !showAllUsers),
+                                            child: Text(showAllUsers ? "Show Less" : "Show More"),
+                                          ),
                                       ],
-                                    );
-                                  },
+                                    ),
+                                  ],
                                 )
                               : Center(
                                   child: Column(
@@ -1350,54 +1350,6 @@ class _AdminPageState extends State<AdminPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                _SectionCard(
-                  title: "Analytics",
-                  cardColor: card,
-                  strong: strong,
-                  subtle: subtle,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 6),
-                      Card(
-                        color: card,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text("Active vs Inactive", style: TextStyle(color: strong, fontWeight: FontWeight.w700)),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                height: isMobile ? 120 : isTablet ? 140 : 160,
-                                child: PieChart(
-                                  PieChartData(
-                                    sections: _pieSections(),
-                                    centerSpaceRadius: 28,
-                                    sectionsSpace: 2,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  _LegendDot(color: Colors.green, text: "Active ($totalActive)"),
-                                  const SizedBox(width: 12),
-                                  _LegendDot(color: Colors.red, text: "Inactive ($totalInactive)"),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           );
@@ -1405,8 +1357,6 @@ class _AdminPageState extends State<AdminPage> {
       ),
     );
   }
-
-
 
   void _showDeviceDetails(Map<String, dynamic> d) {
     showDialog(
