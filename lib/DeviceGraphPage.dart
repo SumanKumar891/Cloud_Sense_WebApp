@@ -702,6 +702,17 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   String? _errorMessage;
   late final String activityType;
 
+double _convertVoltageToPercentage(double voltage) {
+  const double maxVoltage = 4.2; // 100%
+  const double minVoltage = 2.8; // 0%
+  
+  // Clamp the voltage to the valid range to avoid percentages outside 0-100
+  if (voltage >= maxVoltage) return 100.0;
+  if (voltage <= minVoltage) return 0.0;
+  
+  // Linear interpolation: percentage = ((voltage - min) / (max - min)) * 100
+  return ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100.0;
+}
 // Helper function to calculate total rainfall (unchanged)
   double _calculateTotalRainfall(List<ChartData> rainData) {
     if (rainData.isEmpty) return 0.0;
@@ -734,6 +745,8 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
 
     return hourlyTotals.values.fold(0.0, (sum, total) => sum + total);
   }
+
+  
 
 // Helper function to transform cumulative rainfall to incremental rainfall
   List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
@@ -6789,14 +6802,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastfsBattery),
-                                              color: _getBatteryColor(
+                                              _getpercentBatteryIcon(_lastfsBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastfsBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastfsBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastfsBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -6821,14 +6834,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastsmBattery),
-                                              color: _getBatteryColor(
+                                              _getpercentBatteryIcon(_lastsmBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastsmBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastsmBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastsmBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -6853,14 +6866,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastcfBattery),
-                                              color: _getBatteryColor(
+                                             _getpercentBatteryIcon(_lastcfBattery),
+                                              color:_getpercentBatteryColor(
                                                   _lastcfBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastcfBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastcfBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -6885,14 +6898,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastvdBattery),
-                                              color: _getBatteryColor(
+                                             _getpercentBatteryIcon(_lastvdBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastvdBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastvdBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastvdBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -6917,14 +6930,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastkdBattery),
-                                              color: _getBatteryColor(
+                                              _getpercentBatteryIcon(_lastkdBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastkdBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastkdBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastkdBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -6949,15 +6962,15 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(
+                                              _getpercentBatteryIcon(
                                                   _lastNARLBattery),
-                                              color: _getBatteryColor(
+                                              color: _getpercentBatteryColor(
                                                   _lastNARLBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastNARLBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastNARLBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -6982,14 +6995,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastKJBattery),
-                                              color: _getBatteryColor(
+                                             _getpercentBatteryIcon(_lastKJBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastKJBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastKJBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastKJBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -7014,14 +7027,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastMYBattery),
-                                              color: _getBatteryColor(
+                                             _getpercentBatteryIcon(_lastMYBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastMYBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastMYBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastMYBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -7046,14 +7059,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastcsBattery),
-                                              color: _getBatteryColor(
+                                              _getpercentBatteryIcon(_lastcsBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastcsBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastcsBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastcsBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -7078,14 +7091,14 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getfsBatteryIcon(_lastsvBattery),
-                                              color: _getBatteryColor(
+                                              _getpercentBatteryIcon(_lastsvBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastsvBattery),
                                               size: 28,
                                             ),
                                             SizedBox(height: 2),
                                             Text(
-                                              '${_lastsvBattery.toStringAsFixed(2)} V',
+                                              '${_convertVoltageToPercentage(_lastsvBattery).toStringAsFixed(2)} %',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: isDarkMode
@@ -8239,13 +8252,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastfsBattery),
-                                  color: _getBatteryColor(_lastfsBattery),
+                                  _getpercentBatteryIcon(_lastfsBattery),
+                                  color:_getpercentBatteryColor(_lastfsBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastfsBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastfsBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8269,13 +8282,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastsmBattery),
-                                  color: _getBatteryColor(_lastsmBattery),
+                                  _getpercentBatteryIcon(_lastsmBattery),
+                                  color: _getpercentBatteryColor(_lastsmBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastsmBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastsmBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8299,13 +8312,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastcfBattery),
-                                  color: _getBatteryColor(_lastcfBattery),
+                                 _getpercentBatteryIcon(_lastcfBattery),
+                                  color: _getpercentBatteryColor(_lastcfBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastcfBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastcfBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8329,13 +8342,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastvdBattery),
-                                  color: _getBatteryColor(_lastvdBattery),
+                                 _getpercentBatteryIcon(_lastvdBattery),
+                                  color: _getpercentBatteryColor(_lastvdBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastvdBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastvdBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8359,13 +8372,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastkdBattery),
-                                  color: _getBatteryColor(_lastkdBattery),
+                                 _getpercentBatteryIcon(_lastkdBattery),
+                                  color: _getpercentBatteryColor(_lastkdBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastkdBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastkdBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8389,13 +8402,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastNARLBattery),
-                                  color: _getBatteryColor(_lastNARLBattery),
+                                  _getpercentBatteryIcon(_lastNARLBattery),
+                                  color: _getpercentBatteryColor(_lastNARLBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastNARLBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastNARLBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8419,13 +8432,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastKJBattery),
-                                  color: _getBatteryColor(_lastKJBattery),
+                                 _getpercentBatteryIcon(_lastKJBattery),
+                                  color:_getpercentBatteryColor(_lastKJBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastKJBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastKJBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8449,13 +8462,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastMYBattery),
-                                  color: _getBatteryColor(_lastMYBattery),
+                                  _getpercentBatteryIcon(_lastMYBattery),
+                                  color:_getpercentBatteryColor(_lastMYBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastMYBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastMYBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8479,13 +8492,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastcsBattery),
-                                  color: _getBatteryColor(_lastcsBattery),
+                                 _getpercentBatteryIcon(_lastcsBattery),
+                                  color:_getpercentBatteryColor(_lastcsBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastcsBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastcsBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -8509,13 +8522,13 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _getfsBatteryIcon(_lastsvBattery),
-                                  color: _getBatteryColor(_lastsvBattery),
+                                 _getpercentBatteryIcon(_lastsvBattery),
+                                  color: _getpercentBatteryColor(_lastsvBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '${_lastsvBattery.toStringAsFixed(2)} V',
+                                  '${_convertVoltageToPercentage(_lastsvBattery).toStringAsFixed(2)} %',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isDarkMode
@@ -10022,6 +10035,22 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
       return Icons.battery_full; // Full battery
     }
   }
+
+  IconData _getpercentBatteryIcon(double voltage) {
+  double percentage = _convertVoltageToPercentage(voltage);
+  if (percentage >= 80) return Icons.battery_full;
+  if (percentage >= 50) return Icons.battery_5_bar;
+  if (percentage >= 20) return Icons.battery_3_bar;
+  return Icons.battery_alert;
+}
+
+Color _getpercentBatteryColor(double voltage) {
+  double percentage = _convertVoltageToPercentage(voltage);
+  if (percentage >= 80) return Colors.green;
+  if (percentage >= 50) return Colors.yellow;
+  if (percentage >= 20) return Colors.orange;
+  return Colors.red;
+}
 
   Widget _buildChartContainer(
     String title,

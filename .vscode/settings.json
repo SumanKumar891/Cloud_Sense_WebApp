@@ -1,4 +1,5 @@
 {
     "cmake.sourceDirectory": "D:/Sejal_Intern/Cloud_Sense_WebApp/linux",
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
