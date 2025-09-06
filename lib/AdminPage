@@ -117,7 +117,6 @@ class _AdminPageState extends State<AdminPage> {
             final anomaly = item['Anomaly']?.toString() ?? "";
             final timestamp = item['Timestamp']?.toString() ?? "N/A";
             if (anomaly.isNotEmpty) {
-              // Update anomalies map
               anomalies[deviceIdTopic] = anomaly;
               final dismissed = dismissedNotifications.firstWhere(
                 (n) => n['deviceIdTopic'] == deviceIdTopic,
@@ -139,7 +138,6 @@ class _AdminPageState extends State<AdminPage> {
                 }
               }
             } else {
-              // Remove anomaly if none exists
               anomalies.remove(deviceIdTopic);
             }
           }
@@ -211,7 +209,6 @@ class _AdminPageState extends State<AdminPage> {
       final mapped = _mapCategoryAndPrefix(topic);
       final sensorName = mapped.prefix.isNotEmpty ? "${mapped.prefix}${deviceId.padLeft(3, '0')}" : deviceId;
       final sequentialName = "${mapped.category}";
-      // Retrieve anomaly directly from notification message to ensure consistency
       final notification = notifications.firstWhere(
         (n) => n['deviceIdTopic'] == deviceIdTopic,
         orElse: () => {'message': 'No anomaly data available'},
@@ -241,7 +238,7 @@ class _AdminPageState extends State<AdminPage> {
               Text("Topic: $topic"),
               const SizedBox(height: 6),
               Text("Anomaly: $anomalyMessage"),
-             
+            
             ],
           ),
           actions: [
@@ -727,16 +724,12 @@ class _AdminPageState extends State<AdminPage> {
           final responseBody = json.decode(response.body);
           if (responseBody['message']?.toString().toLowerCase().contains('success') == true) {
             _toast("Device $deviceId added to $email successfully");
-            // await fetchDevices();
-            // await fetchAnomalies();
           } else {
             _toast("Failed to add device: ${responseBody['message'] ?? 'Unknown error'}");
           }
         } on FormatException {
           if (response.body.toLowerCase().contains('success')) {
             _toast("Device $deviceId added to $email successfully");
-            // await fetchDevices();
-            // await fetchAnomalies();
           } else {
             _toast("Failed to add device: ${response.body}");
           }
@@ -1177,7 +1170,7 @@ class _AdminPageState extends State<AdminPage> {
                                                     : Colors.red,
                                               ),
                                               title: Text(
-                                                "ID: ${d['DeviceId'] ?? "Unknown"}",
+                                                "ID: ${d['DeviceId'] != null && d['Topic'] != null ? (_mapCategoryAndPrefix(d['Topic']).prefix.isNotEmpty ? "${_mapCategoryAndPrefix(d['Topic']).prefix}${d['DeviceId'].padLeft(3, '0')}" : d['DeviceId']) : "Unknown"}",
                                                 style: TextStyle(
                                                   color: strong,
                                                   fontWeight: FontWeight.w700,
@@ -1185,7 +1178,7 @@ class _AdminPageState extends State<AdminPage> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               subtitle: Text(
-                                                "Name: ${d['Topic'] ?? "Unknown"}\nLast: ${d['lastReceivedTime']}",
+                                                "Name: ${d['Topic'] != null ? _mapCategoryAndPrefix(d['Topic']).category : "Unknown"}\nLast: ${d['lastReceivedTime']}",
                                                 style: TextStyle(color: subtle),
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 2,
