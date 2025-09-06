@@ -3,24 +3,22 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:cloud_sense_webapp/downloadcsv.dart';
-import 'package:cloud_sense_webapp/weatherforecasting.dart';
-import 'package:file_picker/file_picker.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:csv/csv.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:intl/intl.dart';
 import 'dart:async';
-import 'dart:math' as math;
-import 'package:flutter/material.dart';
+
 
 // Updated CompassNeedlePainter with corrected arrowhead positioning
 class CompassNeedlePainter extends CustomPainter {
@@ -10297,6 +10295,7 @@ Color _getpercentBatteryColor(double voltage) {
                                               data, isDarkMode),
                                     ),
                                     primaryYAxis: NumericAxis(
+                                       minimum: 0, 
                                       title: AxisTitle(
                                         text: yAxisTitle,
                                         textStyle: TextStyle(
