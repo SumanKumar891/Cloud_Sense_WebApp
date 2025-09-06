@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:math';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -1321,8 +1320,9 @@ class _HomePageState extends State<HomePage> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "Latitude: ${_formatValue(selectedDevice?["Latitude"])} , "
-                                                                    "Longitude: ${_formatValue(selectedDevice?["Longitude"])}",
+                                                                   isLargeScreen? "Lattitude: ${_formatValue(selectedDevice?["Latitude"])} , "
+                                                                    "Longitude: ${_formatValue(selectedDevice?["Longitude"])}" : "Lat: ${_formatValue(selectedDevice?["Latitude"])} , "
+                                                                    "Long: ${_formatValue(selectedDevice?["Longitude"])}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize: screenWidth <
@@ -2112,7 +2112,7 @@ class _HomePageState extends State<HomePage> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
-                                                       DeviceActivityPage(),
+                                                        DeviceActivityPage(),
                                                   ),
                                                 );
                                               },
