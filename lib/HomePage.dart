@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'dart:math';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -1232,533 +1233,372 @@ class _HomePageState extends State<HomePage> {
                                               fontSize: 18,
                                             ),
                                           )
-                                        : LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              double screenWidth =
-                                                  constraints.maxWidth;
+                                        :LayoutBuilder(
+  builder: (context, constraints) {
+    double screenWidth = constraints.maxWidth;
 
-                                              int columns = screenWidth >= 1024
-                                                  ? 5
-                                                  : screenWidth >= 850
-                                                      ? 4
-                                                      : screenWidth >= 500
-                                                          ? 3
-                                                          : 2;
+    int columns = screenWidth >= 1024
+        ? 5
+        : screenWidth >= 850
+            ? 4
+            : screenWidth >= 500
+                ? 3
+                : 2;
 
-                                              bool isLargeScreen =
-                                                  screenWidth >= 800;
+    bool isLargeScreen = screenWidth >= 800;
+    bool isSmallScreen = screenWidth < 600;
 
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: ConstrainedBox(
-                                                  constraints:
-                                                      const BoxConstraints(
-                                                          maxWidth: 1400),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16),
-                                                      gradient: LinearGradient(
-                                                        colors: isDarkMode
-                                                            ? [
-                                                                Colors.blueGrey
-                                                                    .shade800,
-                                                                Colors.black54
-                                                              ]
-                                                            : [
-                                                                const Color
-                                                                        .fromARGB(
-                                                                        255,
-                                                                        255,
-                                                                        255,
-                                                                        255)
-                                                                    .withOpacity(
-                                                                        0.3),
-                                                                const Color
-                                                                        .fromARGB(
-                                                                        255,
-                                                                        94,
-                                                                        211,
-                                                                        162)
-                                                                    .withOpacity(
-                                                                        0.3)
-                                                              ],
-                                                        begin:
-                                                            Alignment.topLeft,
-                                                        end: Alignment
-                                                            .bottomRight,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withOpacity(0.3),
-                                                          blurRadius: 8,
-                                                          offset: const Offset(
-                                                              0, 4),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              25),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .stretch,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                   isLargeScreen? "Lattitude: ${_formatValue(selectedDevice?["Latitude"])} , "
-                                                                    "Longitude: ${_formatValue(selectedDevice?["Longitude"])}" : "Lat: ${_formatValue(selectedDevice?["Latitude"])} , "
-                                                                    "Long: ${_formatValue(selectedDevice?["Longitude"])}",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize: screenWidth <
-                                                                              600
-                                                                          ? 12
-                                                                          : 16,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Colors
-                                                                          .white,
-                                                                    ),
-                                                                  ),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          2),
-                                                                  Text(
-                                                                    currentDate,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize: screenWidth <
-                                                                              600
-                                                                          ? 10
-                                                                          : 12,
-                                                                      color: Colors
-                                                                          .white70,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              TextButton(
-                                                                style: TextButton
-                                                                    .styleFrom(
-                                                                  backgroundColor: !isDarkMode
-                                                                      ? Colors
-                                                                          .white
-                                                                      : const Color
-                                                                          .fromARGB(
-                                                                          255,
-                                                                          10,
-                                                                          75,
-                                                                          100),
-                                                                  padding: const EdgeInsets
-                                                                      .symmetric(
-                                                                      horizontal:
-                                                                          16,
-                                                                      vertical:
-                                                                          16),
-                                                                  minimumSize:
-                                                                      Size.zero,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(6),
-                                                                  ),
-                                                                ),
-                                                                onPressed: () {
-                                                                  setState(() {
-                                                                    if (selectedDevice?["DeviceId"]
-                                                                            .toString() ==
-                                                                        "11") {
-                                                                      if (nearestDevice !=
-                                                                          null) {
-                                                                        selectedDevice =
-                                                                            nearestDevice;
-                                                                      }
-                                                                    } else {
-                                                                      selectedDevice = devices.cast<Map<String, dynamic>>().firstWhere(
-                                                                          (d) =>
-                                                                              d["DeviceId"].toString() ==
-                                                                              "11",
-                                                                          orElse: () =>
-                                                                              nearestDevice ??
-                                                                              devices.first);
-                                                                    }
-                                                                  });
-                                                                },
-                                                                child: Text(
-                                                                  selectedDevice?["DeviceId"]
-                                                                              .toString() ==
-                                                                          "11"
-                                                                      ? "Check Nearest Device"
-                                                                      : " Check Demo Device",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: isDarkMode
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .black,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        10,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 12),
-                                                          if (isLargeScreen)
-                                                            Row(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Expanded(
-                                                                  child: GridView
-                                                                      .count(
-                                                                    crossAxisCount:
-                                                                        columns,
-                                                                    crossAxisSpacing:
-                                                                        10,
-                                                                    mainAxisSpacing:
-                                                                        10,
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .all(
-                                                                            4),
-                                                                    shrinkWrap:
-                                                                        true,
-                                                                    physics:
-                                                                        const NeverScrollableScrollPhysics(),
-                                                                    childAspectRatio:
-                                                                        2,
-                                                                    children: [
-                                                                      if (!_isNullOrEmpty(
-                                                                          selectedDevice?[
-                                                                              "CurrentTemperature"]))
-                                                                        Container(
-                                                                          padding: const EdgeInsets
-                                                                              .all(
-                                                                              4),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                Colors.redAccent.withOpacity(0.3),
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(8),
-                                                                          ),
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            children: [
-                                                                              const Icon(
-                                                                                Icons.thermostat,
-                                                                                color: Colors.white,
-                                                                                size: 18,
-                                                                              ),
-                                                                              const SizedBox(width: 4),
-                                                                              Text(
-                                                                                "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
-                                                                                style: const TextStyle(
-                                                                                  color: Colors.white,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  fontSize: 16,
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ...(selectedDevice ??
-                                                                              {})
-                                                                          .entries
-                                                                          .where((e) =>
-                                                                              !_isNullOrEmpty(e.value) &&
-                                                                              !{
-                                                                                "Latitude",
-                                                                                "Longitude",
-                                                                                "WindDirection",
-                                                                                
-                                                                                "TimeStamp",
-                                                                                "CurrentTemperature",
-                                                                                "DeviceId",
-                                                                                "IMEINumber",
-                                                                                "LastUpdated",
-                                                                                "Topic",
-                                                                                "SignalStrength",
-                                                                                "BatteryVoltage",
-                                                                                "RainfallHourly"
-                                                                              }.contains(e.key))
-                                                                          .map(
-                                                                            (e) =>
-                                                                                Container(
-                                                                              padding: const EdgeInsets.all(2),
-                                                                              decoration: BoxDecoration(
-                                                                                color: Colors.white.withOpacity(0.1),
-                                                                                borderRadius: BorderRadius.circular(8),
-                                                                              ),
-                                                                              child: Column(
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                                children: [
-                                                                                  Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                                                    children: [
-                                                                                      Icon(
-                                                                                        _getIconForKey(e.key),
-                                                                                        color: Colors.white,
-                                                                                        size: 18,
-                                                                                      ),
-                                                                                      const SizedBox(width: 4),
-                                                                                      Text(
-                                                                                        e.key,
-                                                                                        style: const TextStyle(
-                                                                                          color: Colors.white70,
-                                                                                          fontSize: 13,
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  const SizedBox(height: 4),
-                                                                                  Text(
-                                                                                    "${_formatValue(e.value)} ${_getUnitForKey(e.key)}",
-                                                                                    style: const TextStyle(
-                                                                                      color: Colors.white,
-                                                                                      fontWeight: FontWeight.bold,
-                                                                                      fontSize: 16,
-                                                                                    ),
-                                                                                    textAlign: TextAlign.center,
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                          .toList(),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 25),
-                                                                if (!_isNullOrEmpty(
-                                                                        selectedDevice?[
-                                                                            "WindDirection"]) &&
-                                                                    !_isNullOrEmpty(
-                                                                        selectedDevice?[
-                                                                            "WindSpeed"]))
-                                                                  _windDial(
-                                                                    selectedDevice?[
-                                                                        "WindDirection"],
-                                                                    selectedDevice?[
-                                                                        "WindSpeed"],
-                                                                  ),
-                                                              ],
-                                                            )
-                                                          else
-                                                            GridView.count(
-                                                              crossAxisCount:
-                                                                  columns,
-                                                              crossAxisSpacing:
-                                                                  8,
-                                                              mainAxisSpacing:
-                                                                  8,
-                                                              shrinkWrap: true,
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(4),
-                                                              physics:
-                                                                  const NeverScrollableScrollPhysics(),
-                                                              childAspectRatio:
-                                                                  2,
-                                                              children: [
-                                                                if (!_isNullOrEmpty(
-                                                                    selectedDevice?[
-                                                                        "CurrentTemperature"]))
-                                                                  Container(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .all(
-                                                                            4),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: Colors
-                                                                          .redAccent
-                                                                          .withOpacity(
-                                                                              0.3),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        const Icon(
-                                                                          Icons
-                                                                              .thermostat,
-                                                                          color:
-                                                                              Colors.white,
-                                                                          size:
-                                                                              18,
-                                                                        ),
-                                                                        const SizedBox(
-                                                                            width:
-                                                                                4),
-                                                                        Text(
-                                                                          "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
-                                                                          style:
-                                                                              const TextStyle(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            fontSize:
-                                                                                14,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ...(selectedDevice ??
-                                                                        {})
-                                                                    .entries
-                                                                    .where((e) =>
-                                                                        !_isNullOrEmpty(e.value) &&
-                                                                        !{
-                                                                          "Latitude",
-                                                                          "Longitude",
-                                                                          "WindDirection",
-                                                                          
-                                                                          "TimeStamp",
-                                                                          "CurrentTemperature",
-                                                                          "DeviceId",
-                                                                          "IMEINumber",
-                                                                          "LastUpdated",
-                                                                          "Topic",
-                                                                          "SignalStrength",
-                                                                          "BatteryVoltage",
-                                                                          "RainfallHourly"
-                                                                        }.contains(e.key))
-                                                                    .map(
-                                                                      (e) =>
-                                                                          Container(
-                                                                        padding: const EdgeInsets
-                                                                            .all(
-                                                                            8),
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          color: Colors
-                                                                              .white
-                                                                              .withOpacity(0.3),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8),
-                                                                        ),
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                              children: [
-                                                                                Icon(
-                                                                                  _getIconForKey(e.key),
-                                                                                  color: Colors.white,
-                                                                                  size: 14,
-                                                                                ),
-                                                                                const SizedBox(width: 4),
-                                                                                Text(
-                                                                                  e.key,
-                                                                                  style: const TextStyle(
-                                                                                    color: Colors.white70,
-                                                                                    fontSize: 11,
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                            const SizedBox(height: 4),
-                                                                            Text(
-                                                                              "${_formatValue(e.value)} ${_getUnitForKey(e.key)}",
-                                                                              style: const TextStyle(
-                                                                                color: Colors.white,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                fontSize: 13,
-                                                                              ),
-                                                                              textAlign: TextAlign.center,
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    )
-                                                                    .toList(),
-                                                              ],
-                                                            ),
-                                                          const SizedBox(
-                                                              height: 12),
-                                                          if (!_isNullOrEmpty(
-                                                                  selectedDevice?[
-                                                                      "WindDirection"]) &&
-                                                              !_isNullOrEmpty(
-                                                                  selectedDevice?[
-                                                                      "WindSpeed"]) &&
-                                                              !isLargeScreen)
-                                                            Center(
-                                                              child: _windDial(
-                                                                selectedDevice?[
-                                                                    "WindDirection"],
-                                                                selectedDevice?[
-                                                                    "WindSpeed"],
-                                                              ),
-                                                            ),
-                                                          const SizedBox(
-                                                              height: 5),
-                                                          Text(
-                                                            "Last Updated: ${_formatValue(selectedDevice?["TimeStamp"])}",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 11,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                              color: Color
-                                                                  .fromARGB(
-                                                                      255,
-                                                                      245,
-                                                                      240,
-                                                                      240),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
+    Widget deviceButton = TextButton(
+      style: TextButton.styleFrom(
+        backgroundColor: !isDarkMode
+            ? Colors.white
+            : const Color.fromARGB(255, 10, 75, 100),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        minimumSize: Size.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
+      ),
+      onPressed: () {
+        setState(() {
+          if (selectedDevice?["DeviceId"].toString() == "11") {
+            if (nearestDevice != null) {
+              selectedDevice = nearestDevice;
+            }
+          } else {
+            selectedDevice = devices
+                .cast<Map<String, dynamic>>()
+                .firstWhere(
+                  (d) => d["DeviceId"].toString() == "11",
+                  orElse: () => nearestDevice ?? devices.first,
+                );
+          }
+        });
+      },
+      child: Text(
+        selectedDevice?["DeviceId"].toString() == "11"
+            ? "Check Nearest Device"
+            : "Check Demo Device",
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1400),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: isDarkMode
+                  ? [Colors.blueGrey.shade800, Colors.black54]
+                  : [
+                      const Color.fromARGB(255, 255, 255, 255).withOpacity(0.3),
+                      const Color.fromARGB(255, 94, 211, 162).withOpacity(0.3)
+                    ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+              
+                if (isSmallScreen)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [deviceButton],
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Lattitude: ${_formatValue(selectedDevice?["Latitude"])} , Longitude: ${_formatValue(selectedDevice?["Longitude"])}",
+                             
+                          style: TextStyle(
+                            fontSize: screenWidth < 600 ? 12 : 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          currentDate,
+                          style: TextStyle(
+                            fontSize: screenWidth < 600 ? 10 : 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  
+                    if (!isSmallScreen) deviceButton,
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+             
+                if (isLargeScreen)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: GridView.count(
+                          crossAxisCount: columns,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          padding: const EdgeInsets.all(4),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          childAspectRatio: 2,
+                          children: [
+                            if (!_isNullOrEmpty(selectedDevice?["CurrentTemperature"]))
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.thermostat,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ...(selectedDevice ?? {})
+                                .entries
+                                .where((e) =>
+                                    !_isNullOrEmpty(e.value) &&
+                                    !{
+                                      "Latitude",
+                                      "Longitude",
+                                      "WindDirection",
+                                      "TimeStamp",
+                                      "CurrentTemperature",
+                                      "DeviceId",
+                                      "IMEINumber",
+                                      "LastUpdated",
+                                      "Topic",
+                                      "SignalStrength",
+                                      "BatteryVoltage",
+                                      "RainfallHourly"
+                                    }.contains(e.key))
+                                .map(
+                                  (e) => Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              _getIconForKey(e.key),
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              e.key,
+                                              style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          "${_formatValue(e.value)} ${_getUnitForKey(e.key)}",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 25),
+                      if (!_isNullOrEmpty(selectedDevice?["WindDirection"]) &&
+                          !_isNullOrEmpty(selectedDevice?["WindSpeed"]))
+                        _windDial(
+                          selectedDevice?["WindDirection"],
+                          selectedDevice?["WindSpeed"],
+                        ),
+                    ],
+                  )
+                else
+                  GridView.count(
+                    crossAxisCount: columns,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(4),
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 2,
+                    children: [
+                      if (!_isNullOrEmpty(selectedDevice?["CurrentTemperature"]))
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.thermostat,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ...(selectedDevice ?? {})
+                          .entries
+                          .where((e) =>
+                              !_isNullOrEmpty(e.value) &&
+                              !{
+                                "Latitude",
+                                "Longitude",
+                                "WindDirection",
+                                "TimeStamp",
+                                "CurrentTemperature",
+                                "DeviceId",
+                                "IMEINumber",
+                                "LastUpdated",
+                                "Topic",
+                                "SignalStrength",
+                                "BatteryVoltage",
+                                "RainfallHourly"
+                              }.contains(e.key))
+                          .map(
+                            (e) => Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        _getIconForKey(e.key),
+                                        color: Colors.white,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        e.key,
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "${_formatValue(e.value)} ${_getUnitForKey(e.key)}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ],
+                  ),
+                const SizedBox(height: 12),
+                if (!_isNullOrEmpty(selectedDevice?["WindDirection"]) &&
+                    !_isNullOrEmpty(selectedDevice?["WindSpeed"]) &&
+                    !isLargeScreen)
+                  Center(
+                    child: _windDial(
+                      selectedDevice?["WindDirection"],
+                      selectedDevice?["WindSpeed"],
+                    ),
+                  ),
+                const SizedBox(height: 5),
+                Text(
+                  "Last Updated: ${_formatValue(selectedDevice?["TimeStamp"])}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    color: Color.fromARGB(255, 245, 240, 240),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  },
+)
+
                           ),
                         ),
                         const SizedBox(height: 15),
