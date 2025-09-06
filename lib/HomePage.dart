@@ -689,7 +689,7 @@ class _HomePageState extends State<HomePage> {
     if (paramName.contains('Humidity')) return '%';
     if (paramName.contains('Pressure')) return 'hPa';
     if (paramName.contains('LightIntensity')) return 'Lux';
-    if (paramName.contains('WindSpeed')) return 'km/h';
+    if (paramName.contains('WindSpeed')) return 'm/s';
     if (paramName.contains('WindDirection')) return '°';
     if (paramName.contains('Potassium')) return 'mg/Kg';
     if (paramName.contains('Nitrogen')) return 'mg/Kg';
