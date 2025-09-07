@@ -944,9 +944,10 @@ class _HomePageState extends State<HomePage> {
                     if (userProvider.userEmail != null) ...[
                       if ([
                         'sejalsankhyan2001@gmail.com',
-        'pallavikrishnan01@gmail.com',
-        'officeharsh25@gmail.com'
-                      ].contains(userProvider.userEmail?.trim().toLowerCase())) ...[
+                        'pallavikrishnan01@gmail.com',
+                        'officeharsh25@gmail.com'
+                      ].contains(
+                          userProvider.userEmail?.trim().toLowerCase())) ...[
                         ListTile(
                           leading: Icon(Icons.data_usage),
                           title: Text('My Data'),
@@ -971,9 +972,10 @@ class _HomePageState extends State<HomePage> {
                             Navigator.pop(context);
                             if ([
                               'sejalsankhyan2001@gmail.com',
-        'pallavikrishnan01@gmail.com',
-        'officeharsh25@gmail.com'
-                            ].contains(userProvider.userEmail?.trim().toLowerCase())) {
+                              'pallavikrishnan01@gmail.com',
+                              'officeharsh25@gmail.com'
+                            ].contains(
+                                userProvider.userEmail?.trim().toLowerCase())) {
                               Navigator.pushNamed(context, '/admin');
                             } else if (userProvider.userEmail
                                     ?.trim()
@@ -1245,28 +1247,55 @@ class _HomePageState extends State<HomePage> {
 
                                                 Widget deviceButton =
                                                     TextButton(
-                                                  style: TextButton.styleFrom(
-                                                    backgroundColor: !isDarkMode
-                                                        ? Colors.white
-                                                        : const Color.fromARGB(
-                                                            255, 10, 75, 100),
-                                                    padding: isSmallScreen
-                                                        ? const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 12,
-                                                            vertical: 12)
-                                                        : const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 16),
-                                                    minimumSize: Size.zero,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              6),
-                                                    ),
-                                                  ),
+                                                  style: (selectedDevice?[
+                                                                  "DeviceId"]
+                                                              .toString() ==
+                                                          "11")
+                                                      ? TextButton.styleFrom(
+                                                          backgroundColor:
+                                                              !isDarkMode
+                                                                  ? Colors.white
+                                                                  : const Color
+                                                                      .fromARGB(
+                                                                      255,
+                                                                      10,
+                                                                      75,
+                                                                      100),
+                                                          padding: isSmallScreen
+                                                              ? const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      12,
+                                                                  vertical: 12)
+                                                              : const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      16,
+                                                                  vertical: 16),
+                                                          minimumSize:
+                                                              Size.zero,
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        6),
+                                                          ),
+                                                        )
+                                                      : TextButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          shadowColor: Colors
+                                                              .transparent,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(4),
+                                                          minimumSize:
+                                                              Size.zero,
+                                                          shape:
+                                                              const CircleBorder(),
+                                                        ),
                                                   onPressed: () {
                                                     setState(() {
                                                       if (selectedDevice?[
@@ -1309,10 +1338,9 @@ class _HomePageState extends State<HomePage> {
                                                           ),
                                                         )
                                                       : const Icon(
-                                                          Icons
-                                                              .arrow_back,
-                                                          size: 16,
-                                                          color: Color.fromARGB(255, 15, 0, 0),
+                                                          Icons.arrow_back,
+                                                          size: 20,
+                                                          color: Colors.white,
                                                         ),
                                                 );
 
@@ -2077,8 +2105,8 @@ class _HomePageState extends State<HomePage> {
                                         child: GestureDetector(
                                           onTapDown: (_) =>
                                               setState(() => _isPressed = true),
-                                          onTapUp: (_) =>
-                                              setState(() => _isPressed = false),
+                                          onTapUp: (_) => setState(
+                                              () => _isPressed = false),
                                           onTapCancel: () => setState(
                                               () => _isPressed = false),
                                           child: AnimatedContainer(
@@ -2325,8 +2353,8 @@ class _HomePageState extends State<HomePage> {
         '05agriculture.05@gmail.com';
     final isSuperAdmin = [
       'sejalsankhyan2001@gmail.com',
-        'pallavikrishnan01@gmail.com',
-        'officeharsh25@gmail.com'
+      'pallavikrishnan01@gmail.com',
+      'officeharsh25@gmail.com'
     ].contains(userProvider.userEmail?.trim().toLowerCase());
 
     return GestureDetector(
@@ -2434,8 +2462,8 @@ class _HomePageState extends State<HomePage> {
         } else if (selected == 'devices') {
           if ([
             'sejalsankhyan2001@gmail.com',
-        'pallavikrishnan01@gmail.com',
-        'officeharsh25@gmail.com'
+            'pallavikrishnan01@gmail.com',
+            'officeharsh25@gmail.com'
           ].contains(userProvider.userEmail?.trim().toLowerCase())) {
             Navigator.pushNamed(context, '/admin');
           } else if (userProvider.userEmail?.trim().toLowerCase() ==
@@ -2567,6 +2595,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   Widget _buildSensorCard({
     required String imageAsset,
     required String title,
