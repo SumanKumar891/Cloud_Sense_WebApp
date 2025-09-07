@@ -1251,10 +1251,12 @@ class _HomePageState extends State<HomePage> {
                                                         : const Color.fromARGB(
                                                             255, 10, 75, 100),
                                                     padding: isSmallScreen
-                                                        ? EdgeInsets.symmetric(
+                                                        ? const EdgeInsets
+                                                            .symmetric(
                                                             horizontal: 12,
                                                             vertical: 12)
-                                                        : EdgeInsets.symmetric(
+                                                        : const EdgeInsets
+                                                            .symmetric(
                                                             horizontal: 16,
                                                             vertical: 16),
                                                     minimumSize: Size.zero,
@@ -1293,21 +1295,25 @@ class _HomePageState extends State<HomePage> {
                                                       }
                                                     });
                                                   },
-                                                  child: Text(
-                                                    selectedDevice?["DeviceId"]
-                                                                .toString() ==
-                                                            "11"
-                                                        ? "Check Nearest Device"
-                                                        : "Check Demo Device",
-                                                    style: TextStyle(
-                                                      color: isDarkMode
-                                                          ? Colors.white
-                                                          : Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 10,
-                                                    ),
-                                                  ),
+                                                  child: selectedDevice?[
+                                                                  "DeviceId"]
+                                                              .toString() ==
+                                                          "11"
+                                                      ? const Text(
+                                                          "Check Nearest Device",
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 10,
+                                                          ),
+                                                        )
+                                                      : const Icon(
+                                                          Icons
+                                                              .arrow_back,
+                                                          size: 16,
+                                                          color: Color.fromARGB(255, 15, 0, 0),
+                                                        ),
                                                 );
 
                                                 return Padding(
