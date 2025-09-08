@@ -98,14 +98,22 @@ const RESOURCES = {"assets/AssetManifest.bin": "11d226003992719c708c91a7468ea7d5
 "favicon.png": "352a05256273593e3e2b5d173d54cf60",
 "firebase-messaging-sw.js": "17c44fff535ffea2671fce491d6dd458",
 "flutter.js": "83d881c1dbb6d6bcd6b42e274605b69c",
+<<<<<<< HEAD
 "flutter_bootstrap.js": "17b878a9f2537b3918c34e36c560eec7",
+=======
+"flutter_bootstrap.js": "1ae7a2950cd6b058b0f2655d34030e44",
+>>>>>>> 186c1e58326dccbb325d1d497784c99805a5bdf4
 "icons/Icon-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
 "icons/Icon-512.png": "76feaf63bcbf28ae35c368fa70d14ce7",
 "icons/Icon-maskable-192.png": "90a948ad88bf1c17a5a40ed40bf4905a",
 "icons/Icon-maskable-512.png": "76feaf63bcbf28ae35c368fa70d14ce7",
 "index.html": "7223bc2226add1d3b149d5ba635de84b",
 "/": "7223bc2226add1d3b149d5ba635de84b",
+<<<<<<< HEAD
 "main.dart.js": "0fd5c4d9c6185aba352e9883b2e02fea",
+=======
+"main.dart.js": "2227a353ec31b07dfd94afbd5249d01b",
+>>>>>>> 186c1e58326dccbb325d1d497784c99805a5bdf4
 "manifest.json": "a44270f13c2af2a1352947ed9bba8842",
 "maskable": "d41d8cd98f00b204e9800998ecf8427e",
 "mobile-app.png": "c2b1747bda9c67c734ff806e5bf0e684",
