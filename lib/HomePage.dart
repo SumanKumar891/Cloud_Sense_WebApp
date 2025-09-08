@@ -647,6 +647,9 @@ class _HomePageState extends State<HomePage> {
 
 String _getNameForKey(String paramName) {
 
+  if (paramName.startsWith("Current")) {
+    paramName = paramName.replaceFirst("Current", "");
+  }
   String result = paramName.replaceAllMapped(
     RegExp(r'([a-z])([A-Z])'),
     (match) => '${match.group(1)} ${match.group(2)}',
@@ -654,6 +657,7 @@ String _getNameForKey(String paramName) {
 
   return result[0].toUpperCase() + result.substring(1);
 }
+
 
 
 
