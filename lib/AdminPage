@@ -40,8 +40,9 @@ class _AdminPageState extends State<AdminPage> {
   Timer? _anomalyTimer;
   FlutterLocalNotificationsPlugin? _notificationsPlugin;
 
-  bool showAllDevices = false;
-  bool showAllUsers = false;
+  int devicesToShow = 4; // start with 4 devices
+  int usersToShow = 4;   // start with 4 users
+
 
   @override
   void initState() {
@@ -350,7 +351,7 @@ class _AdminPageState extends State<AdminPage> {
                                   leading: Icon(Icons.warning, color: Colors.orange),
                                   title: Text(
                                     n['message']!,
-                                    style: TextStyle(color: strong, fontWeight: FontWeight.w600),
+                                    style: TextStyle(color: strong, fontSize: 12,fontWeight: FontWeight.w600),
                                   ),
                                   trailing: IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
@@ -430,7 +431,7 @@ class _AdminPageState extends State<AdminPage> {
         });
 
         if (kDebugMode) {
-          print("Fetched devices: $devices");
+          // print("Fetched devices: $devices");
         }
       } else {
         setState(() => isLoading = false);
@@ -978,7 +979,7 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0F1115) : const Color(0xFFF3F5F7);
+    final bg = isDark ? const Color(0xFF0F1115) : const Color.fromARGB(255, 158, 211, 212);
     final card = isDark ? const Color(0xFF161A22) : Colors.white;
     final subtle = isDark ? Colors.white70 : Colors.black54;
     final strong = isDark ? Colors.white : Colors.black;
@@ -1018,6 +1019,7 @@ class _AdminPageState extends State<AdminPage> {
                       decoration: BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
+                        
                       ),
                       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                       child: Text(
@@ -1051,6 +1053,8 @@ class _AdminPageState extends State<AdminPage> {
           final double statChildAspectRatio = isMobile ? 3.8 : isTablet ? 3.0 : 2.4;
           final double padding = isMobile ? 12.0 : isTablet ? 16.0 : 18.0;
 
+
+          // Your widget build
           return SingleChildScrollView(
             padding: EdgeInsets.all(padding),
             child: Column(
@@ -1107,137 +1111,203 @@ class _AdminPageState extends State<AdminPage> {
                 // Sections
                 Column(
                   children: [
-                    // Devices Section
-                    _SectionCard(
-                      title: "Devices",
-                      cardColor: card,
-                      strong: strong,
-                      subtle: subtle,
-                      child: isLoading
-                          ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(24.0),
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
-                          : Column(
-                              children: [
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  children: [
-                                    _ChipFilter(
-                                      value: filter,
-                                      onChanged: (v) {
-                                        setState(() => filter = v);
-                                      },
-                                      strong: strong,
-                                      subtle: subtle,
-                                      isDark: isDark,
-                                    ),
-                                    IconButton(
-                                      tooltip: "Refresh",
-                                      onPressed: () {
-                                        fetchDevices();
-                                        fetchAnomalies();
-                                      },
-                                      icon: Icon(Icons.refresh, color: strong),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                const Divider(height: 1),
-                                const SizedBox(height: 8),
-                                if (filteredDevices.isEmpty)
-                                  Center(
-                                    child: Text("No devices found",
-                                        style: TextStyle(color: subtle)),
-                                  )
-                                else
-                                  Column(
-                                    children: [
-                                      ...((showAllDevices
-                                              ? filteredDevices
-                                              : filteredDevices.take(4))
-                                          .map(
-                                        (d) => Column(
+                  // Devices Section
+                  _SectionCard(
+                    title: "Devices",
+                    cardColor: card,
+                    strong: strong,
+                    subtle: subtle,
+                    child: isLoading
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(24.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : Column(
+                            children: [
+                              // 🔹 Search field + filter
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _SearchField(
+                                    hint: "Search a device",
+                                    strong: strong,
+                                    subtle: subtle,
+                                    isDark: isDark,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        searchQuery = value.trim();
+                                        devicesToShow = 4;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(height: 12),
+                                  // ✅ Responsive filter section
+                                  LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final isMobile = constraints.maxWidth < 600;
+
+                                      if (isMobile) {
+                                        // 👉 Dropdown on mobile
+                                        return Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            ListTile(
+                                            DropdownButton<String>(
+                                              value: filter,
+                                              items: ["All", "Active", "Inactive"]
+                                                  .map((e) => DropdownMenuItem(
+                                                        value: e,
+                                                        child: Text(e),
+                                                      ))
+                                                  .toList(),
+                                              onChanged: (v) {
+                                                if (v != null) setState(() => filter = v);
+                                              },
+                                            ),
+                                            IconButton(
+                                              tooltip: "Refresh",
+                                              onPressed: () {
+                                                fetchDevices();
+                                                fetchAnomalies();
+                                              },
+                                              icon: Icon(Icons.refresh, color: strong),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        // 👉 Chips on larger screens
+                                        return Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                          children: [
+                                            _ChipFilter(
+                                              value: filter,
+                                              onChanged: (v) {
+                                                setState(() => filter = v);
+                                              },
+                                              strong: strong,
+                                              subtle: subtle,
+                                              isDark: isDark,
+                                            ),
+                                            IconButton(
+                                              tooltip: "Refresh",
+                                              onPressed: () {
+                                                fetchDevices();
+                                                fetchAnomalies();
+                                              },
+                                              icon: Icon(Icons.refresh, color: strong),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              const Divider(height: 1),
+                              const SizedBox(height: 8),
+                              if (filteredDevices.isEmpty)
+                                Center(
+                                  child: Text("No devices found", style: TextStyle(color: subtle)),
+                                )
+                              else
+                                Column(
+                                  children: [
+                                    ...(filteredDevices.take(devicesToShow).map(
+                                      (d) => Column(
+                                        children: [
+                                          InkWell(
+                                            hoverColor: const Color(0xFF5BAA9D).withOpacity(0.9), // 👈 Hover color
+                                            borderRadius: BorderRadius.circular(8),
+                                            onTap: () {
+                                              final deviceId = d['DeviceId'] ?? "Unknown";
+                                              final topic = d['Topic'] ?? "Unknown";
+                                              final mapped = _mapCategoryAndPrefix(topic);
+                                              final sensorName = mapped.prefix.isNotEmpty
+                                                  ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
+                                                  : deviceId;
+                                              final sequentialName = "${mapped.category}";
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => DeviceGraphPage(
+                                                    deviceName: sensorName,
+                                                    sequentialName: sequentialName,
+                                                    backgroundImagePath: 'assets/backgroundd.jpg',
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: ListTile(
                                               leading: _StatusDot(
-                                                color: d['isActive'] == true
-                                                    ? Colors.green
-                                                    : Colors.red,
+                                                color: d['isActive'] == true ? Colors.green : Colors.red,
                                               ),
                                               title: Text(
                                                 "ID: ${d['DeviceId'] != null && d['Topic'] != null ? (_mapCategoryAndPrefix(d['Topic']).prefix.isNotEmpty ? "${_mapCategoryAndPrefix(d['Topic']).prefix}${d['DeviceId'].padLeft(3, '0')}" : d['DeviceId']) : "Unknown"}",
                                                 style: TextStyle(
                                                   color: strong,
                                                   fontWeight: FontWeight.w700,
+                                                  fontSize: 14,
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               subtitle: Text(
                                                 "Name: ${d['Topic'] != null ? _mapCategoryAndPrefix(d['Topic']).category : "Unknown"}\nLast: ${d['lastReceivedTime']}",
-                                                style: TextStyle(color: subtle),
+                                                style: TextStyle(
+                                                  color: subtle,
+                                                  fontSize: 12,
+                                                ),
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 2,
                                               ),
                                               trailing: Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                    horizontal: 10, vertical: 6),
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                                 decoration: BoxDecoration(
-                                                  color: (d['isActive'] == true
-                                                          ? Colors.green
-                                                          : Colors.red)
-                                                      .withOpacity(.12),
+                                                  color: (d['isActive'] == true ? Colors.green : Colors.red).withOpacity(.12),
                                                   borderRadius: BorderRadius.circular(20),
                                                 ),
                                                 child: Text(
                                                   d['isActive'] == true ? "Active" : "Inactive",
                                                   style: TextStyle(
-                                                    color: d['isActive'] == true
-                                                        ? Colors.green
-                                                        : Colors.red,
+                                                    color: d['isActive'] == true ? Colors.green : Colors.red,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
                                               ),
-                                              onTap: () {
-                                                final deviceId = d['DeviceId'] ?? "Unknown";
-                                                final topic = d['Topic'] ?? "Unknown";
-                                                final mapped = _mapCategoryAndPrefix(topic);
-                                                final sensorName = mapped.prefix.isNotEmpty
-                                                    ? "${mapped.prefix}${deviceId.padLeft(3, '0')}"
-                                                    : deviceId;
-                                                final sequentialName = "${mapped.category}";
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => DeviceGraphPage(
-                                                      deviceName: sensorName,
-                                                      sequentialName: sequentialName,
-                                                      backgroundImagePath: 'assets/backgroundd.jpg',
-                                                    ),
-                                                  ),
-                                                );
-                                              },
                                             ),
-                                            Divider(color: subtle.withOpacity(.12)),
-                                          ],
-                                        ),
-                                      )),
-                                      if (filteredDevices.length > 4)
-                                        TextButton(
-                                          onPressed: () =>
-                                              setState(() => showAllDevices = !showAllDevices),
-                                          child: Text(showAllDevices ? "Show Less" : "Show More"),
-                                        ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                    ),
+                                          ),
+                                          Divider(color: subtle.withOpacity(.12)),
+                                        ],
+                                      ),
+                                    )).toList(),
+                                    if (devicesToShow < filteredDevices.length)
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            devicesToShow = (devicesToShow + 4).clamp(0, filteredDevices.length);
+                                          });
+                                        },
+                                        child: const Text("Show More"),
+                                      )
+                                    else if (filteredDevices.length > 4)
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            devicesToShow = 4;
+                                          });
+                                        },
+                                        child: const Text("Show Less"),
+                                      ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                  ),
+
+
 
                     // Users Section
                     _SectionCard(
@@ -1267,61 +1337,75 @@ class _AdminPageState extends State<AdminPage> {
                                     const SizedBox(height: 8),
                                     Column(
                                       children: [
-                                        ...((showAllUsers ? users : users.take(4))
-                                            .map(
+                                        ...(users.take(usersToShow).map(
                                           (u) => Column(
                                             children: [
-                                              ListTile(
-                                                leading: CircleAvatar(
-                                                  backgroundColor: Colors.blue.withOpacity(.12),
-                                                  child: const Icon(Icons.person,
-                                                      color: Colors.blue),
-                                                ),
-                                                title: Text(
-                                                  u["name"] ?? "",
-                                                  style: TextStyle(
-                                                    color: strong,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
-                                                subtitle: Text(
-                                                  "${u["email"]} • ${u["role"]}",
-                                                  style: TextStyle(color: subtle),
-                                                  overflow: TextOverflow.ellipsis,
-                                                  maxLines: 2,
-                                                ),
-                                                trailing: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    IconButton(
-                                                      tooltip: "Add Device",
-                                                      onPressed: () =>
-                                                          _showAddDeviceDialog(u["email"]!),
-                                                      icon: const Icon(Icons.add,
-                                                          color: Colors.blue),
-                                                    ),
-                                                    IconButton(
-                                                      tooltip: "Delete",
-                                                      onPressed: () =>
-                                                          _deleteUser(u["email"]!),
-                                                      icon: const Icon(Icons.delete,
-                                                          color: Colors.red),
-                                                    ),
-                                                  ],
-                                                ),
+                                              InkWell(
+                                                hoverColor: const Color(0xFF5BAA9D).withOpacity(0.9), // 👈 Hover color
+                                                borderRadius: BorderRadius.circular(8),
                                                 onTap: () => _showUserDevices(u["email"]!),
+                                                child: ListTile(
+                                                  leading: CircleAvatar(
+                                                    backgroundColor: Colors.blue.withOpacity(.12),
+                                                    child: const Icon(Icons.person, color: Colors.blue),
+                                                  ),
+                                                  title: Text(
+                                                    u["name"] ?? "",
+                                                    style: TextStyle(
+                                                      color: strong,
+                                                      fontWeight: FontWeight.w700,
+                                                      fontSize: 14, // 👈 smaller name
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                  ),
+                                                  subtitle: Text(
+                                                    "${u["email"]} • ${u["role"]}",
+                                                    style: TextStyle(
+                                                      color: subtle,
+                                                      fontSize: 12, // 👈 smaller subtitle
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                  ),
+                                                  trailing: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      IconButton(
+                                                        tooltip: "Add Device",
+                                                        onPressed: () => _showAddDeviceDialog(u["email"]!),
+                                                        icon: const Icon(Icons.add, color: Colors.blue),
+                                                      ),
+                                                      IconButton(
+                                                        tooltip: "Delete",
+                                                        onPressed: () => _deleteUser(u["email"]!),
+                                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
                                               Divider(color: subtle.withOpacity(.12)),
                                             ],
                                           ),
                                         )),
-                                        if (users.length > 4)
+                                        if (usersToShow < users.length)
                                           TextButton(
-                                            onPressed: () =>
-                                                setState(() => showAllUsers = !showAllUsers),
-                                            child: Text(showAllUsers ? "Show Less" : "Show More"),
+                                            onPressed: () {
+                                              setState(() {
+                                                usersToShow = (usersToShow + 4).clamp(0, users.length);
+                                              });
+                                            },
+                                            child: const Text("Show More"),
+                                          )
+                                        else if (users.length > 4)
+                                          TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                usersToShow = 4;
+                                              });
+                                            },
+                                            child: const Text("Show Less"),
                                           ),
                                       ],
                                     ),
@@ -1341,11 +1425,13 @@ class _AdminPageState extends State<AdminPage> {
                                   ),
                                 ),
                     ),
+
                   ],
                 ),
               ],
             ),
           );
+
         },
       ),
     );

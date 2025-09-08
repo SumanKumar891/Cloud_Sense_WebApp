@@ -64,24 +64,31 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             print("Subscribing $email to GPS SNS topic in _checkCurrentUser.");
             await subscribeToGpsSnsTopic(token);
             await prefs.setBool('isGpsTokenSubscribed', true);
-            bool? wasAmmoniaSubscribed =
-                prefs.getBool('isAmmoniaTokenSubscribed');
-            if (wasAmmoniaSubscribed == true) {
+            bool? wasAnomalySubscribed =
+                prefs.getBool('isAnomalyTokenSubscribed');
+            if (wasAnomalySubscribed == true) {
               await unsubscribeFromSnsTopic(token);
-              await prefs.remove('isAmmoniaTokenSubscribed');
+              await prefs.remove('isAnomalyTokenSubscribed');
             }
             Navigator.pushReplacementNamed(context, '/deviceinfo');
-          } else if (email.trim().toLowerCase() ==
-              "sejalsankhyan2001@gmail.com") {
+          } else if (adminEmails.contains(email.trim().toLowerCase())) {
+            print(
+                "Subscribing $email to anomaly SNS topic in _checkCurrentUser.");
+            await subscribeToSnsTopic(token);
+            await prefs.setBool('isAnomalyTokenSubscribed', true);
+            bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
+            if (wasGpsSubscribed == true) {
+              await unsubscribeFromGpsSnsTopic(token);
+              await prefs.remove('isGpsTokenSubscribed');
+            }
             print("Navigating to /admin for $email in _checkCurrentUser");
             Navigator.pushReplacementNamed(context, '/admin');
           } else {
-            bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
-            if (hasAmmoniaSensor) {
-              print(
-                  "Subscribing $email to ammonia SNS topic in _checkCurrentUser.");
-              await subscribeToSnsTopic(token);
-              await prefs.setBool('isAmmoniaTokenSubscribed', true);
+            bool? wasAnomalySubscribed =
+                prefs.getBool('isAnomalyTokenSubscribed');
+            if (wasAnomalySubscribed == true) {
+              await unsubscribeFromSnsTopic(token);
+              await prefs.remove('isAnomalyTokenSubscribed');
             }
             bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
             if (wasGpsSubscribed == true) {
@@ -143,24 +150,31 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
             print("Subscribing $email to GPS SNS topic.");
             await subscribeToGpsSnsTopic(token);
             await prefs.setBool('isGpsTokenSubscribed', true);
-            // Ensure ammonia is unsubscribed for this user
-            bool? wasAmmoniaSubscribed =
-                prefs.getBool('isAmmoniaTokenSubscribed');
-            if (wasAmmoniaSubscribed == true) {
+            // Ensure anomaly is unsubscribed for this user
+            bool? wasAnomalySubscribed =
+                prefs.getBool('isAnomalyTokenSubscribed');
+            if (wasAnomalySubscribed == true) {
               await unsubscribeFromSnsTopic(token);
-              await prefs.remove('isAmmoniaTokenSubscribed');
+              await prefs.remove('isAnomalyTokenSubscribed');
+            }
+          } else if (adminEmails.contains(email)) {
+            print("Subscribing $email to anomaly SNS topic.");
+            await subscribeToSnsTopic(token);
+            await prefs.setBool('isAnomalyTokenSubscribed', true);
+            // Ensure GPS is unsubscribed for admin users
+            bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
+            if (wasGpsSubscribed == true) {
+              await unsubscribeFromGpsSnsTopic(token);
+              await prefs.remove('isGpsTokenSubscribed');
             }
           } else {
-            bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
-            if (hasAmmoniaSensor) {
-              print("Subscribing $email to ammonia SNS topic.");
-              await subscribeToSnsTopic(token);
-              await prefs.setBool('isAmmoniaTokenSubscribed', true);
-            } else {
-              print(
-                  "No ammonia sensor found for $email. Skipping subscription.");
+            // Ensure both anomaly and GPS are unsubscribed for non-authorized users
+            bool? wasAnomalySubscribed =
+                prefs.getBool('isAnomalyTokenSubscribed');
+            if (wasAnomalySubscribed == true) {
+              await unsubscribeFromSnsTopic(token);
+              await prefs.remove('isAnomalyTokenSubscribed');
             }
-            // Ensure GPS is unsubscribed for non-authorized users
             bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
             if (wasGpsSubscribed == true) {
               await unsubscribeFromGpsSnsTopic(token);
@@ -171,11 +185,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         } else {
           print("⚠ FCM Token not available at login.");
         }
-
         // ✅ Navigate based on specific user
         if (email == "05agriculture.05@gmail.com") {
           print("Navigating to /deviceinfo for $email");
           Navigator.pushReplacementNamed(context, '/deviceinfo');
+        } else if (adminEmails.contains(email)) {
+          print("Navigating to /admin for $email");
+          Navigator.pushReplacementNamed(context, '/');
         } else {
           print("Navigating to /devicelist for $email");
           Navigator.pushReplacementNamed(context, '/');
@@ -522,12 +538,11 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       await prefs.setString('email', _emailToVerify!);
       String? token = await FirebaseMessaging.instance.getToken();
       if (token != null) {
-        bool hasAmmoniaSensor = await userHasAmmoniaSensor(_emailToVerify!);
-        if (hasAmmoniaSensor) {
+        if (adminEmails.contains(_emailToVerify!.trim().toLowerCase())) {
           print(
-              "Subscribing $_emailToVerify to ammonia SNS topic after sign-up.");
+              "Subscribing $_emailToVerify to anomaly SNS topic after sign-up.");
           await subscribeToSnsTopic(token);
-          await prefs.setBool('isAmmoniaTokenSubscribed', true);
+          await prefs.setBool('isAnomalyTokenSubscribed', true);
         }
         bool? wasGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
         if (wasGpsSubscribed == true) {
@@ -595,24 +610,15 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: isDarkMode ? Colors.white : Colors.black,
-            size: MediaQuery.of(context).size.width < 800 ? 16 : 32,
-          ),
-          onPressed: () {
-            // Navigate to home screen and remove all previous routes
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/', // Route name for home screen
-              (Route<dynamic> route) => false, // Remove all previous routes
-            );
-          },
+          icon: Icon(Icons.arrow_back,
+              color: isDark ? Colors.white : Colors.black, size: 28),
+          onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context, '/', (Route<dynamic> route) => false),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -620,34 +626,52 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
       body: Stack(
         children: [
           Container(
-            color: isDarkMode ? const Color(0xFF121212) : Colors.transparent,
+            decoration: BoxDecoration(
+              gradient: isDark
+                  ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color.fromARGB(255, 57, 57, 57),
+                        Color.fromARGB(255, 2, 54, 76),
+                      ],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color.fromARGB(255, 147, 214, 207),
+                        Color.fromARGB(255, 79, 106, 112),
+                      ],
+                    ),
+            ),
           ),
           Center(
             child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 800),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset(0.1, 0.0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                );
-              },
-              child: _isSignIn ? _buildSignIn(isDarkMode) : _buildSignUp(),
+              duration: const Duration(milliseconds: 800),
+              transitionBuilder: (child, animation) => SlideTransition(
+                position:
+                    Tween<Offset>(begin: const Offset(0.1, 0), end: Offset.zero)
+                        .animate(animation),
+                child: child,
+              ),
+              child: _isSignIn ? _buildSignIn(isDark) : _buildSignUp(isDark),
             ),
           ),
           if (_errorMessage.isNotEmpty)
             Positioned(
-              bottom: 16.0,
-              left: 16.0,
-              right: 15.0,
+              bottom: 16,
+              left: 16,
+              right: 16,
               child: Container(
-                padding: EdgeInsets.all(16.0),
-                color: Colors.redAccent,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Text(
                   _errorMessage,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -657,50 +681,54 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     );
   }
 
-  Widget _buildSignIn(bool isDarkMode) {
+  Widget _buildSignIn(bool isDark) {
     return SingleChildScrollView(
-      key: ValueKey('SignIn'),
+      key: const ValueKey('SignIn'),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          bool isSmallScreen = constraints.maxWidth < 800;
-          return isSmallScreen
+          final isSmall = constraints.maxWidth < 800;
+          return isSmall
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildContent(isSmallScreen, isDarkMode),
+                  children: _buildContent(isSmall, isDark),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildContent(isSmallScreen, isDarkMode),
+                  children: _buildContent(isSmall, isDark),
                 );
         },
       ),
     );
   }
 
-  List<Widget> _buildContent(bool isSmallScreen, bool isDarkMode) {
+  List<Widget> _buildContent(bool isSmall, bool isDark) {
+    final cardColor = isDark
+        ? const Color.fromARGB(255, 38, 37, 37)
+        : const Color.fromARGB(255, 231, 231, 231);
+    final altColor = isDark
+        ? const Color.fromARGB(255, 231, 231, 231)
+        : const Color.fromARGB(255, 38, 37, 37);
+    final textColor = isDark ? Colors.white : Colors.black;
+    final accent = Colors.teal;
+
     return [
       Container(
-        width: isSmallScreen ? double.infinity : 400,
+        width: isSmall ? double.infinity : 400,
         height: 500,
-        color: isDarkMode
-            ? const Color.fromARGB(255, 231, 231, 231)
-            : const Color.fromARGB(255, 38, 37, 37),
+        color: altColor,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 55),
+            const SizedBox(height: 55),
             Text(
               'Welcome Back!',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.black : Colors.white,
+                color: isDark ? Colors.black : Colors.white,
               ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: Text(
@@ -708,7 +736,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode
+                  color: isDark
                       ? const Color.fromARGB(255, 13, 123, 233)
                       : const Color.fromARGB(255, 49, 145, 241),
                 ),
@@ -716,13 +744,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 5.0),
+              padding: const EdgeInsets.only(top: 5),
               child: Container(
                 width: 250,
                 height: 220,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/signin.png'),
                     fit: BoxFit.cover,
                   ),
@@ -733,96 +761,86 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         ),
       ),
       Container(
-        width: isSmallScreen ? double.infinity : 400,
+        width: isSmall ? double.infinity : 400,
         height: 500,
-        padding: EdgeInsets.all(32.0),
-        color: isDarkMode
-            ? const Color.fromARGB(255, 38, 37, 37)
-            : const Color.fromARGB(255, 231, 231, 231),
+        padding: const EdgeInsets.all(32),
+        color: cardColor,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Text(
               'Login',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: textColor,
               ),
             ),
-            SizedBox(height: 42),
+            const SizedBox(height: 42),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
-                labelStyle:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: textColor),
+                border: const OutlineInputBorder(),
                 errorText: _emailValid ? null : 'Invalid email format',
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
+                  borderSide: BorderSide(color: accent),
                 ),
               ),
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              style: TextStyle(color: textColor),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: textColor),
+                border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _isPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: textColor,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
+                  onPressed: () =>
+                      setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 76, 39, 176)),
+                  borderSide: BorderSide(color: accent),
                 ),
               ),
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              style: TextStyle(color: textColor),
             ),
             if (_isLoading)
-              CircularProgressIndicator()
+              const Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: CircularProgressIndicator(),
+              )
             else
               Padding(
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: const EdgeInsets.only(top: 20),
                 child: ElevatedButton(
                   onPressed: _signIn,
-                  child: Text(
-                    'Sign In',
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? Colors.black
-                          : const Color.fromARGB(255, 245, 241, 240),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-                    backgroundColor: isDarkMode
-                        ? const Color.fromARGB(255, 13, 123, 233)
-                        : const Color.fromARGB(255, 49, 145, 241),
+                  child: const Text(
+                    'Sign In',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-            SizedBox(height: 22),
+            const SizedBox(height: 22),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -831,38 +849,24 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: textColor,
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 GestureDetector(
                   onTap: _forgotPassword,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        bottom: -1,
-                        child: Container(
-                          height: 1.5,
-                          width: 40,
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230),
-                        ),
-                      ),
-                      Text(
-                        'Reset',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.blue : Colors.blue,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Reset',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: accent,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -871,92 +875,77 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: textColor,
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isSignIn = false;
-                    });
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        bottom: -1,
-                        child: Container(
-                          height: 1.5,
-                          width: 45,
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230),
-                        ),
-                      ),
-                      Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.blue : Colors.blue,
-                        ),
-                      ),
-                    ],
+                  onTap: () => setState(() => _isSignIn = false),
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: accent,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
     ];
   }
 
-  Widget _buildSignUp() {
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
+  Widget _buildSignUp(bool isDark) {
     return SingleChildScrollView(
-      key: ValueKey('SignUp'),
+      key: const ValueKey('SignUp'),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          bool isSmallScreen = constraints.maxWidth < 800;
-          return isSmallScreen
+          final isSmall = constraints.maxWidth < 800;
+          return isSmall
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildSignUpContent(isSmallScreen, isDarkMode),
+                  children: _buildSignUpContent(isSmall, isDark),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildSignUpContent(isSmallScreen, isDarkMode),
+                  children: _buildSignUpContent(isSmall, isDark),
                 );
         },
       ),
     );
   }
 
-  List<Widget> _buildSignUpContent(bool isSmallScreen, bool isDarkMode) {
+  List<Widget> _buildSignUpContent(bool isSmall, bool isDark) {
+    final cardColor = isDark
+        ? const Color.fromARGB(255, 38, 37, 37)
+        : const Color.fromARGB(255, 231, 231, 231);
+    final altColor = isDark
+        ? const Color.fromARGB(255, 231, 231, 231)
+        : const Color.fromARGB(255, 38, 37, 37);
+    final textColor = isDark ? Colors.white : Colors.black;
+    final accent = Colors.teal;
+
     return [
       Container(
-        width: isSmallScreen ? double.infinity : 400,
+        width: isSmall ? double.infinity : 400,
         height: 500,
-        color: isDarkMode
-            ? const Color.fromARGB(255, 231, 231, 231)
-            : const Color.fromARGB(255, 38, 37, 37),
+        color: altColor,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Text(
               'Welcome!',
               style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.black : Colors.white),
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.black : Colors.white,
+              ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: Text(
@@ -964,7 +953,7 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode
+                  color: isDark
                       ? const Color.fromARGB(255, 13, 123, 233)
                       : const Color.fromARGB(255, 49, 145, 241),
                 ),
@@ -972,13 +961,13 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 5.0),
+              padding: const EdgeInsets.only(top: 5),
               child: Container(
                 width: 250,
                 height: 220,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(40),
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage('assets/signin.png'),
                     fit: BoxFit.cover,
                   ),
@@ -989,112 +978,99 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
         ),
       ),
       Container(
-        width: isSmallScreen ? double.infinity : 400,
+        width: isSmall ? double.infinity : 400,
         height: 500,
-        padding: EdgeInsets.all(32.0),
-        color: isDarkMode
-            ? const Color.fromARGB(255, 38, 37, 37)
-            : const Color.fromARGB(255, 231, 231, 231),
+        padding: const EdgeInsets.all(32),
+        color: cardColor,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'Create Account',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black,
+                color: textColor,
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Name',
-                labelStyle:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: textColor),
+                border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 76, 39, 176)),
+                  borderSide: BorderSide(color: accent),
                 ),
               ),
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              style: TextStyle(color: textColor),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
-                labelStyle:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: textColor),
+                border: const OutlineInputBorder(),
                 errorText: _emailValid ? null : 'Invalid email format',
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode ? Colors.redAccent : Colors.red),
+                  borderSide: BorderSide(color: accent),
                 ),
               ),
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              style: TextStyle(color: textColor),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
               obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle:
-                    TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: textColor),
+                border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _isPasswordVisible
                         ? Icons.visibility
                         : Icons.visibility_off,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: textColor,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
+                  onPressed: () =>
+                      setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isDarkMode
-                          ? Colors.blue
-                          : const Color.fromARGB(255, 76, 39, 176)),
+                  borderSide: BorderSide(color: accent),
                 ),
               ),
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              style: TextStyle(color: textColor),
             ),
             if (_isLoading)
-              CircularProgressIndicator()
+              const Padding(
+                padding: EdgeInsets.only(top: 20),
+                child: CircularProgressIndicator(),
+              )
             else
               Padding(
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: const EdgeInsets.only(top: 20),
                 child: ElevatedButton(
                   onPressed: _signUp,
-                  child: Text(
-                    'Sign Up',
-                    style: TextStyle(
-                        color: isDarkMode
-                            ? Colors.black
-                            : const Color.fromARGB(255, 245, 241, 240)),
-                  ),
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-                    backgroundColor: isDarkMode
-                        ? const Color.fromARGB(255, 13, 123, 233)
-                        : const Color.fromARGB(255, 49, 145, 241),
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1103,41 +1079,23 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black,
+                    color: textColor,
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isSignIn = true;
-                    });
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        bottom: -1,
-                        child: Container(
-                          height: 1.5,
-                          width: 45,
-                          color: isDarkMode
-                              ? Colors.blue
-                              : Color.fromARGB(243, 32, 39, 230),
-                        ),
-                      ),
-                      Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.blue : Colors.blue,
-                        ),
-                      ),
-                    ],
+                  onTap: () => setState(() => _isSignIn = true),
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: accent,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

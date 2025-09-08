@@ -9,12 +9,10 @@ import 'package:cloud_sense_webapp/dataLogger.dart';
 import 'package:cloud_sense_webapp/gateway.dart';
 import 'package:cloud_sense_webapp/probe.dart';
 import 'package:cloud_sense_webapp/raingauge.dart';
-
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/devicelocationinfo.dart';
 import 'package:cloud_sense_webapp/GPS.dart';
-
 import 'package:cloud_sense_webapp/devicemap.dart';
 import 'package:cloud_sense_webapp/windSensors.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,6 +34,13 @@ import 'package:http/http.dart' as http;
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
+// List of admin emails for anomaly notifications
+const List<String> adminEmails = [
+  'sejalsankhyan2001@gmail.com',
+  'pallavikrishnan01@gmail.com',
+  'officeharsh25@gmail.com',
+];
+
 // Background message handler for Firebase Messaging
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -54,12 +59,16 @@ Future<void> showNotification(RemoteMessage message) async {
     String? title = notification.title ?? "Notification";
     String? body = notification.body;
     String? payload =
-        message.data['ammonia_level'] ?? message.data['gps_movement'] ?? '';
+        message.data['anomaly'] ?? message.data['gps_movement'] ?? '';
 
     if (message.data.containsKey('gps_movement')) {
       title = "GPS Device Movement";
       body =
           "Device ${message.data['device_id']} has moved: ${message.data['gps_movement']}";
+    } else if (message.data.containsKey('anomaly')) {
+      title = "Device Anomaly Detected";
+      body =
+          "Anomaly detected on device ${message.data['device_id']}: ${message.data['anomaly']} at ${message.data['timestamp']}";
     }
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
@@ -92,6 +101,10 @@ Future<void> handleLoginAndSubscribe(String userEmail, String fcmToken) async {
   if (userEmail == '05agriculture.05@gmail.com') {
     print("Matched user: $userEmail - triggering GPS topic subscription.");
     await subscribeToGpsSnsTopic(fcmToken);
+  } else if (adminEmails.contains(userEmail.trim().toLowerCase())) {
+    print(
+        "Matched admin user: $userEmail - triggering anomaly topic subscription.");
+    await subscribeToSnsTopic(fcmToken);
   } else {
     print("User $userEmail is not configured for auto-subscription.");
   }
@@ -135,7 +148,6 @@ Future<void> subscribeToGpsSnsTopic(String fcmToken) async {
   }
 }
 
-// Unsubscribe device from GPS SNS topic
 Future<void> unsubscribeFromGpsSnsTopic(String fcmToken) async {
   print("Unsubscribing device from GPS SNS topic with token: $fcmToken");
   const String apiGatewayUrl =
@@ -199,31 +211,34 @@ Future<void> manageNotificationSubscription() async {
       } else {
         print("Already subscribed to GPS SNS topic.");
       }
-      // Ensure ammonia is unsubscribed
-      bool? wasAmmoniaSubscribed = prefs.getBool('isAmmoniaTokenSubscribed');
-      if (wasAmmoniaSubscribed == true) {
+      // Ensure anomaly is unsubscribed for this user
+      bool? wasAnomalySubscribed = prefs.getBool('isAnomalyTokenSubscribed');
+      if (wasAnomalySubscribed == true) {
         await unsubscribeFromSnsTopic(token);
-        await prefs.remove('isAmmoniaTokenSubscribed');
+        await prefs.remove('isAnomalyTokenSubscribed');
+      }
+    } else if (adminEmails.contains(email.trim().toLowerCase())) {
+      print("Anomaly notifications allowed for admin user.");
+      bool? isAnomalySubscribed = prefs.getBool('isAnomalyTokenSubscribed');
+      if (isAnomalySubscribed != true) {
+        await subscribeToSnsTopic(token);
+        await prefs.setBool('isAnomalyTokenSubscribed', true);
+      } else {
+        print("Already subscribed to anomaly SNS topic.");
+      }
+      // Ensure GPS is unsubscribed for admin users
+      bool? isGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
+      if (isGpsSubscribed == true) {
+        await unsubscribeFromGpsSnsTopic(token);
+        await prefs.remove('isGpsTokenSubscribed');
       }
     } else {
-      bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
-      if (hasAmmoniaSensor) {
-        print(
-            "NH sensor found for user. Subscribing to ammonia notifications.");
-        bool? isAmmoniaSubscribed = prefs.getBool('isAmmoniaTokenSubscribed');
-        if (isAmmoniaSubscribed != true) {
-          await subscribeToSnsTopic(token);
-          await prefs.setBool('isAmmoniaTokenSubscribed', true);
-        } else {
-          print("Already subscribed to ammonia SNS topic.");
-        }
-      } else {
-        print("No NH sensor found. Unsubscribing if previously subscribed.");
-        bool? wasSubscribed = prefs.getBool('isAmmoniaTokenSubscribed');
-        if (wasSubscribed == true) {
-          await unsubscribeFromSnsTopic(token);
-          await prefs.remove('isAmmoniaTokenSubscribed');
-        }
+      print(
+          "User is not an admin. Unsubscribing from anomaly notifications if previously subscribed.");
+      bool? wasAnomalySubscribed = prefs.getBool('isAnomalyTokenSubscribed');
+      if (wasAnomalySubscribed == true) {
+        await unsubscribeFromSnsTopic(token);
+        await prefs.remove('isAnomalyTokenSubscribed');
       }
       // Ensure GPS is unsubscribed for non-authorized users
       bool? isGpsSubscribed = prefs.getBool('isGpsTokenSubscribed');
@@ -244,59 +259,29 @@ Future<void> checkAndUpdateNotificationSubscription() async {
   await manageNotificationSubscription();
 }
 
-// Existing ammonia-specific methods
-Future<bool> userHasAmmoniaSensor(String email) async {
-  final String apiUrl =
-      'https://ln8b1r7ld9.execute-api.us-east-1.amazonaws.com/default/Cloudsense_user_devices?email_id=$email';
-
-  try {
-    var response = await http.get(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/json'},
-    );
-    print("Checking NH sensor for user: $email");
-
-    if (response.statusCode == 200) {
-      try {
-        var data = jsonDecode(response.body);
-        if (data.containsKey("NH") && (data["NH"] as List).isNotEmpty) {
-          print("Ammonia sensor found!");
-          return true;
-        } else {
-          print("No ammonia sensor found.");
-        }
-      } catch (e) {
-        print("Invalid JSON response from device API: ${response.body}");
-        return false;
-      }
-    } else {
-      print("Failed to fetch devices. Status Code: ${response.statusCode}");
-    }
-  } catch (e) {
-    print("Error fetching device list: $e");
-  }
-
-  return false;
+// Check if user is an admin
+bool isAdminUser(String email) {
+  return adminEmails.contains(email.trim().toLowerCase());
 }
 
+// Subscribe to anomaly SNS topic
 Future<void> subscribeToSnsTopic(String fcmToken) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? email = prefs.getString('email');
 
   if (email == null) {
-    print("User is not logged in. Skipping ammonia SNS subscription.");
+    print("User is not logged in. Skipping anomaly SNS subscription.");
     return;
   }
 
-  bool hasAmmoniaSensor = await userHasAmmoniaSensor(email);
-  if (!hasAmmoniaSensor) {
-    print("No NH sensor found in account. Skipping subscription.");
+  if (!isAdminUser(email)) {
+    print("User is not an admin. Skipping anomaly SNS subscription.");
     return;
   }
 
-  print("Subscribing device to ammonia SNS topic with token: $fcmToken");
+  print("Subscribing device to anomaly SNS topic with token: $fcmToken");
   const String snsTopicArn =
-      'arn:aws:sns:us-east-1:975048338421:CloudSense_Notification_NH';
+      'arn:aws:sns:us-east-1:975048338421:Anomaly_Detector';
   const String apiGatewayUrl =
       'https://2u9vg092x5.execute-api.us-east-1.amazonaws.com/default/sns_api_fcm_updation';
 
@@ -306,7 +291,7 @@ Future<void> subscribeToSnsTopic(String fcmToken) async {
       'snsTopicArn': snsTopicArn,
       'fcmToken': fcmToken,
     });
-    print("Sending POST request to subscribe Ammonia: $requestBody");
+    print("Sending POST request to subscribe Anomaly: $requestBody");
 
     var response = await http.post(
       Uri.parse(apiGatewayUrl),
@@ -315,16 +300,17 @@ Future<void> subscribeToSnsTopic(String fcmToken) async {
     );
 
     if (response.statusCode == 200) {
-      print("Device subscribed to ammonia SNS topic successfully.");
-      await prefs.setBool('isAmmoniaTokenSubscribed', true);
+      print("Device subscribed to anomaly SNS topic successfully.");
+      await prefs.setBool('isAnomalyTokenSubscribed', true);
     } else {
-      print("Failed to subscribe to ammonia SNS topic: ${response.statusCode}");
+      print("Failed to subscribe to anomaly SNS topic: ${response.statusCode}");
     }
   } catch (e) {
-    print("Error subscribing to ammonia SNS topic: $e");
+    print("Error subscribing to anomaly SNS topic: $e");
   }
 }
 
+// Unsubscribe from anomaly SNS topic
 Future<void> unsubscribeFromSnsTopic(String fcmToken) async {
   const String apiGatewayUrl =
       'https://2u9vg092x5.execute-api.us-east-1.amazonaws.com/default/sns_api_fcm_updation';
@@ -334,23 +320,25 @@ Future<void> unsubscribeFromSnsTopic(String fcmToken) async {
       'action': 'unsubscribe',
       'fcmToken': fcmToken,
     });
-    print("Sending POST request to unsubscribe Ammonia: $requestBody");
+    print("Sending POST request to unsubscribe Anomaly: $requestBody");
 
     var response = await http.post(
       Uri.parse(apiGatewayUrl),
       headers: {'Content-Type': 'application/json'},
       body: requestBody,
     );
-    print("Unsubscribe ammonia API Response: ${response.body}");
+    print("Unsubscribe anomaly API Response: ${response.body}");
 
     if (response.statusCode == 200) {
-      print("Device unsubscribed from ammonia SNS topic successfully.");
+      print("Device unsubscribed from anomaly SNS topic successfully.");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('isAnomalyTokenSubscribed');
     } else {
       print(
-          "Failed to unsubscribe from ammonia SNS topic: ${response.statusCode}");
+          "Failed to unsubscribe from anomaly SNS topic: ${response.statusCode}");
     }
   } catch (e) {
-    print("Error unsubscribing from ammonia SNS topic: $e");
+    print("Error unsubscribing from anomaly SNS topic: $e");
   }
 }
 
@@ -373,10 +361,12 @@ Future<void> setupNotifications() async {
     android: AndroidInitializationSettings('@mipmap/ic_launcher'),
   );
 
-  await flutterLocalNotificationsPlugin.initialize(initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse details) {
-    print("User tapped on notification: ${details.payload}");
-  });
+  await flutterLocalNotificationsPlugin.initialize(
+    initSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse details) {
+      print("User tapped on notification: ${details.payload}");
+    },
+  );
 }
 
 class UserProvider extends ChangeNotifier {
@@ -433,6 +423,9 @@ Future<String> determineInitialRoute() async {
     if (email?.trim().toLowerCase() == '05agriculture.05@gmail.com') {
       print('Initial route set to /deviceinfo');
       return '/deviceinfo';
+    } else if (adminEmails.contains(email?.trim().toLowerCase())) {
+      print('Initial route set to /admin');
+      return '/admin';
     } else {
       print('Initial route set to /devicelist');
       return '/devicelist';
@@ -481,7 +474,7 @@ void main() async {
     print('Could not configure Amplify: $e');
   }
 
-  // Manage subscriptions for both ammonia and GPS
+  // Manage subscriptions for both anomaly and GPS
   await manageNotificationSubscription();
 
   // Listen for FCM token refreshes and update subscriptions
