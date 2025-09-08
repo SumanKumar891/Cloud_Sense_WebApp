@@ -979,16 +979,28 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0F1115) : const Color.fromARGB(255, 158, 211, 212);
+
+    // 🔹 Use gradient colors instead of a flat bg color
+    final bg = isDark
+        ? [
+            const Color.fromARGB(255, 4, 36, 49),
+            const Color.fromARGB(255, 2, 54, 76),
+          ]
+        : [
+            const Color.fromARGB(255, 191, 242, 237),
+            const Color.fromARGB(255, 79, 106, 112),
+          ];
+
     final card = isDark ? const Color(0xFF161A22) : Colors.white;
     final subtle = isDark ? Colors.white70 : Colors.black54;
     final strong = isDark ? Colors.white : Colors.black;
 
+
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: bg.first,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: bg,
+        backgroundColor: bg.first,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: strong),
           onPressed: () => Navigator.pop(context),
@@ -1050,7 +1062,7 @@ class _AdminPageState extends State<AdminPage> {
 
           // Set layout properties based on screen size
           final int statCrossAxisCount = isMobile ? 1 : isTablet ? 2 : 4;
-          final double statChildAspectRatio = isMobile ? 3.8 : isTablet ? 3.0 : 2.4;
+          final double statChildAspectRatio = isMobile ? 4.0 : isTablet ? 3.3 : 2.9;
           final double padding = isMobile ? 12.0 : isTablet ? 16.0 : 18.0;
 
 
@@ -1220,8 +1232,9 @@ class _AdminPageState extends State<AdminPage> {
                                       (d) => Column(
                                         children: [
                                           InkWell(
-                                            hoverColor: const Color(0xFF5BAA9D).withOpacity(0.9), // 👈 Hover color
-                                            borderRadius: BorderRadius.circular(8),
+                                            hoverColor: isDark
+                                                  ? const Color(0xFF2C3E50).withOpacity(0.6) // Dark mode hover
+                                                  : const Color(0xFF5BAA9D).withOpacity(0.9), // Light mode hover
                                             onTap: () {
                                               final deviceId = d['DeviceId'] ?? "Unknown";
                                               final topic = d['Topic'] ?? "Unknown";
@@ -1341,8 +1354,9 @@ class _AdminPageState extends State<AdminPage> {
                                           (u) => Column(
                                             children: [
                                               InkWell(
-                                                hoverColor: const Color(0xFF5BAA9D).withOpacity(0.9), // 👈 Hover color
-                                                borderRadius: BorderRadius.circular(8),
+                                                hoverColor: isDark
+                                                      ? const Color(0xFF2C3E50).withOpacity(0.6) // Dark mode hover
+                                                      : const Color(0xFF5BAA9D).withOpacity(0.9), // Light mode hover
                                                 onTap: () => _showUserDevices(u["email"]!),
                                                 child: ListTile(
                                                   leading: CircleAvatar(
