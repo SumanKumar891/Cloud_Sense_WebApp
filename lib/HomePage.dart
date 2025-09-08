@@ -1661,7 +1661,7 @@ class _HomePageState extends State<HomePage> {
                                                                                     const Icon(
                                                                                       Icons.thermostat,
                                                                                       color: Colors.white,
-                                                                                      size: 18,
+                                                                                      size: 14,
                                                                                     ),
                                                                                  
                                                                                 const SizedBox(width: 4),
@@ -1669,7 +1669,7 @@ class _HomePageState extends State<HomePage> {
                                                                                           "Temperature",
                                                                                           style: const TextStyle(
                                                                                             color: Colors.white70,
-                                                                                            fontSize: 13,
+                                                                                            fontSize: 11,
                                                                                           ),
                                                                                         ), ],
                                                                                 ),
@@ -1679,7 +1679,7 @@ class _HomePageState extends State<HomePage> {
                                                                                   style: const TextStyle(
                                                                                     color: Colors.white,
                                                                                     fontWeight: FontWeight.bold,
-                                                                                    fontSize: 16,
+                                                                                    fontSize: 13,
                                                                                   ),
                                                                                 ),
                                                                               ],
