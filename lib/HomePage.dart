@@ -1507,15 +1507,28 @@ class _HomePageState extends State<HomePage> {
                                                                               borderRadius: BorderRadius.circular(8),
                                                                             ),
                                                                             child:
-                                                                                Row(
+                                                                                Column(
                                                                               mainAxisAlignment: MainAxisAlignment.center,
                                                                               children: [
-                                                                                const Icon(
-                                                                                  Icons.thermostat,
-                                                                                  color: Colors.white,
-                                                                                  size: 18,
-                                                                                ),
+                                                                                Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    const Icon(
+                                                                                      Icons.thermostat,
+                                                                                      color: Colors.white,
+                                                                                      size: 18,
+                                                                                    ),
+                                                                                 
                                                                                 const SizedBox(width: 4),
+                                                                                Text(
+                                                                                          "Temperature",
+                                                                                          style: const TextStyle(
+                                                                                            color: Colors.white70,
+                                                                                            fontSize: 13,
+                                                                                          ),
+                                                                                        ), ],
+                                                                                ),
+                                                                                  const SizedBox(height: 4),
                                                                                 Text(
                                                                                   "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
                                                                                   style: const TextStyle(
@@ -1631,44 +1644,47 @@ class _HomePageState extends State<HomePage> {
                                                                       selectedDevice?[
                                                                           "CurrentTemperature"]))
                                                                     Container(
-                                                                      padding:
-                                                                          const EdgeInsets
-                                                                              .all(
-                                                                              4),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Colors
-                                                                            .redAccent
-                                                                            .withOpacity(0.3),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(8),
-                                                                      ),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          const Icon(
-                                                                            Icons.thermostat,
-                                                                            color:
-                                                                                Colors.white,
-                                                                            size:
-                                                                                18,
-                                                                          ),
-                                                                          const SizedBox(
-                                                                              width: 4),
-                                                                          Text(
-                                                                            "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 14,
+                                                                            padding:
+                                                                                const EdgeInsets.all(4),
+                                                                            decoration:
+                                                                                BoxDecoration(
+                                                                              color: Colors.redAccent.withOpacity(0.3),
+                                                                              borderRadius: BorderRadius.circular(8),
+                                                                            ),
+                                                                            child:
+                                                                                Column(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    const Icon(
+                                                                                      Icons.thermostat,
+                                                                                      color: Colors.white,
+                                                                                      size: 18,
+                                                                                    ),
+                                                                                 
+                                                                                const SizedBox(width: 4),
+                                                                                Text(
+                                                                                          "Temperature",
+                                                                                          style: const TextStyle(
+                                                                                            color: Colors.white70,
+                                                                                            fontSize: 13,
+                                                                                          ),
+                                                                                        ), ],
+                                                                                ),
+                                                                                  const SizedBox(height: 4),
+                                                                                Text(
+                                                                                  "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
+                                                                                  style: const TextStyle(
+                                                                                    color: Colors.white,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontSize: 16,
+                                                                                  ),
+                                                                                ),
+                                                                              ],
                                                                             ),
                                                                           ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
                                                                   ...(selectedDevice ??
                                                                           {})
                                                                       .entries
