@@ -586,40 +586,6 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-  Widget _infoRow(String key, dynamic formatted) {
-    final unit = _getUnitForKey(key);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(_getIconForKey(key), color: Colors.white70, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            "$key:",
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              unit.isNotEmpty ? "$formatted $unit" : formatted,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   IconData _getIconForKey(String key) {
     key = key.toLowerCase();
@@ -678,6 +644,18 @@ class _HomePageState extends State<HomePage> {
 
   TextStyle _dirStyle() =>
       const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+
+String _getNameForKey(String paramName) {
+
+  String result = paramName.replaceAllMapped(
+    RegExp(r'([a-z])([A-Z])'),
+    (match) => '${match.group(1)} ${match.group(2)}',
+  );
+
+  return result[0].toUpperCase() + result.substring(1);
+}
+
+
 
   String _getUnitForKey(String paramName) {
     if (paramName.contains('Rainfall')) return 'mm';
@@ -1579,7 +1557,7 @@ class _HomePageState extends State<HomePage> {
                                                                                         ),
                                                                                         const SizedBox(width: 4),
                                                                                         Text(
-                                                                                          e.key,
+                                                                                           "${_getNameForKey(e.key)}",
                                                                                           style: const TextStyle(
                                                                                             color: Colors.white70,
                                                                                             fontSize: 13,
@@ -1732,7 +1710,7 @@ class _HomePageState extends State<HomePage> {
                                                                                   ),
                                                                                   const SizedBox(width: 4),
                                                                                   Text(
-                                                                                    e.key,
+                                                                                   "${_getNameForKey(e.key)}",
                                                                                     style: const TextStyle(
                                                                                       color: Colors.white70,
                                                                                       fontSize: 11,
