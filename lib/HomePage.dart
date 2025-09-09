@@ -586,7 +586,6 @@ class _HomePageState extends State<HomePage> {
     return false;
   }
 
-
   IconData _getIconForKey(String key) {
     key = key.toLowerCase();
 
@@ -645,21 +644,17 @@ class _HomePageState extends State<HomePage> {
   TextStyle _dirStyle() =>
       const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 
-String _getNameForKey(String paramName) {
+  String _getNameForKey(String paramName) {
+    if (paramName.startsWith("Current")) {
+      paramName = paramName.replaceFirst("Current", "");
+    }
+    String result = paramName.replaceAllMapped(
+      RegExp(r'([a-z])([A-Z])'),
+      (match) => '${match.group(1)} ${match.group(2)}',
+    );
 
-  if (paramName.startsWith("Current")) {
-    paramName = paramName.replaceFirst("Current", "");
+    return result[0].toUpperCase() + result.substring(1);
   }
-  String result = paramName.replaceAllMapped(
-    RegExp(r'([a-z])([A-Z])'),
-    (match) => '${match.group(1)} ${match.group(2)}',
-  );
-
-  return result[0].toUpperCase() + result.substring(1);
-}
-
-
-
 
   String _getUnitForKey(String paramName) {
     if (paramName.contains('Rainfall')) return 'mm';
@@ -732,6 +727,10 @@ String _getNameForKey(String paramName) {
         key: _scaffoldKey,
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          elevation: 0, // remove shadow
+          scrolledUnderElevation:
+              0, // NEW: disables the lighter overlay effect when scrolled
+          surfaceTintColor: Colors.transparent, // prevents automatic tint
           iconTheme: IconThemeData(
             color: isDarkMode ? Colors.white : Colors.black,
           ),
@@ -1500,17 +1499,17 @@ String _getNameForKey(String paramName) {
                                                                                       color: Colors.white,
                                                                                       size: 18,
                                                                                     ),
-                                                                                 
-                                                                                const SizedBox(width: 4),
-                                                                                Text(
-                                                                                          "Temperature",
-                                                                                          style: const TextStyle(
-                                                                                            color: Colors.white70,
-                                                                                            fontSize: 13,
-                                                                                          ),
-                                                                                        ), ],
+                                                                                    const SizedBox(width: 4),
+                                                                                    Text(
+                                                                                      "Temperature",
+                                                                                      style: const TextStyle(
+                                                                                        color: Colors.white70,
+                                                                                        fontSize: 13,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
-                                                                                  const SizedBox(height: 4),
+                                                                                const SizedBox(height: 4),
                                                                                 Text(
                                                                                   "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
                                                                                   style: const TextStyle(
@@ -1561,7 +1560,7 @@ String _getNameForKey(String paramName) {
                                                                                         ),
                                                                                         const SizedBox(width: 4),
                                                                                         Text(
-                                                                                           "${_getNameForKey(e.key)}",
+                                                                                          "${_getNameForKey(e.key)}",
                                                                                           style: const TextStyle(
                                                                                             color: Colors.white70,
                                                                                             fontSize: 13,
@@ -1626,47 +1625,56 @@ String _getNameForKey(String paramName) {
                                                                       selectedDevice?[
                                                                           "CurrentTemperature"]))
                                                                     Container(
-                                                                            padding:
-                                                                                const EdgeInsets.all(4),
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              color: Colors.redAccent.withOpacity(0.3),
-                                                                              borderRadius: BorderRadius.circular(8),
-                                                                            ),
-                                                                            child:
-                                                                                Column(
-                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                              children: [
-                                                                                Row(
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                                  children: [
-                                                                                    const Icon(
-                                                                                      Icons.thermostat,
-                                                                                      color: Colors.white,
-                                                                                      size: 14,
-                                                                                    ),
-                                                                                 
-                                                                                const SizedBox(width: 4),
-                                                                                Text(
-                                                                                          "Temperature",
-                                                                                          style: const TextStyle(
-                                                                                            color: Colors.white70,
-                                                                                            fontSize: 11,
-                                                                                          ),
-                                                                                        ), ],
+                                                                      padding:
+                                                                          const EdgeInsets
+                                                                              .all(
+                                                                              4),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Colors
+                                                                            .redAccent
+                                                                            .withOpacity(0.3),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(8),
+                                                                      ),
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              const Icon(
+                                                                                Icons.thermostat,
+                                                                                color: Colors.white,
+                                                                                size: 14,
+                                                                              ),
+                                                                              const SizedBox(width: 4),
+                                                                              Text(
+                                                                                "Temperature",
+                                                                                style: const TextStyle(
+                                                                                  color: Colors.white70,
+                                                                                  fontSize: 11,
                                                                                 ),
-                                                                                  const SizedBox(height: 4),
-                                                                                Text(
-                                                                                  "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
-                                                                                  style: const TextStyle(
-                                                                                    color: Colors.white,
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                    fontSize: 13,
-                                                                                  ),
-                                                                                ),
-                                                                              ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              height: 4),
+                                                                          Text(
+                                                                            "${_formatValue(selectedDevice?["CurrentTemperature"])}°C",
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              color: Colors.white,
+                                                                              fontWeight: FontWeight.bold,
+                                                                              fontSize: 13,
                                                                             ),
                                                                           ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
                                                                   ...(selectedDevice ??
                                                                           {})
                                                                       .entries
@@ -1714,7 +1722,7 @@ String _getNameForKey(String paramName) {
                                                                                   ),
                                                                                   const SizedBox(width: 4),
                                                                                   Text(
-                                                                                   "${_getNameForKey(e.key)}",
+                                                                                    "${_getNameForKey(e.key)}",
                                                                                     style: const TextStyle(
                                                                                       color: Colors.white70,
                                                                                       fontSize: 11,

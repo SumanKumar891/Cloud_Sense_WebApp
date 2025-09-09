@@ -1004,7 +1004,9 @@ class _AdminPageState extends State<AdminPage> {
     return Scaffold(
       backgroundColor: bg.first,
       appBar: AppBar(
-        elevation: 0,
+       elevation: 0, // remove shadow
+        scrolledUnderElevation: 0, // NEW: disables the lighter overlay effect when scrolled
+        surfaceTintColor: Colors.transparent, // prevents automatic tint
         backgroundColor: bg.first,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: strong),

@@ -2,8 +2,11 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:cloud_sense_webapp/HomePage.dart';
 import 'package:cloud_sense_webapp/main.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AppBarWidget extends StatefulWidget implements PreferredSizeWidget {
   const AppBarWidget({super.key});

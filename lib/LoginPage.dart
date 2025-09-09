@@ -614,6 +614,10 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        elevation: 0, // remove shadow
+        scrolledUnderElevation:
+            0, // NEW: disables the lighter overlay effect when scrolled
+        surfaceTintColor: Colors.transparent, // prevents automatic tint
         leading: IconButton(
           icon: Icon(Icons.arrow_back,
               color: isDark ? Colors.white : Colors.black, size: 28),
@@ -621,7 +625,6 @@ class _SignInSignUpScreenState extends State<SignInSignUpScreen> {
               context, '/', (Route<dynamic> route) => false),
         ),
         backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: Stack(
         children: [
