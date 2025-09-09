@@ -1,14 +1,14 @@
-import 'package:cloud_sense_webapp/appbar.dart';
-import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/Datasheet_Download.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_sense_webapp/appbar.dart';
 
-class ProductPage extends StatelessWidget {
-  const ProductPage({super.key});
+class ATRHSensorPage extends StatelessWidget {
+  const ATRHSensorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,7 @@ class ProductPage extends StatelessWidget {
                 maxHeight: 450, // 👈 PC par max 400px height
               ),
               child: Image.asset(
-                "assets/gauge.png",
+                "assets/luxpressure.png",
                 fit: BoxFit.contain,
               ).animate().fadeIn(duration: 600.ms).scale(
                     duration: 800.ms,
@@ -226,7 +226,7 @@ class ProductPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/gauge.png",
+            "assets/luxpressure.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -290,7 +290,7 @@ class ProductPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/gauge.png",
+            "assets/luxpressure.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -311,14 +311,14 @@ class ProductPage extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "Rain ",
+                text: "Temperature Humidity Light Intensity and Pressure ",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
                     color: Colors.lightBlueAccent),
               ),
               TextSpan(
-                text: "Gauge",
+                text: "Sensor ",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class ProductPage extends StatelessWidget {
           color: Colors.lightBlueAccent,
         ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
         Text(
-          "Tipping Bucket Rain Gauge",
+          "Compact environmental sensing unit for precise measurements",
           style: TextStyle(
               fontSize: bannerTextSize,
               fontWeight: FontWeight.bold,
@@ -344,11 +344,12 @@ class ProductPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BannerPoint("Measure rain via Tipping Bucket Mechanism",
+            BannerPoint("High-precision measurements with cutting-edge sensor",
                 fontSize: bannerPointSize),
-            BannerPoint("Accurate and Low Maintenance",
+            BannerPoint(
+                "Robust design for long-term reliability and minimal maintenance",
                 fontSize: bannerPointSize),
-            BannerPoint("Robust design for all weather conditions",
+            BannerPoint("Flexible model to diverse applications",
                 fontSize: bannerPointSize),
           ],
         ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
@@ -482,17 +483,22 @@ class ProductPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(BuildContext context, isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
-      "Made of ABS material, offering durability and weather resistance",
-      "Available in two diameter options: 159.5 mm and 200 mm",
-      "Collection areas: 200 cm² and 314 cm²",
-      "Resolution: 0.2 mm or 0.5 mm depending on the model",
-      "Equipped with reed switch or magnetic sensor for tip detection",
-      "Data Output: Number of tips × Resolution = Total Rainfall",
+      " Supply Voltage : 3.3 V DC",
+      "Range of Temperature : -40 to +85 °C",
+      "Range of Humidity : 0-100%",
+      "Range of Pressure : 300-1100 hPa",
+      "Range of Light Intensity: 0-140000 Lux",
+      "Communications Protocol : I2C",
+      "Temperature Accuracy : ±1°C",
+      "Humidity Accuracy:±3.0% RH",
+      "Pressure Accuracy:±1hPa",
+      "LUX Accuracy:±3%"
     ];
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
+
     final int splitIndex = (specItems.length / 2).ceil();
     final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
     final List<String> rightColumnItems = specItems.sublist(splitIndex);
@@ -570,7 +576,7 @@ class ProductPage extends StatelessWidget {
                 () {
                   DownloadManager.downloadFile(
                     context: context,
-                    sensorKey: "RainGauge",
+                    sensorKey: "ARTH",
                     fileType: "datasheet",
                   );
                 },
@@ -596,19 +602,16 @@ class ProductPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
+            featureItem("Accurate Environmental Measurements", isDarkMode),
+            featureItem("Wide measurement range", isDarkMode),
             featureItem(
-                "Balanced tipping bucket mechanism ensures high accuracy",
+                "Maintenance-free for long-term field deployment", isDarkMode),
+            featureItem("Low power consumption, suitable for remote station",
                 isDarkMode),
+            featureItem("Robust, IP66 Compact design", isDarkMode),
+            featureItem("All-weather protection", isDarkMode),
             featureItem(
-                "Minimal moving parts → long-term reliability with low maintenance",
-                isDarkMode),
-            featureItem("Reed switch / magnetic sensor for precise detection",
-                isDarkMode),
-            featureItem(
-                "Accurate even under varying rainfall intensities", isDarkMode),
-            featureItem("Durable ABS body with weather resistance", isDarkMode),
-            featureItem(
-                "Easy integration with data loggers and weather stations for automated rainfall recording",
+                "Compact & lightweight, easy to install with radiation shield",
                 isDarkMode),
           ],
         ),
@@ -630,13 +633,13 @@ class ProductPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem(
-                "Meteorological stations for rainfall monitoring", isDarkMode),
-            featureItem("Agriculture & irrigation planning", isDarkMode),
-            featureItem(
-                "Environmental monitoring & climate research", isDarkMode),
-            featureItem("Suitable for precise/general purpose rain monitoring",
+            featureItem("Agriculture and smart irrigation system", isDarkMode),
+            featureItem("Environmental monitoring", isDarkMode),
+            featureItem("Healthcare & Medical Facilities", isDarkMode),
+            featureItem("Greenhouses and Indoor Farming", isDarkMode),
+            featureItem("Industrial Process monitoring (HVAC, Food processing)",
                 isDarkMode),
+            featureItem("Safety and Security", isDarkMode),
           ],
         ),
       ),

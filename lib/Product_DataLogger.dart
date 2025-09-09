@@ -1,14 +1,14 @@
-import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/appbar.dart';
+import 'package:cloud_sense_webapp/Datasheet_Download.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cloud_sense_webapp/appbar.dart';
 
-class ATRHSensorPage extends StatelessWidget {
-  const ATRHSensorPage({super.key});
+class DataLoggerPage extends StatelessWidget {
+  const DataLoggerPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,7 @@ class ATRHSensorPage extends StatelessWidget {
                 maxHeight: 450, // 👈 PC par max 400px height
               ),
               child: Image.asset(
-                "assets/luxpressure.png",
+                "assets/dataloggerrender.png",
                 fit: BoxFit.contain,
               ).animate().fadeIn(duration: 600.ms).scale(
                     duration: 800.ms,
@@ -226,7 +226,7 @@ class ATRHSensorPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/luxpressure.png",
+            "assets/dataloggerrender.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -290,7 +290,7 @@ class ATRHSensorPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/luxpressure.png",
+            "assets/dataloggerrender.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -311,14 +311,14 @@ class ATRHSensorPage extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "Temperature Humidity Light Intensity and Pressure ",
+                text: "Data ",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
                     color: Colors.lightBlueAccent),
               ),
               TextSpan(
-                text: "Sensor ",
+                text: "Logger",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class ATRHSensorPage extends StatelessWidget {
           color: Colors.lightBlueAccent,
         ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
         Text(
-          "Compact environmental sensing unit for precise measurements",
+          "Reliable Data Logging & seamless Connectivity",
           style: TextStyle(
               fontSize: bannerTextSize,
               fontWeight: FontWeight.bold,
@@ -344,12 +344,11 @@ class ATRHSensorPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BannerPoint("High-precision measurements with cutting-edge sensor",
+            BannerPoint("4G Dual sim With multi protocol Support",
                 fontSize: bannerPointSize),
-            BannerPoint(
-                "Robust design for long-term reliability and minimal maintenance",
+            BannerPoint("Advance power management with solar charging",
                 fontSize: bannerPointSize),
-            BannerPoint("Flexible model to diverse applications",
+            BannerPoint("Robust Design with IP66 Rating.",
                 fontSize: bannerPointSize),
           ],
         ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
@@ -485,20 +484,17 @@ class ATRHSensorPage extends StatelessWidget {
   // ---------- Specifications Card ----------
   Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
-      " Supply Voltage : 3.3 V DC",
-      "Range of Temperature : -40 to +85 °C",
-      "Range of Humidity : 0-100%",
-      "Range of Pressure : 300-1100 hPa",
-      "Range of Light Intensity: 0-140000 Lux",
-      "Communications Protocol : I2C",
-      "Temperature Accuracy : ±1°C",
-      "Humidity Accuracy:±3.0% RH",
-      "Pressure Accuracy:±1hPa",
-      "LUX Accuracy:±3%"
+      "Input Supply voltage: 5V - 16",
+      "Communication interfaces: ADC, UART, I2C, SPI, RS232, RS485",
+      "Data Support: HTTP, HTTPS, MQTT, FTP",
+      "Flexible Power input options : USB Type C or LiIon Battery",
+      "Support SD card",
+      "Built in LTE and GPS Antennas",
+      "Inbuild Real Time clock",
+      "Ultra low power sleep mode",
     ];
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
-
     final int splitIndex = (specItems.length / 2).ceil();
     final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
     final List<String> rightColumnItems = specItems.sublist(splitIndex);
@@ -576,7 +572,7 @@ class ATRHSensorPage extends StatelessWidget {
                 () {
                   DownloadManager.downloadFile(
                     context: context,
-                    sensorKey: "ARTH",
+                    sensorKey: "DataLogger",
                     fileType: "datasheet",
                   );
                 },
@@ -602,16 +598,13 @@ class ATRHSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Accurate Environmental Measurements", isDarkMode),
-            featureItem("Wide measurement range", isDarkMode),
+            featureItem("4G Dual sim connectivity", isDarkMode),
+            featureItem("25-30 Days Data Backup", isDarkMode),
             featureItem(
-                "Maintenance-free for long-term field deployment", isDarkMode),
-            featureItem("Low power consumption, suitable for remote station",
+                "Support Multi protocol communication Interfaces", isDarkMode),
+            featureItem("Robust IP66 Enclosure for harsh weather condition",
                 isDarkMode),
-            featureItem("Robust, IP66 Compact design", isDarkMode),
-            featureItem("All-weather protection", isDarkMode),
-            featureItem(
-                "Compact & lightweight, easy to install with radiation shield",
+            featureItem("Solar and Battery Powered option for remote site.",
                 isDarkMode),
           ],
         ),
@@ -633,13 +626,12 @@ class ATRHSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Agriculture and smart irrigation system", isDarkMode),
-            featureItem("Environmental monitoring", isDarkMode),
-            featureItem("Healthcare & Medical Facilities", isDarkMode),
-            featureItem("Greenhouses and Indoor Farming", isDarkMode),
-            featureItem("Industrial Process monitoring (HVAC, Food processing)",
-                isDarkMode),
-            featureItem("Safety and Security", isDarkMode),
+            featureItem("Remote weather monitoring stations", isDarkMode),
+            featureItem(
+                "Smart agriculture and irrigation management", isDarkMode),
+            featureItem("Industrial and environmental monitoring", isDarkMode),
+            featureItem("Smart cities and IoT projects", isDarkMode),
+            featureItem("Cold storage management", isDarkMode),
           ],
         ),
       ),

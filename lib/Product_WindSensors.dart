@@ -1,5 +1,5 @@
 import 'package:cloud_sense_webapp/appbar.dart';
-import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/Datasheet_Download.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class GatewayPage extends StatelessWidget {
-  const GatewayPage({super.key});
+class UltrasonicSensorPage extends StatelessWidget {
+  const UltrasonicSensorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,7 @@ class GatewayPage extends StatelessWidget {
                 maxHeight: 450, // 👈 PC par max 400px height
               ),
               child: Image.asset(
-                "assets/blegateway.png",
+                "assets/ultrasonic.png",
                 fit: BoxFit.contain,
               ).animate().fadeIn(duration: 600.ms).scale(
                     duration: 800.ms,
@@ -201,6 +201,17 @@ class GatewayPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
                     const SizedBox(height: 8),
                     _buildHeroText(
                         headlineSize, bannerTextSize, bannerPointSize, context),
@@ -215,7 +226,7 @@ class GatewayPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/blegateway.png",
+            "assets/ultrasonic.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -254,6 +265,17 @@ class GatewayPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // IconButton(
+                    //   icon: const Icon(Icons.arrow_back,
+                    //       color: Colors.white, size: 22),
+                    //   onPressed: () {
+                    //     if (Navigator.of(context).canPop()) {
+                    //       Navigator.of(context).pop();
+                    //     } else {
+                    //       Navigator.of(context).pushReplacementNamed("/");
+                    //     }
+                    //   },
+                    // ).animate().fadeIn(duration: 500.ms),
                     const SizedBox(height: 8),
                     _buildHeroText(
                         headlineSize, bannerTextSize, bannerPointSize, context),
@@ -268,7 +290,7 @@ class GatewayPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/blegateway.png",
+            "assets/ultrasonic.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -289,14 +311,14 @@ class GatewayPage extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "BLE ",
+                text: "Ultrasonic ",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
                     color: Colors.lightBlueAccent),
               ),
               TextSpan(
-                text: "Gateway",
+                text: "Anemometer",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
@@ -312,7 +334,7 @@ class GatewayPage extends StatelessWidget {
           color: Colors.lightBlueAccent,
         ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
         Text(
-          "BLE Gateway For industrial IoT Applications",
+          "Ultrasonic Anemometer for precise wind speed and wind direction",
           style: TextStyle(
               fontSize: bannerTextSize,
               fontWeight: FontWeight.bold,
@@ -322,12 +344,10 @@ class GatewayPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BannerPoint("Multi-Industry IoT Gateway Solution",
+            BannerPoint("Accurate wind monitoring", fontSize: bannerPointSize),
+            BannerPoint("Real time speed and direction measurement",
                 fontSize: bannerPointSize),
-            BannerPoint("Real-Time Data Aggregation",
-                fontSize: bannerPointSize),
-            BannerPoint("Scalable Gateway for 100+ nodes",
-                fontSize: bannerPointSize),
+            BannerPoint("Robust and compact design", fontSize: bannerPointSize),
           ],
         ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
         const SizedBox(height: 20),
@@ -462,15 +482,12 @@ class GatewayPage extends StatelessWidget {
   // ---------- Specifications Card ----------
   Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
-      "Input Voltage Range : 5 - 30 v",
-      "On board led indications for networking , cloud and BLE connectivity.",
-      "On board flash memory, sd card slot, MIC , sim card, gsm and BLE Antenna.",
-      "Support Multiple Communications protocol such as SPI,I2C,I2S,UART etc.",
-      "Integrated with both battery and solar panel.",
-      "Processor : Dual- Core Arm Cortex-M33.",
-      "Controller used is nrf5340.",
-      "Bluetooth version: BLE 5.4",
-      "512KB RAM +1MB Flash",
+      "Input Supply voltage: 2V - 16V",
+      "Measure wind speed and wind direction via Δ ToF",
+      "Communication protocols: RS232 or RS485 (Modbus)",
+      "Ultra low power sleep mode",
+      "Weight : 0.6kg",
+      "Heating option (-40℃ to +70℃)",
     ];
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
@@ -542,7 +559,7 @@ class GatewayPage extends StatelessWidget {
                 () {
                   DownloadManager.downloadFile(
                     context: context,
-                    sensorKey: "Gateway",
+                    sensorKey: "WindSensor",
                     fileType: "datasheet",
                   );
                 },
@@ -569,13 +586,13 @@ class GatewayPage extends StatelessWidget {
                 )),
             const SizedBox(height: 10),
             featureItem(
-                "Real Time Monitoring with low power consumptions", isDarkMode),
-            featureItem("FOTA (Firmware Over the Air)", isDarkMode),
-            featureItem("100+ Node Connected at a time", isDarkMode),
+                "High Quality measurement up to 60m/s (216km/h)", isDarkMode),
+            featureItem("High accuracy with fast response time", isDarkMode),
+            featureItem("0°-360° wind direction coverage with 1° resolution",
+                isDarkMode),
             featureItem(
-                "BLE Range up to 1km at line of sight (LOS)", isDarkMode),
-            featureItem("IP66 & Compact design", isDarkMode),
-            featureItem("Connectivity option: 4G, WIFI, LAN", isDarkMode),
+                "Low Maintenance, ensuring low cost of ownership", isDarkMode),
+            featureItem("Robust design for all weather conditions", isDarkMode),
           ],
         ),
       ),
@@ -596,12 +613,10 @@ class GatewayPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Smart Agriculture & Precision farming", isDarkMode),
-            featureItem("Logistics and asset tracking", isDarkMode),
-            featureItem(
-                "Industrial equipment and health monitoring", isDarkMode),
-            featureItem("Healthcare wearable data collections", isDarkMode),
-            featureItem("Home Automations and energy management", isDarkMode),
+            featureItem("Weather monitoring stations", isDarkMode),
+            featureItem("Smart agriculture and precision farming", isDarkMode),
+            featureItem("Ports and harbours", isDarkMode),
+            featureItem("Runways and helipads", isDarkMode),
           ],
         ),
       ),

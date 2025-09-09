@@ -1,14 +1,14 @@
-import 'package:cloud_sense_webapp/appbar.dart';
-import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/Datasheet_Download.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_sense_webapp/appbar.dart';
 
-class DataLoggerPage extends StatelessWidget {
-  const DataLoggerPage({super.key});
+class ProbePage extends StatelessWidget {
+  const ProbePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -130,9 +130,9 @@ class DataLoggerPage extends StatelessWidget {
     BuildContext context,
   ) {
     return Container(
-      color: const Color.fromARGB(
-          255, 78, 127, 133), // background same as you want
-      padding: const EdgeInsets.symmetric(horizontal: 92, vertical: 24),
+      color:
+          const Color.fromARGB(255, 28, 59, 75), // background same as you want
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -160,7 +160,7 @@ class DataLoggerPage extends StatelessWidget {
                 maxHeight: 450, // 👈 PC par max 400px height
               ),
               child: Image.asset(
-                "assets/dataloggerrender.png",
+                "assets/thprobe.png",
                 fit: BoxFit.contain,
               ).animate().fadeIn(duration: 600.ms).scale(
                     duration: 800.ms,
@@ -180,7 +180,7 @@ class DataLoggerPage extends StatelessWidget {
         // Text section with grey background and overlay
         Container(
           width: double.infinity,
-          color: const Color.fromARGB(255, 78, 127, 133),
+          color: Colors.blueGrey.shade600, // text background
           child: Stack(
             children: [
               // Overlay
@@ -226,7 +226,7 @@ class DataLoggerPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/dataloggerrender.png",
+            "assets/thprobe.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -244,7 +244,7 @@ class DataLoggerPage extends StatelessWidget {
         // Text section with grey background and overlay
         Container(
           width: double.infinity,
-          color: const Color.fromARGB(255, 78, 127, 133),
+          color: Colors.grey.shade600, // text background
           child: Stack(
             children: [
               // Overlay
@@ -290,7 +290,7 @@ class DataLoggerPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/dataloggerrender.png",
+            "assets/thprobe.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -311,14 +311,14 @@ class DataLoggerPage extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "Data ",
+                text: "Temperature and Humidity ",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
                     color: Colors.lightBlueAccent),
               ),
               TextSpan(
-                text: "Logger",
+                text: "Probe",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class DataLoggerPage extends StatelessWidget {
           color: Colors.lightBlueAccent,
         ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
         Text(
-          "Reliable Data Logging & seamless Connectivity",
+          "Accurate measurements for temperature and humidity",
           style: TextStyle(
               fontSize: bannerTextSize,
               fontWeight: FontWeight.bold,
@@ -344,11 +344,14 @@ class DataLoggerPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BannerPoint("4G Dual sim With multi protocol Support",
+            BannerPoint(
+                "Real-time temperature & humidity sensing for critical applications",
                 fontSize: bannerPointSize),
-            BannerPoint("Advance power management with solar charging",
+            BannerPoint(
+                "Provides both analog (0-1000)mV and digital (RS485) output",
                 fontSize: bannerPointSize),
-            BannerPoint("Robust Design with IP66 Rating.",
+            BannerPoint(
+                "Reliable Industrial grade monitoring with CRC validated communications",
                 fontSize: bannerPointSize),
           ],
         ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
@@ -419,7 +422,7 @@ class DataLoggerPage extends StatelessWidget {
     );
   }
 
-  // ---------- iPad Layout for Card Alignment ----------
+  // ---------- iPad/Desktop Layout for Cards ----------
   Widget _buildIpadLayout(bool isDarkMode) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -432,72 +435,31 @@ class DataLoggerPage extends StatelessWidget {
             .slideX(begin: 0.3)
             .fadeIn();
 
-        // Get the height of both cards
-        final featuresKey = GlobalKey();
-        final applicationsKey = GlobalKey();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final featuresBox =
-              featuresKey.currentContext?.findRenderObject() as RenderBox?;
-          final applicationsBox =
-              applicationsKey.currentContext?.findRenderObject() as RenderBox?;
-          if (featuresBox != null && applicationsBox != null) {
-            final featuresHeight = featuresBox.size.height;
-            final applicationsHeight = applicationsBox.size.height;
-            if (featuresHeight != applicationsHeight) {
-              // If heights differ, adjust the smaller card to be centered
-              final maxHeight = featuresHeight > applicationsHeight
-                  ? featuresHeight
-                  : applicationsHeight;
-              featuresBox.size = Size(featuresBox.size.width, maxHeight);
-              applicationsBox.size =
-                  Size(applicationsBox.size.width, maxHeight);
-            }
-          }
-        });
-
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Center(
-                child: SizedBox(
-                  key: featuresKey,
-                  child: featuresCard,
-                ),
-              ),
-            ),
+            Expanded(child: featuresCard),
             const SizedBox(width: 16),
-            Expanded(
-              child: Center(
-                child: SizedBox(
-                  key: applicationsKey,
-                  child: applicationsCard,
-                ),
-              ),
-            ),
+            Expanded(child: applicationsCard),
           ],
         );
       },
     );
   }
 
-  // ---------- Specifications Card ----------
+  // ---------- Other cards & buttons remain same ----------
   Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
     final List<String> specItems = [
-      "Input Supply voltage: 5V - 16",
-      "Communication interfaces: ADC, UART, I2C, SPI, RS232, RS485",
-      "Data Support: HTTP, HTTPS, MQTT, FTP",
-      "Flexible Power input options : USB Type C or LiIon Battery",
-      "Support SD card",
-      "Built in LTE and GPS Antennas",
-      "Inbuild Real Time clock",
-      "Ultra low power sleep mode",
+      "Supply Voltage : 5-12 V DC",
+      "Range of Temperature : -40 to +60 °C",
+      "Range of Humidity : 0-100%",
+      "Communications Protocol : RS485 & 0-1V (ADC)",
+      "Temperature Accuracy : ±0.1°C",
+      "Humidity Accuracy: ±1.0% RH",
     ];
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
-    final int splitIndex = (specItems.length / 2).ceil();
-    final List<String> leftColumnItems = specItems.sublist(0, splitIndex);
-    final List<String> rightColumnItems = specItems.sublist(splitIndex);
 
     return HoverCard(
       child: Padding(
@@ -507,24 +469,15 @@ class DataLoggerPage extends StatelessWidget {
               ? CrossAxisAlignment.center
               : CrossAxisAlignment.start,
           children: [
-            Text(
-              "Specifications",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.blue.shade800,
-              ),
-            ),
-
+            Text("Specifications",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 20),
-            // Use a LayoutBuilder to determine screen width and adjust layout
             LayoutBuilder(
               builder: (context, constraints) {
-                // final screenWidth = MediaQuery.of(context).size.width;
-                // final isWideScreen = screenWidth > 800;
-
                 if (isWideScreen) {
-                  // Two-column layout for wide screens
                   final int splitIndex = (specItems.length / 2).ceil();
                   final List<String> leftColumnItems =
                       specItems.sublist(0, splitIndex);
@@ -554,7 +507,6 @@ class DataLoggerPage extends StatelessWidget {
                     ],
                   );
                 } else {
-                  // Single-column layout for mobile
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: specItems
@@ -566,17 +518,12 @@ class DataLoggerPage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             Center(
-              child: _buildBannerButton(
-                "Download Datasheet",
-                Colors.teal,
-                () {
-                  DownloadManager.downloadFile(
+              child: _buildBannerButton("Download Datasheet", Colors.teal, () {
+                DownloadManager.downloadFile(
                     context: context,
-                    sensorKey: "DataLogger",
-                    fileType: "datasheet",
-                  );
-                },
-              ),
+                    sensorKey: "TempHumidityProbe",
+                    fileType: "datasheet");
+              }),
             ),
           ],
         ),
@@ -593,19 +540,23 @@ class DataLoggerPage extends StatelessWidget {
           children: [
             Text("Key Features",
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 10),
-            featureItem("4G Dual sim connectivity", isDarkMode),
-            featureItem("25-30 Days Data Backup", isDarkMode),
+            featureItem("High precision temperature and humidity sensing probe",
+                isDarkMode),
             featureItem(
-                "Support Multi protocol communication Interfaces", isDarkMode),
-            featureItem("Robust IP66 Enclosure for harsh weather condition",
+                "Compact low power design suitable for iot and embedded applications",
                 isDarkMode),
-            featureItem("Solar and Battery Powered option for remote site.",
+            featureItem(
+                "Robust RS485/MODBUS RTU communications for industrial use",
                 isDarkMode),
+            featureItem(
+                "CRC validations provide reliable and error free data transfer",
+                isDarkMode),
+            featureItem(
+                "Output provides both analog and digital value", isDarkMode),
           ],
         ),
       ),
@@ -621,17 +572,15 @@ class DataLoggerPage extends StatelessWidget {
           children: [
             Text("Applications",
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.blue.shade800,
-                )),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.blue.shade800)),
             const SizedBox(height: 10),
-            featureItem("Remote weather monitoring stations", isDarkMode),
-            featureItem(
-                "Smart agriculture and irrigation management", isDarkMode),
-            featureItem("Industrial and environmental monitoring", isDarkMode),
-            featureItem("Smart cities and IoT projects", isDarkMode),
-            featureItem("Cold storage management", isDarkMode),
+            featureItem("Healthcare and Medical Facilities", isDarkMode),
+            featureItem("Agriculture and Farming", isDarkMode),
+            featureItem("Cold Storage and Warehouse", isDarkMode),
+            featureItem("Food and Beverage Industry", isDarkMode),
+            featureItem("Transportation and Logistics", isDarkMode),
           ],
         ),
       ),
@@ -651,26 +600,21 @@ class DataLoggerPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: color,
               padding: EdgeInsets.symmetric(
-                horizontal: isWideScreen ? 20 : 12,
-                vertical: isWideScreen ? 14 : 10,
-              ),
+                  horizontal: isWideScreen ? 20 : 12,
+                  vertical: isWideScreen ? 14 : 10),
               minimumSize: Size(isWideScreen ? 160 : 100, 40),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
+                  borderRadius: BorderRadius.circular(6)),
               elevation: 4,
             ),
             onPressed: onPressed,
-            icon:
-                const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-            label: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: isWideScreen ? 15 : 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            // icon:
+            //     const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
+            label: Text(label,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isWideScreen ? 15 : 12,
+                    fontWeight: FontWeight.w600)),
           ).animate(onPlay: (controller) => controller.repeat(reverse: true))
             ..scale(
                 begin: const Offset(1, 1),
@@ -691,20 +635,17 @@ class DataLoggerPage extends StatelessWidget {
               color: isDarkMode ? Colors.tealAccent : Colors.teal, size: 20),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 15,
-                color: isDarkMode ? Colors.white : Colors.black87,
-              ),
-            ),
-          ),
+              child: Text(text,
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: isDarkMode ? Colors.white : Colors.black87))),
         ],
       ).animate().fadeIn(duration: 400.ms),
     );
   }
 }
 
+// ---------- HoverCard ----------
 class HoverCard extends StatefulWidget {
   final Widget child;
   const HoverCard({super.key, required this.child});
@@ -748,17 +689,14 @@ class _HoverCardState extends State<HoverCard> {
   }
 }
 
+// ---------- Banner Point ----------
 class BannerPoint extends StatelessWidget {
   final String text;
-  final double? fontSize;
-  const BannerPoint(this.text, {super.key, this.fontSize});
+  final double fontSize;
+  const BannerPoint(this.text, {super.key, required this.fontSize});
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWideScreen = screenWidth > 1024;
-    final effectiveFontSize = fontSize ?? (isWideScreen ? 16 : 13);
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -769,11 +707,10 @@ class BannerPoint extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white,
-                fontSize: effectiveFontSize,
-                fontWeight: FontWeight.w500,
-                height: 1.4,
-              ),
+                  color: Colors.white,
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w500,
+                  height: 1.4),
             ),
           ),
         ],

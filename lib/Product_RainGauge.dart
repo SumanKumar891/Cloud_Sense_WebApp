@@ -1,5 +1,5 @@
 import 'package:cloud_sense_webapp/appbar.dart';
-import 'package:cloud_sense_webapp/download.dart';
+import 'package:cloud_sense_webapp/Datasheet_Download.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
 import 'package:cloud_sense_webapp/footer.dart';
 import 'package:flutter/foundation.dart';
@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class UltrasonicSensorPage extends StatelessWidget {
-  const UltrasonicSensorPage({super.key});
+class ProductPage extends StatelessWidget {
+  const ProductPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                 maxHeight: 450, // 👈 PC par max 400px height
               ),
               child: Image.asset(
-                "assets/ultrasonic.png",
+                "assets/gauge.png",
                 fit: BoxFit.contain,
               ).animate().fadeIn(duration: 600.ms).scale(
                     duration: 800.ms,
@@ -226,7 +226,7 @@ class UltrasonicSensorPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/ultrasonic.png",
+            "assets/gauge.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -290,7 +290,7 @@ class UltrasonicSensorPage extends StatelessWidget {
         Container(
           height: heroHeight * 0.6,
           child: Image.asset(
-            "assets/ultrasonic.png",
+            "assets/gauge.png",
             fit: BoxFit.contain,
           ).animate().fadeIn(duration: 600.ms).scale(
                 duration: 800.ms,
@@ -311,14 +311,14 @@ class UltrasonicSensorPage extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "Ultrasonic ",
+                text: "Rain ",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
                     color: Colors.lightBlueAccent),
               ),
               TextSpan(
-                text: "Anemometer",
+                text: "Gauge",
                 style: TextStyle(
                     fontSize: headlineSize,
                     fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class UltrasonicSensorPage extends StatelessWidget {
           color: Colors.lightBlueAccent,
         ).animate().scaleX(duration: 800.ms, curve: Curves.easeOut),
         Text(
-          "Ultrasonic Anemometer for precise wind speed and wind direction",
+          "Tipping Bucket Rain Gauge",
           style: TextStyle(
               fontSize: bannerTextSize,
               fontWeight: FontWeight.bold,
@@ -344,10 +344,12 @@ class UltrasonicSensorPage extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BannerPoint("Accurate wind monitoring", fontSize: bannerPointSize),
-            BannerPoint("Real time speed and direction measurement",
+            BannerPoint("Measure rain via Tipping Bucket Mechanism",
                 fontSize: bannerPointSize),
-            BannerPoint("Robust and compact design", fontSize: bannerPointSize),
+            BannerPoint("Accurate and Low Maintenance",
+                fontSize: bannerPointSize),
+            BannerPoint("Robust design for all weather conditions",
+                fontSize: bannerPointSize),
           ],
         ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
         const SizedBox(height: 20),
@@ -480,14 +482,14 @@ class UltrasonicSensorPage extends StatelessWidget {
   }
 
   // ---------- Specifications Card ----------
-  Widget _buildSpecificationsCard(BuildContext context, bool isDarkMode) {
+  Widget _buildSpecificationsCard(BuildContext context, isDarkMode) {
     final List<String> specItems = [
-      "Input Supply voltage: 2V - 16V",
-      "Measure wind speed and wind direction via Δ ToF",
-      "Communication protocols: RS232 or RS485 (Modbus)",
-      "Ultra low power sleep mode",
-      "Weight : 0.6kg",
-      "Heating option (-40℃ to +70℃)",
+      "Made of ABS material, offering durability and weather resistance",
+      "Available in two diameter options: 159.5 mm and 200 mm",
+      "Collection areas: 200 cm² and 314 cm²",
+      "Resolution: 0.2 mm or 0.5 mm depending on the model",
+      "Equipped with reed switch or magnetic sensor for tip detection",
+      "Data Output: Number of tips × Resolution = Total Rainfall",
     ];
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth > 800;
@@ -516,8 +518,17 @@ class UltrasonicSensorPage extends StatelessWidget {
             // Use a LayoutBuilder to determine screen width and adjust layout
             LayoutBuilder(
               builder: (context, constraints) {
+                // final screenWidth = MediaQuery.of(context).size.width;
+                // final isWideScreen = screenWidth > 800;
+
                 if (isWideScreen) {
                   // Two-column layout for wide screens
+                  final int splitIndex = (specItems.length / 2).ceil();
+                  final List<String> leftColumnItems =
+                      specItems.sublist(0, splitIndex);
+                  final List<String> rightColumnItems =
+                      specItems.sublist(splitIndex);
+
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -559,7 +570,7 @@ class UltrasonicSensorPage extends StatelessWidget {
                 () {
                   DownloadManager.downloadFile(
                     context: context,
-                    sensorKey: "WindSensor",
+                    sensorKey: "RainGauge",
                     fileType: "datasheet",
                   );
                 },
@@ -586,13 +597,19 @@ class UltrasonicSensorPage extends StatelessWidget {
                 )),
             const SizedBox(height: 10),
             featureItem(
-                "High Quality measurement up to 60m/s (216km/h)", isDarkMode),
-            featureItem("High accuracy with fast response time", isDarkMode),
-            featureItem("0°-360° wind direction coverage with 1° resolution",
+                "Balanced tipping bucket mechanism ensures high accuracy",
                 isDarkMode),
             featureItem(
-                "Low Maintenance, ensuring low cost of ownership", isDarkMode),
-            featureItem("Robust design for all weather conditions", isDarkMode),
+                "Minimal moving parts → long-term reliability with low maintenance",
+                isDarkMode),
+            featureItem("Reed switch / magnetic sensor for precise detection",
+                isDarkMode),
+            featureItem(
+                "Accurate even under varying rainfall intensities", isDarkMode),
+            featureItem("Durable ABS body with weather resistance", isDarkMode),
+            featureItem(
+                "Easy integration with data loggers and weather stations for automated rainfall recording",
+                isDarkMode),
           ],
         ),
       ),
@@ -613,10 +630,13 @@ class UltrasonicSensorPage extends StatelessWidget {
                   color: isDarkMode ? Colors.white : Colors.blue.shade800,
                 )),
             const SizedBox(height: 10),
-            featureItem("Weather monitoring stations", isDarkMode),
-            featureItem("Smart agriculture and precision farming", isDarkMode),
-            featureItem("Ports and harbours", isDarkMode),
-            featureItem("Runways and helipads", isDarkMode),
+            featureItem(
+                "Meteorological stations for rainfall monitoring", isDarkMode),
+            featureItem("Agriculture & irrigation planning", isDarkMode),
+            featureItem(
+                "Environmental monitoring & climate research", isDarkMode),
+            featureItem("Suitable for precise/general purpose rain monitoring",
+                isDarkMode),
           ],
         ),
       ),
