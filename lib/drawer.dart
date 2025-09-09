@@ -44,7 +44,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                         userProvider.userEmail ?? 'Guest User',
                         style: TextStyle(
                           color: isDarkMode ? Colors.white : Colors.black87,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -69,9 +69,11 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               ListTile(
                 leading: const Icon(Icons.devices),
                 title: const Text('My Devices'),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/devicelist');
+                  await Future.delayed(const Duration(milliseconds: 200));
+                  Navigator.of(context, rootNavigator: true)
+                      .pushNamed('/devicelist');
                 },
               ),
               if (userProvider.userEmail?.trim().toLowerCase() !=
@@ -79,9 +81,11 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                 ListTile(
                   leading: const Icon(Icons.account_circle),
                   title: const Text('Account Info'),
-                  onTap: () {
+                  onTap: () async {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/accountinfo');
+                    await Future.delayed(const Duration(milliseconds: 200));
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed('/accountinfo');
                   },
                 ),
               ListTile(
@@ -90,13 +94,14 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                     : Icons.dark_mode),
                 title: const Text('Theme'),
                 onTap: () {
+                  // theme toggling doesn't need delayed root navigation
                   themeProvider.toggleTheme();
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.share),
                 title: const Text('Share'),
-                onTap: () {
+                onTap: () async {
                   Share.share(
                     'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
                     subject: 'Download Our App',
@@ -107,9 +112,15 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               ListTile(
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
-                onTap: () {
+                onTap: () async {
+                  // Close drawer first and wait for the close animation to finish (important on mobile)
                   Navigator.pop(context);
-                  _handleLogout(context);
+                  await Future.delayed(const Duration(milliseconds: 250));
+
+                  // Use root navigator context for logout to ensure top-level navigation
+                  final rootCtx =
+                      Navigator.of(context, rootNavigator: true).context;
+                  await _handleLogout(rootCtx);
                 },
               ),
               const Divider(),
@@ -156,7 +167,7 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
               ListTile(
                 leading: const Icon(Icons.share),
                 title: const Text('Share'),
-                onTap: () {
+                onTap: () async {
                   Share.share(
                     'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
                     subject: 'Download Our App',
@@ -192,9 +203,11 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                     'Temperature and Humidity\nProbe',
                     style: TextStyle(fontSize: 12),
                   ),
-                  onTap: () {
+                  onTap: () async {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/probe');
+                    await Future.delayed(const Duration(milliseconds: 200));
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed('/probe');
                   },
                 ),
                 ListTile(
@@ -203,9 +216,11 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
                     'Temperature Humidity\nLight Intensity and\nPressure Radiation Shield',
                     style: TextStyle(fontSize: 12),
                   ),
-                  onTap: () {
+                  onTap: () async {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/atrh');
+                    await Future.delayed(const Duration(milliseconds: 200));
+                    Navigator.of(context, rootNavigator: true)
+                        .pushNamed('/atrh');
                   },
                 ),
               ],
@@ -215,33 +230,40 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
             leading: const Icon(Icons.air, size: 20),
             title: const Text('Ultrasonic Anemometer',
                 style: TextStyle(fontSize: 14)),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/windsensor');
+              await Future.delayed(const Duration(milliseconds: 200));
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed('/windsensor');
             },
           ),
           ListTile(
             leading: const Icon(Icons.water_drop, size: 20),
             title: const Text('Rain Gauge', style: TextStyle(fontSize: 14)),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/raingauge');
+              await Future.delayed(const Duration(milliseconds: 200));
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed('/raingauge');
             },
           ),
           ListTile(
             leading: const Icon(Icons.storage, size: 20),
             title: const Text('Data Logger', style: TextStyle(fontSize: 14)),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/datalogger');
+              await Future.delayed(const Duration(milliseconds: 200));
+              Navigator.of(context, rootNavigator: true)
+                  .pushNamed('/datalogger');
             },
           ),
           ListTile(
             leading: const Icon(Icons.router, size: 20),
             title: const Text('BLE Gateway', style: TextStyle(fontSize: 14)),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/gateway');
+              await Future.delayed(const Duration(milliseconds: 200));
+              Navigator.of(context, rootNavigator: true).pushNamed('/gateway');
             },
           ),
         ],
@@ -285,16 +307,22 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
         await unsubscribeFromSnsTopic(fcmToken);
       }
       userProvider.setUser(null);
+
+      // Show snackbar using root context so it appears on top-level scaffold
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Logged out successfully')),
       );
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+
+      // Use root navigator to clear stack and send to login
+      Navigator.of(context, rootNavigator: true)
+          .pushNamedAndRemoveUntil('/login', (route) => false);
     } catch (e) {
       print('Error during logout: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error logging out')),
       );
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      Navigator.of(context, rootNavigator: true)
+          .pushNamedAndRemoveUntil('/login', (route) => false);
     }
   }
 
@@ -310,7 +338,8 @@ class _EndDrawerWidgetState extends State<EndDrawerWidget> {
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
-                await Navigator.pushNamed(context, '/login');
+                await Navigator.of(context, rootNavigator: true)
+                    .pushNamed('/login');
               },
               child: const Text('Login/Signup'),
             ),
