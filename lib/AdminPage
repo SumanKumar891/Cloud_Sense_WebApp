@@ -7,19 +7,18 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DeviceGraphPage.dart';
-import 'Shared_Add_Device.dart';
-
+import 'Shared_Add_Device.dart'; 
 
 class AdminPage extends StatefulWidget {
   const AdminPage({Key? key}) : super(key: key);
 
   @override
   State<AdminPage> createState() => _AdminPageState();
-}
-double getResponsiveFontSize(BuildContext context, double mobileSize, double desktopSize) {
+}double getResponsiveFontSize(BuildContext context, double mobileSize, double desktopSize) {
   final width = MediaQuery.of(context).size.width;
   return width <= 600 ? mobileSize :desktopSize;
 }
+
 class _AdminPageState extends State<AdminPage> {
   final String apiUrl =
       "https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function";
@@ -46,7 +45,6 @@ class _AdminPageState extends State<AdminPage> {
 
   int devicesToShow = 4; // start with 4 devices
   int usersToShow = 4;   // start with 4 users
-  
 
 
   @override
@@ -74,7 +72,6 @@ class _AdminPageState extends State<AdminPage> {
       final decoded = json.decode(dismissedJson) as List;
       dismissedNotifications = decoded.map((item) => Map<String, String>.from(item)).toList();
     }
-    seenAnomalies = prefs.getStringList('seenAnomalies') ?? [];
     setState(() {});
   }
 
@@ -82,7 +79,6 @@ class _AdminPageState extends State<AdminPage> {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('notifications', json.encode(notifications));
     prefs.setString('dismissedNotifications', json.encode(dismissedNotifications));
-    prefs.setStringList('seenAnomalies', seenAnomalies);
   }
 
   @override
@@ -105,73 +101,97 @@ class _AdminPageState extends State<AdminPage> {
       },
     );
   }
+Future<void> fetchAnomalies() async {
+  final newNotifications = <Map<String, String>>[];
+  final failedDevices = <String, int>{}; // Track failed attempts per device
 
-  Future<void> fetchAnomalies() async {
-    final newNotifications = <Map<String, String>>[];
-    for (final d in allDevices) {
-      final deviceId = d['DeviceId'] ?? "";
-      final topic = d['Topic'] ?? "Unknown";
-      if (deviceId.isEmpty || !topic.contains('WS/Campus')) continue;
-      final deviceIdTopic = "$deviceId#$topic";
+  for (final d in allDevices) {
+    final deviceId = d['DeviceId'] ?? "";
+    final topic = d['Topic'] ?? "Unknown";
+    if (deviceId.isEmpty || !topic.contains('WS/Campus')) continue;
+    final deviceIdTopic = "$deviceId#$topic";
 
-      try {
-        final response = await http.get(Uri.parse("$flaggingApiUrl?DeviceID=$deviceId"));
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data is List && data.isNotEmpty) {
-            final item = data.last;
+    // Initialize failure count if not exists
+    failedDevices[deviceId] = failedDevices[deviceId] ?? 0;
+
+    // Skip devices with too many failures (e.g., 5 failed attempts)
+    if (failedDevices[deviceId]! >= 5) {
+      if (kDebugMode) {
+        print("Skipping device $deviceId due to repeated failures");
+      }
+      continue;
+    }
+
+    try {
+      final response = await http.get(Uri.parse("$flaggingApiUrl?DeviceID=$deviceId")).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          throw TimeoutException("Request to $flaggingApiUrl timed out for device $deviceId");
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        failedDevices[deviceId] = 0; // Reset failure count on success
+        if (data is List && data.isNotEmpty) {
+          for (final item in data) {
             final anomaly = item['Anomaly']?.toString() ?? "";
             final timestamp = item['Timestamp']?.toString() ?? "N/A";
             if (anomaly.isNotEmpty) {
-              anomalies[deviceIdTopic] = anomaly;
-              final dismissed = dismissedNotifications.firstWhere(
-                (n) => n['deviceIdTopic'] == deviceIdTopic,
-                orElse: () => {},
+              final isAlreadyNotified = notifications.any(
+                (n) => n['deviceIdTopic'] == deviceIdTopic && n['timestamp'] == timestamp,
               );
-              if (!seenAnomalies.contains(deviceIdTopic) &&
-                  (dismissed.isEmpty ||
-                      dismissed['anomaly'] != anomaly ||
-                      dismissed['timestamp'] != timestamp)) {
+              final isDismissed = dismissedNotifications.any(
+                (dn) => dn['deviceIdTopic'] == deviceIdTopic && dn['timestamp'] == timestamp,
+              );
+              if (!isAlreadyNotified && !isDismissed) {
+                final message = _buildNotificationMessage(deviceIdTopic, anomaly, timestamp);
                 newNotifications.add({
                   'deviceIdTopic': deviceIdTopic,
-                  'message': _buildNotificationMessage(deviceIdTopic, anomaly, timestamp),
+                  'message': message,
+                  'anomaly': anomaly,
+                  'timestamp': timestamp,
                 });
-                seenAnomalies.add(deviceIdTopic);
-              } else {
-                final existingIndex = notifications.indexWhere((n) => n['deviceIdTopic'] == deviceIdTopic);
-                if (existingIndex != -1) {
-                  notifications[existingIndex]['message'] = _buildNotificationMessage(deviceIdTopic, anomaly, timestamp);
-                }
+                final uniqueId = "$deviceIdTopic#$timestamp";
+                _showNotification(uniqueId, message);
               }
-            } else {
-              anomalies.remove(deviceIdTopic);
             }
           }
-        } else {
+        }
+      } else {
+        failedDevices[deviceId] = failedDevices[deviceId]! + 1;
+        if (kDebugMode) {
           print("Flagging API error for $deviceId: ${response.statusCode}");
         }
-      } catch (e) {
+      }
+    } catch (e) {
+      failedDevices[deviceId] = failedDevices[deviceId]! + 1;
+      if (kDebugMode) {
         print("Flagging API Exception for $deviceId: $e");
       }
-    }
-
-    if (newNotifications.isNotEmpty) {
-      setState(() {
-        notifications.insertAll(0, newNotifications);
-        for (var notification in newNotifications) {
-          _showNotification(notification['deviceIdTopic']!, notification['message']!);
-        }
-      });
-      await _savePrefs();
-    } else {
-      setState(() {});
-    }
-    if (kDebugMode) {
-      print("Anomalies map: $anomalies");
-      print("Notifications: $notifications");
+      if (failedDevices[deviceId]! >= 5) {
+        _toast("Persistent error fetching anomalies for device $deviceId. Skipping further attempts.");
+      }
     }
   }
 
+  if (newNotifications.isNotEmpty) {
+    setState(() {
+      notifications.addAll(newNotifications);
+      notifications.sort((a, b) {
+        final da = parseDate(a['timestamp']) ?? DateTime(0);
+        final db = parseDate(b['timestamp']) ?? DateTime(0);
+        return db.compareTo(da); // Sort newest first
+      });
+    });
+    await _savePrefs();
+  } else {
+    setState(() {});
+  }
+  if (kDebugMode) {
+    print("Notifications: $notifications");
+    print("Failed devices: $failedDevices");
+  }
+}
   String _buildNotificationMessage(String deviceIdTopic, String anomaly, String timestamp) {
     final deviceId = deviceIdTopic.split('#')[0];
     final topic = deviceIdTopic.split('#').length > 1 ? deviceIdTopic.split('#')[1] : "Unknown";
@@ -180,7 +200,7 @@ class _AdminPageState extends State<AdminPage> {
     return "Anomaly in Device $sensorName: $anomaly at $timestamp";
   }
 
-  Future<void> _showNotification(String deviceIdTopic, String message) async {
+  Future<void> _showNotification(String uniqueId, String message) async {
     if (kIsWeb) {
       return;
     } else {
@@ -194,18 +214,35 @@ class _AdminPageState extends State<AdminPage> {
       const iosDetails = DarwinNotificationDetails();
       const platformDetails = NotificationDetails(android: androidDetails, iOS: iosDetails);
       await _notificationsPlugin!.show(
-        deviceIdTopic.hashCode,
+        uniqueId.hashCode,
         'Device Anomaly',
         message,
         platformDetails,
-        payload: deviceIdTopic,
+        payload: uniqueId,
       );
     }
   }
 
-  void _handleNotificationTap(String deviceIdTopic) {
-    final deviceId = deviceIdTopic.split('#')[0];
-    final topic = deviceIdTopic.split('#').length > 1 ? deviceIdTopic.split('#')[1] : "Unknown";
+  void _handleNotificationTap(String payload) {
+    final parts = payload.split('#');
+    if (parts.length != 3) {
+      _toast("Invalid notification data");
+      return;
+    }
+    final deviceId = parts[0];
+    final topic = parts[1];
+    final timestamp = parts[2];
+    final deviceIdTopic = '$deviceId#$topic';
+
+    final notification = notifications.firstWhere(
+      (n) => n['deviceIdTopic'] == deviceIdTopic && n['timestamp'] == timestamp,
+      orElse: () => {},
+    );
+    if (notification.isEmpty) {
+      _toast("Notification not found");
+      return;
+    }
+
     final device = filteredDevices.asMap().entries.firstWhere(
           (entry) => entry.value['DeviceId'] == deviceId && entry.value['Topic'] == topic,
           orElse: () => MapEntry(-1, {}),
@@ -215,19 +252,12 @@ class _AdminPageState extends State<AdminPage> {
       final mapped = _mapCategoryAndPrefix(topic);
       final sensorName = mapped.prefix.isNotEmpty ? "${mapped.prefix}${deviceId.padLeft(3, '0')}" : deviceId;
       final sequentialName = "${mapped.category}";
-      final notification = notifications.firstWhere(
-        (n) => n['deviceIdTopic'] == deviceIdTopic,
-        orElse: () => {'message': 'No anomaly data available'},
-      );
-      final anomalyMessage = notification['message']?.split(': ').length == 2
-          ? notification['message']!.split(': ')[1].split(' at ')[0]
-          : anomalies[deviceIdTopic] ?? "No anomaly data available";
+      final anomalyMessage = notification['anomaly'] ?? "No anomaly data available";
 
       if (kDebugMode) {
-        print("Handling notification tap for deviceIdTopic: $deviceIdTopic");
+        print("Handling notification tap for payload: $payload");
         print("Device: $d");
-        print("Anomaly from notification: ${notification['message']}");
-        print("Anomaly from map: ${anomalies[deviceIdTopic]}");
+        print("Anomaly: $anomalyMessage");
         print("Last Received Time: ${d['lastReceivedTime']}");
       }
 
@@ -279,25 +309,22 @@ class _AdminPageState extends State<AdminPage> {
     }
   }
 
-  void _dismissNotification(String deviceIdTopic) {
+  void _dismissNotification(String deviceIdTopic, String timestamp) {
     setState(() {
-      final notification = notifications.firstWhere(
-        (n) => n['deviceIdTopic'] == deviceIdTopic,
-        orElse: () => {},
+      final notificationIndex = notifications.indexWhere(
+        (n) => n['deviceIdTopic'] == deviceIdTopic && n['timestamp'] == timestamp,
       );
-      if (notification.isNotEmpty) {
-        final anomaly = anomalies[deviceIdTopic] ?? "";
-        final message = notification['message'] ?? "";
-        final timestamp = message.contains(' at ') ? message.split(' at ').last : "N/A";
+      if (notificationIndex != -1) {
+        final notification = notifications[notificationIndex];
         dismissedNotifications.add({
           'deviceIdTopic': deviceIdTopic,
-          'anomaly': anomaly,
+          'anomaly': notification['anomaly'] ?? "",
           'timestamp': timestamp,
         });
-        notifications.removeWhere((n) => n['deviceIdTopic'] == deviceIdTopic);
-        seenAnomalies.remove(deviceIdTopic);
+        notifications.removeAt(notificationIndex);
         if (!kIsWeb) {
-          _notificationsPlugin?.cancel(deviceIdTopic.hashCode);
+          final uniqueId = "$deviceIdTopic#$timestamp";
+          _notificationsPlugin?.cancel(uniqueId.hashCode);
         }
       }
     });
@@ -315,6 +342,27 @@ class _AdminPageState extends State<AdminPage> {
       builder: (_) => StatefulBuilder(
         builder: (dialogContext, dialogSetState) {
           final ScrollController scrollController = ScrollController();
+
+          Map<String, List<Map<String, String>>> groupedNotifications = {};
+          for (var n in notifications) {
+            final key = n['deviceIdTopic']!;
+            groupedNotifications.putIfAbsent(key, () => []).add(n);
+          }
+
+          groupedNotifications.forEach((key, list) {
+            list.sort((a, b) {
+              final da = parseDate(a['timestamp']) ?? DateTime(0);
+              final db = parseDate(b['timestamp']) ?? DateTime(0);
+              return db.compareTo(da);
+            });
+          });
+
+          final sortedKeys = groupedNotifications.keys.toList();
+          sortedKeys.sort((a, b) {
+            final ta = parseDate(groupedNotifications[a]![0]['timestamp']) ?? DateTime(0);
+            final tb = parseDate(groupedNotifications[b]![0]['timestamp']) ?? DateTime(0);
+            return tb.compareTo(ta);
+          });
 
           return Dialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -347,34 +395,150 @@ class _AdminPageState extends State<AdminPage> {
                             controller: scrollController,
                             child: ListView.separated(
                               controller: scrollController,
-                              itemCount: notifications.length,
+                              itemCount: sortedKeys.length,
                               separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
                               itemBuilder: (_, i) {
-                                final n = notifications[i];
-                                final deviceIdTopic = n['deviceIdTopic']!;
+                                final key = sortedKeys[i];
+                                final deviceNotifs = groupedNotifications[key]!;
+                                final latest = deviceNotifs[0];
+                                final hasMore = deviceNotifs.length > 1;
                                 return ListTile(
                                   leading: Icon(Icons.warning, color: Colors.orange),
                                   title: Text(
-                                    n['message']!,
+                                    latest['message']!,
                                     style: TextStyle(color: strong, fontSize: 12,fontWeight: FontWeight.w600),
                                   ),
-                                  trailing: IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () {
-                                      dialogSetState(() {
-                                        _dismissNotification(deviceIdTopic);
-                                      });
-                                    },
-                                    tooltip: 'Dismiss',
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (hasMore)
+                                        GestureDetector(
+                                          onTap: () {
+                                            _showDeviceNotificationsDialog(dialogContext, key, dialogSetState);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              "+${deviceNotifs.length - 1}",
+                                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                                            ),
+                                          ),
+                                        ),
+                                      const SizedBox(width: 8),
+                                      IconButton(
+                                        icon: Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () {
+                                          dialogSetState(() {
+                                            _dismissNotification(key, latest['timestamp']!);
+                                          });
+                                        },
+                                        tooltip: 'Dismiss',
+                                      ),
+                                    ],
                                   ),
                                   onTap: () {
                                     Navigator.pop(dialogContext);
-                                    _handleNotificationTap(deviceIdTopic);
+                                    _handleNotificationTap("$key#${latest['timestamp']!}");
                                   },
                                 );
                               },
                             ),
                           ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showDeviceNotificationsDialog(BuildContext dialogContext, String deviceIdTopic, StateSetter dialogSetState) {
+    final deviceId = deviceIdTopic.split('#')[0];
+    final topic = deviceIdTopic.split('#')[1];
+    final mapped = _mapCategoryAndPrefix(topic);
+    final sensorName = mapped.prefix.isNotEmpty ? "${mapped.prefix}${deviceId.padLeft(3, '0')}" : deviceId;
+
+    showDialog(
+      context: dialogContext,
+      builder: (subContext) => StatefulBuilder(
+        builder: (subContext, subSetState) {
+          final deviceNotifs = notifications
+              .where((n) => n['deviceIdTopic'] == deviceIdTopic)
+              .toList()
+            ..sort((a, b) {
+              final da = parseDate(a['timestamp']) ?? DateTime(0);
+              final db = parseDate(b['timestamp']) ?? DateTime(0);
+              return db.compareTo(da);
+            });
+
+          if (deviceNotifs.isEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) => Navigator.pop(subContext));
+            return const SizedBox();
+          }
+
+          final theme = Theme.of(subContext);
+          final isDark = theme.brightness == Brightness.dark;
+          final subtle = isDark ? Colors.white70 : Colors.black54;
+          final strong = isDark ? Colors.white : Colors.black;
+
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400, maxHeight: 400),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Notifications for $sensorName (${deviceNotifs.length})",
+                        style: TextStyle(color: strong, fontSize: 16, fontWeight: FontWeight.w800),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: subtle),
+                        onPressed: () => Navigator.pop(subContext),
+                        tooltip: 'Close',
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: deviceNotifs.length,
+                      separatorBuilder: (_, __) => Divider(color: subtle.withOpacity(.12)),
+                      itemBuilder: (_, i) {
+                        final n = deviceNotifs[i];
+                        return ListTile(
+                          leading: Icon(Icons.warning, color: Colors.orange),
+                          title: Text(
+                            n['message']!,
+                            style: TextStyle(color: strong, fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              _dismissNotification(deviceIdTopic, n['timestamp']!);
+                              subSetState(() {});
+                              dialogSetState(() {});
+                            },
+                            tooltip: 'Dismiss',
+                          ),
+                          onTap: () {
+                            Navigator.pop(subContext);
+                            Navigator.pop(dialogContext);
+                            _handleNotificationTap("$deviceIdTopic#${n['timestamp']!}");
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -666,12 +830,14 @@ class _AdminPageState extends State<AdminPage> {
             final fullDeviceIdTopic = "$deviceId#$deviceIdTopic";
             dialogSetState(() {
               notifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
-              seenAnomalies.remove(fullDeviceIdTopic);
               anomalies.remove(fullDeviceIdTopic);
               dismissedNotifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
             });
             if (!kIsWeb) {
-              _notificationsPlugin?.cancel(fullDeviceIdTopic.hashCode);
+              for (var n in notifications.where((n) => n['deviceIdTopic'] == fullDeviceIdTopic)) {
+                final uniqueId = "$fullDeviceIdTopic#${n['timestamp']}";
+                _notificationsPlugin?.cancel(uniqueId.hashCode);
+              }
             }
             await _savePrefs();
           } else {
@@ -686,12 +852,14 @@ class _AdminPageState extends State<AdminPage> {
             final fullDeviceIdTopic = "$deviceId#$deviceIdTopic";
             dialogSetState(() {
               notifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
-              seenAnomalies.remove(fullDeviceIdTopic);
               anomalies.remove(fullDeviceIdTopic);
               dismissedNotifications.removeWhere((n) => n['deviceIdTopic'] == fullDeviceIdTopic);
             });
             if (!kIsWeb) {
-              _notificationsPlugin?.cancel(fullDeviceIdTopic.hashCode);
+              for (var n in notifications.where((n) => n['deviceIdTopic'] == fullDeviceIdTopic)) {
+                final uniqueId = "$fullDeviceIdTopic#${n['timestamp']}";
+                _notificationsPlugin?.cancel(uniqueId.hashCode);
+              }
             }
             await _savePrefs();
           } else {
@@ -803,7 +971,7 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   DateTime? parseDate(String? dateStr) {
-    if (dateStr == null) return null;
+    if (dateStr == null || dateStr == "N/A") return null;
     try {
       final compactRegex = RegExp(r'^\d{8}T\d{6}$');
       if (compactRegex.hasMatch(dateStr)) {
@@ -980,7 +1148,7 @@ class _AdminPageState extends State<AdminPage> {
     ];
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;

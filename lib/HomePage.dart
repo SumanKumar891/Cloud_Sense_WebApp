@@ -951,7 +951,7 @@ class _HomePageState extends State<HomePage> {
                           title: const Text('Share'),
                           onTap: () {
                             Share.share(
-                              'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                              'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
                               subject: 'Download Our App',
                             );
                           },
@@ -1011,7 +1011,7 @@ class _HomePageState extends State<HomePage> {
                           title: const Text('Share'),
                           onTap: () {
                             Share.share(
-                              'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                              'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.CloudSenseVis',
                               subject: 'Download Our App',
                             );
                           },
@@ -1160,7 +1160,7 @@ class _HomePageState extends State<HomePage> {
                         title: const Text('Share'),
                         onTap: () {
                           Share.share(
-                            'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                            'Check out our app on Google Play Store:https://play.google.com/store/apps/details?id=com.CloudSenseVis',
                             subject: 'Download Our App',
                           );
                         },
