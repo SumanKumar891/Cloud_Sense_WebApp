@@ -147,6 +147,10 @@ flutter:
     - assets/ULTRASONIC_DATASHEET.pdf
     - assets/RAIN_GAUGE_DATASHEET.pdf
     - assets/gauge.png
+    - assets/thprobe.png
+    - assets/blegateway.png
+
+
 
    
    

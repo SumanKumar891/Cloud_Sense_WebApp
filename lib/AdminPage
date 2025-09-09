@@ -16,7 +16,10 @@ class AdminPage extends StatefulWidget {
   @override
   State<AdminPage> createState() => _AdminPageState();
 }
-
+double getResponsiveFontSize(BuildContext context, double mobileSize, double desktopSize) {
+  final width = MediaQuery.of(context).size.width;
+  return width <= 600 ? mobileSize :desktopSize;
+}
 class _AdminPageState extends State<AdminPage> {
   final String apiUrl =
       "https://xa9ry8sls0.execute-api.us-east-1.amazonaws.com/CloudSense_device_activity_api_function";
@@ -43,6 +46,7 @@ class _AdminPageState extends State<AdminPage> {
 
   int devicesToShow = 4; // start with 4 devices
   int usersToShow = 4;   // start with 4 users
+  
 
 
   @override
@@ -1369,7 +1373,8 @@ class _AdminPageState extends State<AdminPage> {
                                                     style: TextStyle(
                                                       color: strong,
                                                       fontWeight: FontWeight.w700,
-                                                      fontSize: 14, // 👈 smaller name
+                                                          fontSize: getResponsiveFontSize(context, 12, 14), // 👈 mobile=12, pc=14
+
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                     maxLines: 1,
@@ -1378,7 +1383,8 @@ class _AdminPageState extends State<AdminPage> {
                                                     "${u["email"]} • ${u["role"]}",
                                                     style: TextStyle(
                                                       color: subtle,
-                                                      fontSize: 12, // 👈 smaller subtitle
+                                                           fontSize: getResponsiveFontSize(context, 10, 12), // 👈 mobile=9, pc=10
+
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                     maxLines: 2,
