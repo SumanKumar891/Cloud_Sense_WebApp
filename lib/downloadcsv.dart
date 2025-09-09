@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:csv/csv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -70,6 +72,9 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     } else if (widget.deviceName.startsWith('NA')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/ssmetnarldata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+    } else if (widget.deviceName.startsWith('CP')) {
+      apiUrl =
+          'https://d3g5fo66jwc4iw.cloudfront.net/campusdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -129,6 +134,8 @@ class _CsvDownloaderState extends State<CsvDownloader> {
         _parseKDData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('NA')) {
         _parseNARLData(data['items'] ?? []);
+      } else if (widget.deviceName.startsWith('CP')) {
+        _parseCPData(data['items'] ?? []);
       } else if (widget.deviceName.startsWith('CL') ||
           widget.deviceName.startsWith('BD')) {
         _csvRows.add(['Timestamp', 'Chlorine']);
@@ -560,6 +567,50 @@ class _CsvDownloaderState extends State<CsvDownloader> {
     }
   }
 
+  void _parseCPData(List<dynamic> items) {
+    print('NA API Items Count: ${items.length}'); // Debug
+    if (items.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No items in CF API response');
+      return;
+    }
+
+    // Collect non-null parameter keys, excluding non-data fields
+    final sampleItem = items.first;
+    final parameterKeys = sampleItem.keys.where((key) {
+      return !['TimeStamp', 'Topic', 'IMEINumber', 'DeviceId'].contains(key) &&
+          sampleItem[key] != null;
+    }).toList();
+
+    if (parameterKeys.isEmpty) {
+      _csvRows = [
+        ['Timestamp', 'Message'],
+        ['', 'No data available']
+      ];
+      print('No valid CP parameters found');
+      return;
+    }
+
+    // Build headers
+    List<String> headers = ['TimeStamp'];
+    headers.addAll(parameterKeys);
+    _csvRows.add(headers);
+
+    // Build data rows
+    for (var item in items) {
+      if (item == null) continue;
+      List<dynamic> row = [item['TimeStamp'] ?? ''];
+      for (var key in parameterKeys) {
+        var value = item[key] != null ? item[key].toString() : '';
+        row.add(value);
+      }
+      _csvRows.add(row);
+    }
+  }
+
   void _parseSVData(List<dynamic> items) {
     print('SV API Items Count: ${items.length}'); // Debug
     if (items.isEmpty) {
@@ -700,7 +751,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
                       setState(() {
                         startDate = pickedStartDate;
                       });
-                                        },
+                    },
                   ),
                   ListTile(
                     title: Text(
@@ -717,7 +768,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
                       setState(() {
                         endDate = pickedEndDate;
                       });
-                                        },
+                    },
                   ),
                 ],
               ),

@@ -420,6 +420,10 @@ class _AppBarWidgetState extends State<AppBarWidget> {
     bool isTablet = screenWidth >= 800 && screenWidth <= 1024;
 
     return AppBar(
+      elevation: 0, // remove shadow
+      scrolledUnderElevation:
+          0, // NEW: disables the lighter overlay effect when scrolled
+      surfaceTintColor: Colors.transparent, // prevents automatic tint
       iconTheme: IconThemeData(
         color: isDarkMode ? Colors.white : Colors.black,
       ),

@@ -16,7 +16,6 @@ import 'package:universal_html/html.dart' as html;
 import 'package:intl/intl.dart';
 import 'dart:async';
 
-
 // Updated CompassNeedlePainter with corrected arrowhead positioning
 class CompassNeedlePainter extends CustomPainter {
   CompassNeedlePainter();
@@ -60,7 +59,7 @@ class CompassNeedlePainter extends CustomPainter {
     final arrowSize = 8.0; // Width of the arrowhead base
     final arrowHeight = 10.0; // Height of the arrowhead (from base to tip)
     final arrowPath = Path();
-    
+
     final baseLeft = Offset(tipX - arrowSize / 2, tipY); // Left base point
     final baseRight = Offset(tipX + arrowSize / 2, tipY); // Right base point
     // The tip of the arrowhead extends further in the direction of the red line (upward)
@@ -695,23 +694,41 @@ class _DeviceGraphPageState extends State<DeviceGraphPage>
   late final String activityType;
 
   // Add this method to convert degrees to direction (e.g., ENE)
-String _getWindDirection(double degrees) {
-  final directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
-  final index = ((degrees + 11.25) / 22.5).floor() % 16;
-  return directions[index];
-}
+  String _getWindDirection(double degrees) {
+    final directions = [
+      "N",
+      "NNE",
+      "NE",
+      "ENE",
+      "E",
+      "ESE",
+      "SE",
+      "SSE",
+      "S",
+      "SSW",
+      "SW",
+      "WSW",
+      "W",
+      "WNW",
+      "NW",
+      "NNW"
+    ];
+    final index = ((degrees + 11.25) / 22.5).floor() % 16;
+    return directions[index];
+  }
 
-double _convertVoltageToPercentage(double voltage) {
-  const double maxVoltage = 4.2; // 100%
-  const double minVoltage = 2.8; // 0%
-  
-  // Clamp the voltage to the valid range to avoid percentages outside 0-100
-  if (voltage >= maxVoltage) return 100.0;
-  if (voltage <= minVoltage) return 0.0;
-  
-  // Linear interpolation: percentage = ((voltage - min) / (max - min)) * 100
-  return ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100.0;
-}
+  double _convertVoltageToPercentage(double voltage) {
+    const double maxVoltage = 4.2; // 100%
+    const double minVoltage = 2.8; // 0%
+
+    // Clamp the voltage to the valid range to avoid percentages outside 0-100
+    if (voltage >= maxVoltage) return 100.0;
+    if (voltage <= minVoltage) return 0.0;
+
+    // Linear interpolation: percentage = ((voltage - min) / (max - min)) * 100
+    return ((voltage - minVoltage) / (maxVoltage - minVoltage)) * 100.0;
+  }
+
 // Helper function to calculate total rainfall (unchanged)
   double _calculateTotalRainfall(List<ChartData> rainData) {
     if (rainData.isEmpty) return 0.0;
@@ -744,8 +761,6 @@ double _convertVoltageToPercentage(double voltage) {
 
     return hourlyTotals.values.fold(0.0, (sum, total) => sum + total);
   }
-
-  
 
 // Helper function to transform cumulative rainfall to incremental rainfall
   List<ChartData> _transformToIncrementalRainfall(List<ChartData> rainData) {
@@ -1490,7 +1505,7 @@ double _convertVoltageToPercentage(double voltage) {
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/mysurudata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('CP')) {
       apiUrl =
-          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/campusdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+          'https://d3g5fo66jwc4iw.cloudfront.net/campusdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('WD')) {
       apiUrl =
           'https://62f4ihe2lf.execute-api.us-east-1.amazonaws.com/CloudSense_Weather_data_api_function?DeviceId=$deviceId&startdate=$startdate&enddate=$enddate';
@@ -6801,7 +6816,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getpercentBatteryIcon(_lastfsBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastfsBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastfsBattery),
                                               size: 28,
@@ -6833,7 +6849,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getpercentBatteryIcon(_lastsmBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastsmBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastsmBattery),
                                               size: 28,
@@ -6865,8 +6882,9 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                             _getpercentBatteryIcon(_lastcfBattery),
-                                              color:_getpercentBatteryColor(
+                                              _getpercentBatteryIcon(
+                                                  _lastcfBattery),
+                                              color: _getpercentBatteryColor(
                                                   _lastcfBattery),
                                               size: 28,
                                             ),
@@ -6897,7 +6915,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                             _getpercentBatteryIcon(_lastvdBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastvdBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastvdBattery),
                                               size: 28,
@@ -6929,7 +6948,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getpercentBatteryIcon(_lastkdBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastkdBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastkdBattery),
                                               size: 28,
@@ -6994,7 +7014,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                             _getpercentBatteryIcon(_lastKJBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastKJBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastKJBattery),
                                               size: 28,
@@ -7026,7 +7047,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                             _getpercentBatteryIcon(_lastMYBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastMYBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastMYBattery),
                                               size: 28,
@@ -7058,7 +7080,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getpercentBatteryIcon(_lastcsBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastcsBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastcsBattery),
                                               size: 28,
@@ -7090,7 +7113,8 @@ double _convertVoltageToPercentage(double voltage) {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              _getpercentBatteryIcon(_lastsvBattery),
+                                              _getpercentBatteryIcon(
+                                                  _lastsvBattery),
                                               color: _getpercentBatteryColor(
                                                   _lastsvBattery),
                                               size: 28,
@@ -7261,854 +7285,1464 @@ double _convertVoltageToPercentage(double voltage) {
                                       ),
                                     ),
                                   ),
-                 Column(
-  children: [
-    if (widget.deviceName.startsWith('SM'))
-      ...[
-        if (hasNonZeroValues(smParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              smParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(smParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              smParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(smParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              smParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(smParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              smParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('SM'))
-      _buildWindChartContainer(
-        'Wind',
-        smParametersData['WindSpeed'] ?? [],
-        smParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('SM'))
-      ...smParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'TemperatureHourlyComulative',
-              'LuxHourlyComulative',
-              'PressureHourlyComulative',
-              'HumidityHourlyComulative'
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('CF'))
-      ...[
-        if (hasNonZeroValues(cfParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              cfParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(cfParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              cfParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(cfParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              cfParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(cfParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              cfParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('CF'))
-      _buildWindChartContainer(
-        'Wind',
-        cfParametersData['WindSpeed'] ?? [],
-        cfParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('CF'))
-      ...cfParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('VD'))
-      ...[
-        if (hasNonZeroValues(vdParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              vdParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(vdParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              vdParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(vdParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              vdParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(vdParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              vdParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('VD'))
-      _buildWindChartContainer(
-        'Wind',
-        vdParametersData['WindSpeed'] ?? [],
-        vdParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('VD'))
-      ...vdParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '$displayName ($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('KD'))
-      ...[
-        if (hasNonZeroValues(kdParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              kdParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(kdParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              kdParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(kdParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              kdParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(kdParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              kdParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('KD'))
-      _buildWindChartContainer(
-        'Wind',
-        kdParametersData['WindSpeed'] ?? [],
-        kdParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('KD'))
-      ...kdParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '$displayName ($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('NA'))
-      ...[
-        if (hasNonZeroValues(NARLParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              NARLParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(NARLParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              NARLParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(NARLParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              NARLParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(NARLParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              NARLParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('NA'))
-      _buildWindChartContainer(
-        'Wind',
-        NARLParametersData['WindSpeed'] ?? [],
-        NARLParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('NA'))
-      ...NARLParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('KJ'))
-      ...[
-        if (hasNonZeroValues(KJParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              KJParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(KJParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              KJParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(KJParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              KJParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(KJParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              KJParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('KJ'))
-      _buildWindChartContainer(
-        'Wind',
-        KJParametersData['WindSpeed'] ?? [],
-        KJParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('KJ'))
-      ...KJParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallHourly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-              'AtmPressure',
-              'Light Intensity',
-              'Wind Direction',
-              'Wind Speed',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('MY'))
-      ...[
-        if (hasNonZeroValues(MYParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              MYParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(MYParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              MYParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(MYParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              MYParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(MYParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              MYParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('MY'))
-      _buildWindChartContainer(
-        'Wind',
-        MYParametersData['WindSpeed'] ?? [],
-        MYParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('MY'))
-      ...MYParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              'BatteryVoltage',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-              'WindSpeed',
-              'WindDirection',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('CP'))
-      ...[
-        if (hasNonZeroValues(csParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              csParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(csParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              csParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(csParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              csParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(csParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              csParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('CP'))
-      _buildWindChartContainer(
-        'Wind',
-        csParametersData['WindSpeed'] ?? [],
-        csParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('CP'))
-      ...csParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallMinutly',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('SV'))
-      ...svParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (!widget.deviceName.startsWith('SM') &&
-        !widget.deviceName.startsWith('CF') &&
-        !widget.deviceName.startsWith('VD') &&
-        !widget.deviceName.startsWith('KD') &&
-        !widget.deviceName.startsWith('NA') &&
-        !widget.deviceName.startsWith('KJ') &&
-        !widget.deviceName.startsWith('MY') &&
-        !widget.deviceName.startsWith('CP') &&
-        !widget.deviceName.startsWith('SV'))
-      ...[
-        if (hasNonZeroValues(chlorineData))
-          _buildChartContainer('Chlorine', chlorineData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperatureData))
-          _buildChartContainer('Temperature', temperatureData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humidityData))
-          _buildChartContainer('Humidity', humidityData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(lightIntensityData))
-          _buildChartContainer('Light Intensity', lightIntensityData, '(Lux)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(windSpeedData))
-          _buildChartContainer('Wind Speed', windSpeedData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(solarIrradianceData))
-          _buildChartContainer('Solar Irradiance', solarIrradianceData, '(W/M^2)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(tempData))
-          _buildChartContainer('Temperature', tempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(tdsData))
-          _buildChartContainer('TDS', tdsData, '(ppm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(codData))
-          _buildChartContainer('COD', codData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(bodData))
-          _buildChartContainer('BOD', bodData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(pHData))
-          _buildChartContainer('pH', pHData, 'pH', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(doData))
-          _buildChartContainer('DO', doData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ecData))
-          _buildChartContainer('EC', ecData, '(mS/cm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temppData))
-          _buildChartContainer('Temperature', temppData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(electrodeSignalData))
-          _buildChartContainer('Electrode Signal', electrodeSignalData, '(mV)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(residualchlorineData))
-          _buildChartContainer('Chlorine', residualchlorineData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(hypochlorousData))
-          _buildChartContainer('Hypochlorous', hypochlorousData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temmppData))
-          _buildChartContainer('Temperature', temmppData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humidityyData))
-          _buildChartContainer('Humidity', humidityyData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(lightIntensityyData))
-          _buildChartContainer('Light Intensity', lightIntensityyData, '(Lux)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(windSpeeddData))
-          _buildChartContainer('Wind Speed', windSpeeddData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ttempData))
-          _buildChartContainer('Temperature', ttempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(dovaluedata))
-          _buildChartContainer('DO Value', dovaluedata, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(dopercentagedata))
-          _buildChartContainer('DO Percentage', dopercentagedata, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperaturData))
-          _buildChartContainer('Temperature', temperaturData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humData))
-          _buildChartContainer('Humidity', humData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(luxData))
-          _buildChartContainer('Light Intensity', luxData, '(Lux)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(coddata))
-          _buildChartContainer('COD', coddata, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(boddata))
-          _buildChartContainer('BOD', boddata, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(phdata))
-          _buildChartContainer('pH', phdata, 'pH', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperattureData))
-          _buildChartContainer('Temperature', temperattureData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humidittyData))
-          _buildChartContainer('Humidity', humidittyData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ammoniaData))
-          _buildChartContainer('Ammonia', ammoniaData, '(PPM)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperaturedata))
-          _buildChartContainer('Temperature', temperaturedata, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humiditydata))
-          _buildChartContainer('Humidity', humiditydata, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ittempData))
-          _buildChartContainer('Temperature', ittempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itpressureData))
-          _buildChartContainer('Pressure', itpressureData, '(hPa)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ithumidityData))
-          _buildChartContainer('Humidity', ithumidityData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itrainData))
-          _buildChartContainer('Rain Level', itrainData, '(mm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itwindspeedData))
-          _buildChartContainer('Wind Speed', itwindspeedData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itradiationData))
-          _buildChartContainer('Radiation', itradiationData, '(W/m²)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itvisibilityData))
-          _buildChartContainer('Visibility', itvisibilityData, '(m)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fstempData))
-          _buildChartContainer('Temperature', fstempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fspressureData))
-          _buildChartContainer('Pressure', fspressureData, '(hPa)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fshumidityData))
-          _buildChartContainer('Humidity', fshumidityData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fsrainData))
-          _buildChartContainer('Rain Level', fsrainData, '(mm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fsradiationData))
-          _buildChartContainer('Radiation', fsradiationData, '(W/m²)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fswindspeedData))
-          _buildChartContainer('Wind Speed', fswindspeedData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fswinddirectionData))
-          _buildChartContainer('Wind Direction', fswinddirectionData, '(°)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temp2Data))
-          _buildChartContainer('Temperature', temp2Data, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(cod2Data))
-          _buildChartContainer('COD', cod2Data, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(bod2Data))
-          _buildChartContainer('BOD', bod2Data, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(wfAverageTemperatureData))
-          _buildChartContainer('Temperature', wfAverageTemperatureData, '(°C)', ChartType.line, isDarkMode),
-        _buildChartContainer('Rain Level', wfrainfallData, '(mm)', ChartType.line, isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-  ],
-)
+                                Column(
+                                  children: [
+                                    if (widget.deviceName.startsWith('SM'))
+                                      ...[
+                                        if (hasNonZeroValues(smParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              smParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            smParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              smParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(smParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              smParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(smParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              smParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('SM'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        smParametersData['WindSpeed'] ?? [],
+                                        smParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('SM'))
+                                      ...smParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'TemperatureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'HumidityHourlyComulative'
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('CF'))
+                                      ...[
+                                        if (hasNonZeroValues(cfParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              cfParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            cfParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              cfParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(cfParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              cfParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(cfParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              cfParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('CF'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        cfParametersData['WindSpeed'] ?? [],
+                                        cfParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('CF'))
+                                      ...cfParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'RainfallMinutly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                              'HumidityHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'TemperatureHourlyComulative',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('VD'))
+                                      ...[
+                                        if (hasNonZeroValues(vdParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              vdParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            vdParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              vdParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(vdParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              vdParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(vdParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              vdParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('VD'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        vdParametersData['WindSpeed'] ?? [],
+                                        vdParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('VD'))
+                                      ...vdParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '$displayName ($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('KD'))
+                                      ...[
+                                        if (hasNonZeroValues(kdParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              kdParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            kdParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              kdParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(kdParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              kdParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(kdParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              kdParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('KD'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        kdParametersData['WindSpeed'] ?? [],
+                                        kdParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('KD'))
+                                      ...kdParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '$displayName ($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('NA'))
+                                      ...[
+                                        if (hasNonZeroValues(NARLParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              NARLParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            NARLParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              NARLParametersData[
+                                                      'AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(NARLParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              NARLParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(NARLParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              NARLParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('NA'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        NARLParametersData['WindSpeed'] ?? [],
+                                        NARLParametersData['WindDirection'] ??
+                                            [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('NA'))
+                                      ...NARLParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'RainfallMinutly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                              'HumidityHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'TemperatureHourlyComulative',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('KJ'))
+                                      ...[
+                                        if (hasNonZeroValues(KJParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              KJParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            KJParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              KJParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(KJParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              KJParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(KJParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              KJParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('KJ'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        KJParametersData['WindSpeed'] ?? [],
+                                        KJParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('KJ'))
+                                      ...KJParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'RainfallHourly',
+                                              'RainfallMinutly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                              'HumidityHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'TemperatureHourlyComulative',
+                                              'AtmPressure',
+                                              'Light Intensity',
+                                              'Wind Direction',
+                                              'Wind Speed',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('MY'))
+                                      ...[
+                                        if (hasNonZeroValues(MYParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              MYParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            MYParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              MYParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(MYParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              MYParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(MYParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              MYParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('MY'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        MYParametersData['WindSpeed'] ?? [],
+                                        MYParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('MY'))
+                                      ...MYParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              'BatteryVoltage',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'RainfallMinutly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                              'HumidityHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'TemperatureHourlyComulative',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('CP'))
+                                      ...[
+                                        if (hasNonZeroValues(csParametersData[
+                                                'CurrentTemperature'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              csParametersData[
+                                                      'CurrentTemperature'] ??
+                                                  [],
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            csParametersData['AtmPressure'] ??
+                                                []))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              csParametersData['AtmPressure'] ??
+                                                  [],
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(csParametersData[
+                                                'CurrentHumidity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              csParametersData[
+                                                      'CurrentHumidity'] ??
+                                                  [],
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(csParametersData[
+                                                'LightIntensity'] ??
+                                            []))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              csParametersData[
+                                                      'LightIntensity'] ??
+                                                  [],
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('CP'))
+                                      _buildWindChartContainer(
+                                        'Wind',
+                                        csParametersData['WindSpeed'] ?? [],
+                                        csParametersData['WindDirection'] ?? [],
+                                        isDarkMode,
+                                      ),
+                                    if (widget.deviceName.startsWith('CP'))
+                                      ...csParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'WindSpeed',
+                                              'WindDirection',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallMinutly',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                              'HumidityHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'TemperatureHourlyComulative',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            if ([
+                                              'CurrentTemperature',
+                                              'AtmPressure',
+                                              'CurrentHumidity',
+                                              'LightIntensity'
+                                            ].contains(paramName)) {
+                                              return const SizedBox
+                                                  .shrink(); // Skip these as they are handled above
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (widget.deviceName.startsWith('SV'))
+                                      ...svParametersData.entries
+                                          .where((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            List<String> excludedParams = [
+                                              'Longitude',
+                                              'Latitude',
+                                              'SignalStrength',
+                                              // 'BatteryVoltage',
+                                              'MaximumTemperature',
+                                              'MinimumTemperature',
+                                              'AverageTemperature',
+                                              'RainfallDaily',
+                                              'RainfallWeekly',
+                                              'RainfallMinutly',
+                                              'AverageHumidity',
+                                              'MinimumHumidity',
+                                              'MaximumHumidity',
+                                              'HumidityHourlyComulative',
+                                              'PressureHourlyComulative',
+                                              'LuxHourlyComulative',
+                                              'TemperatureHourlyComulative',
+                                            ];
+                                            return !excludedParams
+                                                    .contains(paramName) &&
+                                                data.isNotEmpty;
+                                          })
+                                          .map((entry) {
+                                            String paramName = entry.key;
+                                            List<ChartData> data = entry.value;
+                                            final displayInfo =
+                                                _getParameterDisplayInfo(
+                                                    paramName);
+                                            String displayName =
+                                                displayInfo['displayName'];
+                                            String unit = displayInfo['unit'];
+                                            String chartTitle;
+                                            if (paramName.toLowerCase() ==
+                                                'currenthumidity') {
+                                              chartTitle = '($unit)';
+                                            } else if (paramName
+                                                    .toLowerCase() ==
+                                                'currenttemperature') {
+                                              chartTitle = '($unit)';
+                                            } else {
+                                              chartTitle = unit.isNotEmpty
+                                                  ? '($unit)'
+                                                  : displayName;
+                                            }
+                                            return _buildChartContainer(
+                                                displayName,
+                                                data,
+                                                chartTitle,
+                                                ChartType.line,
+                                                isDarkMode);
+                                          })
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                    if (!widget.deviceName.startsWith('SM') &&
+                                        !widget.deviceName.startsWith('CF') &&
+                                        !widget.deviceName.startsWith('VD') &&
+                                        !widget.deviceName.startsWith('KD') &&
+                                        !widget.deviceName.startsWith('NA') &&
+                                        !widget.deviceName.startsWith('KJ') &&
+                                        !widget.deviceName.startsWith('MY') &&
+                                        !widget.deviceName.startsWith('CP') &&
+                                        !widget.deviceName.startsWith('SV'))
+                                      ...[
+                                        if (hasNonZeroValues(chlorineData))
+                                          _buildChartContainer(
+                                              'Chlorine',
+                                              chlorineData,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(temperatureData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temperatureData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(humidityData))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              humidityData,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            lightIntensityData))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              lightIntensityData,
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(windSpeedData))
+                                          _buildChartContainer(
+                                              'Wind Speed',
+                                              windSpeedData,
+                                              '(m/s)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            solarIrradianceData))
+                                          _buildChartContainer(
+                                              'Solar Irradiance',
+                                              solarIrradianceData,
+                                              '(W/M^2)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(tempData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              tempData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(tdsData))
+                                          _buildChartContainer(
+                                              'TDS',
+                                              tdsData,
+                                              '(ppm)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(codData))
+                                          _buildChartContainer(
+                                              'COD',
+                                              codData,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(bodData))
+                                          _buildChartContainer(
+                                              'BOD',
+                                              bodData,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(pHData))
+                                          _buildChartContainer('pH', pHData,
+                                              'pH', ChartType.line, isDarkMode),
+                                        if (hasNonZeroValues(doData))
+                                          _buildChartContainer(
+                                              'DO',
+                                              doData,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(ecData))
+                                          _buildChartContainer(
+                                              'EC',
+                                              ecData,
+                                              '(mS/cm)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(temppData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temppData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            electrodeSignalData))
+                                          _buildChartContainer(
+                                              'Electrode Signal',
+                                              electrodeSignalData,
+                                              '(mV)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            residualchlorineData))
+                                          _buildChartContainer(
+                                              'Chlorine',
+                                              residualchlorineData,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(hypochlorousData))
+                                          _buildChartContainer(
+                                              'Hypochlorous',
+                                              hypochlorousData,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(temmppData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temmppData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(humidityyData))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              humidityyData,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            lightIntensityyData))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              lightIntensityyData,
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(windSpeeddData))
+                                          _buildChartContainer(
+                                              'Wind Speed',
+                                              windSpeeddData,
+                                              '(m/s)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(ttempData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              ttempData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(dovaluedata))
+                                          _buildChartContainer(
+                                              'DO Value',
+                                              dovaluedata,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(dopercentagedata))
+                                          _buildChartContainer(
+                                              'DO Percentage',
+                                              dopercentagedata,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(temperaturData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temperaturData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(humData))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              humData,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(luxData))
+                                          _buildChartContainer(
+                                              'Light Intensity',
+                                              luxData,
+                                              '(Lux)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(coddata))
+                                          _buildChartContainer(
+                                              'COD',
+                                              coddata,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(boddata))
+                                          _buildChartContainer(
+                                              'BOD',
+                                              boddata,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(phdata))
+                                          _buildChartContainer('pH', phdata,
+                                              'pH', ChartType.line, isDarkMode),
+                                        if (hasNonZeroValues(temperattureData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temperattureData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(humidittyData))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              humidittyData,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(ammoniaData))
+                                          _buildChartContainer(
+                                              'Ammonia',
+                                              ammoniaData,
+                                              '(PPM)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(temperaturedata))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temperaturedata,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(humiditydata))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              humiditydata,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(ittempData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              ittempData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(itpressureData))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              itpressureData,
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(ithumidityData))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              ithumidityData,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(itrainData))
+                                          _buildChartContainer(
+                                              'Rain Level',
+                                              itrainData,
+                                              '(mm)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(itwindspeedData))
+                                          _buildChartContainer(
+                                              'Wind Speed',
+                                              itwindspeedData,
+                                              '(m/s)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(itradiationData))
+                                          _buildChartContainer(
+                                              'Radiation',
+                                              itradiationData,
+                                              '(W/m²)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(itvisibilityData))
+                                          _buildChartContainer(
+                                              'Visibility',
+                                              itvisibilityData,
+                                              '(m)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(fstempData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              fstempData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(fspressureData))
+                                          _buildChartContainer(
+                                              'Pressure',
+                                              fspressureData,
+                                              '(hPa)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(fshumidityData))
+                                          _buildChartContainer(
+                                              'Humidity',
+                                              fshumidityData,
+                                              '(%)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(fsrainData))
+                                          _buildChartContainer(
+                                              'Rain Level',
+                                              fsrainData,
+                                              '(mm)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(fsradiationData))
+                                          _buildChartContainer(
+                                              'Radiation',
+                                              fsradiationData,
+                                              '(W/m²)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(fswindspeedData))
+                                          _buildChartContainer(
+                                              'Wind Speed',
+                                              fswindspeedData,
+                                              '(m/s)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            fswinddirectionData))
+                                          _buildChartContainer(
+                                              'Wind Direction',
+                                              fswinddirectionData,
+                                              '(°)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(temp2Data))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              temp2Data,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(cod2Data))
+                                          _buildChartContainer(
+                                              'COD',
+                                              cod2Data,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(bod2Data))
+                                          _buildChartContainer(
+                                              'BOD',
+                                              bod2Data,
+                                              '(mg/L)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        if (hasNonZeroValues(
+                                            wfAverageTemperatureData))
+                                          _buildChartContainer(
+                                              'Temperature',
+                                              wfAverageTemperatureData,
+                                              '(°C)',
+                                              ChartType.line,
+                                              isDarkMode),
+                                        _buildChartContainer(
+                                            'Rain Level',
+                                            wfrainfallData,
+                                            '(mm)',
+                                            ChartType.line,
+                                            isDarkMode),
+                                      ]
+                                          .where((widget) =>
+                                              widget != const SizedBox.shrink())
+                                          .toList(),
+                                  ],
+                                )
                               ],
                             ),
                           ),
@@ -8196,7 +8830,8 @@ double _convertVoltageToPercentage(double voltage) {
                               children: [
                                 Icon(
                                   _getpercentBatteryIcon(_lastfsBattery),
-                                  color:_getpercentBatteryColor(_lastfsBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastfsBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8226,7 +8861,8 @@ double _convertVoltageToPercentage(double voltage) {
                               children: [
                                 Icon(
                                   _getpercentBatteryIcon(_lastsmBattery),
-                                  color: _getpercentBatteryColor(_lastsmBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastsmBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8255,8 +8891,9 @@ double _convertVoltageToPercentage(double voltage) {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                 _getpercentBatteryIcon(_lastcfBattery),
-                                  color: _getpercentBatteryColor(_lastcfBattery),
+                                  _getpercentBatteryIcon(_lastcfBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastcfBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8285,8 +8922,9 @@ double _convertVoltageToPercentage(double voltage) {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                 _getpercentBatteryIcon(_lastvdBattery),
-                                  color: _getpercentBatteryColor(_lastvdBattery),
+                                  _getpercentBatteryIcon(_lastvdBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastvdBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8315,8 +8953,9 @@ double _convertVoltageToPercentage(double voltage) {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                 _getpercentBatteryIcon(_lastkdBattery),
-                                  color: _getpercentBatteryColor(_lastkdBattery),
+                                  _getpercentBatteryIcon(_lastkdBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastkdBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8346,7 +8985,8 @@ double _convertVoltageToPercentage(double voltage) {
                               children: [
                                 Icon(
                                   _getpercentBatteryIcon(_lastNARLBattery),
-                                  color: _getpercentBatteryColor(_lastNARLBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastNARLBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8375,8 +9015,9 @@ double _convertVoltageToPercentage(double voltage) {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                 _getpercentBatteryIcon(_lastKJBattery),
-                                  color:_getpercentBatteryColor(_lastKJBattery),
+                                  _getpercentBatteryIcon(_lastKJBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastKJBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8406,7 +9047,8 @@ double _convertVoltageToPercentage(double voltage) {
                               children: [
                                 Icon(
                                   _getpercentBatteryIcon(_lastMYBattery),
-                                  color:_getpercentBatteryColor(_lastMYBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastMYBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8435,8 +9077,9 @@ double _convertVoltageToPercentage(double voltage) {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                 _getpercentBatteryIcon(_lastcsBattery),
-                                  color:_getpercentBatteryColor(_lastcsBattery),
+                                  _getpercentBatteryIcon(_lastcsBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastcsBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8465,8 +9108,9 @@ double _convertVoltageToPercentage(double voltage) {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                 _getpercentBatteryIcon(_lastsvBattery),
-                                  color: _getpercentBatteryColor(_lastsvBattery),
+                                  _getpercentBatteryIcon(_lastsvBattery),
+                                  color:
+                                      _getpercentBatteryColor(_lastsvBattery),
                                   size: 28,
                                 ),
                                 SizedBox(height: 2),
@@ -8866,854 +9510,1662 @@ double _convertVoltageToPercentage(double voltage) {
                                             ),
                                           ),
                                         ),
-                                     Column(
-  children: [
-    if (widget.deviceName.startsWith('SM'))
-      ...[
-        if (hasNonZeroValues(smParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              smParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(smParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              smParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(smParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              smParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(smParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              smParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('SM'))
-      _buildWindChartContainer(
-        'Wind',
-        smParametersData['WindSpeed'] ?? [],
-        smParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('SM'))
-      ...smParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'TemperatureHourlyComulative',
-              'LuxHourlyComulative',
-              'PressureHourlyComulative',
-              'HumidityHourlyComulative'
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('CF'))
-      ...[
-        if (hasNonZeroValues(cfParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              cfParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(cfParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              cfParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(cfParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              cfParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(cfParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              cfParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('CF'))
-      _buildWindChartContainer(
-        'Wind',
-        cfParametersData['WindSpeed'] ?? [],
-        cfParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('CF'))
-      ...cfParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('VD'))
-      ...[
-        if (hasNonZeroValues(vdParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              vdParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(vdParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              vdParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(vdParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              vdParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(vdParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              vdParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('VD'))
-      _buildWindChartContainer(
-        'Wind',
-        vdParametersData['WindSpeed'] ?? [],
-        vdParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('VD'))
-      ...vdParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '$displayName ($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('KD'))
-      ...[
-        if (hasNonZeroValues(kdParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              kdParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(kdParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              kdParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(kdParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              kdParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(kdParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              kdParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('KD'))
-      _buildWindChartContainer(
-        'Wind',
-        kdParametersData['WindSpeed'] ?? [],
-        kdParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('KD'))
-      ...kdParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '$displayName ($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('NA'))
-      ...[
-        if (hasNonZeroValues(NARLParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              NARLParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(NARLParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              NARLParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(NARLParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              NARLParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(NARLParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              NARLParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('NA'))
-      _buildWindChartContainer(
-        'Wind',
-        NARLParametersData['WindSpeed'] ?? [],
-        NARLParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('NA'))
-      ...NARLParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('KJ'))
-      ...[
-        if (hasNonZeroValues(KJParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              KJParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(KJParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              KJParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(KJParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              KJParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(KJParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              KJParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('KJ'))
-      _buildWindChartContainer(
-        'Wind',
-        KJParametersData['WindSpeed'] ?? [],
-        KJParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('KJ'))
-      ...KJParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallHourly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-              'AtmPressure',
-              'Light Intensity',
-              'Wind Direction',
-              'Wind Speed',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('MY'))
-      ...[
-        if (hasNonZeroValues(MYParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              MYParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(MYParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              MYParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(MYParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              MYParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(MYParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              MYParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('MY'))
-      _buildWindChartContainer(
-        'Wind',
-        MYParametersData['WindSpeed'] ?? [],
-        MYParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('MY'))
-      ...MYParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              'BatteryVoltage',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-              'WindSpeed',
-              'WindDirection',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('CP'))
-      ...[
-        if (hasNonZeroValues(csParametersData['CurrentTemperature'] ?? []))
-          _buildChartContainer(
-              'Temperature',
-              csParametersData['CurrentTemperature'] ?? [],
-              '(°C)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(csParametersData['AtmPressure'] ?? []))
-          _buildChartContainer(
-              'Pressure',
-              csParametersData['AtmPressure'] ?? [],
-              '(hPa)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(csParametersData['CurrentHumidity'] ?? []))
-          _buildChartContainer(
-              'Humidity',
-              csParametersData['CurrentHumidity'] ?? [],
-              '(%)',
-              ChartType.line,
-              isDarkMode),
-        if (hasNonZeroValues(csParametersData['LightIntensity'] ?? []))
-          _buildChartContainer(
-              'Light Intensity',
-              csParametersData['LightIntensity'] ?? [],
-              '(Lux)',
-              ChartType.line,
-              isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-    if (widget.deviceName.startsWith('CP'))
-      _buildWindChartContainer(
-        'Wind',
-        csParametersData['WindSpeed'] ?? [],
-        csParametersData['WindDirection'] ?? [],
-        isDarkMode,
-      ),
-    if (widget.deviceName.startsWith('CP'))
-      ...csParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'WindSpeed',
-              'WindDirection',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallMinutly',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            if (['CurrentTemperature', 'AtmPressure', 'CurrentHumidity', 'LightIntensity'].contains(paramName)) {
-              return const SizedBox.shrink(); // Skip these as they are handled above
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (widget.deviceName.startsWith('SV'))
-      ...svParametersData.entries
-          .where((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            List<String> excludedParams = [
-              'Longitude',
-              'Latitude',
-              'SignalStrength',
-              // 'BatteryVoltage',
-              'MaximumTemperature',
-              'MinimumTemperature',
-              'AverageTemperature',
-              'RainfallDaily',
-              'RainfallWeekly',
-              'RainfallMinutly',
-              'AverageHumidity',
-              'MinimumHumidity',
-              'MaximumHumidity',
-              'HumidityHourlyComulative',
-              'PressureHourlyComulative',
-              'LuxHourlyComulative',
-              'TemperatureHourlyComulative',
-            ];
-            return !excludedParams.contains(paramName) && data.isNotEmpty;
-          })
-          .map((entry) {
-            String paramName = entry.key;
-            List<ChartData> data = entry.value;
-            final displayInfo = _getParameterDisplayInfo(paramName);
-            String displayName = displayInfo['displayName'];
-            String unit = displayInfo['unit'];
-            String chartTitle;
-            if (paramName.toLowerCase() == 'currenthumidity') {
-              chartTitle = '($unit)';
-            } else if (paramName.toLowerCase() == 'currenttemperature') {
-              chartTitle = '($unit)';
-            } else {
-              chartTitle = unit.isNotEmpty ? '($unit)' : displayName;
-            }
-            return _buildChartContainer(displayName, data, chartTitle, ChartType.line, isDarkMode);
-          })
-          .where((widget) => widget != const SizedBox.shrink())
-          .toList(),
-    if (!widget.deviceName.startsWith('SM') &&
-        !widget.deviceName.startsWith('CF') &&
-        !widget.deviceName.startsWith('VD') &&
-        !widget.deviceName.startsWith('KD') &&
-        !widget.deviceName.startsWith('NA') &&
-        !widget.deviceName.startsWith('KJ') &&
-        !widget.deviceName.startsWith('MY') &&
-        !widget.deviceName.startsWith('CP') &&
-        !widget.deviceName.startsWith('SV'))
-      ...[
-        if (hasNonZeroValues(chlorineData))
-          _buildChartContainer('Chlorine', chlorineData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperatureData))
-          _buildChartContainer('Temperature', temperatureData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humidityData))
-          _buildChartContainer('Humidity', humidityData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(lightIntensityData))
-          _buildChartContainer('Light Intensity', lightIntensityData, '(Lux)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(windSpeedData))
-          _buildChartContainer('Wind Speed', windSpeedData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(solarIrradianceData))
-          _buildChartContainer('Solar Irradiance', solarIrradianceData, '(W/M^2)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(tempData))
-          _buildChartContainer('Temperature', tempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(tdsData))
-          _buildChartContainer('TDS', tdsData, '(ppm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(codData))
-          _buildChartContainer('COD', codData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(bodData))
-          _buildChartContainer('BOD', bodData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(pHData))
-          _buildChartContainer('pH', pHData, 'pH', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(doData))
-          _buildChartContainer('DO', doData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ecData))
-          _buildChartContainer('EC', ecData, '(mS/cm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temppData))
-          _buildChartContainer('Temperature', temppData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(electrodeSignalData))
-          _buildChartContainer('Electrode Signal', electrodeSignalData, '(mV)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(residualchlorineData))
-          _buildChartContainer('Chlorine', residualchlorineData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(hypochlorousData))
-          _buildChartContainer('Hypochlorous', hypochlorousData, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temmppData))
-          _buildChartContainer('Temperature', temmppData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humidityyData))
-          _buildChartContainer('Humidity', humidityyData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(lightIntensityyData))
-          _buildChartContainer('Light Intensity', lightIntensityyData, '(Lux)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(windSpeeddData))
-          _buildChartContainer('Wind Speed', windSpeeddData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ttempData))
-          _buildChartContainer('Temperature', ttempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(dovaluedata))
-          _buildChartContainer('DO Value', dovaluedata, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(dopercentagedata))
-          _buildChartContainer('DO Percentage', dopercentagedata, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperaturData))
-          _buildChartContainer('Temperature', temperaturData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humData))
-          _buildChartContainer('Humidity', humData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(luxData))
-          _buildChartContainer('Light Intensity', luxData, '(Lux)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(coddata))
-          _buildChartContainer('COD', coddata, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(boddata))
-          _buildChartContainer('BOD', boddata, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(phdata))
-          _buildChartContainer('pH', phdata, 'pH', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperattureData))
-          _buildChartContainer('Temperature', temperattureData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humidittyData))
-          _buildChartContainer('Humidity', humidittyData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ammoniaData))
-          _buildChartContainer('Ammonia', ammoniaData, '(PPM)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temperaturedata))
-          _buildChartContainer('Temperature', temperaturedata, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(humiditydata))
-          _buildChartContainer('Humidity', humiditydata, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ittempData))
-          _buildChartContainer('Temperature', ittempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itpressureData))
-          _buildChartContainer('Pressure', itpressureData, '(hPa)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(ithumidityData))
-          _buildChartContainer('Humidity', ithumidityData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itrainData))
-          _buildChartContainer('Rain Level', itrainData, '(mm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itwindspeedData))
-          _buildChartContainer('Wind Speed', itwindspeedData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itradiationData))
-          _buildChartContainer('Radiation', itradiationData, '(W/m²)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(itvisibilityData))
-          _buildChartContainer('Visibility', itvisibilityData, '(m)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fstempData))
-          _buildChartContainer('Temperature', fstempData, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fspressureData))
-          _buildChartContainer('Pressure', fspressureData, '(hPa)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fshumidityData))
-          _buildChartContainer('Humidity', fshumidityData, '(%)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fsrainData))
-          _buildChartContainer('Rain Level', fsrainData, '(mm)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fsradiationData))
-          _buildChartContainer('Radiation', fsradiationData, '(W/m²)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fswindspeedData))
-          _buildChartContainer('Wind Speed', fswindspeedData, '(m/s)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(fswinddirectionData))
-          _buildChartContainer('Wind Direction', fswinddirectionData, '(°)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(temp2Data))
-          _buildChartContainer('Temperature', temp2Data, '(°C)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(cod2Data))
-          _buildChartContainer('COD', cod2Data, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(bod2Data))
-          _buildChartContainer('BOD', bod2Data, '(mg/L)', ChartType.line, isDarkMode),
-        if (hasNonZeroValues(wfAverageTemperatureData))
-          _buildChartContainer('Temperature', wfAverageTemperatureData, '(°C)', ChartType.line, isDarkMode),
-        _buildChartContainer('Rain Level', wfrainfallData, '(mm)', ChartType.line, isDarkMode),
-      ].where((widget) => widget != const SizedBox.shrink()).toList(),
-  ],
-)
+                                      Column(
+                                        children: [
+                                          if (widget.deviceName
+                                              .startsWith('SM'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  smParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    smParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  smParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    smParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  smParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    smParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  smParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    smParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('SM'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              smParametersData['WindSpeed'] ??
+                                                  [],
+                                              smParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('SM'))
+                                            ...smParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'TemperatureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'HumidityHourlyComulative'
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('CF'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  cfParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    cfParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  cfParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    cfParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  cfParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    cfParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  cfParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    cfParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('CF'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              cfParametersData['WindSpeed'] ??
+                                                  [],
+                                              cfParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('CF'))
+                                            ...cfParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'RainfallMinutly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                    'HumidityHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'TemperatureHourlyComulative',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('VD'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  vdParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    vdParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  vdParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    vdParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  vdParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    vdParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  vdParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    vdParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('VD'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              vdParametersData['WindSpeed'] ??
+                                                  [],
+                                              vdParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('VD'))
+                                            ...vdParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '$displayName ($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('KD'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  kdParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    kdParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  kdParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    kdParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  kdParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    kdParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  kdParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    kdParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('KD'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              kdParametersData['WindSpeed'] ??
+                                                  [],
+                                              kdParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('KD'))
+                                            ...kdParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '$displayName ($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('NA'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  NARLParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    NARLParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  NARLParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    NARLParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  NARLParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    NARLParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  NARLParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    NARLParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('NA'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              NARLParametersData['WindSpeed'] ??
+                                                  [],
+                                              NARLParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('NA'))
+                                            ...NARLParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'RainfallMinutly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                    'HumidityHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'TemperatureHourlyComulative',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('KJ'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  KJParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    KJParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  KJParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    KJParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  KJParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    KJParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  KJParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    KJParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('KJ'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              KJParametersData['WindSpeed'] ??
+                                                  [],
+                                              KJParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('KJ'))
+                                            ...KJParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'RainfallHourly',
+                                                    'RainfallMinutly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                    'HumidityHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'TemperatureHourlyComulative',
+                                                    'AtmPressure',
+                                                    'Light Intensity',
+                                                    'Wind Direction',
+                                                    'Wind Speed',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('MY'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  MYParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    MYParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  MYParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    MYParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  MYParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    MYParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  MYParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    MYParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('MY'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              MYParametersData['WindSpeed'] ??
+                                                  [],
+                                              MYParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('MY'))
+                                            ...MYParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    'BatteryVoltage',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'RainfallMinutly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                    'HumidityHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'TemperatureHourlyComulative',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('CP'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  csParametersData[
+                                                          'CurrentTemperature'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    csParametersData[
+                                                            'CurrentTemperature'] ??
+                                                        [],
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  csParametersData[
+                                                          'AtmPressure'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    csParametersData[
+                                                            'AtmPressure'] ??
+                                                        [],
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  csParametersData[
+                                                          'CurrentHumidity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    csParametersData[
+                                                            'CurrentHumidity'] ??
+                                                        [],
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  csParametersData[
+                                                          'LightIntensity'] ??
+                                                      []))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    csParametersData[
+                                                            'LightIntensity'] ??
+                                                        [],
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('CP'))
+                                            _buildWindChartContainer(
+                                              'Wind',
+                                              csParametersData['WindSpeed'] ??
+                                                  [],
+                                              csParametersData[
+                                                      'WindDirection'] ??
+                                                  [],
+                                              isDarkMode,
+                                            ),
+                                          if (widget.deviceName
+                                              .startsWith('CP'))
+                                            ...csParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'WindSpeed',
+                                                    'WindDirection',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallMinutly',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                    'HumidityHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'TemperatureHourlyComulative',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  if ([
+                                                    'CurrentTemperature',
+                                                    'AtmPressure',
+                                                    'CurrentHumidity',
+                                                    'LightIntensity'
+                                                  ].contains(paramName)) {
+                                                    return const SizedBox
+                                                        .shrink(); // Skip these as they are handled above
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (widget.deviceName
+                                              .startsWith('SV'))
+                                            ...svParametersData.entries
+                                                .where((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  List<String> excludedParams =
+                                                      [
+                                                    'Longitude',
+                                                    'Latitude',
+                                                    'SignalStrength',
+                                                    // 'BatteryVoltage',
+                                                    'MaximumTemperature',
+                                                    'MinimumTemperature',
+                                                    'AverageTemperature',
+                                                    'RainfallDaily',
+                                                    'RainfallWeekly',
+                                                    'RainfallMinutly',
+                                                    'AverageHumidity',
+                                                    'MinimumHumidity',
+                                                    'MaximumHumidity',
+                                                    'HumidityHourlyComulative',
+                                                    'PressureHourlyComulative',
+                                                    'LuxHourlyComulative',
+                                                    'TemperatureHourlyComulative',
+                                                  ];
+                                                  return !excludedParams
+                                                          .contains(
+                                                              paramName) &&
+                                                      data.isNotEmpty;
+                                                })
+                                                .map((entry) {
+                                                  String paramName = entry.key;
+                                                  List<ChartData> data =
+                                                      entry.value;
+                                                  final displayInfo =
+                                                      _getParameterDisplayInfo(
+                                                          paramName);
+                                                  String displayName =
+                                                      displayInfo[
+                                                          'displayName'];
+                                                  String unit =
+                                                      displayInfo['unit'];
+                                                  String chartTitle;
+                                                  if (paramName.toLowerCase() ==
+                                                      'currenthumidity') {
+                                                    chartTitle = '($unit)';
+                                                  } else if (paramName
+                                                          .toLowerCase() ==
+                                                      'currenttemperature') {
+                                                    chartTitle = '($unit)';
+                                                  } else {
+                                                    chartTitle = unit.isNotEmpty
+                                                        ? '($unit)'
+                                                        : displayName;
+                                                  }
+                                                  return _buildChartContainer(
+                                                      displayName,
+                                                      data,
+                                                      chartTitle,
+                                                      ChartType.line,
+                                                      isDarkMode);
+                                                })
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                          if (!widget.deviceName
+                                                  .startsWith('SM') &&
+                                              !widget.deviceName
+                                                  .startsWith('CF') &&
+                                              !widget.deviceName
+                                                  .startsWith('VD') &&
+                                              !widget.deviceName
+                                                  .startsWith('KD') &&
+                                              !widget.deviceName
+                                                  .startsWith('NA') &&
+                                              !widget.deviceName
+                                                  .startsWith('KJ') &&
+                                              !widget.deviceName
+                                                  .startsWith('MY') &&
+                                              !widget.deviceName
+                                                  .startsWith('CP') &&
+                                              !widget.deviceName
+                                                  .startsWith('SV'))
+                                            ...[
+                                              if (hasNonZeroValues(
+                                                  chlorineData))
+                                                _buildChartContainer(
+                                                    'Chlorine',
+                                                    chlorineData,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  temperatureData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temperatureData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  humidityData))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    humidityData,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  lightIntensityData))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    lightIntensityData,
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  windSpeedData))
+                                                _buildChartContainer(
+                                                    'Wind Speed',
+                                                    windSpeedData,
+                                                    '(m/s)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  solarIrradianceData))
+                                                _buildChartContainer(
+                                                    'Solar Irradiance',
+                                                    solarIrradianceData,
+                                                    '(W/M^2)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(tempData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    tempData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(tdsData))
+                                                _buildChartContainer(
+                                                    'TDS',
+                                                    tdsData,
+                                                    '(ppm)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(codData))
+                                                _buildChartContainer(
+                                                    'COD',
+                                                    codData,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(bodData))
+                                                _buildChartContainer(
+                                                    'BOD',
+                                                    bodData,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(pHData))
+                                                _buildChartContainer(
+                                                    'pH',
+                                                    pHData,
+                                                    'pH',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(doData))
+                                                _buildChartContainer(
+                                                    'DO',
+                                                    doData,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(ecData))
+                                                _buildChartContainer(
+                                                    'EC',
+                                                    ecData,
+                                                    '(mS/cm)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(temppData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temppData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  electrodeSignalData))
+                                                _buildChartContainer(
+                                                    'Electrode Signal',
+                                                    electrodeSignalData,
+                                                    '(mV)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  residualchlorineData))
+                                                _buildChartContainer(
+                                                    'Chlorine',
+                                                    residualchlorineData,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  hypochlorousData))
+                                                _buildChartContainer(
+                                                    'Hypochlorous',
+                                                    hypochlorousData,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(temmppData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temmppData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  humidityyData))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    humidityyData,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  lightIntensityyData))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    lightIntensityyData,
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  windSpeeddData))
+                                                _buildChartContainer(
+                                                    'Wind Speed',
+                                                    windSpeeddData,
+                                                    '(m/s)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(ttempData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    ttempData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(dovaluedata))
+                                                _buildChartContainer(
+                                                    'DO Value',
+                                                    dovaluedata,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  dopercentagedata))
+                                                _buildChartContainer(
+                                                    'DO Percentage',
+                                                    dopercentagedata,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  temperaturData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temperaturData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(humData))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    humData,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(luxData))
+                                                _buildChartContainer(
+                                                    'Light Intensity',
+                                                    luxData,
+                                                    '(Lux)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(coddata))
+                                                _buildChartContainer(
+                                                    'COD',
+                                                    coddata,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(boddata))
+                                                _buildChartContainer(
+                                                    'BOD',
+                                                    boddata,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(phdata))
+                                                _buildChartContainer(
+                                                    'pH',
+                                                    phdata,
+                                                    'pH',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  temperattureData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temperattureData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  humidittyData))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    humidittyData,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(ammoniaData))
+                                                _buildChartContainer(
+                                                    'Ammonia',
+                                                    ammoniaData,
+                                                    '(PPM)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  temperaturedata))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temperaturedata,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  humiditydata))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    humiditydata,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(ittempData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    ittempData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  itpressureData))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    itpressureData,
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  ithumidityData))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    ithumidityData,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(itrainData))
+                                                _buildChartContainer(
+                                                    'Rain Level',
+                                                    itrainData,
+                                                    '(mm)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  itwindspeedData))
+                                                _buildChartContainer(
+                                                    'Wind Speed',
+                                                    itwindspeedData,
+                                                    '(m/s)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  itradiationData))
+                                                _buildChartContainer(
+                                                    'Radiation',
+                                                    itradiationData,
+                                                    '(W/m²)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  itvisibilityData))
+                                                _buildChartContainer(
+                                                    'Visibility',
+                                                    itvisibilityData,
+                                                    '(m)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(fstempData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    fstempData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  fspressureData))
+                                                _buildChartContainer(
+                                                    'Pressure',
+                                                    fspressureData,
+                                                    '(hPa)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  fshumidityData))
+                                                _buildChartContainer(
+                                                    'Humidity',
+                                                    fshumidityData,
+                                                    '(%)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(fsrainData))
+                                                _buildChartContainer(
+                                                    'Rain Level',
+                                                    fsrainData,
+                                                    '(mm)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  fsradiationData))
+                                                _buildChartContainer(
+                                                    'Radiation',
+                                                    fsradiationData,
+                                                    '(W/m²)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  fswindspeedData))
+                                                _buildChartContainer(
+                                                    'Wind Speed',
+                                                    fswindspeedData,
+                                                    '(m/s)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  fswinddirectionData))
+                                                _buildChartContainer(
+                                                    'Wind Direction',
+                                                    fswinddirectionData,
+                                                    '(°)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(temp2Data))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    temp2Data,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(cod2Data))
+                                                _buildChartContainer(
+                                                    'COD',
+                                                    cod2Data,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(bod2Data))
+                                                _buildChartContainer(
+                                                    'BOD',
+                                                    bod2Data,
+                                                    '(mg/L)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              if (hasNonZeroValues(
+                                                  wfAverageTemperatureData))
+                                                _buildChartContainer(
+                                                    'Temperature',
+                                                    wfAverageTemperatureData,
+                                                    '(°C)',
+                                                    ChartType.line,
+                                                    isDarkMode),
+                                              _buildChartContainer(
+                                                  'Rain Level',
+                                                  wfrainfallData,
+                                                  '(mm)',
+                                                  ChartType.line,
+                                                  isDarkMode),
+                                            ]
+                                                .where((widget) =>
+                                                    widget !=
+                                                    const SizedBox.shrink())
+                                                .toList(),
+                                        ],
+                                      )
                                     ],
                                   ),
                                 ),
@@ -9907,312 +11359,351 @@ double _convertVoltageToPercentage(double voltage) {
   }
 
   IconData _getpercentBatteryIcon(double voltage) {
-  double percentage = _convertVoltageToPercentage(voltage);
-  if (percentage >= 80) return Icons.battery_full;
-  if (percentage >= 50) return Icons.battery_5_bar;
-  if (percentage >= 20) return Icons.battery_3_bar;
-  return Icons.battery_alert;
-}
-
-Color _getpercentBatteryColor(double voltage) {
-  double percentage = _convertVoltageToPercentage(voltage);
-  if (percentage >= 80) return Colors.green;
-  if (percentage >= 50) return Colors.yellow;
-  if (percentage >= 20) return Colors.orange;
-  return Colors.red;
-}
-
-
-// Add this new method for the combined wind chart (copy/adapted from _buildChartContainer)
-Widget _buildWindChartContainer(
-  String title,
-  List<ChartData> speedData,
-  List<ChartData> directionData,
-  bool isDarkMode,
-) {
-  if (speedData.isEmpty) return const SizedBox.shrink();
-
-  // No conversion to km/h, keep original units (assuming m/s from API)
-  final convertedSpeed = speedData; // No transformation needed
-
-  final double maxSpeed = convertedSpeed.map((e) => e.value).reduce((a, b) => a > b ? a : b);
-  final double offset = maxSpeed * 0.1 + 1; // Small buffer for arrows
-
-  final bool hasDirection = directionData.isNotEmpty && directionData.length == speedData.length;
-
-  List<CartesianChartAnnotation> annotations = [];
-  if (hasDirection) {
-    for (int i = 0; i < convertedSpeed.length; i++) {
-      final double degrees = directionData[i].value;
-      annotations.add(
-        CartesianChartAnnotation( // Corrected to use ChartAnnotation from Syncfusion
-          coordinateUnit: CoordinateUnit.point, // Changed from 'data' to 'point'
-          region: AnnotationRegion.chart,
-          x: convertedSpeed[i].timestamp,
-          y: maxSpeed + offset,
-          widget: Transform.rotate(
-            angle: (degrees * math.pi / 180) + math.pi / 2, // Adjust rotation for "from" direction
-            child: const Icon(
-              Icons.arrow_forward,
-              size: 20,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      );
-    }
+    double percentage = _convertVoltageToPercentage(voltage);
+    if (percentage >= 80) return Icons.battery_full;
+    if (percentage >= 50) return Icons.battery_5_bar;
+    if (percentage >= 20) return Icons.battery_3_bar;
+    return Icons.battery_alert;
   }
 
-  bool isSelected = _selectedParam == title;
+  Color _getpercentBatteryColor(double voltage) {
+    double percentage = _convertVoltageToPercentage(voltage);
+    if (percentage >= 80) return Colors.green;
+    if (percentage >= 50) return Colors.yellow;
+    if (percentage >= 20) return Colors.orange;
+    return Colors.red;
+  }
 
-  return Padding(
-    padding: const EdgeInsets.all(0.0),
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      key: _chartKeys[title],
-      width: double.infinity,
-      height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
-      margin: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.0),
-        color: isDarkMode ? Color.fromARGB(150, 0, 0, 0) : Color.fromARGB(173, 227, 220, 220),
-        border: isSelected
-            ? Border.all(
-                color: isDarkMode ? Colors.deepOrange : Colors.deepOrange,
-                width: 2.0,
-              )
-            : null,
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.0),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: isSelected || _selectedParam == null ? 0.0 : 100.0,
-            sigmaY: isSelected || _selectedParam == null ? 0.0 : 100.0,
+// Add this new method for the combined wind chart (copy/adapted from _buildChartContainer)
+  Widget _buildWindChartContainer(
+    String title,
+    List<ChartData> speedData,
+    List<ChartData> directionData,
+    bool isDarkMode,
+  ) {
+    if (speedData.isEmpty) return const SizedBox.shrink();
+
+    // No conversion to km/h, keep original units (assuming m/s from API)
+    final convertedSpeed = speedData; // No transformation needed
+
+    final double maxSpeed =
+        convertedSpeed.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    final double offset = maxSpeed * 0.1 + 1; // Small buffer for arrows
+
+    final bool hasDirection =
+        directionData.isNotEmpty && directionData.length == speedData.length;
+
+    List<CartesianChartAnnotation> annotations = [];
+    if (hasDirection) {
+      for (int i = 0; i < convertedSpeed.length; i++) {
+        final double degrees = directionData[i].value;
+        annotations.add(
+          CartesianChartAnnotation(
+            // Corrected to use ChartAnnotation from Syncfusion
+            coordinateUnit:
+                CoordinateUnit.point, // Changed from 'data' to 'point'
+            region: AnnotationRegion.chart,
+            x: convertedSpeed[i].timestamp,
+            y: maxSpeed + offset,
+            widget: Transform.rotate(
+              angle: (degrees * math.pi / 180) +
+                  math.pi / 2, // Adjust rotation for "from" direction
+              child: const Icon(
+                Icons.arrow_forward,
+                size: 20,
+                color: Colors.black,
+              ),
+            ),
           ),
-          child: Opacity(
-            opacity: isSelected || _selectedParam == null ? 1.0 : 0.2,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width < 800 ? 18 : 22,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black,
+        );
+      }
+    }
+
+    bool isSelected = _selectedParam == title;
+
+    return Padding(
+      padding: const EdgeInsets.all(0.0),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        key: _chartKeys[title],
+        width: double.infinity,
+        height: MediaQuery.of(context).size.width < 800 ? 400 : 500,
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: isDarkMode
+              ? Color.fromARGB(150, 0, 0, 0)
+              : Color.fromARGB(173, 227, 220, 220),
+          border: isSelected
+              ? Border.all(
+                  color: isDarkMode ? Colors.deepOrange : Colors.deepOrange,
+                  width: 2.0,
+                )
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16.0),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: isSelected || _selectedParam == null ? 0.0 : 100.0,
+              sigmaY: isSelected || _selectedParam == null ? 0.0 : 100.0,
+            ),
+            child: Opacity(
+              opacity: isSelected || _selectedParam == null ? 1.0 : 0.2,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 800 ? 18 : 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Focus(
-                    autofocus: true,
-                    child: RawKeyboardListener(
-                      focusNode: _focusNode,
+                  Expanded(
+                    child: Focus(
                       autofocus: true,
-                      onKey: (RawKeyEvent event) {
-                        if (event is RawKeyDownEvent &&
-                            (event.logicalKey == LogicalKeyboardKey.shiftLeft ||
-                                event.logicalKey == LogicalKeyboardKey.shiftRight)) {
-                          setState(() {
-                            isShiftPressed = true;
-                          });
-                        } else if (event is RawKeyUpEvent &&
-                            (event.logicalKey == LogicalKeyboardKey.shiftLeft ||
-                                event.logicalKey == LogicalKeyboardKey.shiftRight)) {
-                          setState(() {
-                            isShiftPressed = false;
-                          });
-                        }
-                      },
-                      child: MouseRegion(
-                        onEnter: (_) => _focusNode.requestFocus(),
-                        child: Listener(
-                          onPointerSignal: (PointerSignalEvent event) {
-                            if (event is PointerScrollEvent && isShiftPressed) {}
-                          },
-                          child: SfCartesianChart(
-                            annotations: annotations, // Add this for arrows
-                            plotAreaBackgroundColor: isDarkMode
-                                ? Color.fromARGB(100, 0, 0, 0)
-                                : Color.fromARGB(189, 222, 218, 218),
-                            primaryXAxis: DateTimeAxis(
-                              dateFormat: _lastSelectedRange == 'single'
-                                  ? DateFormat('MM/dd hh:mm a')
-                                  : (_lastSelectedRange == '3months' ||
-                                          _lastSelectedRange == '1year'
-                                      ? DateFormat('MM/dd')
-                                      : DateFormat('MM/dd')),
-                              title: AxisTitle(
-                                text: 'Time',
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black,
+                      child: RawKeyboardListener(
+                        focusNode: _focusNode,
+                        autofocus: true,
+                        onKey: (RawKeyEvent event) {
+                          if (event is RawKeyDownEvent &&
+                              (event.logicalKey ==
+                                      LogicalKeyboardKey.shiftLeft ||
+                                  event.logicalKey ==
+                                      LogicalKeyboardKey.shiftRight)) {
+                            setState(() {
+                              isShiftPressed = true;
+                            });
+                          } else if (event is RawKeyUpEvent &&
+                              (event.logicalKey ==
+                                      LogicalKeyboardKey.shiftLeft ||
+                                  event.logicalKey ==
+                                      LogicalKeyboardKey.shiftRight)) {
+                            setState(() {
+                              isShiftPressed = false;
+                            });
+                          }
+                        },
+                        child: MouseRegion(
+                          onEnter: (_) => _focusNode.requestFocus(),
+                          child: Listener(
+                            onPointerSignal: (PointerSignalEvent event) {
+                              if (event is PointerScrollEvent &&
+                                  isShiftPressed) {}
+                            },
+                            child: SfCartesianChart(
+                              annotations: annotations, // Add this for arrows
+                              plotAreaBackgroundColor: isDarkMode
+                                  ? Color.fromARGB(100, 0, 0, 0)
+                                  : Color.fromARGB(189, 222, 218, 218),
+                              primaryXAxis: DateTimeAxis(
+                                dateFormat: _lastSelectedRange == 'single'
+                                    ? DateFormat('MM/dd hh:mm a')
+                                    : (_lastSelectedRange == '3months' ||
+                                            _lastSelectedRange == '1year'
+                                        ? DateFormat('MM/dd')
+                                        : DateFormat('MM/dd')),
+                                title: AxisTitle(
+                                  text: 'Time',
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
-                              ),
-                              labelStyle: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
-                              ),
-                              labelRotation: 70,
-                              edgeLabelPlacement: EdgeLabelPlacement.shift,
-                              intervalType: _lastSelectedRange == 'single' ||
-                                      _lastSelectedRange == '3months' ||
-                                      _lastSelectedRange == '1year'
-                                  ? DateTimeIntervalType.auto
-                                  : DateTimeIntervalType.days,
-                              interval: _lastSelectedRange == 'single' ||
-                                      _lastSelectedRange == '3months' ||
-                                      _lastSelectedRange == '1year'
-                                  ? null
-                                  : 1.0,
-                              enableAutoIntervalOnZooming: true,
-                              majorGridLines: _lastSelectedRange == 'single' ||
-                                      _lastSelectedRange == '3months' ||
-                                      _lastSelectedRange == '1year'
-                                  ? MajorGridLines(
-                                      width: 1.0,
-                                      dashArray: [5, 5],
-                                      color: isDarkMode
-                                          ? Color.fromARGB(255, 141, 144, 148)
-                                          : Color.fromARGB(255, 48, 48, 48),
-                                    )
-                                  : MajorGridLines(width: 0),
-                              majorTickLines: MajorTickLines(
-                                size: 6.0,
-                                width: 1.0,
-                                color: isDarkMode ? Colors.white : Colors.black,
-                              ),
-                              plotBands: _lastSelectedRange == 'single' ||
-                                      _lastSelectedRange == '3months' ||
-                                      _lastSelectedRange == '1year'
-                                  ? []
-                                  : _generateNoonPlotBands(convertedSpeed, isDarkMode), // Fixed data reference
-                            ),
-                            primaryYAxis: NumericAxis(
-                              minimum: 0,
-                              title: AxisTitle(
-                                text: '(m/s)', // Updated to reflect original unit
-                                textStyle: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black,
+                                labelStyle: TextStyle(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
                                 ),
+                                labelRotation: 70,
+                                edgeLabelPlacement: EdgeLabelPlacement.shift,
+                                intervalType: _lastSelectedRange == 'single' ||
+                                        _lastSelectedRange == '3months' ||
+                                        _lastSelectedRange == '1year'
+                                    ? DateTimeIntervalType.auto
+                                    : DateTimeIntervalType.days,
+                                interval: _lastSelectedRange == 'single' ||
+                                        _lastSelectedRange == '3months' ||
+                                        _lastSelectedRange == '1year'
+                                    ? null
+                                    : 1.0,
+                                enableAutoIntervalOnZooming: true,
+                                majorGridLines: _lastSelectedRange ==
+                                            'single' ||
+                                        _lastSelectedRange == '3months' ||
+                                        _lastSelectedRange == '1year'
+                                    ? MajorGridLines(
+                                        width: 1.0,
+                                        dashArray: [5, 5],
+                                        color: isDarkMode
+                                            ? Color.fromARGB(255, 141, 144, 148)
+                                            : Color.fromARGB(255, 48, 48, 48),
+                                      )
+                                    : MajorGridLines(width: 0),
+                                majorTickLines: MajorTickLines(
+                                  size: 6.0,
+                                  width: 1.0,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                                plotBands: _lastSelectedRange == 'single' ||
+                                        _lastSelectedRange == '3months' ||
+                                        _lastSelectedRange == '1year'
+                                    ? []
+                                    : _generateNoonPlotBands(convertedSpeed,
+                                        isDarkMode), // Fixed data reference
                               ),
-                              labelStyle: TextStyle(
-                                color: isDarkMode ? Colors.white : Colors.black,
+                              primaryYAxis: NumericAxis(
+                                minimum: 0,
+                                title: AxisTitle(
+                                  text:
+                                      '(m/s)', // Updated to reflect original unit
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                                labelStyle: TextStyle(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                                axisLine: AxisLine(width: 1),
+                                majorGridLines: MajorGridLines(width: 0),
                               ),
-                              axisLine: AxisLine(width: 1),
-                              majorGridLines: MajorGridLines(width: 0),
-                            ),
-                            trackballBehavior: TrackballBehavior(
-                              enable: true,
-                              activationMode: ActivationMode.singleTap,
-                              lineType: TrackballLineType.vertical,
-                              lineColor: isDarkMode
-                                  ? Colors.blue
-                                  : Color.fromARGB(255, 42, 147, 212),
-                              lineWidth: 1,
-                              markerSettings: TrackballMarkerSettings(
-                                markerVisibility: TrackballVisibilityMode.visible,
-                                width: 8,
-                                height: 8,
-                                borderWidth: 2,
-                                color: isDarkMode
+                              trackballBehavior: TrackballBehavior(
+                                enable: true,
+                                activationMode: ActivationMode.singleTap,
+                                lineType: TrackballLineType.vertical,
+                                lineColor: isDarkMode
                                     ? Colors.blue
                                     : Color.fromARGB(255, 42, 147, 212),
-                              ),
-                              builder: (BuildContext context, TrackballDetails details) {
-                                try {
-                                  final DateTime? time = details.point?.x;
-                                  final num? value = details.point?.y;
-                                  if (time == null || value == null) {
+                                lineWidth: 1,
+                                markerSettings: TrackballMarkerSettings(
+                                  markerVisibility:
+                                      TrackballVisibilityMode.visible,
+                                  width: 8,
+                                  height: 8,
+                                  borderWidth: 2,
+                                  color: isDarkMode
+                                      ? Colors.blue
+                                      : Color.fromARGB(255, 42, 147, 212),
+                                ),
+                                builder: (BuildContext context,
+                                    TrackballDetails details) {
+                                  try {
+                                    final DateTime? time = details.point?.x;
+                                    final num? value = details.point?.y;
+                                    if (time == null || value == null) {
+                                      return const SizedBox();
+                                    }
+                                    String formattedDate;
+                                    if (_lastSelectedRange == '1year') {
+                                      formattedDate =
+                                          DateFormat('MM/dd').format(time);
+                                    } else {
+                                      formattedDate =
+                                          DateFormat('MM/dd hh:mm a')
+                                              .format(time);
+                                    }
+                                    String valueText =
+                                        'Speed: ${value.toStringAsFixed(1)} m/s'; // 1 decimal for precision
+                                    String directionText = '';
+                                    if (hasDirection &&
+                                        details.pointIndex != null) {
+                                      final double dir =
+                                          directionData[details.pointIndex!]
+                                              .value;
+                                      final String dirStr =
+                                          _getWindDirection(dir);
+                                      directionText = ' from $dirStr';
+                                    }
+                                    return Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: isDarkMode
+                                            ? Color.fromARGB(200, 0, 0, 0)
+                                            : Colors.white,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            formattedDate,
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            '$valueText$directionText',
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } catch (e) {
                                     return const SizedBox();
                                   }
-                                  String formattedDate;
-                                  if (_lastSelectedRange == '1year') {
-                                    formattedDate = DateFormat('MM/dd').format(time);
-                                  } else {
-                                    formattedDate = DateFormat('MM/dd hh:mm a').format(time);
-                                  }
-                                  String valueText = 'Speed: ${value.toStringAsFixed(1)} m/s'; // 1 decimal for precision
-                                  String directionText = '';
-                                  if (hasDirection && details.pointIndex != null) {
-                                    final double dir = directionData[details.pointIndex!].value;
-                                    final String dirStr = _getWindDirection(dir);
-                                    directionText = ' from $dirStr';
-                                  }
-                                  return Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: isDarkMode
-                                          ? Color.fromARGB(200, 0, 0, 0)
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          formattedDate,
-                                          style: TextStyle(
-                                            color: isDarkMode ? Colors.white : Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '$valueText$directionText',
-                                          style: TextStyle(
-                                            color: isDarkMode ? Colors.white : Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } catch (e) {
-                                  return const SizedBox();
-                                }
-                              },
+                                },
+                              ),
+                              zoomPanBehavior: ZoomPanBehavior(
+                                zoomMode: ZoomMode.x,
+                                enablePanning: true,
+                                enablePinching: true,
+                                enableMouseWheelZooming: isShiftPressed,
+                              ),
+                              series: <CartesianSeries<ChartData, DateTime>>[
+                                _getChartSeries(
+                                    ChartType.line, convertedSpeed, title),
+                              ],
                             ),
-                            zoomPanBehavior: ZoomPanBehavior(
-                              zoomMode: ZoomMode.x,
-                              enablePanning: true,
-                              enablePinching: true,
-                              enableMouseWheelZooming: isShiftPressed,
-                            ),
-                            series: <CartesianSeries<ChartData, DateTime>>[
-                              _getChartSeries(ChartType.line, convertedSpeed, title),
-                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildChartContainer(
     String title,
     List<ChartData> data,
@@ -10458,7 +11949,7 @@ Widget _buildWindChartContainer(
                                               data, isDarkMode),
                                     ),
                                     primaryYAxis: NumericAxis(
-                                       minimum: 0, 
+                                      minimum: 0,
                                       title: AxisTitle(
                                         text: yAxisTitle,
                                         textStyle: TextStyle(
