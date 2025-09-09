@@ -902,7 +902,7 @@ class _HomePageState extends State<HomePage> {
                                   color: isDarkMode
                                       ? Colors.white
                                       : Colors.black87,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -935,6 +935,25 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.pushNamed(context, '/admin');
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(themeProvider.isDarkMode
+                              ? Icons.light_mode
+                              : Icons.dark_mode),
+                          title: const Text('Theme'),
+                          onTap: () {
+                            themeProvider.toggleTheme();
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.share),
+                          title: const Text('Share'),
+                          onTap: () {
+                            Share.share(
+                              'Check out our app on Google Play Store: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                              subject: 'Download Our App',
+                            );
                           },
                         ),
                         ListTile(
