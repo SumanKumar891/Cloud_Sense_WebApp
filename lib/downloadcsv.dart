@@ -59,7 +59,7 @@ class _CsvDownloaderState extends State<CsvDownloader> {
           'https://n42fiw7l89.execute-api.us-east-1.amazonaws.com/default/SSMet_API_Func?device_id=$deviceId&start_date=$smStartDate&end_date=$smEndDate';
     } else if (widget.deviceName.startsWith('CF')) {
       apiUrl =
-          'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
+          'https://d3g5fo66jwc4iw.cloudfront.net/colonelfarmdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
     } else if (widget.deviceName.startsWith('VD')) {
       apiUrl =
           'https://gtk47vexob.execute-api.us-east-1.amazonaws.com/vanixdata?deviceid=$deviceId&startdate=$startdate&enddate=$enddate';
