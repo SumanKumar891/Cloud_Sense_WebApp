@@ -4,8 +4,9 @@ import 'package:cloud_sense_webapp/appbar.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/drawer.dart';
-import 'package:cloud_sense_webapp/manuallyenter.dart';
+
 import 'package:cloud_sense_webapp/GPS.dart';
+import 'package:cloud_sense_webapp/Manually_Add_Device.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -14,8 +15,6 @@ import 'DeviceGraphPage.dart';
 import 'HomePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-
-
 
 class DataDisplayPage extends StatefulWidget {
   @override

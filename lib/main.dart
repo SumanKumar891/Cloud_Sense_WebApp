@@ -8,7 +8,7 @@ import 'package:cloud_sense_webapp/LoginPage.dart';
 import 'package:cloud_sense_webapp/Product_DataLogger.dart';
 import 'package:cloud_sense_webapp/Product_Gateway.dart';
 import 'package:cloud_sense_webapp/Product_Probe.dart';
-import 'package:cloud_sense_webapp/raingauge.dart';
+import 'package:cloud_sense_webapp/Product_RainGauge.dart';
 import 'package:cloud_sense_webapp/buffalodata.dart';
 import 'package:cloud_sense_webapp/cowdata.dart';
 import 'package:cloud_sense_webapp/devicelocationinfo.dart';

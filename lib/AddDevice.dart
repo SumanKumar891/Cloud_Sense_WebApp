@@ -3,7 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_sense_webapp/DeviceListPage.dart';
-import 'shareddevice.dart'; // Shared utilities file
+import 'Shared_Add_Device.dart'; // Shared utilities file
 
 class QRScannerPopup extends StatefulWidget {
   final Map<String, List<String>> devices;
@@ -20,7 +20,7 @@ class _QRScannerPopupState extends State<QRScannerPopup> {
   late MobileScannerController _controller;
   String? _email;
   Color messageColor = Colors.teal;
-  bool _canClose = true; 
+  bool _canClose = true;
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _QRScannerPopupState extends State<QRScannerPopup> {
     setState(() {
       _email = email;
     });
-    }
+  }
 
   Future<void> _showSuccessMessage() async {
     return showDialog<void>(
@@ -86,7 +86,7 @@ class _QRScannerPopupState extends State<QRScannerPopup> {
 
   Future<void> _addDevice(String deviceID) async {
     setState(() {
-      _canClose = false; 
+      _canClose = false;
     });
 
     final String apiUrl =
@@ -113,7 +113,7 @@ class _QRScannerPopupState extends State<QRScannerPopup> {
       });
     }
 
-    await _showSuccessMessage(); 
+    await _showSuccessMessage();
   }
 
   @override
@@ -203,8 +203,6 @@ class _QRScannerPopupState extends State<QRScannerPopup> {
               ),
             ),
             SizedBox(height: 10),
-
-           
             if (_canClose)
               TextButton(
                 onPressed: () => Navigator.pop(context),
