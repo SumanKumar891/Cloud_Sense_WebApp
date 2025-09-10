@@ -1294,7 +1294,7 @@ class _HomePageState extends State<HomePage> {
                                                           seconds: 3), () {
                                                     if (mounted) {
                                                       setState(() {
-                                                        // errorMessage = null;
+                                                        errorMessage = null;
                                                       });
                                                     }
                                                   });
@@ -1313,7 +1313,7 @@ class _HomePageState extends State<HomePage> {
                                                               "11",
                                                           orElse: () =>
                                                               devices.first);
-                                                  // errorMessage = null;
+                                                  errorMessage = null;
                                                 });
                                               }
                                             },
