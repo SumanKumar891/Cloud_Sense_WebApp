@@ -433,7 +433,7 @@ class _HomePageState extends State<HomePage> {
         if (devices.isEmpty) {
           if (mounted) {
             setState(() {
-              errorMessage = "No devices found.";
+              // errorMessage = "No devices found.";
               isLoading = false;
             });
           }
@@ -467,7 +467,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         if (mounted) {
           setState(() {
-            errorMessage = "API error: ${response.statusCode}";
+            // errorMessage = "API error: ${response.statusCode}";
             isLoading = false;
           });
         }
@@ -475,7 +475,7 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          errorMessage = "Error: $e";
+          // errorMessage = "Error: $e";
           isLoading = false;
         });
       }
@@ -548,7 +548,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           nearestDevice = nearest;
           selectedDevice = nearestDevice;
-          errorMessage = null;
+          // errorMessage = null;
         });
       }
       return true;
@@ -1294,7 +1294,7 @@ class _HomePageState extends State<HomePage> {
                                                           seconds: 3), () {
                                                     if (mounted) {
                                                       setState(() {
-                                                        errorMessage = null;
+                                                        // errorMessage = null;
                                                       });
                                                     }
                                                   });
@@ -1313,7 +1313,7 @@ class _HomePageState extends State<HomePage> {
                                                               "11",
                                                           orElse: () =>
                                                               devices.first);
-                                                  errorMessage = null;
+                                                  // errorMessage = null;
                                                 });
                                               }
                                             },
